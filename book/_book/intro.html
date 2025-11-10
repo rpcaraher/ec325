@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>1&nbsp; Introduction – Econometrics Lecture Notes</title>
+<title>1&nbsp; Introduction – EC325 Workbook</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,6 +19,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 /* CSS for citations */
 div.csl-bib-body { }
@@ -116,19 +150,19 @@ div.csl-indent {
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">Econometrics Lecture Notes</a> 
+      <a href="./">EC325 Workbook</a> 
         <div class="sidebar-tools-main">
     <div class="dropdown">
       <a href="" title="Download" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label="Download"><i class="bi bi-download"></i></a>
       <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
           <li>
-            <a class="dropdown-item sidebar-tools-main-item" href="./Econometrics-Lecture-Notes.pdf">
+            <a class="dropdown-item sidebar-tools-main-item" href="./EC325-Workbook.pdf">
               <i class="bi bi-file-pdf pe-1"></i>
             Download PDF
             </a>
           </li>
           <li>
-            <a class="dropdown-item sidebar-tools-main-item" href="./Econometrics-Lecture-Notes.epub">
+            <a class="dropdown-item sidebar-tools-main-item" href="./EC325-Workbook.epub">
               <i class="bi bi-journal pe-1"></i>
             Download ePub
             </a>
@@ -181,6 +215,9 @@ div.csl-indent {
   <ul>
   <li><a href="#what-is-this-class-about" id="toc-what-is-this-class-about" class="nav-link active" data-scroll-target="#what-is-this-class-about"><span class="header-section-number">1.1</span> What is this Class About?</a></li>
   <li><a href="#does-having-health-insurance-cause-you-to-be-healthier" id="toc-does-having-health-insurance-cause-you-to-be-healthier" class="nav-link" data-scroll-target="#does-having-health-insurance-cause-you-to-be-healthier"><span class="header-section-number">1.2</span> Does Having Health Insurance <em>Cause</em> You to be Healthier?</a></li>
+  <li><a href="#broad-steps-of-econometric-analysis" id="toc-broad-steps-of-econometric-analysis" class="nav-link" data-scroll-target="#broad-steps-of-econometric-analysis"><span class="header-section-number">1.3</span> Broad Steps of Econometric Analysis</a></li>
+  <li><a href="#statistical-software" id="toc-statistical-software" class="nav-link" data-scroll-target="#statistical-software"><span class="header-section-number">1.4</span> Statistical Software</a></li>
+  <li><a href="#unit-1-snippet-1" id="toc-unit-1-snippet-1" class="nav-link" data-scroll-target="#unit-1-snippet-1"><span class="header-section-number">1.5</span> Unit 1 Snippet 1:</a></li>
   </ul>
 </nav>
     </div>
@@ -239,7 +276,7 @@ div.csl-indent {
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<strong>Econometrics</strong>
+Definition of Econometrics
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -251,7 +288,48 @@ div.csl-indent {
 <section id="does-having-health-insurance-cause-you-to-be-healthier" class="level2" data-number="1.2">
 <h2 data-number="1.2" class="anchored" data-anchor-id="does-having-health-insurance-cause-you-to-be-healthier"><span class="header-section-number">1.2</span> Does Having Health Insurance <em>Cause</em> You to be Healthier?</h2>
 <p>Let’s think about a critical question in public policy: <em>does having health insurance make someone healthier</em>? This is especially an important question in the context of the United States, which does not have a public health insurance system. Instead, it is a predominantly private system entangled with a complex net of social safety nets meant to provide a patchwork of coverage to the most marginalized.</p>
-<p>However, as of XXX, YYY do not have any health insurance coverage. Would the US as a whole be better off guarantee health insurance coverage for everyone? If health insurance makes people healthier, then there may be a strong case to do so. If not, the benefits of such a system would become, at the very least, more opaque.</p>
+<p>However, as of 2023, 9.5% of U.S. adults do not have any health insurance coverage.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> Would the US as a whole be better off guarantee health insurance coverage for everyone? If health insurance makes people healthier, then there may be a strong case to do so. If not, the benefits of such a system would become, at the very least, more opaque.</p>
+<p>Let’s take a look at life expectancy in the US (a course but important measure of population health), relative to similar high-income, developed countries. <a href="#fig-us-life-exp-vs-peers" class="quarto-xref">Figure&nbsp;<span>1.1</span></a> shows the average life expectancy from 1990 to 2021 for the US, UK, Canada, Australia, and a number of other high-income countries. As can be seen, the US performs considerably worse in terms of life expectancy, and this divergence between peer countries has gotten <em>larger</em> since the 1990s, and especially during the COVID-19 pandemic.</p>
+<div id="fig-us-life-exp-vs-peers" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-us-life-exp-vs-peers-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.1: Life expectancy in the US vs.&nbsp;peer countries.
+</figcaption>
+<div aria-describedby="fig-us-life-exp-vs-peers-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<p><img src="images/life_expectancy_us_vs_peers.png" class="img-fluid figure-img"></p>
+<p>Source: <a href="https://ourworldindata.org/data-insights/life-expectancy-is-lower-in-the-united-states-than-in-other-high-income-countries">Our World in Data</a></p>
+</div>
+</figure>
+</div>
+<p>Critically—with the exception of the US—all of the countries in the peer group have some form of universal health care. In other words, all developed countries which are healthier than the US have policies which guarantee the uninsured rate is zero.</p>
+<p>This then leads to a critical question: did universal health insurance <em>cause</em> these countries to have better health outcomes? Or is this a correlation between policy and outcomes? Certainly, one could make an argument that having health insurance does cause better health outcomes. On the other hand, there are lots of differences between the US and other high-income countries which may also explain the pattern seen in <a href="#fig-us-life-exp-vs-peers" class="quarto-xref">Figure&nbsp;<span>1.1</span></a>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Correlation vs.&nbsp;Causation
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <strong>correlation</strong> between two variables describes how they move together. It means two things are <em>associated</em>. <strong>Causation</strong> describes a direct relationship where a change in one variable causes a change in another. It means one thing <em>makes the other happen.</em></p>
+</div>
+</div>
+<p>A key part of the content in this course is to think about when our comparisons are describing a <strong>correlative</strong> relationship or a <strong>causal</strong> relationship. We will study techniques which—if one is convinced that the requisite assumptions hold—will actually be able to recover causal estimates of social phenomena, and bring important insights into essential public policy questions like: does having health insurance cause you to be healthier?</p>
+</section>
+<section id="broad-steps-of-econometric-analysis" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="broad-steps-of-econometric-analysis"><span class="header-section-number">1.3</span> Broad Steps of Econometric Analysis</h2>
+</section>
+<section id="statistical-software" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="statistical-software"><span class="header-section-number">1.4</span> Statistical Software</h2>
+</section>
+<section id="unit-1-snippet-1" class="level2" data-number="1.5">
+<h2 data-number="1.5" class="anchored" data-anchor-id="unit-1-snippet-1"><span class="header-section-number">1.5</span> Unit 1 Snippet 1:</h2>
+<p>Open an instance of R Studio on your computer. In the console, type the following:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">"I love econometrics!"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 
 
 <div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
@@ -259,6 +337,12 @@ div.csl-indent {
 Wooldridge, Jeffrey M. 2019. <em>Introductory Econometrics: A Modern Approach</em>. 7th ed. Cengage Learning.
 </div>
 </div>
+</section>
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn1"><p>Source: <a href="https://www.kff.org/uninsured/key-facts-about-the-uninsured-population/">KFF</a><a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
 </section>
 
 </main> <!-- /main -->
