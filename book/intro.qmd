@@ -11,6 +11,91 @@ library(tidyverse)
 
 ```
 
+```{=html}
+
+<style>
+.problem {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+.context {
+    background-color: #e8f4f8;
+    padding: 12px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border-left: 4px solid #2874a6;
+}
+.question {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #fff3cd;
+    border-radius: 5px;
+}
+.answer-row {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.answer-row label {
+    min-width: 320px;
+    font-weight: 500;
+}
+select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    min-width: 300px;
+    cursor: pointer;
+}
+select:focus {
+    border-color: #2874a6;
+    outline: none;
+}
+.correct {
+    border-color: #28a745 !important;
+    background-color: #d4edda !important;
+}
+.incorrect {
+    border-color: #dc3545 !important;
+    background-color: #f8d7da !important;
+}
+.explanation {
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #e7f3ff;
+    border-radius: 5px;
+    border-left: 4px solid #2874a6;
+}
+.note {
+    font-size: 0.85em;
+    color: #666;
+    font-style: italic;
+}
+</style>
+
+<script>
+function checkAnswer(selectElement, correctValue) {
+    if (selectElement.value === '') {
+        selectElement.classList.remove('correct', 'incorrect');
+    } else if (selectElement.value === correctValue) {
+        selectElement.classList.remove('incorrect');
+        selectElement.classList.add('correct');
+    } else {
+        selectElement.classList.remove('correct');
+        selectElement.classList.add('incorrect');
+    }
+}
+</script>
+
+```
+
+
 ::: {.callout-tip collapse="true"}
 ## **Key Questions**
 - What is the difference between correlation and causation?
@@ -274,3 +359,28 @@ As we move forward, remember that econometrics is as much an art as it is a scie
 The mathematical tools we will learn are powerful, 
 but they are only as good as the questions we ask, 
 the data we can find, and the thoughtfulness with which we interpret our results.
+
+## Check Your Understanding
+
+```{=html}
+
+<div class="question">
+<div class="answer-row">
+    <label>i. You notice that in the summer, ice cream prices increase. </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">College graduates earn $8.45 per hour</option>
+        <option value="b">Select this answer</option>
+        <option value="c">Each year of college increases wages by $8.45</option>
+        <option value="d">College graduates earn 8.45% more than non-graduates</option>
+    </select>
+</div>
+</div>
+```
+
+::: {.callout-tip collapse="true"}
+## Show Explanation
+
+i. Explain the answers here!
+
+:::

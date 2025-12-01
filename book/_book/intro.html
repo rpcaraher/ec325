@@ -222,6 +222,7 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">1.5.1</span> Key Takeaways:</a></li>
   </ul></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">1.6</span> Check Your Understanding</a></li>
   </ul>
 </nav>
     </div>
@@ -246,6 +247,87 @@ window.Quarto = {
 
 </header>
 
+
+
+<style>
+.problem {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+.context {
+    background-color: #e8f4f8;
+    padding: 12px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border-left: 4px solid #2874a6;
+}
+.question {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #fff3cd;
+    border-radius: 5px;
+}
+.answer-row {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.answer-row label {
+    min-width: 320px;
+    font-weight: 500;
+}
+select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    min-width: 300px;
+    cursor: pointer;
+}
+select:focus {
+    border-color: #2874a6;
+    outline: none;
+}
+.correct {
+    border-color: #28a745 !important;
+    background-color: #d4edda !important;
+}
+.incorrect {
+    border-color: #dc3545 !important;
+    background-color: #f8d7da !important;
+}
+.explanation {
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #e7f3ff;
+    border-radius: 5px;
+    border-left: 4px solid #2874a6;
+}
+.note {
+    font-size: 0.85em;
+    color: #666;
+    font-style: italic;
+}
+</style>
+
+<script>
+function checkAnswer(selectElement, correctValue) {
+    if (selectElement.value === '') {
+        selectElement.classList.remove('correct', 'incorrect');
+    } else if (selectElement.value === correctValue) {
+        selectElement.classList.remove('incorrect');
+        selectElement.classList.add('correct');
+    } else {
+        selectElement.classList.remove('correct');
+        selectElement.classList.add('incorrect');
+    }
+}
+</script>
 
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
@@ -371,8 +453,8 @@ wage = \beta_0 + \beta_1(training) + \mu,
 
     <script>
 
-      function styleCell_zodudq5dmqi5hzcnemm8(i, j, css_id) {
-          var table = document.getElementById("tinytable_zodudq5dmqi5hzcnemm8");
+      function styleCell_0uoqwkkrg1e9er3qqgt6(i, j, css_id) {
+          var table = document.getElementById("tinytable_0uoqwkkrg1e9er3qqgt6");
           var cell = table.rows[i]?.cells[j];  // Safe navigation to avoid errors
           if (cell) {
               console.log(`Styling cell at (${i}, ${j}) with class ${css_id}`);
@@ -382,7 +464,7 @@ wage = \beta_0 + \beta_1(training) + \mu,
           }
       }
       function insertSpanRow(i, colspan, content) {
-        var table = document.getElementById('tinytable_zodudq5dmqi5hzcnemm8');
+        var table = document.getElementById('tinytable_0uoqwkkrg1e9er3qqgt6');
         var newRow = table.insertRow(i);
         var newCell = newRow.insertCell(0);
         newCell.setAttribute("colspan", colspan);
@@ -390,8 +472,8 @@ wage = \beta_0 + \beta_1(training) + \mu,
         // this may be unsafe, but innerText does not interpret <br>
         newCell.innerHTML = content;
       }
-      function spanCell_zodudq5dmqi5hzcnemm8(i, j, rowspan, colspan) {
-        var table = document.getElementById("tinytable_zodudq5dmqi5hzcnemm8");
+      function spanCell_0uoqwkkrg1e9er3qqgt6(i, j, rowspan, colspan) {
+        var table = document.getElementById("tinytable_0uoqwkkrg1e9er3qqgt6");
         const targetRow = table.rows[i];
         const targetCell = targetRow.cells[j];
         for (let r = 0; r < rowspan; r++) {
@@ -421,15 +503,15 @@ wage = \beta_0 + \beta_1(training) + \mu,
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: 4, j: 0 }, { i: 4, j: 1 }, { i: 4, j: 2 }, { i: 4, j: 3 },  ], css_id: 'tinytable_css_wt2kt38vvbmc4qeagi0l',}, 
-          { positions: [ { i: 0, j: 0 }, { i: 0, j: 1 }, { i: 0, j: 2 }, { i: 0, j: 3 },  ], css_id: 'tinytable_css_9v9ceyz4k1gkgqzugn2g',}, 
-          { positions: [ { i: 3, j: 1 }, { i: 1, j: 0 }, { i: 2, j: 0 }, { i: 3, j: 0 }, { i: 2, j: 2 }, { i: 3, j: 2 }, { i: 1, j: 1 }, { i: 2, j: 1 }, { i: 1, j: 3 }, { i: 2, j: 3 }, { i: 3, j: 3 }, { i: 1, j: 2 },  ], css_id: 'tinytable_css_7jqj62oxds6xka2e6asn',}, 
+          { positions: [ { i: 0, j: 0 }, { i: 0, j: 1 }, { i: 0, j: 2 }, { i: 0, j: 3 },  ], css_id: 'tinytable_css_zwjh9ehyha32b95f6n6b',}, 
+          { positions: [ { i: 3, j: 1 }, { i: 1, j: 0 }, { i: 2, j: 0 }, { i: 3, j: 0 }, { i: 2, j: 2 }, { i: 3, j: 2 }, { i: 1, j: 1 }, { i: 2, j: 1 }, { i: 1, j: 3 }, { i: 2, j: 3 }, { i: 3, j: 3 }, { i: 1, j: 2 },  ], css_id: 'tinytable_css_a79gd9xbhv9hxyb56eom',}, 
+          { positions: [ { i: 4, j: 0 }, { i: 4, j: 1 }, { i: 4, j: 2 }, { i: 4, j: 3 },  ], css_id: 'tinytable_css_0ipeogx0iclwapeex25q',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  styleCell_zodudq5dmqi5hzcnemm8(cell.i, cell.j, group.css_id);
+                  styleCell_0uoqwkkrg1e9er3qqgt6(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -437,12 +519,12 @@ wage = \beta_0 + \beta_1(training) + \mu,
 
     <style>
       /* tinytable css entries after */
-      .table td.tinytable_css_wt2kt38vvbmc4qeagi0l, .table th.tinytable_css_wt2kt38vvbmc4qeagi0l { text-align: left; border-bottom: solid #d3d8dc 0.1em; }
-      .table td.tinytable_css_9v9ceyz4k1gkgqzugn2g, .table th.tinytable_css_9v9ceyz4k1gkgqzugn2g { text-align: left; border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
-      .table td.tinytable_css_7jqj62oxds6xka2e6asn, .table th.tinytable_css_7jqj62oxds6xka2e6asn { text-align: left; }
+      .table td.tinytable_css_zwjh9ehyha32b95f6n6b, .table th.tinytable_css_zwjh9ehyha32b95f6n6b { text-align: left; border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
+      .table td.tinytable_css_a79gd9xbhv9hxyb56eom, .table th.tinytable_css_a79gd9xbhv9hxyb56eom { text-align: left; }
+      .table td.tinytable_css_0ipeogx0iclwapeex25q, .table th.tinytable_css_0ipeogx0iclwapeex25q { text-align: left; border-bottom: solid #d3d8dc 0.1em; }
     </style>
     <div class="container">
-      <table class="table table-borderless" id="tinytable_zodudq5dmqi5hzcnemm8" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="table table-borderless" id="tinytable_0uoqwkkrg1e9er3qqgt6" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         <thead>
         
               <tr>
@@ -525,6 +607,41 @@ wage = \beta_0 + \beta_1(training) + \mu,
 <li><p><strong>Statistical software:</strong> We will use <strong>R</strong> to clean data, estimate models, and present results</p></li>
 </ul>
 <p>As we move forward, remember that econometrics is as much an art as it is a science. The mathematical tools we will learn are powerful, but they are only as good as the questions we ask, the data we can find, and the thoughtfulness with which we interpret our results.</p>
+</section>
+</section>
+<section id="check-your-understanding" class="level2" data-number="1.6">
+<h2 data-number="1.6" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">1.6</span> Check Your Understanding</h2>
+
+<div class="question">
+<div class="answer-row">
+    <label>i. You notice that in the summer, ice cream prices increase. </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">College graduates earn $8.45 per hour</option>
+        <option value="b">Select this answer</option>
+        <option value="c">Each year of college increases wages by $8.45</option>
+        <option value="d">College graduates earn 8.45% more than non-graduates</option>
+    </select>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Show Explanation
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="i">
+<li>Explain the answers here!</li>
+</ol>
+</div>
+</div>
+</div>
 
 
 <div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
@@ -535,7 +652,6 @@ Wickham, Hadley, Mine Çetinkaya-Rundel, and Garrett Grolemund. 2023. <em>R for 
 Wooldridge, Jeffrey M. 2019. <em>Introductory Econometrics: A Modern Approach</em>. 7th ed. Cengage Learning.
 </div>
 </div>
-</section>
 </section>
 <section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
 <hr>
