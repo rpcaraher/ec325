@@ -1,3 +1,60 @@
 # Randomized Control Trials {#sec-rcts}
 
-In summary, this book has no content whatsoever.
+```{r}
+#| echo: false
+#| output: false
+#| message: false
+#| warning: false
+
+library(modelsummary)
+library(tidyverse)
+
+```
+
+::: {.callout-tip collapse="true"}
+## **Key Questions**
+- Goes here
+:::
+
+::: {.callout-note collapse="true"}
+## **Suggested Readings**
+- @angrist_mastering_2014, ch. 1
+:::
+
+## Review: Correlation vs Causality
+
+Last lecture, we established that **correlation does not imply causation**. 
+This fundamental principle underlies all of causal inference in econometrics.
+
+### Example: Health Insurance and Health Outcomes
+
+Consider the question: *Does health insurance cause better health?*
+
+We observe that health insurance and better health outcomes are certainly correlated. 
+There are multiple potential explanations:
+
+1. **Causal pathway**: Insurance might provide better access to preventative care, leading to better health outcomes
+2. **Confounding factors**: Those with health insurance are likely wealthier on average, and wealth has many positive effects on health through better nutrition, housing, reduced stress, etc.
+
+Therefore, 
+a simple comparison of health outcomes between insured and uninsured individuals would be misleading---we cannot separate the effect of insurance from the effect of other correlated, confounding factors.
+
+## The Selection Bias Problem
+
+### Apples to Oranges vs. Apples to Apples
+
+The fundamental issue is that the characteristics of those with insurance differ systematically from those without insurance (income, nutrition, employment, etc.).
+In other words,
+ee are making an "apples to oranges" comparison.
+
+::: {.callout-note}
+## Selection Bias
+**Selection Bias** occurs when we make apples to oranges comparisons and underlying groups are fundamentally different.
+:::
+
+### The Ceteris Paribus Condition
+
+To identify causal effects, we need to instead make "apples to apples" comparisons. 
+This requires the **ceteris paribus condition**: all else being equal, 
+the difference between treated and untreated units represents the causal effect of treatment.
+
