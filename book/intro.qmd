@@ -196,7 +196,7 @@ The **correlation** between two variables describes how they move together. It m
 :::
 
 A key part of the content in this course is to think about when our comparisons are describing a **correlative** relationship or a **causal** relationship.
-We will study techniques which---if one is convinced that the requisite assumptions hold---will actually be able to recover *causal effect* of social phenomena,
+We will study techniques which---if one is convinced that the requisite assumptions hold---will actually be able to recover the *causal effect* of social phenomena,
 and bring important insights into essential public policy questions like:
 what is the effect of health insurance on health outcomes?
 Does going to college cause you to have higher wages?
@@ -227,7 +227,7 @@ and $training$ is the *explanatory, right-hand side (RHS), predictor, or indepen
 The $\beta_0$ and $\beta_1$ variables are the parameters that we want to *estimate the value of* using econometric methods,
 and they tell us *how* our *independent* variable is related mathematically to our dependent variable.
 
-### Step 2: Find the Data
+### Step 2: Find and Explore the Data
 
 The next thing you have to do---after we figure out the model we want to estimate, such as in @eq-basic-econometric-model---is to get the data.
 There is a *huge* range of datasets out there,
@@ -260,23 +260,30 @@ where each column represents a different variable (which is usually labelled, so
 and each row represents the values that a specific unit has across these variables.
 
 For example,
-the data we use to estimate the model in @eq-basic-econometric-model may look like:
+the data we use to estimate the model in @eq-basic-econometric-model may look like @tbl-training-wages,
 
 ```{r}
 #| echo: false
+#| message: false
+#| warning: false
+#| label: tbl-training-wages
+#| tbl-cap: "Relationship between training and wages for 10 workers"
 
-person_name <- c("Paul", "Ringo", "George", "John")
-person <- c(1, 2, 3, 4)
-wage <- c(18.50, 19.00, 17.65, 27.95)
-training <- c(1, 3, 2.5, 8.2)
+person_name <- c("Paul", "Ringo", "George", "John", "Linda", 
+                 "Yoko", "Pattie", "Maureen", "Cynthia", "Barbara")
+person <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+wage <- c(18.50, 22.00, 17.65, 27.95, 19.20, 
+          24.80, 20.50, 23.75, 16.40, 28.50)
+training <- c(1, 3, 2.5, 8.2, 0.5, 
+              6.8, 5.5, 4.2, 0.8, 9.1)
 
 data <- tibble(
     person_name = person_name,
     person_id = as.character(person),
-    wage = wage, yrs_training = training)
+    wage = wage, 
+    yrs_training = training)
 
-datasummary_df(data
-  )
+datasummary_df(data)
 
 ```
 
@@ -286,8 +293,80 @@ where the **person_name** column is (obviously) each person's name,
 the **wage** column shows each person's hourly wage in dollars,
 and the **yrs_training** column shows the number of years each
 person received on-the-job training.
-This row-column structure of organizing data is so common that the word *column* is often interchanged with the word *variable*.
+This row-column structure of organizing data is so fundamental that the word *column* is often interchanged with the word *variable*.
 
+When you first look at some data,
+it is really important to figure out what each row represents.
+In the simple example shown in @tbl-training-wages,
+this is straightforward since each row represents a different person.
+However,
+in more complex datasets,
+it may not be immediately obvious what each row represents.
+For example,
+in panel data,
+each row may represent a specific person at a specific point in time.
+So row 1 may be Paul in year 2020,
+row 2 may be Paul in year 2021,
+row 3 may be Ringo in year 2020,
+and so on.
+Figuring out what each row represents is *critical* to understanding the data,
+as well as how to appropriately analyze it.
+
+Once we have the data in hand,
+then we may need to do some data cleaning and organization.
+This may involve:
+- Removing missing values
+- Creating new variables
+- Changing the format of variables (e.g., from string to numeric)
+- Merging datasets together
+- Filtering the data to only include certain observations
+- And many other tasks.
+
+These are all tasks that in many cases take up the bulk of the time in an econometric research project,
+and while not the most glamorous part of econometrics,
+it is absolutely essential to get right.
+
+Before moving on to estimation,
+it is also important to do some **exploratory data analysis**,
+(which should be considered step 2.5 in the econometric research process).
+This involves looking at summary statistics of the data (means, medians, standard deviations, etc.),
+as well as visualizations (histograms, scatter plots, etc.).
+Exploratory data analysis is important for understanding the data,
+as well as for identifying potential issues with the data (e.g., outliers, missing values, etc.).
+
+One of the most important parts of exploratory data analysis is to look at the relationship between the dependent variable and independent variable(s) in your model.
+One way this can be done is using a **scatterplot**,
+which plots each observation in the dataset using the independent and dependent variables as coordinates,
+with the independent variable on the x-axis and the dependent variable on the y-axis.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-scatter-training-wages
+#| fig-cap: "Relationship between training and wages for 10 workers"
+
+p1 <- ggplot(data, aes(x = yrs_training, y = wage)) +
+  geom_point(size = 3, color = "blue") +
+  labs(
+    title = "Scatterplot of Wage vs. Years of Training",
+    x = "Years of Training",
+    y = "Wage ($ per hour)"
+  ) +
+  theme_minimal()
+
+print(p1)
+
+```
+
+In @fig-scatter-training-wages,
+we see a scatterplot of the relationship between years of training and wages for the 10 workers shown in @tbl-training-wages.
+From this plot,
+we can see that there is a positive relationship between years of training and wages:
+as years of training increases,
+wages also tend to increase.
+While not good enough to draw any strong conclusions,
+one can see how this type of exploratory data analysis is useful for understanding the data and the relationship between variables.
 
 ### Step 3: Estimate the Model
 
@@ -343,7 +422,7 @@ Each one of these software of their own pros and cons,
 and it is worth knowing several quite well.
 For the purposes of this class,
 we will learn the **R** programming language to do econometrics.
-If you haven't take the time to review appendix R to learn more about R,
+If you haven't take the time to review @sec-installingR to learn more about R,
 how to install it,
 and to run your first chunk of code!
 
@@ -362,7 +441,7 @@ The tools you will learn in this course are designed to help you identify causal
 
 - **Four steps of econometric research:**
     1. Write an econometric model
-    2. Find appropriate data
+    2. Find and explore the appropriate data
     3. Estimate the model parameters
     4. Interpret the results
 
@@ -372,30 +451,97 @@ The tools you will learn in this course are designed to help you identify causal
 
 As we move forward, remember that econometrics is as much an art as it is a science. 
 The mathematical tools we will learn are powerful, 
-but they are only as good as the questions we ask, 
-the data we can find, and the thoughtfulness with which we interpret our results.
+but they are only as good as the questions we ask
+and the care with which we interpret our results.
 
 ## Check Your Understanding
 
-```{=html}
+:::: {.content-visible when-format="html"}
 
+For each question below, 
+select the best answer from the dropdown menu. 
+The dropdown will turn green if correct and red if incorrect. 
+Click the “Show Explanation” toggle to see a full explanation of the answer after attempting each question.
+
+```{=html}
 <div class="question">
 <div class="answer-row">
-    <label>i. You notice that in the summer, ice cream prices increase. </label>
+    <label>i. You observe that cities with more police officers tend to have higher crime rates. A friend concludes that "police cause crime." What is the most likely issue with this interpretation? </label>
     <select onchange="checkAnswer(this, 'b')">
         <option value="">-- Select Answer --</option>
-        <option value="a">College graduates earn $8.45 per hour</option>
-        <option value="b">Select this answer</option>
-        <option value="c">Each year of college increases wages by $8.45</option>
-        <option value="d">College graduates earn 8.45% more than non-graduates</option>
+        <option value="a">This is correct—more police leads to more crime</option>
+        <option value="b">This is a correlation that may reflect confounding factors</option>
+        <option value="c">The data must be incorrect</option>
+        <option value="d">Police and crime are unrelated</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>ii. A researcher collects GDP data for France from 1990 to 2023. What type of data is this? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Cross-sectional data</option>
+        <option value="b">Time-series data</option>
+        <option value="c">Panel data</option>
+        <option value="d">Experimental data</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iii. In the model: \(wage = \beta_0 + \beta_1(training) + \mu\), which statement is correct? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Wage is the independent variable and training is the dependent variable</option>
+        <option value="b">Training is the dependent variable and wage is the independent variable</option>
+        <option value="c">Wage is the dependent variable and training is the independent variable</option>
+        <option value="d">Both wage and training are independent variables</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iv. After writing your econometric model but before estimating it, what should you do? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Interpret the results</option>
+        <option value="b">Find and explore the data</option>
+        <option value="c">Submit for publication</option>
+        <option value="d">Choose your statistical software</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>v. <strong>(Challenge)</strong> Researchers find that people with health insurance have better health outcomes than those without. They want to claim that health insurance <em>causes</em> better health. What is the most serious threat to this causal interpretation? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The sample size is too small</option>
+        <option value="b">People with insurance may differ in other ways (e.g., income, education) that also affect health</option>
+        <option value="c">Health outcomes are hard to measure</option>
+        <option value="d">Some people don't like going to the doctor</option>
     </select>
 </div>
 </div>
+
 ```
 
 ::: {.callout-tip collapse="true"}
 ## Show Explanation
 
-i. Explain the answers here!
+i. Cities may hire more police *because* they have high crime (reverse causality), or other factors like population density may drive both police presence and crime rates. This illustrates why correlation does not imply causation.
+
+ii. This tracks a single unit (France) across multiple time periods (1990–2023), which defines time-series data. Cross-sectional data would be multiple countries at one point in time; panel data would be multiple countries over multiple years.
+
+iii. The dependent variable (wage) is what we're trying to explain—it goes on the left-hand side. The independent variable (training) is what we think affects it—it goes on the right-hand side.
+
+iv. The four steps of econometric research are: (1) write the model, (2) find and explore data, (3) estimate the model, (4) interpret results. Exploratory data analysis—looking at summary statistics and visualizations—is critical before estimation.
+
+v. Those with insurance often have higher incomes, more education, and better access to other resources—factors that independently improve health. Without accounting for these confounders, we cannot separate the effect of insurance from the effect of these other characteristics. This is exactly why econometric methods for causal inference exist.
 
 :::
+
+::::
+
+:::: {.content-hidden when-format="html"}
+
+*Note: This section contains interactive content only available in the HTML version.*
+
+:::: 
