@@ -1,4 +1,4 @@
-# Randomized Control Trials {#sec-rcts}
+# Causality and Randomized Control Trials {#sec-rcts}
 
 ```{r}
 #| echo: false
@@ -6,55 +6,929 @@
 #| message: false
 #| warning: false
 
-library(modelsummary)
 library(tidyverse)
 
 ```
 
+```{=html}
+
+<style>
+.problem {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+.context {
+    background-color: #e8f4f8;
+    padding: 12px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border-left: 4px solid #2874a6;
+}
+.question {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #fff3cd;
+    border-radius: 5px;
+}
+.answer-row {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.answer-row label {
+    min-width: 320px;
+    font-weight: 500;
+}
+select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    min-width: 300px;
+    cursor: pointer;
+}
+select:focus {
+    border-color: #2874a6;
+    outline: none;
+}
+.correct {
+    border-color: #28a745 !important;
+    background-color: #d4edda !important;
+}
+.incorrect {
+    border-color: #dc3545 !important;
+    background-color: #f8d7da !important;
+}
+.explanation {
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #e7f3ff;
+    border-radius: 5px;
+    border-left: 4px solid #2874a6;
+}
+.note {
+    font-size: 0.85em;
+    color: #666;
+    font-style: italic;
+}
+</style>
+
+<script>
+function checkAnswer(selectElement, correctValue) {
+    if (selectElement.value === '') {
+        selectElement.classList.remove('correct', 'incorrect');
+    } else if (selectElement.value === correctValue) {
+        selectElement.classList.remove('incorrect');
+        selectElement.classList.add('correct');
+    } else {
+        selectElement.classList.remove('correct');
+        selectElement.classList.add('incorrect');
+    }
+}
+</script>
+
+```
+
+
 ::: {.callout-tip collapse="true"}
 ## **Key Questions**
-- Goes here
+- Why can't we interpret correlations as causal effects?
+- What is selection bias and how does it arise?
+- How do randomized control trials eliminate selection bias?
+- What is the potential outcomes framework and how does it formalize causal inference?
 :::
 
 ::: {.callout-note collapse="true"}
 ## **Suggested Readings**
-- @angrist_mastering_2014, ch. 1
+- @angrist_mastering_2014, Ch. 1
 :::
 
-## Review: Correlation vs Causality
 
-Last lecture, we established that **correlation does not imply causation**. 
-This fundamental principle underlies all of causal inference in econometrics.
+In @sec-introduction, 
+we discussed how econometrics focuses on identifying **causal effects** rather than mere correlations.
+We used the example of health insurance: 
+while people with health insurance tend to be healthier than people without insurance, 
+we cannot immediately conclude that health insurance *causes* better health.
+This chapter develops the conceptual and mathematical tools we need to think rigorously about causality, 
+and introduces the randomized control trial (RCT) as the gold standard for causal inference.
 
-### Example: Health Insurance and Health Outcomes
 
-Consider the question: *Does health insurance cause better health?*
+## The Problem with Simple Comparisons
 
-We observe that health insurance and better health outcomes are certainly correlated. 
-There are multiple potential explanations:
+Let's return to our health insurance example.
+People with health insurance are, on average, healthier than people without it.
+This correlation is undeniable.
+But can we interpret this as evidence that insurance *causes* better health?
 
-1. **Causal pathway**: Insurance might provide better access to preventative care, leading to better health outcomes
-2. **Confounding factors**: Those with health insurance are likely wealthier on average, and wealth has many positive effects on health through better nutrition, housing, reduced stress, etc.
-
-Therefore, 
-a simple comparison of health outcomes between insured and uninsured individuals would be misleading---we cannot separate the effect of insurance from the effect of other correlated, confounding factors.
-
-## The Selection Bias Problem
-
-### Apples to Oranges vs. Apples to Apples
-
-The fundamental issue is that the characteristics of those with insurance differ systematically from those without insurance (income, nutrition, employment, etc.).
-In other words,
-ee are making an "apples to oranges" comparison.
+The problem is that people who have health insurance differ from those who don't in many ways beyond just their insurance status.
+Those with insurance tend to be wealthier, 
+more educated, 
+and have more stable employment.
+All of these factors independently affect health outcomes.
+When we compare the health of insured and uninsured individuals, 
+we're not just comparing the effect of insurance---we're comparing people who differ along many dimensions.
 
 ::: {.callout-note}
 ## Selection Bias
-**Selection Bias** occurs when we make apples to oranges comparisons and underlying groups are fundamentally different.
+**Selection bias** occurs when we compare groups that differ systematically in ways beyond just the treatment we're studying.
+In other words,
+we are comparing **apples to oranges**.
 :::
 
-### The Ceteris Paribus Condition
+The comparison we *want* to make is between two otherwise identical people who differ only in whether they have health insurance.
+In other words,
+we want an **apples to apples** comparison.
+This is the essence of the *ceteris paribus* condition:
+**all else being equal**,
+the difference between treated and untreated units reveals the causal effect of treatment.
 
-To identify causal effects, we need to instead make "apples to apples" comparisons. 
-This requires the **ceteris paribus condition**: all else being equal, 
-the difference between treated and untreated units represents the causal effect of treatment.
 
+## The Multiverse of Possibilities
+
+To build intuition for causal inference,
+consider the television show *Rick and Morty*.
+In this show,
+the character Rick possesses a "portal gun" that allows him to travel across infinite parallel universes.
+In each universe,
+there exists a version of his grandson Morty who is identical in every way except for one characteristic---Cowboy Morty,
+Evil Morty,
+Hammer Morty,
+and so on.
+Each Morty has the same home,
+same parents,
+same sister,
+same *everything else*.
+
+:::{#fig-rick-and-morty}
+
+![](images/rick_and_morty_title.png){width=50%}
+
+Rick and Morty: A show about infinite parallel universes.
+
+:::
+
+This multiverse provides the perfect setting for causal inference!
+Comparisons between different Mortys are truly *ceteris paribus* comparisons because everything except the one characteristic of interest is held constant.
+
+### The Causal Effect of College
+
+Suppose we want to know the causal effect of attending college on wages.
+We can't simply compare the wages of college graduates to non-graduates because these groups likely differ in many unobserved ways (motivation,
+family background,
+innate ability,
+etc.).
+
+But imagine we could observe two versions of Morty from parallel universes:
+Morty C-137 (who didn't attend college) and College Morty (who did).
+These two Mortys are identical in every way---same intelligence,
+same family,
+same opportunities---except that one went to college and the other didn't.
+
+:::{#fig-morty-comparison layout-ncol=2}
+
+![Morty C-137](images/c137_morty.png){#fig-mortyc137 width=300px} 
+
+![College Morty](images/college_morty.png){#fig-collegemorty width=300px}
+
+Morty C-137 (left) and College Morty (right). The wage difference between them represents the true causal effect of college.
+
+:::
+
+The difference in wages between College Morty and Morty C-137 would be a genuine *ceteris paribus* difference---the true causal effect of college on wages.
+
+### The Fundamental Problem
+
+Of course,
+the fundamental problem of causal inference is that **we don't have a portal gun**.
+We only observe one version of reality,
+not parallel universes.
+We can never observe what would have happened to a college graduate had they *not* gone to college,
+or what would have happened to a non-graduate had they attended.
+This unobserved "what if" scenario is called the **counterfactual**.
+
+
+## Randomized Control Trials: The Next Best Thing
+
+Since we can't travel between parallel universes,
+we need another way to make valid causal comparisons.
+The solution that comes closest to achieving *ceteris paribus* conditions in the real world is the **randomized control trial** (RCT).
+
+Consider how a pharmaceutical company tests whether a new drug works.
+They don't just give the drug to sick people and see if they get better---that would be subject to all sorts of selection bias.
+Instead,
+they conduct an RCT:
+
+1. **Sample** a group of volunteers from the population of interest
+2. **Randomly assign** some volunteers to receive the drug (the "treatment" group) and others to receive a placebo (the "control" group)
+3. **Compare** the average outcomes between the treatment and control groups
+
+The key insight is that **random assignment eliminates selection bias**.
+When treatment is assigned randomly,
+there is no systematic relationship between who receives treatment and their underlying characteristics.
+On average,
+the treatment group and control group will be identical in terms of age,
+health status,
+income,
+motivation,
+and every other characteristic---both observed and unobserved.
+
+::: {.callout-important}
+## Why Randomization Works
+Random assignment ensures that, on average, the treatment and control groups have identical characteristics.
+Any difference in outcomes between the groups can therefore be attributed to the treatment itself, not to pre-existing differences between the groups.
+:::
+
+
+## The Law of Large Numbers
+
+Why exactly does randomization eliminate selection bias?
+The answer lies in a fundamental result from probability theory:
+the **Law of Large Numbers** (LLN).
+
+The LLN states that as the sample size increases,
+the sample average converges to the population average.
+Formally,
+if $Y_1, Y_2, ..., Y_n$ are independent,
+identically distributed random variables with mean $\mu$,
+then:
+
+$$
+\text{plim}(\bar{Y}_n) = \mu
+$$
+
+where $\bar{Y}_n$ is the sample average and $\text{plim}$ denotes the probability limit (what the value converges to as $n \to \infty$).
+
+When we randomly assign individuals to treatment and control groups,
+we are essentially drawing random samples from the same underlying population.
+The LLN guarantees that,
+with a large enough sample,
+the average characteristics of each group will converge to the population average---and therefore to each other.
+
+### A Simulation
+
+::: {.callout-note}
+## What is a Simulation?
+A **simulation** is a computer-based experiment where we generate artificial data according to rules we specify.
+Unlike real-world data,
+we know exactly how the simulated data was created---including the true causal effects, which variables influence which outcomes, and how treatment was assigned.
+
+Simulations are powerful learning tools because they let us see what *should* happen under ideal conditions.
+If we set the true causal effect to zero and then compare treated and untreated groups,
+any difference we observe must be due to something other than a real treatment effect (like selection bias or random chance).
+By manipulating features of the simulation---such as sample size or how treatment is assigned---we can build intuition for how these factors affect our ability to recover causal effects.
+Think of simulations as a laboratory where we can run controlled experiments on statistical methods themselves.
+:::
+
+To see the Law of Large Numbers in action,
+consider a simulation where we have a population with three observable characteristics:
+light-colored eyes,
+dark hair,
+and being tall.
+Suppose these characteristics are correlated with both treatment status and outcomes in observational data (i.e., without random assignment).
+Critically, we set the true causal effect of treatment on the outcome to **zero**.
+
+::: {.callout-tip}
+## A Note on the Code Below
+The R code in the following sections is more advanced than what we've covered so far in the course.
+Don't worry if you don't understand every line!
+The code is provided for those who are curious and want to see how simulations work "under the hood."
+Even if the syntax is unfamiliar,
+reading through the comments can help you understand the logic of what we're doing.
+As you progress through the course,
+more of this code will start to make sense.
+:::
+
+::: {.callout-note collapse="true"}
+## Show Code: Generating the Simulated Data
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# Load the tidyverse package for data manipulation and plotting
+library(tidyverse)
+
+# Set a "seed" for reproducibility
+# This ensures we get the same random numbers each time we run the code
+set.seed(181247)
+
+# Define the TRUE causal effect of treatment
+# We're setting this to ZERO so we know any observed difference is bias!
+causal_effect <- 0
+
+# Create a population of 10,000 individuals
+n_population <- 10000
+
+# Generate three random characteristics for each person
+# Each characteristic is randomly 0 or 1 (like a coin flip)
+eye_light <- sample(x = c(1, 0), size = n_population, replace = TRUE)
+hair_dark <- sample(x = c(1, 0), size = n_population, replace = TRUE)
+big_feet <- sample(x = c(1, 0), size = n_population, replace = TRUE)
+
+# Generate random "noise" - unexplained variation in outcomes
+err <- rnorm(n_population)
+
+# Create an underlying "propensity" for treatment
+# Notice: people with light eyes are MUCH more likely to be treated (coefficient = 2.1)
+# People with dark hair are moderately more likely (coefficient = 0.83)
+# Big feet has a small negative effect (coefficient = -0.11)
+treatment_propensity <- 1 + 2.1 * eye_light + 0.83 * hair_dark - 0.11 * big_feet + err
+
+# Assign treatment based on this propensity (treated if propensity > 2.25)
+# This creates SELECTION BIAS: treatment is correlated with characteristics
+treated <- ifelse(treatment_propensity > 2.25, 1, 0)
+
+# Create the outcome variable
+# The outcome depends on the same characteristics that predict treatment!
+# But notice: we add "treated * causal_effect" which equals zero
+# So treatment has NO real effect on the outcome
+outcome <- 1 + 2.2 * eye_light + 1.2 * hair_dark - 0.01 * big_feet + treated * causal_effect
+
+# Combine everything into a data frame
+dat <- tibble(
+  outcome = outcome,
+  treated = treated,
+  eye_light = eye_light,
+  hair_dark = hair_dark,
+  big_feet = big_feet
+)
+
+# Let's see how many people ended up in each group
+cat("Number in each group:\n")
+count(dat, treated)
+```
+
+:::
+
+When we simply compare treated and untreated individuals *without* random assignment,
+we see large differences between groups---not just in outcomes,
+but in their baseline characteristics.
+The treated group has more people with light eyes,
+more people with dark hair,
+and so on.
+These differences in characteristics lead to a misleading difference in outcomes,
+even though the true causal effect is zero.
+
+::: {.callout-note collapse="true"}
+## Show Code: Visualizing Baseline Differences (No Randomization)
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| label: fig-baseline-diffs
+#| fig-cap: "Baseline differences between treated and untreated groups without randomization. Despite the true causal effect being zero, we observe large differences in both characteristics and outcomes."
+
+# Calculate the mean of each variable for treated vs untreated groups
+baseline_diffs <- dat |>
+  # Group the data by treatment status
+  group_by(treated) |>
+  # Calculate summary statistics for each group
+  summarise(
+    Outcome = mean(outcome),
+    `Prop. light eyes` = mean(eye_light),
+    `Prop. dark hair` = mean(hair_dark),
+    `Prop. big feet` = mean(big_feet)
+  ) |>
+  # Reshape data from "wide" to "long" format for plotting
+  pivot_longer(
+    cols = Outcome:`Prop. big feet`,
+    names_to = "variable",
+    values_to = "value"
+  ) |>
+  # Create nice labels for the treatment groups
+
+  mutate(group = ifelse(treated == 1, "Treated", "Untreated"))
+
+# Create the bar plot
+ggplot(baseline_diffs) +
+  geom_bar(
+    aes(x = group, y = value, fill = group),
+    stat = "identity"
+  ) +
+  # Create separate panels for each variable
+  facet_wrap(~variable, nrow = 1, scales = "free_y") +
+  labs(
+    x = "Group",
+    y = "Value",
+    title = "Baseline Differences: No Randomization"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    strip.text = element_text(size = 11)
+  )
+```
+
+:::
+
+Notice how the treated and untreated groups look very different!
+The treated group has a higher proportion of people with light eyes and dark hair.
+Most importantly,
+the treated group has a higher mean outcome---even though **we know the true causal effect is zero**.
+This is selection bias in action:
+people who "select into" treatment have characteristics that also lead to better outcomes.
+
+Now let's see what happens when we randomly assign treatment.
+Starting with a small sample (N=10),
+random assignment reduces but doesn't eliminate the differences between groups.
+With such a small sample,
+random chance can still produce imbalanced groups.
+
+::: {.callout-note collapse="true"}
+## Show Code: Random Assignment Simulation
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# Function to run the random assignment simulation for a given sample size
+run_random_assignment <- function(data, sample_size, seed = 181247) {
+  
+  # Set seed for reproducibility
+  set.seed(seed)
+  
+  # Take a random sample from the untreated population
+  # (We use untreated only to avoid any prior treatment effects)
+  sample_data <- data |>
+    filter(treated == 0) |>
+    slice_sample(n = sample_size)
+  
+  # RANDOMLY assign treatment - this is the key step!
+  # Each person has a 50% chance of being assigned to treatment
+  # This assignment is INDEPENDENT of their characteristics
+  random_treatment <- sample(c(1, 0), size = sample_size, replace = TRUE)
+  
+  # Add the random treatment assignment to our sample
+  sample_data <- sample_data |>
+    mutate(rand_treat = random_treatment)
+  
+  # Calculate means for each randomly assigned group
+  sample_data |>
+    group_by(rand_treat) |>
+    summarise(
+      Outcome = mean(outcome),
+      `Prop. light eyes` = mean(eye_light),
+      `Prop. dark hair` = mean(hair_dark),
+      `Prop. big feet` = mean(big_feet),
+      .groups = "drop"
+    ) |>
+    mutate(sample_size = sample_size)
+}
+
+# Run the simulation for different sample sizes
+results_n10 <- run_random_assignment(dat, sample_size = 10)
+results_n25 <- run_random_assignment(dat, sample_size = 25)
+results_n50 <- run_random_assignment(dat, sample_size = 50)
+results_n100 <- run_random_assignment(dat, sample_size = 100)
+
+# Combine all results
+all_results <- bind_rows(results_n10, results_n25, results_n50, results_n100)
+
+# Reshape for plotting
+all_results_long <- all_results |>
+  pivot_longer(
+    cols = Outcome:`Prop. big feet`,
+    names_to = "variable",
+    values_to = "value"
+  ) |>
+  mutate(
+    group = ifelse(rand_treat == 1, "Treated", "Control"),
+    sample_size_label = paste("N =", sample_size)
+  )
+```
+
+:::
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-random-n10
+#| fig-cap: "Random assignment with N=10. Some imbalance remains due to small sample size."
+
+# Plot for N = 10
+all_results_long |>
+  filter(sample_size == 10) |>
+  ggplot() +
+  geom_bar(
+    aes(x = group, y = value, fill = group),
+    stat = "identity"
+  ) +
+  facet_wrap(~variable, nrow = 1, scales = "free_y") +
+  labs(
+    x = "Random Assignment",
+    y = "Value",
+    title = "Random Assignment: N = 10"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    strip.text = element_text(size = 11)
+  )
+```
+
+With only 10 people,
+we still see noticeable differences between the randomly assigned treatment and control groups.
+This is not selection bias---it's just random chance with a small sample.
+
+As we increase the sample size to N=25 and N=50,
+the differences between treatment and control groups shrink.
+The LLN is at work:
+larger samples produce more balanced groups.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-random-n25-n50
+#| fig-cap: "Random assignment with N=25 (top) and N=50 (bottom). As sample size increases, the groups become more balanced."
+#| fig-height: 8
+
+# Plot for N = 25 and N = 50
+all_results_long |>
+  filter(sample_size %in% c(25, 50)) |>
+  mutate(sample_size_label = factor(
+    sample_size_label, 
+    levels = c("N = 25", "N = 50")
+  )) |>
+  ggplot() +
+  geom_bar(
+    aes(x = group, y = value, fill = group),
+    stat = "identity"
+  ) +
+  facet_grid(sample_size_label ~ variable, scales = "free_y") +
+  labs(
+    x = "Random Assignment",
+    y = "Value"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    strip.text = element_text(size = 11)
+  )
+```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-random-n100
+#| fig-cap: "Random assignment with N=100. The treatment and control groups are now nearly identical in their characteristics, and the difference in outcomes is close to the true causal effect of zero."
+
+# Plot for N = 100
+all_results_long |>
+  filter(sample_size == 100) |>
+  ggplot() +
+  geom_bar(
+    aes(x = group, y = value, fill = group),
+    stat = "identity"
+  ) +
+  facet_wrap(~variable, nrow = 1, scales = "free_y") +
+  labs(
+    x = "Random Assignment",
+    y = "Value",
+    title = "Random Assignment: N = 100"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    strip.text = element_text(size = 11)
+  )
+```
+
+By N=100,
+the treatment and control groups are nearly identical across all characteristics.
+The difference in outcomes between groups is now close to zero---the true causal effect!
+Any remaining difference is just random variation,
+not systematic selection bias.
+
+
+## The Potential Outcomes Framework
+
+Now that we intuitively understand why simple comparisons can be misleading and how randomization addresses this problem,
+let's formalize these concepts mathematically using the **potential outcomes framework**.
+
+### Defining Potential Outcomes
+
+Consider our example of estimating the causal effect of college on wages.
+For any individual $i$,
+we can define two **potential outcomes**:
+
+- $Y_{1i}$: The wage individual $i$ would earn **if they attend college**
+- $Y_{0i}$: The wage individual $i$ would earn **if they do not attend college**
+
+The causal effect of college for individual $i$ is simply the difference between these potential outcomes:
+
+$$
+\kappa_i = Y_{1i} - Y_{0i}
+$$
+
+This framework captures the "multiverse" intuition:
+$Y_{1i}$ is College Morty's wage,
+$Y_{0i}$ is Morty C-137's wage,
+and $\kappa_i$ is the causal effect of college for Morty.
+
+:::{#fig-fork-road}
+
+![](images/fork_in_the_road.png){width=60%}
+
+The potential outcomes framework conceptualizes causal effects as the comparison between two paths at a fork in the road.
+
+:::
+
+### The Fundamental Problem of Causal Inference
+
+The fundamental problem is that we only observe **one** potential outcome for each individual.
+If person $i$ attends college,
+we observe $Y_{1i}$ but never see $Y_{0i}$.
+If they don't attend,
+we observe $Y_{0i}$ but never see $Y_{1i}$.
+We never observe both potential outcomes for the same individual.
+
+Let $D_i$ be a treatment indicator:
+
+$$
+D_i = \begin{cases}
+1 & \text{if individual } i \text{ is treated (attends college)} \\
+0 & \text{otherwise}
+\end{cases}
+$$
+
+What we actually observe is:
+
+$$
+Y_i = D_i \cdot Y_{1i} + (1 - D_i) \cdot Y_{0i}
+$$
+
+That is,
+we observe the treated outcome for treated individuals and the untreated outcome for untreated individuals---but never both.
+
+### Selection Bias Formalized
+
+Now we can formally see why simple comparisons are problematic.
+Suppose we compare average outcomes between those who are treated ($D_i = 1$) and those who are untreated ($D_i = 0$).
+The difference in group means is:
+
+$$
+E[Y_i | D_i = 1] - E[Y_i | D_i = 0]
+$$
+
+Since we only observe $Y_{1i}$ for the treated and $Y_{0i}$ for the untreated,
+this becomes:
+
+$$
+E[Y_{1i} | D_i = 1] - E[Y_{0i} | D_i = 0]
+$$
+
+Here's the key insight.
+Let's add and subtract a term that represents the counterfactual---what the treated group's outcome would have been without treatment:
+
+$$
+E[Y_{1i} | D_i = 1] - E[Y_{0i} | D_i = 0] + \underbrace{\{E[Y_{0i} | D_i = 1] - E[Y_{0i} | D_i = 1]\}}_{= 0}
+$$
+
+Rearranging terms:
+
+$$
+\underbrace{E[Y_{1i} | D_i = 1] - E[Y_{0i} | D_i = 1]}_{\text{Causal effect for the treated}} + \underbrace{\{E[Y_{0i} | D_i = 1] - E[Y_{0i} | D_i = 0]\}}_{\text{Selection bias}}
+$$
+
+::: {.callout-important}
+## The Selection Bias Decomposition
+A simple difference in group means equals the causal effect **plus** selection bias:
+
+$$
+\underbrace{E[Y_i | D_i = 1] - E[Y_i | D_i = 0]}_{\text{Observed difference}} = \underbrace{\kappa}_{\text{Causal effect}} + \underbrace{\{E[Y_{0i} | D_i = 1] - E[Y_{0i} | D_i = 0]\}}_{\text{Selection bias}}
+$$
+:::
+
+The selection bias term compares the **untreated potential outcomes** of the treated group to the untreated potential outcomes of the control group.
+In the health insurance example,
+this captures differences in baseline health (absent insurance) between those who choose to get insurance and those who don't.
+If people who get insurance would be healthier even without insurance (perhaps because they're wealthier or more health-conscious),
+then selection bias is positive,
+and the simple comparison overstates the causal effect.
+
+### How Randomization Eliminates Selection Bias
+
+When treatment is randomly assigned,
+the treatment and control groups are drawn from the same population.
+By the Law of Large Numbers,
+their average characteristics---including their average potential outcomes---converge to each other.
+Formally:
+
+$$
+E[Y_{0i} | D_i = 1] = E[Y_{0i} | D_i = 0]
+$$
+
+This says that the average untreated potential outcome is the same for both groups.
+Plugging this into our decomposition:
+
+$$
+E[Y_i | D_i = 1] - E[Y_i | D_i = 0] = \kappa + \{E[Y_{0i} | D_i = 1] - E[Y_{0i} | D_i = 0]\} = \kappa + 0 = \kappa
+$$
+
+**With random assignment,
+the simple difference in means equals the causal effect.**
+Selection bias disappears.
+
+
+## The Oregon Health Insurance Experiment
+
+Most econometric research cannot rely on randomization to identify causal effects.
+We typically work with observational data where treatment is not randomly assigned,
+and much of this course focuses on methods for addressing selection bias in such settings.
+However,
+there have been a few landmark studies that used randomization to study important policy questions.
+One of the most influential is the **Oregon Health Insurance Experiment**.
+
+### Context: Medicaid Expansion
+
+Throughout the 2000s,
+many U.S. states expanded their Medicaid programs to cover more low-income residents.
+Most states simply extended coverage to everyone who became newly eligible.
+But in 2008,
+Oregon did something unique:
+facing limited resources,
+they offered Medicaid coverage through a public lottery.
+
+### The Lottery
+
+Oregon's approach created a natural randomized experiment.
+People who wanted coverage could sign up for the lottery.
+Winners received the opportunity to apply for the Oregon Health Plan (the state's Medicaid program),
+while losers remained uninsured.
+To be eligible,
+applicants had to be legal Oregon residents aged 19-64,
+uninsured for the past six months,
+with income below the federal poverty line,
+and not otherwise eligible for health insurance.
+
+Because lottery winners were chosen randomly,
+the comparison between winners and losers provides a valid causal estimate of the effect of health insurance---free from the selection bias that plagues observational studies.
+
+### Results
+
+Researchers followed lottery participants and found that lottery winners (relative to losers) experienced:
+
+1. **Increased take-up of Medicaid:** The lottery actually changed insurance status, confirming the treatment "worked"
+2. **Increased use of medical resources:** Winners used more hospital and outpatient services
+3. **Small improvements in overall health:** Physical health improvements were modest, though mental health and financial security improved substantially
+
+These findings are important because they come from a rigorous RCT rather than observational comparisons.
+The study provides some of the cleanest evidence we have on what health insurance actually *causes*,
+as opposed to what it merely correlates with.
+
+::: {.callout-tip}
+## Discussion Question
+The Oregon experiment found modest effects of insurance on physical health.
+Does this mean expanding health insurance is not worthwhile?
+What other outcomes might matter for policy decisions?
+:::
+
+
+## Summary and Conclusion
+
+This chapter introduced the fundamental concepts underlying causal inference in econometrics.
+We began with the intuition that simple comparisons between treated and untreated groups can be misleading due to selection bias---the groups may differ in ways beyond just the treatment.
+The "multiverse" thought experiment illustrated what we really want:
+*ceteris paribus* comparisons where everything except the treatment is held constant.
+
+Randomized control trials approximate this ideal by randomly assigning treatment,
+which ensures that treatment and control groups are comparable on average.
+The Law of Large Numbers guarantees that with large enough samples,
+random assignment eliminates selection bias.
+
+We then formalized these ideas using the potential outcomes framework,
+which defines causal effects as the difference between what would happen with and without treatment.
+The fundamental problem is that we only observe one potential outcome per individual.
+Simple comparisons of means capture both the causal effect and selection bias,
+but random assignment makes selection bias vanish.
+
+### Key Takeaways
+
+- **Selection bias** arises when treated and untreated groups differ systematically beyond just the treatment---we're comparing apples to oranges
+
+- **Ceteris paribus** ("all else equal") comparisons isolate the causal effect by holding everything constant except the treatment
+
+- **Randomized control trials** eliminate selection bias by ensuring treatment and control groups are drawn from the same population
+
+- The **Law of Large Numbers** guarantees that with large samples, randomly assigned groups have identical average characteristics
+
+- The **potential outcomes framework** formalizes causal effects as $\kappa = Y_{1i} - Y_{0i}$, but we only observe one potential outcome per individual
+
+- Simple differences in means equal: $\text{Causal effect} + \text{Selection bias}$. Randomization sets selection bias to zero.
+
+
+## Check Your Understanding
+
+:::: {.content-visible when-format="html"}
+
+For each question below, 
+select the best answer from the dropdown menu. 
+The dropdown will turn green if correct and red if incorrect. 
+Click the "Show Explanation" toggle to see a full explanation of the answer after attempting each question.
+
+```{=html}
+<div class="question">
+<div class="answer-row">
+    <label>i. A researcher compares test scores of students who attended tutoring to those who didn't, finding tutored students score higher. What is the most likely concern with concluding that tutoring <em>caused</em> higher scores? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The sample size is too small</option>
+        <option value="b">Test scores are hard to measure</option>
+        <option value="c">Students who seek tutoring may differ in motivation or ability</option>
+        <option value="d">Tutoring has no effect on learning</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>ii. What does "ceteris paribus" mean in the context of causal inference? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The treatment effect varies across individuals</option>
+        <option value="b">All else being equal</option>
+        <option value="c">Correlation implies causation</option>
+        <option value="d">The sample is representative</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iii. In an RCT, why does random assignment eliminate selection bias? </label>
+    <select onchange="checkAnswer(this, 'a')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">It ensures treatment and control groups have the same average characteristics</option>
+        <option value="b">It increases the sample size</option>
+        <option value="c">It removes measurement error</option>
+        <option value="d">It guarantees perfect compliance with treatment</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iv. In the potential outcomes framework, <em>Y</em><sub>0<em>i</em></sub> represents: </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The outcome for individual <em>i</em> if they are treated</option>
+        <option value="b">The outcome for individual <em>i</em> if they are not treated</option>
+        <option value="c">The average outcome in the control group</option>
+        <option value="d">The selection bias for individual <em>i</em></option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>v. The "fundamental problem of causal inference" refers to: </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Sample sizes are always too small</option>
+        <option value="b">Randomization is impossible</option>
+        <option value="c">We can only observe one potential outcome per individual</option>
+        <option value="d">Correlation and causation are the same</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>vi. <strong>(Challenge)</strong> If E[<em>Y</em><sub>0<em>i</em></sub> | <em>D<sub>i</sub></em> = 1] > E[<em>Y</em><sub>0<em>i</em></sub> | <em>D<sub>i</sub></em> = 0], what does this imply? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The treatment has a positive causal effect</option>
+        <option value="b">Selection bias is positive—simple comparisons overstate the causal effect</option>
+        <option value="c">Selection bias is negative—simple comparisons understate the causal effect</option>
+        <option value="d">Randomization was successful</option>
+    </select>
+</div>
+</div>
+
+```
+
+::: {.callout-tip collapse="true"}
+## Show Explanation
+
+i. Students who seek out tutoring are likely more motivated, more concerned about their grades, or struggling in ways that prompt intervention. These characteristics affect test scores independently of tutoring. This is selection bias: tutored and non-tutored students are not comparable.
+
+ii. "Ceteris paribus" is Latin for "all else being equal." In causal inference, it refers to the ideal comparison where two groups (or two versions of the same individual) differ only in the treatment, with all other characteristics held constant.
+
+iii. Random assignment means each individual has the same probability of being in treatment or control, regardless of their characteristics. By the Law of Large Numbers, this ensures both groups have the same average characteristics, eliminating systematic differences (selection bias).
+
+iv. $Y_{0i}$ denotes the potential outcome for individual $i$ under the control condition (no treatment). $Y_{1i}$ would be the potential outcome under treatment. The causal effect is $Y_{1i} - Y_{0i}$.
+
+v. The fundamental problem is that for any individual, we observe either their treated outcome or their untreated outcome, but never both. We cannot directly observe the counterfactual—what would have happened under the alternative treatment status.
+
+vi. This inequality says the untreated potential outcome is higher for the treated group than for the control group. In other words, the treated group would have better outcomes *even without treatment*. This means selection bias is positive: when we compare groups, part of the difference reflects this pre-existing advantage, not the causal effect. Simple comparisons overstate how much the treatment actually helps.
+
+:::
+
+::::
+
+:::: {.content-hidden when-format="html"}
+
+*Note: This section contains interactive content only available in the HTML version.*
+
+::::
