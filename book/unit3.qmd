@@ -103,6 +103,7 @@ function checkAnswer(selectElement, correctValue) {
 - How do we derive the OLS estimator?
 - What assumptions are required for OLS to be unbiased?
 - What is omitted variable bias and when does it arise?
+- When can we interpret OLS estimates as causal effects?
 - How do we measure the precision of our estimates?
 :::
 
@@ -1125,6 +1126,65 @@ ggplot(sim_biased, aes(x = b1_hat)) +
 ```
 
 
+## Unbiasedness and Causality: Why This All Matters
+
+Let's step back and connect what we've learned to the bigger picture.
+In @sec-rcts,
+we discussed how the fundamental challenge of causal inference is selection bias:
+people who receive "treatment" (more education,
+a new drug,
+a policy intervention) may differ systematically from those who don't.
+This makes it hard to know whether differences in outcomes are caused by the treatment or by those pre-existing differences.
+
+Now we can see the same problem through the lens of regression.
+**The zero conditional mean assumption is essentially a "no selection bias" assumption.**
+
+### When Can We Interpret $\hat{\beta}_1$ Causally?
+
+Consider our wage regression:
+$$wage = \beta_0 + \beta_1 \cdot educ + \mu$$
+
+When $E[\mu | educ] = 0$,
+our OLS estimate $\hat{\beta}_1$ is unbiased for $\beta_1$.
+But what does $\beta_1$ actually represent?
+
+If the zero conditional mean assumption holds,
+then $\beta_1$ represents the **causal effect** of education on wages:
+how much wages would change if we could take a person and give them one more year of education,
+holding everything else constant.
+In this case,
+$\hat{\beta}_1$ is an unbiased estimate of this causal effect.
+
+But if $E[\mu | educ] \neq 0$---say,
+because high-ability people get more education---then $\beta_1$ no longer represents a pure causal effect.
+It conflates the effect of education with the effect of ability.
+Our estimate $\hat{\beta}_1$ is biased,
+and we cannot interpret it as the causal effect of education.
+
+### Correlation vs. Causation, Revisited
+
+Recall that the OLS slope can be written as:
+$$\hat{\beta}_1 = \rho_{xy} \frac{\sigma_y}{\sigma_x}$$
+
+Bivariate OLS is fundamentally measuring the *correlation* between $x$ and $y$,
+scaled by their relative standard deviations.
+Correlation becomes causation **only when the Gauss-Markov assumptions hold**---especially the zero conditional mean assumption.
+
+This is why we emphasize these assumptions so heavily.
+Without them:
+
+- OLS still gives you numbers
+- Those numbers still describe the correlation in your data
+- But you **cannot** interpret those numbers as causal effects
+
+::: {.callout-warning}
+## The Key Insight
+OLS always estimates *something*.
+Whether that something is a causal effect or merely a correlation depends entirely on whether the assumptions are satisfied.
+Most of econometrics is about finding clever ways to make the zero conditional mean assumption more plausible.
+:::
+
+
 ## Variance of the OLS Estimator
 
 Even when OLS is unbiased,
@@ -1191,12 +1251,19 @@ the foundational tool of econometrics.
 We started with the goal of modeling how the conditional expectation $E[Y|X]$ varies with $x$,
 and showed how the linear regression model $y = \beta_0 + \beta_1 x + \mu$ provides a framework for this.
 
-We derived the OLS estimator formulas,
+We derived the OLS estimator by minimizing the sum of squared residuals,
 learned to compute regressions in R,
 and explored the properties of the OLS regression line.
 We then turned to the statistical properties of OLS,
 introducing the Gauss-Markov assumptions and proving that OLS is unbiased when these assumptions hold.
 When the zero conditional mean assumption fails---typically due to omitted variables---our estimates become biased.
+
+Crucially,
+we connected unbiasedness to causality:
+the zero conditional mean assumption is what allows us to interpret OLS coefficients as causal effects rather than mere correlations.
+Without this assumption,
+OLS still produces numbers,
+but those numbers cannot be given a causal interpretation.
 
 Finally,
 we discussed the variance of OLS estimates and the conditions under which OLS is the best linear unbiased estimator.
@@ -1213,6 +1280,8 @@ $$\hat{\beta}_1 = \frac{Cov(x,y)}{Var(x)}$$
 - **The Gauss-Markov assumptions** (especially zero conditional mean) are required for unbiasedness
 
 - **Omitted variable bias** arises when we exclude a variable correlated with both $x$ and $y$
+
+- **Causality requires unbiasedness**—only when $E[\mu|x] = 0$ can we interpret $\hat{\beta}_1$ as a causal effect
 
 - **OLS is BLUE** under the Gauss-Markov assumptions—best among linear unbiased estimators
 
@@ -1318,6 +1387,145 @@ v. Omitted variable bias occurs when we leave out a variable that belongs in the
 vi. The zero conditional mean assumption ($E[\mu|x] = 0$) is needed to prove OLS is unbiased, but it is not needed to derive the OLS formulas themselves. The calculus minimization approach works regardless of this assumption—it just tells us which values minimize squared residuals.
 
 vii. As sample size increases, we get more variation in $x$, so $SST = \sum(x_i - \bar{x})^2$ increases. Since this appears in the denominator, the variance of our estimate decreases. Larger samples give more precise estimates.
+
+:::
+
+::::
+
+### Practice: Interpreting Regression Output
+
+The following questions present regression results for you to interpret.
+
+```{=html}
+<div class="context" style="margin-bottom: 20px;">
+<strong>Regression 1:</strong> A researcher estimates the relationship between test scores and class size using data from California elementary schools:
+<pre style="background-color: #f5f5f5; padding: 10px; margin-top: 10px; font-family: monospace;">
+Dependent variable: testscr (average test score, points)
+
+             Estimate  Std. Error
+(Intercept)   698.93      10.36
+str            -2.28       0.52
+
+n = 420, R-squared = 0.051
+</pre>
+<em>Note: str = student-teacher ratio (students per teacher)</em>
+</div>
+
+<div class="question">
+<div class="answer-row">
+    <label>viii. According to this regression, a class with 5 more students per teacher is predicted to score: </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">2.28 points higher</option>
+        <option value="b">11.4 points lower</option>
+        <option value="c">2.28 points lower</option>
+        <option value="d">11.4 points higher</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>ix. A school with a student-teacher ratio of 20 would have a predicted test score of: </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">698.93</option>
+        <option value="b">744.53</option>
+        <option value="c">653.33</option>
+        <option value="d">656.13</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>x. The R-squared of 0.051 means: </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The regression is invalid</option>
+        <option value="b">About 5% of the variation in test scores is explained by class size</option>
+        <option value="c">Class size has no effect on test scores</option>
+        <option value="d">The coefficient is statistically insignificant</option>
+    </select>
+</div>
+</div>
+
+<div class="context" style="margin-top: 30px; margin-bottom: 20px;">
+<strong>Regression 2:</strong> An economist studies the relationship between cigarette consumption and prices across U.S. states:
+<pre style="background-color: #f5f5f5; padding: 10px; margin-top: 10px; font-family: monospace;">
+Dependent variable: packs (cigarette packs sold per capita)
+
+             Estimate  Std. Error
+(Intercept)   219.58      29.19
+rprice        -1.04       0.29
+
+n = 48, R-squared = 0.21
+</pre>
+<em>Note: rprice = real price per pack (cents)</em>
+</div>
+
+<div class="question">
+<div class="answer-row">
+    <label>xi. According to this regression, if the price increases by 10 cents per pack: </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Consumption increases by 1.04 packs per capita</option>
+        <option value="b">Consumption decreases by 1.04 packs per capita</option>
+        <option value="c">Consumption decreases by 10.4 packs per capita</option>
+        <option value="d">Consumption increases by 10.4 packs per capita</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>xii. The negative coefficient on price is consistent with: </label>
+    <select onchange="checkAnswer(this, 'a')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The law of demand: higher prices lead to lower quantity demanded</option>
+        <option value="b">A violation of the zero conditional mean assumption</option>
+        <option value="c">Heteroskedasticity in the error term</option>
+        <option value="d">An R-squared that is too low</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>xiii. <strong>(Challenge)</strong> Why might we be cautious about interpreting this coefficient as the causal effect of price on consumption? </label>
+    <select onchange="checkAnswer(this, 'd')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The R-squared is too low</option>
+        <option value="b">The sample size is too small</option>
+        <option value="c">The coefficient is negative</option>
+        <option value="d">Omitted variables (like anti-smoking policies or income) may affect both price and consumption</option>
+    </select>
+</div>
+</div>
+```
+
+::: {.callout-tip collapse="true"}
+## Show Explanation
+
+i. The slope coefficient $\beta_1$ is the marginal effect—it tells us how much $y$ changes when $x$ increases by one unit. The intercept $\beta_0$ gives the predicted value when $x = 0$.
+
+ii. The zero conditional mean assumption $E[\mu|x] = 0$ states that the expected value of the error term is zero for any given value of $x$. This is crucial for unbiasedness.
+
+iii. The OLS slope equals the sample covariance of $x$ and $y$ divided by the sample variance of $x$. This follows directly from the derivation.
+
+iv. Unbiasedness means that if we could repeat the sampling process many times, the *average* of our estimates would equal the true parameter. Individual estimates can still miss the target.
+
+v. Omitted variable bias occurs when we leave out a variable that belongs in the model and is correlated with our included independent variable. This causes $E[\mu|x] \neq 0$.
+
+vi. The zero conditional mean assumption ($E[\mu|x] = 0$) is needed to prove OLS is unbiased, but it is not needed to derive the OLS formulas themselves. The calculus minimization approach works regardless of this assumption—it just tells us which values minimize squared residuals.
+
+vii. As sample size increases, we get more variation in $x$, so $SST = \sum(x_i - \bar{x})^2$ increases. Since this appears in the denominator, the variance of our estimate decreases. Larger samples give more precise estimates.
+
+**Regression Interpretation Questions:**
+
+viii. The coefficient on `str` is $-2.28$, meaning each additional student per teacher is associated with 2.28 fewer points. For 5 additional students: $5 \times (-2.28) = -11.4$ points.
+
+ix. Using the regression equation: $\hat{y} = 698.93 + (-2.28)(20) = 698.93 - 45.6 = 653.33$
+
+x. R-squared measures the fraction of variance in $y$ explained by the regression. Here, 5.1% of test score variation is explained by class size. A low R-squared doesn't make the coefficient meaningless—it just means other factors also matter.
+
+xi. The coefficient is $-1.04$, so a 10-cent increase predicts: $10 \times (-1.04) = -10.4$ packs per capita.
+
+xii. The negative relationship between price and quantity is exactly what economic theory predicts—the law of demand.
+
+xiii. States with strong anti-smoking policies might have both higher cigarette taxes (raising prices) AND other policies that reduce smoking. This would create omitted variable bias, making price appear more effective than it actually is at reducing consumption.
 
 :::
 

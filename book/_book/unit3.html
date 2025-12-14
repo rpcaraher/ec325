@@ -84,7 +84,7 @@ div.csl-indent {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./references.html" rel="next">
+<link href="./unit4.html" rel="next">
 <link href="./unit2.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -234,6 +234,18 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./unit4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Multivariate Regression</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./unit5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Statistical Inference</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./references.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">References</span></a>
   </div>
@@ -321,14 +333,22 @@ window.Quarto = {
   <li><a href="#simulation-unbiasedness-in-action" id="toc-simulation-unbiasedness-in-action" class="nav-link" data-scroll-target="#simulation-unbiasedness-in-action"><span class="header-section-number">3.8.4</span> Simulation: Unbiasedness in Action</a></li>
   </ul></li>
   <li><a href="#omitted-variable-bias" id="toc-omitted-variable-bias" class="nav-link" data-scroll-target="#omitted-variable-bias"><span class="header-section-number">3.9</span> Omitted Variable Bias</a></li>
-  <li><a href="#variance-of-the-ols-estimator" id="toc-variance-of-the-ols-estimator" class="nav-link" data-scroll-target="#variance-of-the-ols-estimator"><span class="header-section-number">3.10</span> Variance of the OLS Estimator</a></li>
-  <li><a href="#standard-errors" id="toc-standard-errors" class="nav-link" data-scroll-target="#standard-errors"><span class="header-section-number">3.11</span> Standard Errors</a></li>
-  <li><a href="#ols-is-blue" id="toc-ols-is-blue" class="nav-link" data-scroll-target="#ols-is-blue"><span class="header-section-number">3.12</span> OLS is BLUE</a></li>
-  <li><a href="#summary-and-conclusion" id="toc-summary-and-conclusion" class="nav-link" data-scroll-target="#summary-and-conclusion"><span class="header-section-number">3.13</span> Summary and Conclusion</a>
+  <li><a href="#unbiasedness-and-causality-why-this-all-matters" id="toc-unbiasedness-and-causality-why-this-all-matters" class="nav-link" data-scroll-target="#unbiasedness-and-causality-why-this-all-matters"><span class="header-section-number">3.10</span> Unbiasedness and Causality: Why This All Matters</a>
   <ul class="collapse">
-  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">3.13.1</span> Key Takeaways</a></li>
+  <li><a href="#when-can-we-interpret-hatbeta_1-causally" id="toc-when-can-we-interpret-hatbeta_1-causally" class="nav-link" data-scroll-target="#when-can-we-interpret-hatbeta_1-causally"><span class="header-section-number">3.10.1</span> When Can We Interpret <span class="math inline">\(\hat{\beta}_1\)</span> Causally?</a></li>
+  <li><a href="#correlation-vs.-causation-revisited" id="toc-correlation-vs.-causation-revisited" class="nav-link" data-scroll-target="#correlation-vs.-causation-revisited"><span class="header-section-number">3.10.2</span> Correlation vs.&nbsp;Causation, Revisited</a></li>
   </ul></li>
-  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">3.14</span> Check Your Understanding</a></li>
+  <li><a href="#variance-of-the-ols-estimator" id="toc-variance-of-the-ols-estimator" class="nav-link" data-scroll-target="#variance-of-the-ols-estimator"><span class="header-section-number">3.11</span> Variance of the OLS Estimator</a></li>
+  <li><a href="#standard-errors" id="toc-standard-errors" class="nav-link" data-scroll-target="#standard-errors"><span class="header-section-number">3.12</span> Standard Errors</a></li>
+  <li><a href="#ols-is-blue" id="toc-ols-is-blue" class="nav-link" data-scroll-target="#ols-is-blue"><span class="header-section-number">3.13</span> OLS is BLUE</a></li>
+  <li><a href="#summary-and-conclusion" id="toc-summary-and-conclusion" class="nav-link" data-scroll-target="#summary-and-conclusion"><span class="header-section-number">3.14</span> Summary and Conclusion</a>
+  <ul class="collapse">
+  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">3.14.1</span> Key Takeaways</a></li>
+  </ul></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">3.15</span> Check Your Understanding</a>
+  <ul class="collapse">
+  <li><a href="#practice-interpreting-regression-output" id="toc-practice-interpreting-regression-output" class="nav-link" data-scroll-target="#practice-interpreting-regression-output"><span class="header-section-number">3.15.1</span> Practice: Interpreting Regression Output</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -453,6 +473,7 @@ function checkAnswer(selectElement, correctValue) {
 <li>How do we derive the OLS estimator?</li>
 <li>What assumptions are required for OLS to be unbiased?</li>
 <li>What is omitted variable bias and when does it arise?</li>
+<li>When can we interpret OLS estimates as causal effects?</li>
 <li>How do we measure the precision of our estimates?</li>
 </ul>
 </div>
@@ -604,7 +625,6 @@ wage = \beta_0 + \beta_1 \cdot educ + \mu
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning in is.na(x): is.na() applied to non-(list or vector) of type
 'expression'
-
 Warning in is.na(x): is.na() applied to non-(list or vector) of type
 'expression'</code></pre>
 </div>
@@ -626,15 +646,6 @@ Figure&nbsp;3.2: Components of the regression line. Black points show actual val
 <h3 data-number="3.3.3" class="anchored" data-anchor-id="a-numerical-example"><span class="header-section-number">3.3.3</span> A Numerical Example</h3>
 <p>Let’s see these concepts with actual numbers. The table below shows the first six observations from a regression of MPG on horsepower, along with the predicted values and residuals:</p>
 <div class="cell">
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: 'xfun::attr()' is deprecated.
-Use 'xfun::attr2()' instead.
-See help("Deprecated")
-
-Warning: 'xfun::attr()' is deprecated.
-Use 'xfun::attr2()' instead.
-See help("Deprecated")</code></pre>
-</div>
 <div id="tbl-regression-example" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-regression-example-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -822,8 +833,8 @@ The OLS Slope Formula
 <section id="basic-syntax" class="level3" data-number="3.5.1">
 <h3 data-number="3.5.1" class="anchored" data-anchor-id="basic-syntax"><span class="header-section-number">3.5.1</span> Basic Syntax</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># General syntax</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">lm</span>(y <span class="sc">~</span> x, <span class="at">data =</span> your_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># General syntax</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">lm</span>(y <span class="sc">~</span> x, <span class="at">data =</span> your_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The formula <code>y ~ x</code> specifies that <span class="math inline">\(y\)</span> is the dependent variable and <span class="math inline">\(x\)</span> is the independent variable. An intercept is included by default.</p>
 </section>
@@ -831,14 +842,14 @@ The OLS Slope Formula
 <h3 data-number="3.5.2" class="anchored" data-anchor-id="example-mpg-and-horsepower"><span class="header-section-number">3.5.2</span> Example: MPG and Horsepower</h3>
 <p>Let’s estimate the relationship between fuel efficiency (MPG) and engine horsepower using the built-in <code>mtcars</code> dataset:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the data</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(mtcars)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimate the regression</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>lm_mpg <span class="ot">&lt;-</span> <span class="fu">lm</span>(mpg <span class="sc">~</span> hp, <span class="at">data =</span> mtcars)</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># View the results</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm_mpg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the data</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(mtcars)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimate the regression</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>lm_mpg <span class="ot">&lt;-</span> <span class="fu">lm</span>(mpg <span class="sc">~</span> hp, <span class="at">data =</span> mtcars)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># View the results</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm_mpg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
@@ -1135,38 +1146,38 @@ Show Code: Unbiasedness Simulation
 <div id="callout-11" class="callout-11-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a "population" with known parameters</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1248</span>)</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>n_pop <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>x_pop <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">100</span>, <span class="at">size =</span> n_pop, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>err_pop <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n_pop)</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co"># True model: y = 3.5 + 2.21*x + error</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>pop_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> x_pop,</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="fl">3.5</span> <span class="sc">+</span> <span class="fl">2.21</span> <span class="sc">*</span> x <span class="sc">+</span> err_pop</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Draw many samples and estimate beta_1 each time</span></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">812476</span>)</span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>n_simulations <span class="ot">&lt;-</span> <span class="dv">500</span></span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>sample_size <span class="ot">&lt;-</span> <span class="dv">25</span></span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>sim_results <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(<span class="dv">1</span><span class="sc">:</span>n_simulations, <span class="cf">function</span>(i) {</span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Draw a random sample</span></span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>  sample_data <span class="ot">&lt;-</span> <span class="fu">slice_sample</span>(pop_data, <span class="at">n =</span> sample_size, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Estimate OLS</span></span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>  reg <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> x, <span class="at">data =</span> sample_data)</span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(</span>
-<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">iteration =</span> i,</span>
-<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">b1_hat =</span> <span class="fu">coef</span>(reg)[<span class="dv">2</span>]</span>
-<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the average of all estimates</span></span>
-<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>mean_b1 <span class="ot">&lt;-</span> <span class="fu">mean</span>(sim_results<span class="sc">$</span>b1_hat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a "population" with known parameters</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1248</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>n_pop <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>x_pop <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">100</span>, <span class="at">size =</span> n_pop, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>err_pop <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n_pop)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># True model: y = 3.5 + 2.21*x + error</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>pop_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> x_pop,</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="fl">3.5</span> <span class="sc">+</span> <span class="fl">2.21</span> <span class="sc">*</span> x <span class="sc">+</span> err_pop</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Draw many samples and estimate beta_1 each time</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">812476</span>)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>n_simulations <span class="ot">&lt;-</span> <span class="dv">500</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>sample_size <span class="ot">&lt;-</span> <span class="dv">25</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>sim_results <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(<span class="dv">1</span><span class="sc">:</span>n_simulations, <span class="cf">function</span>(i) {</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Draw a random sample</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>  sample_data <span class="ot">&lt;-</span> <span class="fu">slice_sample</span>(pop_data, <span class="at">n =</span> sample_size, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Estimate OLS</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>  reg <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> x, <span class="at">data =</span> sample_data)</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">iteration =</span> i,</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">b1_hat =</span> <span class="fu">coef</span>(reg)[<span class="dv">2</span>]</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the average of all estimates</span></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>mean_b1 <span class="ot">&lt;-</span> <span class="fu">mean</span>(sim_results<span class="sc">$</span>b1_hat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -1212,8 +1223,44 @@ Figure&nbsp;3.5: With omitted variable bias, the average of OLS estimates (green
 </div>
 </div>
 </section>
-<section id="variance-of-the-ols-estimator" class="level2" data-number="3.10">
-<h2 data-number="3.10" class="anchored" data-anchor-id="variance-of-the-ols-estimator"><span class="header-section-number">3.10</span> Variance of the OLS Estimator</h2>
+<section id="unbiasedness-and-causality-why-this-all-matters" class="level2" data-number="3.10">
+<h2 data-number="3.10" class="anchored" data-anchor-id="unbiasedness-and-causality-why-this-all-matters"><span class="header-section-number">3.10</span> Unbiasedness and Causality: Why This All Matters</h2>
+<p>Let’s step back and connect what we’ve learned to the bigger picture. In <a href="unit2.html" class="quarto-xref"><span>Chapter 2</span></a>, we discussed how the fundamental challenge of causal inference is selection bias: people who receive “treatment” (more education, a new drug, a policy intervention) may differ systematically from those who don’t. This makes it hard to know whether differences in outcomes are caused by the treatment or by those pre-existing differences.</p>
+<p>Now we can see the same problem through the lens of regression. <strong>The zero conditional mean assumption is essentially a “no selection bias” assumption.</strong></p>
+<section id="when-can-we-interpret-hatbeta_1-causally" class="level3" data-number="3.10.1">
+<h3 data-number="3.10.1" class="anchored" data-anchor-id="when-can-we-interpret-hatbeta_1-causally"><span class="header-section-number">3.10.1</span> When Can We Interpret <span class="math inline">\(\hat{\beta}_1\)</span> Causally?</h3>
+<p>Consider our wage regression: <span class="math display">\[wage = \beta_0 + \beta_1 \cdot educ + \mu\]</span></p>
+<p>When <span class="math inline">\(E[\mu | educ] = 0\)</span>, our OLS estimate <span class="math inline">\(\hat{\beta}_1\)</span> is unbiased for <span class="math inline">\(\beta_1\)</span>. But what does <span class="math inline">\(\beta_1\)</span> actually represent?</p>
+<p>If the zero conditional mean assumption holds, then <span class="math inline">\(\beta_1\)</span> represents the <strong>causal effect</strong> of education on wages: how much wages would change if we could take a person and give them one more year of education, holding everything else constant. In this case, <span class="math inline">\(\hat{\beta}_1\)</span> is an unbiased estimate of this causal effect.</p>
+<p>But if <span class="math inline">\(E[\mu | educ] \neq 0\)</span>—say, because high-ability people get more education—then <span class="math inline">\(\beta_1\)</span> no longer represents a pure causal effect. It conflates the effect of education with the effect of ability. Our estimate <span class="math inline">\(\hat{\beta}_1\)</span> is biased, and we cannot interpret it as the causal effect of education.</p>
+</section>
+<section id="correlation-vs.-causation-revisited" class="level3" data-number="3.10.2">
+<h3 data-number="3.10.2" class="anchored" data-anchor-id="correlation-vs.-causation-revisited"><span class="header-section-number">3.10.2</span> Correlation vs.&nbsp;Causation, Revisited</h3>
+<p>Recall that the OLS slope can be written as: <span class="math display">\[\hat{\beta}_1 = \rho_{xy} \frac{\sigma_y}{\sigma_x}\]</span></p>
+<p>Bivariate OLS is fundamentally measuring the <em>correlation</em> between <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>, scaled by their relative standard deviations. Correlation becomes causation <strong>only when the Gauss-Markov assumptions hold</strong>—especially the zero conditional mean assumption.</p>
+<p>This is why we emphasize these assumptions so heavily. Without them:</p>
+<ul>
+<li>OLS still gives you numbers</li>
+<li>Those numbers still describe the correlation in your data</li>
+<li>But you <strong>cannot</strong> interpret those numbers as causal effects</li>
+</ul>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The Key Insight
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>OLS always estimates <em>something</em>. Whether that something is a causal effect or merely a correlation depends entirely on whether the assumptions are satisfied. Most of econometrics is about finding clever ways to make the zero conditional mean assumption more plausible.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="variance-of-the-ols-estimator" class="level2" data-number="3.11">
+<h2 data-number="3.11" class="anchored" data-anchor-id="variance-of-the-ols-estimator"><span class="header-section-number">3.11</span> Variance of the OLS Estimator</h2>
 <p>Even when OLS is unbiased, our estimates vary from sample to sample. The <strong>variance</strong> of <span class="math inline">\(\hat{\beta}_1\)</span> tells us how much variation to expect.</p>
 <p>Under the Gauss-Markov assumptions:</p>
 <p><span class="math display">\[
@@ -1226,8 +1273,8 @@ Var(\hat{\beta}_1) = \frac{\sigma^2}{SST_x}
 <li><p><strong>More variation in <span class="math inline">\(x\)</span> means less variance:</strong> Spreading out our observations of <span class="math inline">\(x\)</span> gives us more information and more precise estimates. This also implies that larger samples (which have more total variation) yield more precise estimates.</p></li>
 </ol>
 </section>
-<section id="standard-errors" class="level2" data-number="3.11">
-<h2 data-number="3.11" class="anchored" data-anchor-id="standard-errors"><span class="header-section-number">3.11</span> Standard Errors</h2>
+<section id="standard-errors" class="level2" data-number="3.12">
+<h2 data-number="3.12" class="anchored" data-anchor-id="standard-errors"><span class="header-section-number">3.12</span> Standard Errors</h2>
 <p>The <strong>standard error</strong> of <span class="math inline">\(\hat{\beta}_1\)</span> is the square root of the variance:</p>
 <p><span class="math display">\[
 se(\hat{\beta}_1) = \frac{\hat{\sigma}}{\sqrt{SST_x}}
@@ -1235,8 +1282,8 @@ se(\hat{\beta}_1) = \frac{\hat{\sigma}}{\sqrt{SST_x}}
 <p>where <span class="math inline">\(\hat{\sigma} = \sqrt{\frac{SSR}{n-2}}\)</span> is the estimated standard deviation of the errors.</p>
 <p>Standard errors quantify the precision of our estimates and are essential for hypothesis testing and confidence intervals (which we’ll cover in the next chapter).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># R reports standard errors automatically</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm_mpg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># R reports standard errors automatically</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm_mpg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
@@ -1260,8 +1307,8 @@ F-statistic: 45.46 on 1 and 30 DF,  p-value: 1.788e-07</code></pre>
 </div>
 <p>The standard error of <span class="math inline">\(\hat{\beta}_1\)</span> is 0.01, shown in the <code>Std. Error</code> column.</p>
 </section>
-<section id="ols-is-blue" class="level2" data-number="3.12">
-<h2 data-number="3.12" class="anchored" data-anchor-id="ols-is-blue"><span class="header-section-number">3.12</span> OLS is BLUE</h2>
+<section id="ols-is-blue" class="level2" data-number="3.13">
+<h2 data-number="3.13" class="anchored" data-anchor-id="ols-is-blue"><span class="header-section-number">3.13</span> OLS is BLUE</h2>
 <p>Under all five Gauss-Markov assumptions, OLS is <strong>BLUE</strong>:</p>
 <ul>
 <li><strong>B</strong>est: Lowest variance among all linear unbiased estimators</li>
@@ -1271,25 +1318,27 @@ F-statistic: 45.46 on 1 and 30 DF,  p-value: 1.788e-07</code></pre>
 </ul>
 <p>This is a powerful result: among all estimators that are linear and unbiased, OLS has the smallest variance. You cannot do better without either using non-linear methods or accepting some bias.</p>
 </section>
-<section id="summary-and-conclusion" class="level2" data-number="3.13">
-<h2 data-number="3.13" class="anchored" data-anchor-id="summary-and-conclusion"><span class="header-section-number">3.13</span> Summary and Conclusion</h2>
+<section id="summary-and-conclusion" class="level2" data-number="3.14">
+<h2 data-number="3.14" class="anchored" data-anchor-id="summary-and-conclusion"><span class="header-section-number">3.14</span> Summary and Conclusion</h2>
 <p>This chapter introduced Ordinary Least Squares regression, the foundational tool of econometrics. We started with the goal of modeling how the conditional expectation <span class="math inline">\(E[Y|X]\)</span> varies with <span class="math inline">\(x\)</span>, and showed how the linear regression model <span class="math inline">\(y = \beta_0 + \beta_1 x + \mu\)</span> provides a framework for this.</p>
-<p>We derived the OLS estimator formulas, learned to compute regressions in R, and explored the properties of the OLS regression line. We then turned to the statistical properties of OLS, introducing the Gauss-Markov assumptions and proving that OLS is unbiased when these assumptions hold. When the zero conditional mean assumption fails—typically due to omitted variables—our estimates become biased.</p>
+<p>We derived the OLS estimator by minimizing the sum of squared residuals, learned to compute regressions in R, and explored the properties of the OLS regression line. We then turned to the statistical properties of OLS, introducing the Gauss-Markov assumptions and proving that OLS is unbiased when these assumptions hold. When the zero conditional mean assumption fails—typically due to omitted variables—our estimates become biased.</p>
+<p>Crucially, we connected unbiasedness to causality: the zero conditional mean assumption is what allows us to interpret OLS coefficients as causal effects rather than mere correlations. Without this assumption, OLS still produces numbers, but those numbers cannot be given a causal interpretation.</p>
 <p>Finally, we discussed the variance of OLS estimates and the conditions under which OLS is the best linear unbiased estimator.</p>
-<section id="key-takeaways" class="level3" data-number="3.13.1">
-<h3 data-number="3.13.1" class="anchored" data-anchor-id="key-takeaways"><span class="header-section-number">3.13.1</span> Key Takeaways</h3>
+<section id="key-takeaways" class="level3" data-number="3.14.1">
+<h3 data-number="3.14.1" class="anchored" data-anchor-id="key-takeaways"><span class="header-section-number">3.14.1</span> Key Takeaways</h3>
 <ul>
 <li><p><strong>The goal</strong> is to estimate the conditional expectation <span class="math inline">\(E[Y|X] = \beta_0 + \beta_1 x\)</span></p></li>
 <li><p><strong>The OLS slope</strong> equals the covariance of <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> divided by the variance of <span class="math inline">\(x\)</span>: <span class="math display">\[\hat{\beta}_1 = \frac{Cov(x,y)}{Var(x)}\]</span></p></li>
 <li><p><strong>Bivariate OLS is essentially correlation</strong>—be very careful about causal interpretation</p></li>
 <li><p><strong>The Gauss-Markov assumptions</strong> (especially zero conditional mean) are required for unbiasedness</p></li>
 <li><p><strong>Omitted variable bias</strong> arises when we exclude a variable correlated with both <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span></p></li>
+<li><p><strong>Causality requires unbiasedness</strong>—only when <span class="math inline">\(E[\mu|x] = 0\)</span> can we interpret <span class="math inline">\(\hat{\beta}_1\)</span> as a causal effect</p></li>
 <li><p><strong>OLS is BLUE</strong> under the Gauss-Markov assumptions—best among linear unbiased estimators</p></li>
 </ul>
 </section>
 </section>
-<section id="check-your-understanding" class="level2" data-number="3.14">
-<h2 data-number="3.14" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">3.14</span> Check Your Understanding</h2>
+<section id="check-your-understanding" class="level2" data-number="3.15">
+<h2 data-number="3.15" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">3.15</span> Check Your Understanding</h2>
 <div class="question">
 <div class="answer-row">
     <label>i. In the model \(y = \beta_0 + \beta_1 x + \mu\), what does \(\beta_1\) represent? </label>
@@ -1369,7 +1418,7 @@ F-statistic: 45.46 on 1 and 30 DF,  p-value: 1.788e-07</code></pre>
 </div>
 </div>
 <div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1378,7 +1427,7 @@ Show Explanation
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="i">
 <li><p>The slope coefficient <span class="math inline">\(\beta_1\)</span> is the marginal effect—it tells us how much <span class="math inline">\(y\)</span> changes when <span class="math inline">\(x\)</span> increases by one unit. The intercept <span class="math inline">\(\beta_0\)</span> gives the predicted value when <span class="math inline">\(x = 0\)</span>.</p></li>
@@ -1392,6 +1441,138 @@ Show Explanation
 </div>
 </div>
 </div>
+<section id="practice-interpreting-regression-output" class="level3" data-number="3.15.1">
+<h3 data-number="3.15.1" class="anchored" data-anchor-id="practice-interpreting-regression-output"><span class="header-section-number">3.15.1</span> Practice: Interpreting Regression Output</h3>
+<p>The following questions present regression results for you to interpret.</p>
+<div class="context" style="margin-bottom: 20px;">
+<strong>Regression 1:</strong> A researcher estimates the relationship between test scores and class size using data from California elementary schools:
+<pre style="background-color: #f5f5f5; padding: 10px; margin-top: 10px; font-family: monospace;">Dependent variable: testscr (average test score, points)
+
+             Estimate  Std. Error
+(Intercept)   698.93      10.36
+str            -2.28       0.52
+
+n = 420, R-squared = 0.051
+</pre>
+<em>Note: str = student-teacher ratio (students per teacher)</em>
+</div>
+
+<div class="question">
+<div class="answer-row">
+    <label>viii. According to this regression, a class with 5 more students per teacher is predicted to score: </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">2.28 points higher</option>
+        <option value="b">11.4 points lower</option>
+        <option value="c">2.28 points lower</option>
+        <option value="d">11.4 points higher</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>ix. A school with a student-teacher ratio of 20 would have a predicted test score of: </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">698.93</option>
+        <option value="b">744.53</option>
+        <option value="c">653.33</option>
+        <option value="d">656.13</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>x. The R-squared of 0.051 means: </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The regression is invalid</option>
+        <option value="b">About 5% of the variation in test scores is explained by class size</option>
+        <option value="c">Class size has no effect on test scores</option>
+        <option value="d">The coefficient is statistically insignificant</option>
+    </select>
+</div>
+</div>
+
+<div class="context" style="margin-top: 30px; margin-bottom: 20px;">
+<strong>Regression 2:</strong> An economist studies the relationship between cigarette consumption and prices across U.S. states:
+<pre style="background-color: #f5f5f5; padding: 10px; margin-top: 10px; font-family: monospace;">Dependent variable: packs (cigarette packs sold per capita)
+
+             Estimate  Std. Error
+(Intercept)   219.58      29.19
+rprice        -1.04       0.29
+
+n = 48, R-squared = 0.21
+</pre>
+<em>Note: rprice = real price per pack (cents)</em>
+</div>
+
+<div class="question">
+<div class="answer-row">
+    <label>xi. According to this regression, if the price increases by 10 cents per pack: </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Consumption increases by 1.04 packs per capita</option>
+        <option value="b">Consumption decreases by 1.04 packs per capita</option>
+        <option value="c">Consumption decreases by 10.4 packs per capita</option>
+        <option value="d">Consumption increases by 10.4 packs per capita</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>xii. The negative coefficient on price is consistent with: </label>
+    <select onchange="checkAnswer(this, 'a')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The law of demand: higher prices lead to lower quantity demanded</option>
+        <option value="b">A violation of the zero conditional mean assumption</option>
+        <option value="c">Heteroskedasticity in the error term</option>
+        <option value="d">An R-squared that is too low</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>xiii. <strong>(Challenge)</strong> Why might we be cautious about interpreting this coefficient as the causal effect of price on consumption? </label>
+    <select onchange="checkAnswer(this, 'd')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The R-squared is too low</option>
+        <option value="b">The sample size is too small</option>
+        <option value="c">The coefficient is negative</option>
+        <option value="d">Omitted variables (like anti-smoking policies or income) may affect both price and consumption</option>
+    </select>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Show Explanation
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="i">
+<li><p>The slope coefficient <span class="math inline">\(\beta_1\)</span> is the marginal effect—it tells us how much <span class="math inline">\(y\)</span> changes when <span class="math inline">\(x\)</span> increases by one unit. The intercept <span class="math inline">\(\beta_0\)</span> gives the predicted value when <span class="math inline">\(x = 0\)</span>.</p></li>
+<li><p>The zero conditional mean assumption <span class="math inline">\(E[\mu|x] = 0\)</span> states that the expected value of the error term is zero for any given value of <span class="math inline">\(x\)</span>. This is crucial for unbiasedness.</p></li>
+<li><p>The OLS slope equals the sample covariance of <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> divided by the sample variance of <span class="math inline">\(x\)</span>. This follows directly from the derivation.</p></li>
+<li><p>Unbiasedness means that if we could repeat the sampling process many times, the <em>average</em> of our estimates would equal the true parameter. Individual estimates can still miss the target.</p></li>
+<li><p>Omitted variable bias occurs when we leave out a variable that belongs in the model and is correlated with our included independent variable. This causes <span class="math inline">\(E[\mu|x] \neq 0\)</span>.</p></li>
+<li><p>The zero conditional mean assumption (<span class="math inline">\(E[\mu|x] = 0\)</span>) is needed to prove OLS is unbiased, but it is not needed to derive the OLS formulas themselves. The calculus minimization approach works regardless of this assumption—it just tells us which values minimize squared residuals.</p></li>
+<li><p>As sample size increases, we get more variation in <span class="math inline">\(x\)</span>, so <span class="math inline">\(SST = \sum(x_i - \bar{x})^2\)</span> increases. Since this appears in the denominator, the variance of our estimate decreases. Larger samples give more precise estimates.</p></li>
+</ol>
+<p><strong>Regression Interpretation Questions:</strong></p>
+<ol start="8" type="i">
+<li><p>The coefficient on <code>str</code> is <span class="math inline">\(-2.28\)</span>, meaning each additional student per teacher is associated with 2.28 fewer points. For 5 additional students: <span class="math inline">\(5 \times (-2.28) = -11.4\)</span> points.</p></li>
+<li><p>Using the regression equation: <span class="math inline">\(\hat{y} = 698.93 + (-2.28)(20) = 698.93 - 45.6 = 653.33\)</span></p></li>
+<li><p>R-squared measures the fraction of variance in <span class="math inline">\(y\)</span> explained by the regression. Here, 5.1% of test score variation is explained by class size. A low R-squared doesn’t make the coefficient meaningless—it just means other factors also matter.</p></li>
+<li><p>The coefficient is <span class="math inline">\(-1.04\)</span>, so a 10-cent increase predicts: <span class="math inline">\(10 \times (-1.04) = -10.4\)</span> packs per capita.</p></li>
+<li><p>The negative relationship between price and quantity is exactly what economic theory predicts—the law of demand.</p></li>
+<li><p>States with strong anti-smoking policies might have both higher cigarette taxes (raising prices) AND other policies that reduce smoking. This would create omitted variable bias, making price appear more effective than it actually is at reducing consumption.</p></li>
+</ol>
+</div>
+</div>
+</div>
+<p>::::</p>
 
 
 <div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
@@ -1399,6 +1580,7 @@ Show Explanation
 Wooldridge, Jeffrey M. 2019. <em>Introductory Econometrics: A Modern Approach</em>. 7th ed. Cengage Learning.
 </div>
 </div>
+</section>
 </section>
 
 </main> <!-- /main -->
@@ -1829,8 +2011,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./references.html" class="pagination-link" aria-label="References">
-        <span class="nav-page-text">References</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./unit4.html" class="pagination-link" aria-label="Multivariate Regression">
+        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Multivariate Regression</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

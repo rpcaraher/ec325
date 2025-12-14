@@ -1,0 +1,1283 @@
+# Multivariate Regression {#sec-multivariate}
+
+```{r}
+#| echo: false
+#| output: false
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(patchwork)
+
+```
+
+```{=html}
+
+<style>
+.problem {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+.context {
+    background-color: #e8f4f8;
+    padding: 12px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border-left: 4px solid #2874a6;
+}
+.question {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #fff3cd;
+    border-radius: 5px;
+}
+.answer-row {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.answer-row label {
+    min-width: 320px;
+    font-weight: 500;
+}
+select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    min-width: 300px;
+    cursor: pointer;
+}
+select:focus {
+    border-color: #2874a6;
+    outline: none;
+}
+.correct {
+    border-color: #28a745 !important;
+    background-color: #d4edda !important;
+}
+.incorrect {
+    border-color: #dc3545 !important;
+    background-color: #f8d7da !important;
+}
+.explanation {
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #e7f3ff;
+    border-radius: 5px;
+    border-left: 4px solid #2874a6;
+}
+.note {
+    font-size: 0.85em;
+    color: #666;
+    font-style: italic;
+}
+</style>
+
+<script>
+function checkAnswer(selectElement, correctValue) {
+    if (selectElement.value === '') {
+        selectElement.classList.remove('correct', 'incorrect');
+    } else if (selectElement.value === correctValue) {
+        selectElement.classList.remove('incorrect');
+        selectElement.classList.add('correct');
+    } else {
+        selectElement.classList.remove('correct');
+        selectElement.classList.add('incorrect');
+    }
+}
+</script>
+
+```
+
+
+::: {.callout-tip collapse="true"}
+## **Key Questions**
+- Why do we need multivariate regression?
+- How do we interpret coefficients when there are multiple independent variables?
+- What is the zero conditional mean assumption in the multivariate case?
+- How does multivariate OLS function as a "matching" estimator?
+- What is the omitted variable bias formula and how do we use it?
+- What is the bias-variance tradeoff when deciding which controls to include?
+:::
+
+::: {.callout-note collapse="true"}
+## **Suggested Readings**
+- @wooldridge_introductory_2019, Ch. 3
+:::
+
+
+In @sec-ols,
+we introduced bivariate OLS and saw that causal interpretation requires the zero conditional mean assumption: $E[\mu | x] = 0$.
+We also saw that this assumption is frequently violated due to omitted variables---factors in the error term that are correlated with both $x$ and $y$.
+
+This chapter introduces **multivariate OLS**,
+which allows us to explicitly control for confounding variables.
+By including additional variables on the right-hand side of our regression,
+we can make the zero conditional mean assumption more plausible and get closer to causal estimates.
+
+
+## The Problem with Bivariate OLS
+
+Let's revisit why bivariate OLS often fails to give us causal estimates.
+
+Consider a regression of wages on education:
+
+$$
+wage = \beta_0 + \beta_1 \cdot educ + \mu
+$$
+
+For $\hat{\beta}_1$ to be an unbiased estimate of the causal effect of education,
+we need $E[\mu | educ] = 0$.
+But the error term $\mu$ contains everything else that affects wages:
+ability,
+family connections,
+motivation,
+and countless other factors.
+
+Many of these factors are likely correlated with education.
+For example,
+people from wealthier families tend to get more education (better schools,
+tutors,
+college is affordable) *and* earn higher wages (family connections,
+inherited wealth).
+If family income is in $\mu$ and correlated with education,
+then $E[\mu | educ] \neq 0$,
+and our estimate is biased.
+
+::: {.callout-important}
+## The Core Problem
+With bivariate OLS,
+the zero conditional mean assumption requires that *all* factors affecting $y$ (other than $x$) be uncorrelated with $x$.
+This is almost never plausible in observational data.
+:::
+
+
+## The Multivariate Solution
+
+Multivariate OLS offers a solution:
+**explicitly control** for variables that might be confounders.
+
+If we're worried that family income confounds the education-wage relationship,
+we can include it in our model:
+
+$$
+wage = \beta_0 + \beta_1 \cdot educ + \beta_2 \cdot family\_income + \mu
+$$
+
+Now $\beta_1$ represents the effect of education on wages **holding family income constant**.
+The error term $\mu$ no longer contains family income,
+so that source of bias is eliminated.
+
+### The General Multivariate Model
+
+The general multivariate linear regression model with $k$ independent variables is:
+
+$$
+y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots + \beta_k x_k + \mu
+$$ {#eq-multivariate}
+
+where:
+
+- $y$ is the dependent variable
+- $x_1, x_2, \ldots, x_k$ are the independent variables
+- $\beta_0$ is the intercept
+- $\beta_j$ is the coefficient on $x_j$ (for $j = 1, 2, \ldots, k$)
+- $\mu$ is the error term containing all factors not included in the model
+
+
+### Interpreting Coefficients
+
+In multivariate regression,
+each coefficient has a **ceteris paribus** interpretation:
+
+$$
+\beta_j = \frac{\partial y}{\partial x_j}
+$$
+
+This is the change in $y$ associated with a one-unit increase in $x_j$,
+**holding all other independent variables constant**.
+
+For example,
+in the model:
+
+$$
+wage = \beta_0 + \beta_1 \cdot educ + \beta_2 \cdot family\_income + \mu
+$$
+
+- $\beta_1$: The change in wages for one additional year of education, **holding family income constant**
+- $\beta_2$: The change in wages for one additional dollar of family income, **holding education constant**
+
+
+### The Zero Conditional Mean Assumption
+
+In multivariate OLS,
+the zero conditional mean assumption becomes:
+
+$$
+E[\mu | x_1, x_2, \ldots, x_k] = 0
+$$
+
+This states that the average of unobserved factors is zero for *all unique combinations* of the independent variables.
+In other words,
+everything in $\mu$ must be uncorrelated with *all* the variables we've included.
+
+This assumption is much more plausible than its bivariate counterpart.
+By including relevant control variables,
+we've removed them from $\mu$,
+making it more likely that what remains is uncorrelated with our variables of interest.
+
+
+## Deriving the Multivariate OLS Estimator
+
+The derivation follows the same logic as bivariate OLS:
+we minimize the sum of squared residuals.
+
+### The Minimization Problem
+
+Given a sample of $n$ observations,
+we want to find values $\hat{\beta}_0, \hat{\beta}_1, \ldots, \hat{\beta}_k$ that minimize:
+
+$$
+SSR = \sum_{i=1}^{n} (y_i - \hat{\beta}_0 - \hat{\beta}_1 x_{1i} - \hat{\beta}_2 x_{2i} - \cdots - \hat{\beta}_k x_{ki})^2
+$$
+
+### First-Order Conditions
+
+Taking partial derivatives with respect to each $\hat{\beta}_j$ and setting them equal to zero yields $k + 1$ first-order conditions:
+
+$$
+\sum_{i=1}^{n}(y_i - \hat{\beta}_0 - \hat{\beta}_1 x_{1i} - \cdots - \hat{\beta}_k x_{ki}) = 0
+$$
+
+$$
+\sum_{i=1}^{n} x_{1i}(y_i - \hat{\beta}_0 - \hat{\beta}_1 x_{1i} - \cdots - \hat{\beta}_k x_{ki}) = 0
+$$
+
+$$
+\vdots
+$$
+
+$$
+\sum_{i=1}^{n} x_{ki}(y_i - \hat{\beta}_0 - \hat{\beta}_1 x_{1i} - \cdots - \hat{\beta}_k x_{ki}) = 0
+$$
+
+Solving this system of equations yields the OLS estimates.
+The algebra is tedious (and typically handled with matrix methods),
+so we won't derive the explicit formulas here.
+Fortunately,
+your computer does this effortlessly.
+
+
+## Estimating Multivariate OLS in R
+
+In R,
+we estimate multivariate regression using the same `lm()` function,
+simply adding variables with the `+` symbol.
+
+### Example: MPG, Horsepower, and Weight
+
+Let's estimate the effect of horsepower on fuel efficiency,
+first without and then with a control for vehicle weight.
+
+```{r}
+#| echo: true
+
+# Load data
+data(mtcars)
+
+# Bivariate regression
+lm_bivariate <- lm(mpg ~ hp, data = mtcars)
+
+# Multivariate regression (adding weight as control)
+lm_multivariate <- lm(mpg ~ hp + wt, data = mtcars)
+```
+
+**Bivariate results:**
+
+```{r}
+#| echo: true
+
+summary(lm_bivariate)
+```
+
+**Multivariate results:**
+
+```{r}
+#| echo: true
+
+summary(lm_multivariate)
+```
+
+### Interpreting the Results
+
+In the **bivariate** regression,
+the coefficient on horsepower is $-0.068$:
+each additional unit of horsepower is associated with 0.068 fewer miles per gallon.
+
+In the **multivariate** regression (controlling for weight),
+the coefficient on horsepower drops to $-0.032$---less than half the size!
+
+What happened?
+Horsepower and weight are positively correlated (more powerful engines tend to be in heavier vehicles),
+and weight independently reduces fuel efficiency.
+The bivariate estimate was conflating the effect of horsepower with the effect of weight.
+Once we control for weight,
+we isolate the effect of horsepower alone.
+
+::: {.callout-tip}
+## What Changed?
+The coefficient on `hp` dropped from $-0.068$ to $-0.032$ when we added `wt`.
+This suggests that much of what appeared to be the "effect" of horsepower was actually the effect of weight.
+This is precisely what controlling for confounders accomplishes.
+:::
+
+
+## Multivariate OLS as Matching
+
+There's an intuitive way to understand what multivariate OLS does:
+it's essentially a **matching** estimator.
+When we "control for" a variable,
+we're comparing observations that have similar values of that control variable.
+
+### The Returns to Education Example
+
+Suppose we want to estimate the effect of education on wages.
+A simple comparison of average wages across education levels might be misleading because people with more education tend to work in higher-paying industries.
+Part of the apparent "return to education" might actually be an "industry premium."
+
+Let's work through this with simulated data to see exactly how controlling for industry works.
+
+```{r}
+#| echo: true
+
+# Simulate wage data
+set.seed(42)
+n <- 2000
+
+# Create data where:
+# - More educated workers are more likely to be in high-paying industries
+# - Industry independently affects wages
+wage_data <- tibble(
+  # Education: 1 = HS, 2 = Some College, 3 = Bachelor's+
+  educ_years = sample(c(12, 14, 16), n, replace = TRUE, prob = c(0.4, 0.3, 0.3)),
+  
+  # Higher education -> more likely in professional services (high pay industry)
+  ind_professional = rbinom(n, 1, prob = case_when(
+    educ_years == 12 ~ 0.20,
+    educ_years == 14 ~ 0.40,
+    educ_years == 16 ~ 0.65
+  )),
+  
+  # Wages depend on education AND industry
+  wage = 25000 + 
+    3000 * (educ_years - 12) +     # True education effect: $3000 per year
+    15000 * ind_professional +      # Industry premium: $15000
+    rnorm(n, 0, 8000)
+) |>
+  mutate(
+    educ_cat = case_when(
+      educ_years == 12 ~ "HS Only",
+      educ_years == 14 ~ "Some College", 
+      educ_years == 16 ~ "Bachelor's+"
+    ),
+    industry = ifelse(ind_professional == 1, "Professional", "Other")
+  )
+```
+
+### The Naive Comparison
+
+First, let's compute average wages by education level without any controls:
+
+```{r}
+#| echo: true
+
+naive_means <- wage_data |>
+  group_by(educ_cat, educ_years) |>
+  summarise(avg_wage = mean(wage), n = n(), .groups = "drop") |>
+  arrange(educ_years)
+
+naive_means |>
+  knitr::kable(
+    col.names = c("Education", "Years", "Avg Wage ($)", "N"),
+    digits = 0
+  )
+```
+
+```{r}
+#| echo: false
+
+# Calculate naive differences
+hs_wage <- naive_means$avg_wage[naive_means$educ_years == 12]
+sc_wage <- naive_means$avg_wage[naive_means$educ_years == 14]
+ba_wage <- naive_means$avg_wage[naive_means$educ_years == 16]
+
+naive_sc_diff <- sc_wage - hs_wage
+naive_ba_diff <- ba_wage - hs_wage
+```
+
+The naive comparison suggests that going from high school to some college is associated with about $`r format(round(naive_sc_diff, 0), big.mark = ",")` higher wages,
+and going from high school to a bachelor's degree is associated with about $`r format(round(naive_ba_diff, 0), big.mark = ",")` higher wages.
+
+But wait—the true effect of education in our simulation is only \$3,000 per year (so \$6,000 for 2 extra years and \$12,000 for 4 extra years).
+The naive estimates are too large!
+This is because more educated workers are more likely to be in high-paying industries.
+
+### Step 1: Compute Within-Industry Differences
+
+To control for industry,
+we first compute average wages separately for each education-industry combination:
+
+```{r}
+#| echo: true
+#| label: tbl-matching-detailed
+#| tbl-cap: "Average wages by education and industry"
+
+cell_means <- wage_data |>
+  group_by(industry, educ_cat, educ_years) |>
+  summarise(avg_wage = mean(wage), n = n(), .groups = "drop") |>
+  arrange(industry, educ_years)
+
+cell_means |>
+  select(industry, educ_cat, avg_wage, n) |>
+  knitr::kable(
+    col.names = c("Industry", "Education", "Avg Wage ($)", "N"),
+    digits = 0
+  )
+```
+
+Now let's compute the wage differences **within** each industry:
+
+```{r}
+#| echo: true
+
+within_industry <- cell_means |>
+  group_by(industry) |>
+  mutate(
+    diff_from_hs = avg_wage - avg_wage[educ_years == 12]
+  ) |>
+  filter(educ_years > 12) |>
+  select(industry, educ_cat, diff_from_hs, n)
+
+within_industry |>
+  knitr::kable(
+    col.names = c("Industry", "Education", "Wage Diff vs HS ($)", "N in Cell"),
+    digits = 0
+  )
+```
+
+Notice that the within-industry differences are much closer to the true values (\$6,000 for Some College, \$12,000 for Bachelor's+).
+
+### Step 2: Compute Weights
+
+To combine these within-industry estimates into a single number,
+we take a **weighted average**.
+The weights are based on the number of observations in each industry:
+
+```{r}
+#| echo: true
+
+# Total workers in each industry
+industry_totals <- wage_data |>
+  count(industry) |>
+  mutate(weight = n / sum(n))
+
+industry_totals |>
+  knitr::kable(
+    col.names = c("Industry", "N", "Weight"),
+    digits = 3
+  )
+```
+
+### Step 3: Compute Weighted Average
+
+Now we combine the within-industry differences using these weights.
+Let's do this for the Bachelor's+ vs HS comparison:
+
+```{r}
+#| echo: true
+
+# Get the within-industry differences for Bachelor's+
+ba_diffs <- within_industry |>
+  filter(educ_cat == "Bachelor's+") |>
+  left_join(industry_totals, by = "industry")
+
+ba_diffs |>
+  select(industry, diff_from_hs, weight) |>
+  knitr::kable(
+    col.names = c("Industry", "Within-Industry Diff ($)", "Weight"),
+    digits = c(0, 0, 3)
+  )
+
+# Weighted average
+weighted_avg <- sum(ba_diffs$diff_from_hs * ba_diffs$weight)
+```
+
+The weighted average is:
+
+$$
+(`r round(ba_diffs$diff_from_hs[1], 0)` \times `r round(ba_diffs$weight[1], 3)`) + (`r round(ba_diffs$diff_from_hs[2], 0)` \times `r round(ba_diffs$weight[2], 3)`) = `r format(round(weighted_avg, 0), big.mark = ",")`
+$$
+
+This is much closer to the true effect of \$12,000!
+
+### The Regression Equivalent
+
+Now let's see what regression gives us:
+
+```{r}
+#| echo: true
+
+# Create numeric education variable (years beyond HS)
+wage_data <- wage_data |>
+  mutate(educ_beyond_hs = educ_years - 12)
+
+# Regression controlling for industry
+lm_controlled <- lm(wage ~ educ_beyond_hs + ind_professional, data = wage_data)
+summary(lm_controlled)
+```
+
+The coefficient on `educ_beyond_hs` is approximately \$3,000 per year—almost exactly the true value we built into the simulation!
+
+Compare this to the naive regression without the industry control:
+
+```{r}
+#| echo: true
+
+lm_naive <- lm(wage ~ educ_beyond_hs, data = wage_data)
+coef(lm_naive)["educ_beyond_hs"]
+```
+
+The naive estimate (`r format(round(coef(lm_naive)["educ_beyond_hs"], 0), big.mark = ",")`) is inflated because it conflates the education effect with the industry premium.
+
+::: {.callout-note}
+## Multivariate OLS as Matching
+When you include control variables,
+OLS is effectively:
+
+1. **Grouping** observations by similar values of the control variables
+2. **Computing** the relationship between $x$ and $y$ within each group
+3. **Taking a weighted average** across groups,
+where weights reflect group sizes
+
+This is why multivariate regression is sometimes called a "matching" estimator—we're matching people who work in the same industry and comparing their wages based on education.
+:::
+
+
+## Goodness-of-Fit: Adjusted R-Squared
+
+In bivariate OLS,
+we used $R^2$ to measure how much variation in $y$ our model explains.
+The same concept applies to multivariate OLS,
+but with an important caveat.
+
+### The Problem with R-Squared
+
+The $R^2$ can never decrease when you add more variables---it can only increase or stay the same.
+This is because adding variables can only improve (or maintain) the fit,
+even if those variables are irrelevant.
+
+This creates a problem:
+$R^2$ mechanically increases as you add more variables,
+potentially making a bloated model look better than a parsimonious one.
+
+### The Adjusted R-Squared
+
+The **adjusted R-squared** penalizes for the number of parameters:
+
+$$
+\bar{R}^2 = 1 - \frac{(1 - R^2)(n - 1)}{n - k - 1}
+$$
+
+where $n$ is the sample size and $k$ is the number of independent variables.
+
+The adjusted $R^2$:
+
+- Is always smaller than the regular $R^2$
+- Can decrease when you add irrelevant variables
+- Provides a better comparison between models with different numbers of variables
+
+```{r}
+#| echo: true
+
+# Compare R-squared and Adjusted R-squared
+c(
+  "Bivariate R-sq" = summary(lm_bivariate)$r.squared,
+  "Bivariate Adj R-sq" = summary(lm_bivariate)$adj.r.squared,
+  "Multivariate R-sq" = summary(lm_multivariate)$r.squared,
+  "Multivariate Adj R-sq" = summary(lm_multivariate)$adj.r.squared
+)
+```
+
+
+## Gauss-Markov Assumptions for Multivariate OLS
+
+The Gauss-Markov assumptions extend naturally to the multivariate case,
+with one important addition.
+
+### Assumption 1: Linear in Parameters
+
+$$
+y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots + \beta_k x_k + \mu
+$$
+
+As in the bivariate case,
+we can transform variables to model non-linear relationships while maintaining linearity in parameters.
+
+### Assumption 2: Random Sampling
+
+We have a random sample $\{(x_{1i}, x_{2i}, \ldots, x_{ki}, y_i) : i = 1, \ldots, n\}$ from the population.
+
+### Assumption 3: No Perfect Multicollinearity
+
+This assumption has two parts:
+
+1. **No constant variables:** Each independent variable must have some variation in the sample
+2. **No exact linear relationships:** No independent variable can be a perfect linear function of other independent variables
+
+The second part is new and important in multivariate regression.
+
+::: {.callout-warning}
+## Perfect Multicollinearity
+**Perfect multicollinearity** occurs when one independent variable is an exact linear combination of others.
+Examples:
+
+- Including both `family_income` and `family_income_thousands` (one is just the other divided by 1000)
+- Including `parent1_income`, `parent2_income`, and `family_income` when `family_income = parent1_income + parent2_income`
+- Including dummy variables for all categories of a categorical variable plus an intercept
+
+When perfect multicollinearity exists,
+the OLS formulas break down (the system of equations has no unique solution).
+R will typically drop one of the collinear variables automatically and issue a warning.
+:::
+
+### Assumption 4: Zero Conditional Mean
+
+$$
+E[\mu | x_1, x_2, \ldots, x_k] = 0
+$$
+
+The error term has mean zero for all combinations of the independent variables.
+This can still fail due to:
+
+- Omitted variables correlated with included variables
+- Wrong functional form
+- Measurement error in independent variables
+- Simultaneous causality
+
+### Assumption 5: Homoskedasticity
+
+$$
+Var(\mu | x_1, x_2, \ldots, x_k) = \sigma^2
+$$
+
+The variance of the error term is constant across all combinations of independent variable values.
+
+
+## The Omitted Variable Bias Formula
+
+Even when we can't include an omitted variable (perhaps because it's unobservable),
+we can still reason about the **direction** of the bias.
+
+### Setup
+
+Suppose the true model is:
+
+$$
+y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \mu
+$$
+
+But we can't observe $x_2$,
+so we estimate the misspecified model:
+
+$$
+\tilde{y} = \tilde{\beta}_0 + \tilde{\beta}_1 x_1
+$$
+
+where the tilde ($\tilde{}$) indicates estimates from the misspecified model.
+
+### The OVB Formula
+
+It can be shown that:
+
+$$
+\tilde{\beta}_1 = \hat{\beta}_1 + \hat{\beta}_2 \tilde{\delta}_1
+$$ {#eq-ovb-formula}
+
+where $\tilde{\delta}_1$ is the coefficient from regressing $x_2$ on $x_1$:
+
+$$
+x_2 = \tilde{\delta}_0 + \tilde{\delta}_1 x_1 + \text{error}
+$$
+
+Taking expectations:
+
+$$
+E[\tilde{\beta}_1] = \beta_1 + \beta_2 \tilde{\delta}_1
+$$
+
+Therefore,
+the **bias** is:
+
+$$
+\text{Bias}(\tilde{\beta}_1) = \beta_2 \cdot \tilde{\delta}_1
+$$ {#eq-ovb-bias}
+
+### Interpreting the Bias Formula
+
+The bias depends on two factors:
+
+1. **$\beta_2$:** The effect of the omitted variable on $y$
+2. **$\tilde{\delta}_1$:** The correlation between the omitted variable ($x_2$) and the included variable ($x_1$)
+
+If either factor is zero,
+there is no bias.
+But if both are non-zero,
+bias exists,
+and its direction depends on the signs:
+
+| | $Corr(x_1, x_2) > 0$ | $Corr(x_1, x_2) < 0$ |
+|-----|---------------------|---------------------|
+| $\beta_2 > 0$ | Positive bias (overestimate) | Negative bias (underestimate) |
+| $\beta_2 < 0$ | Negative bias (underestimate) | Positive bias (overestimate) |
+
+### Example: Education, Wages, and Ability
+
+Consider estimating the return to education while omitting ability:
+
+- **$\beta_2$ (effect of ability on wages):** Positive (more able people earn more)
+- **$\tilde{\delta}_1$ (correlation of ability with education):** Positive (more able people get more education)
+
+Therefore:
+$$\text{Bias} = (+)(+) = \text{Positive}$$
+
+Our estimate of the return to education is **too large**---it includes part of the return to ability.
+
+### Example: Policing, Crime, and Poverty
+
+Consider estimating the effect of policing on crime while omitting local poverty:
+
+- **Effect of poverty on crime ($\beta_2$):** Positive (higher poverty → more crime)
+- **Correlation of poverty with policing ($\tilde{\delta}_1$):** Positive (high-poverty areas get more policing)
+
+Therefore:
+$$\text{Bias} = (+)(+) = \text{Positive}$$
+
+Our estimate suggests policing *increases* crime more than it actually does (or reduces it less than it actually does).
+This is why naive correlations between police presence and crime can be misleading.
+
+
+## Variance in Multivariate OLS
+
+Under the Gauss-Markov assumptions,
+the variance of $\hat{\beta}_j$ is:
+
+$$
+Var(\hat{\beta}_j) = \frac{\sigma^2}{SST_j (1 - R_j^2)}
+$$ {#eq-multivar-variance}
+
+where:
+
+- $\sigma^2$ is the error variance
+- $SST_j = \sum(x_{ji} - \bar{x}_j)^2$ is the total variation in $x_j$
+- $R_j^2$ is the R-squared from regressing $x_j$ on all other independent variables
+
+### What Increases Variance?
+
+From @eq-multivar-variance,
+the variance of $\hat{\beta}_j$ increases when:
+
+1. **More noise ($\sigma^2$):** Higher error variance means less precise estimates
+2. **Less variation in $x_j$ ($SST_j$):** Less information about how $x_j$ relates to $y$
+3. **Higher $R_j^2$:** More correlation between $x_j$ and other independent variables
+
+The third point is crucial:
+when your variable of interest is highly correlated with control variables,
+your estimate becomes less precise.
+This is sometimes called **imperfect multicollinearity** or the **multicollinearity problem**.
+
+### Standard Errors
+
+The standard error is estimated as:
+
+$$
+se(\hat{\beta}_j) = \frac{\hat{\sigma}}{\sqrt{SST_j(1 - R_j^2)}}
+$$
+
+where $\hat{\sigma}^2 = \frac{SSR}{n - k - 1}$ is the estimated error variance,
+and $n - k - 1$ represents the **degrees of freedom**.
+
+
+## The Bias-Variance Tradeoff
+
+Should you include a variable in your regression?
+The answer depends on a tradeoff.
+
+### The Costs of Omitting a Relevant Variable
+
+If a variable truly belongs in the model ($\beta_2 \neq 0$) and is correlated with $x_1$,
+omitting it causes **bias**.
+Your estimate systematically misses the true value.
+
+### The Costs of Including an Irrelevant Variable
+
+What if you include a variable that doesn't belong ($\beta_2 = 0$)?
+
+From the OVB formula:
+$$E[\hat{\beta}_1] = \beta_1 + (0) \cdot \tilde{\delta}_1 = \beta_1$$
+
+No bias!
+Including an irrelevant variable doesn't bias your estimate.
+
+But look at the variance formula.
+Including an extra variable increases $R_1^2$ (the correlation between $x_1$ and other variables),
+which increases the variance of $\hat{\beta}_1$.
+
+**Including irrelevant variables inflates variance without reducing bias.**
+
+### The Tradeoff
+
+| Action | Bias | Variance |
+|--------|------|----------|
+| Omit relevant variable | Increases | Decreases |
+| Include irrelevant variable | No change | Increases |
+
+This is the **bias-variance tradeoff**:
+
+- If you're too conservative (omit too many variables),
+you risk bias
+- If you're too liberal (include everything),
+you inflate variance
+
+### Practical Guidance
+
+There's no perfect solution,
+but some principles help:
+
+1. **Include variables you have strong theoretical reasons to believe are confounders.** Use economic theory and prior research to guide variable selection.
+
+2. **Be cautious about highly correlated controls.** If two controls are very highly correlated with each other,
+including both can dramatically inflate variance.
+
+3. **Larger samples help.** As $n$ increases,
+variance decreases,
+making the "include it just in case" strategy less costly.
+
+4. **Check how estimates change.** If adding a control substantially changes your coefficient of interest,
+that control is probably important.
+
+
+## Simulation: Bias vs. Variance
+
+Let's see the bias-variance tradeoff in action with a simulation.
+
+```{r}
+#| echo: false
+#| label: fig-bias-variance
+#| fig-cap: "The bias-variance tradeoff. Left: When x₂ doesn't affect y (β₂=0), including it adds variance without reducing bias. Right: When x₂ does affect y (β₂≠0), omitting it causes bias."
+#| fig-width: 10
+#| fig-height: 4
+#| out-width: "95%"
+#| cache: true
+
+set.seed(124890)
+
+# Case 1: x2 is irrelevant (beta2 = 0)
+pop_irrelevant <- tibble(
+  x2 = sample(1:100, 10000, replace = TRUE),
+  err = rnorm(10000),
+  x1 = 5.68 + 1.89 * x2 + rnorm(10000),
+  y = 8.78 + 2.21 * x1 + err  # Note: no x2 effect
+)
+
+# Case 2: x2 is relevant (beta2 != 0)
+pop_relevant <- tibble(
+  x2 = sample(1:100, 10000, replace = TRUE),
+  err = rnorm(10000),
+  x1 = 5.68 + 1.89 * x2 + rnorm(10000),
+  y = 8.78 + 2.21 * x1 + 0.15 * x2 + err  # x2 has effect
+)
+
+# Simulation function
+simulate_estimates <- function(pop_data, include_x2, n_sims = 500, sample_size = 100) {
+  map_dfr(1:n_sims, function(i) {
+    samp <- slice_sample(pop_data, n = sample_size)
+    if (include_x2) {
+      reg <- lm(y ~ x1 + x2, data = samp)
+    } else {
+      reg <- lm(y ~ x1, data = samp)
+    }
+    tibble(b1 = coef(reg)["x1"])
+  })
+}
+
+# Run simulations
+set.seed(42)
+irrel_omit <- simulate_estimates(pop_irrelevant, include_x2 = FALSE)
+irrel_include <- simulate_estimates(pop_irrelevant, include_x2 = TRUE)
+rel_omit <- simulate_estimates(pop_relevant, include_x2 = FALSE)
+rel_include <- simulate_estimates(pop_relevant, include_x2 = TRUE)
+
+# Plot Case 1: Irrelevant variable
+p1 <- ggplot() +
+  geom_histogram(data = irrel_omit, aes(x = b1, fill = "Omit x₂"), 
+                 alpha = 0.5, bins = 30, color = "white") +
+  geom_histogram(data = irrel_include, aes(x = b1, fill = "Include x₂"), 
+                 alpha = 0.5, bins = 30, color = "white") +
+  geom_vline(xintercept = 2.21, color = "darkred", linewidth = 1.5, linetype = "dashed") +
+  scale_fill_manual(values = c("Omit x₂" = "steelblue", "Include x₂" = "coral")) +
+  labs(
+    title = expression(paste("Case 1: ", x[2], " is irrelevant (", beta[2], " = 0)")),
+    x = expression(hat(beta)[1]),
+    y = "Count",
+    fill = "Model"
+  ) +
+  annotate("text", x = 2.21, y = 55, label = "True β₁", color = "darkred", hjust = -0.1) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+# Plot Case 2: Relevant variable
+p2 <- ggplot() +
+  geom_histogram(data = rel_omit, aes(x = b1, fill = "Omit x₂"), 
+                 alpha = 0.5, bins = 30, color = "white") +
+  geom_histogram(data = rel_include, aes(x = b1, fill = "Include x₂"), 
+                 alpha = 0.5, bins = 30, color = "white") +
+  geom_vline(xintercept = 2.21, color = "darkred", linewidth = 1.5, linetype = "dashed") +
+  scale_fill_manual(values = c("Omit x₂" = "steelblue", "Include x₂" = "coral")) +
+  labs(
+    title = expression(paste("Case 2: ", x[2], " is relevant (", beta[2], " ≠ 0)")),
+    x = expression(hat(beta)[1]),
+    y = "Count",
+    fill = "Model"
+  ) +
+  annotate("text", x = 2.21, y = 55, label = "True β₁", color = "darkred", hjust = -0.1) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+p1 + p2
+```
+
+In **Case 1** (left panel),
+$x_2$ doesn't actually affect $y$.
+Including it (coral) doesn't reduce bias (both distributions are centered on the true value),
+but it does increase variance (the coral distribution is wider).
+
+In **Case 2** (right panel),
+$x_2$ does affect $y$.
+Omitting it (blue) causes bias---the distribution is centered away from the true value.
+Including it (coral) eliminates the bias,
+even though variance is slightly higher.
+
+
+## Summary
+
+This chapter extended OLS to the multivariate case,
+allowing us to control for confounding variables.
+
+### Key Takeaways
+
+- **Multivariate OLS** includes multiple independent variables:
+$$y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots + \beta_k x_k + \mu$$
+
+- **Coefficients have ceteris paribus interpretations:**
+$\beta_j$ is the effect of $x_j$ holding all other variables constant
+
+- **The zero conditional mean assumption** now requires $E[\mu | x_1, \ldots, x_k] = 0$---more plausible with good controls
+
+- **Multivariate OLS is like matching:**
+It compares observations within groups defined by control variables
+
+- **The OVB formula** tells us the direction of bias from omitting a variable:
+$$\text{Bias} = \beta_2 \cdot \tilde{\delta}_1$$
+
+- **There's a bias-variance tradeoff:**
+Omitting relevant variables causes bias;
+including irrelevant variables inflates variance
+
+- **Perfect multicollinearity** occurs when one variable is an exact linear function of others;
+it must be avoided
+
+
+## Check Your Understanding
+
+:::: {.content-visible when-format="html"}
+
+```{=html}
+<div class="question">
+<div class="answer-row">
+    <label>i. In the model \(y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \mu\), what does \(\beta_1\) represent? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The total effect of \(x_1\) on \(y\)</option>
+        <option value="b">The correlation between \(x_1\) and \(y\)</option>
+        <option value="c">The effect of \(x_1\) on \(y\), holding \(x_2\) constant</option>
+        <option value="d">The effect of \(x_1\) on \(y\), ignoring \(x_2\)</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>ii. The zero conditional mean assumption in multivariate OLS states: </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">\(E[\mu] = 0\)</option>
+        <option value="b">\(E[\mu | x_1, x_2, \ldots, x_k] = 0\)</option>
+        <option value="c">\(E[y | x_1, x_2, \ldots, x_k] = 0\)</option>
+        <option value="d">\(Var(\mu | x_1, x_2, \ldots, x_k) = \sigma^2\)</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iii. Perfect multicollinearity occurs when: </label>
+    <select onchange="checkAnswer(this, 'd')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Two independent variables are correlated</option>
+        <option value="b">The R-squared is very high</option>
+        <option value="c">The error term is correlated with an independent variable</option>
+        <option value="d">One independent variable is an exact linear function of others</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iv. The adjusted R-squared differs from the regular R-squared because it: </label>
+    <select onchange="checkAnswer(this, 'a')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Penalizes for the number of independent variables</option>
+        <option value="b">Is always larger</option>
+        <option value="c">Measures causality rather than correlation</option>
+        <option value="d">Only applies to bivariate regression</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>v. According to the OVB formula, bias equals zero when: </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The omitted variable is important</option>
+        <option value="b">The sample size is large</option>
+        <option value="c">Either \(\beta_2 = 0\) or the omitted variable is uncorrelated with \(x_1\)</option>
+        <option value="d">The R-squared is high</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>vi. If you include an irrelevant variable (one with \(\beta = 0\)), your estimate of \(\beta_1\) will be: </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Biased with lower variance</option>
+        <option value="b">Unbiased with higher variance</option>
+        <option value="c">Biased with higher variance</option>
+        <option value="d">Unbiased with lower variance</option>
+    </select>
+</div>
+</div>
+
+<div class="context" style="margin-top: 30px; margin-bottom: 20px;">
+<strong>OVB Direction Practice:</strong> For each scenario, determine the likely direction of bias.
+</div>
+
+<div class="question">
+<div class="answer-row">
+    <label>vii. Model: \(health = \beta_0 + \beta_1(exercise) + \mu\). Omitted variable: income. If higher income → more exercise AND higher income → better health, the bias on \(\hat{\beta}_1\) is: </label>
+    <select onchange="checkAnswer(this, 'a')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Positive (overestimate)</option>
+        <option value="b">Negative (underestimate)</option>
+        <option value="c">Zero</option>
+        <option value="d">Cannot determine</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>viii. Model: \(test\_score = \beta_0 + \beta_1(class\_size) + \mu\). Omitted variable: school funding. If more funding → smaller classes AND more funding → higher scores, the bias on \(\hat{\beta}_1\) is: </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Positive (makes class size look beneficial)</option>
+        <option value="b">Negative (makes class size look more harmful)</option>
+        <option value="c">Zero</option>
+        <option value="d">Cannot determine</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>ix. <strong>(Challenge)</strong> In a wage regression controlling for education and experience, you add a control for "IQ score." The coefficient on education drops substantially. This suggests: </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">IQ is irrelevant to wages</option>
+        <option value="b">Education has no causal effect on wages</option>
+        <option value="c">Part of the original "education effect" was actually capturing ability differences</option>
+        <option value="d">The new regression is biased</option>
+    </select>
+</div>
+</div>
+
+<div class="context" style="margin-top: 30px; margin-bottom: 20px;">
+<strong>Practice: Interpreting Multivariate Regression Output</strong>
+</div>
+
+<div class="context" style="margin-bottom: 20px;">
+<strong>Regression 1:</strong> A researcher estimates the determinants of house prices:
+<pre style="background-color: #f5f5f5; padding: 10px; margin-top: 10px; font-family: monospace;">
+Dependent variable: price (house price in $1000s)
+
+             Estimate  Std. Error
+(Intercept)    50.23      12.45
+sqft            0.15       0.02
+bedrooms       -8.72       3.21
+bathrooms      24.56       4.89
+
+n = 546, Adjusted R-squared = 0.68
+</pre>
+</div>
+
+<div class="question">
+<div class="answer-row">
+    <label>x. According to this regression, an additional 100 square feet is associated with a price increase of: </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">$0.15</option>
+        <option value="b">$15,000</option>
+        <option value="c">$150</option>
+        <option value="d">$1,500</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>xi. The negative coefficient on bedrooms (-8.72) means: </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Houses with more bedrooms are always cheaper</option>
+        <option value="b">Bedrooms reduce house prices by $8,720 on average</option>
+        <option value="c">Holding sqft and bathrooms constant, an extra bedroom is associated with $8,720 lower price</option>
+        <option value="d">The regression is incorrectly specified</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>xii. Why might the coefficient on bedrooms be negative even though houses with more bedrooms typically sell for more? </label>
+    <select onchange="checkAnswer(this, 'd')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Measurement error in the data</option>
+        <option value="b">The sample is not representative</option>
+        <option value="c">Omitted variable bias</option>
+        <option value="d">Holding square footage constant, more bedrooms means smaller rooms on average</option>
+    </select>
+</div>
+</div>
+
+<div class="context" style="margin-top: 30px; margin-bottom: 20px;">
+<strong>Regression 2:</strong> An economist studies student test performance:
+<pre style="background-color: #f5f5f5; padding: 10px; margin-top: 10px; font-family: monospace;">
+Dependent variable: test_score (standardized, mean=0, sd=1)
+
+                  Estimate  Std. Error
+(Intercept)        -0.892      0.156
+hours_studied       0.045      0.008
+parent_college      0.312      0.067
+free_lunch         -0.287      0.071
+
+n = 1,200, Adjusted R-squared = 0.23
+</pre>
+<em>Note: parent_college = 1 if at least one parent has college degree; free_lunch = 1 if eligible for free lunch program (proxy for low income)</em>
+</div>
+
+<div class="question">
+<div class="answer-row">
+    <label>xiii. A student who studies 10 more hours per week is predicted to score how much higher? </label>
+    <select onchange="checkAnswer(this, 'a')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">0.45 standard deviations higher</option>
+        <option value="b">0.045 standard deviations higher</option>
+        <option value="c">4.5 points higher</option>
+        <option value="d">45 points higher</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>xiv. Comparing two students who study the same amount and have the same free lunch status, a student with a college-educated parent scores on average: </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">0.312 points higher</option>
+        <option value="b">0.312 standard deviations higher</option>
+        <option value="c">31.2% higher</option>
+        <option value="d">Cannot determine from this output</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>xv. <strong>(Challenge)</strong> A naive regression of test_score on hours_studied alone yields a coefficient of 0.062. Why might this be larger than the 0.045 in the full model? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The full model has more noise</option>
+        <option value="b">Hours studied has less variation in the full model</option>
+        <option value="c">Students from advantaged backgrounds (college parents, higher income) study more AND score higher for other reasons</option>
+        <option value="d">The adjusted R-squared is too low</option>
+    </select>
+</div>
+</div>
+```
+
+::: {.callout-tip collapse="true"}
+## Show Explanation
+
+i. In multivariate regression,
+$\beta_1$ is the partial effect of $x_1$ on $y$,
+holding $x_2$ (and all other included variables) constant.
+This is the ceteris paribus interpretation.
+
+ii. The multivariate zero conditional mean assumption requires that the error term have mean zero for all combinations of the independent variables,
+not just unconditionally.
+
+iii. Perfect multicollinearity means one variable is a perfect linear combination of others (like including income in dollars and income in thousands,
+or including all categories of a dummy variable plus an intercept).
+Simple correlation between variables is not perfect multicollinearity.
+
+iv. The adjusted R-squared penalizes for adding more variables,
+preventing the mechanical increase that happens with regular R-squared when you add irrelevant variables.
+
+v. From the OVB formula: $\text{Bias} = \beta_2 \cdot \tilde{\delta}_1$.
+Bias equals zero if either $\beta_2 = 0$ (the omitted variable doesn't affect $y$) or $\tilde{\delta}_1 = 0$ (the omitted variable is uncorrelated with $x_1$).
+
+vi. Including an irrelevant variable doesn't cause bias (since $\beta_2 = 0$ in the OVB formula),
+but it does increase variance through the $(1 - R_j^2)$ term in the variance formula.
+
+vii. Income is positively correlated with both exercise and health.
+$\text{Bias} = (+)(+) = $ Positive.
+We overestimate the effect of exercise because part of what we're measuring is actually the effect of income.
+
+viii. More funding means smaller classes (negative correlation: $\tilde{\delta}_1 < 0$) and higher scores ($\beta_2 > 0$).
+$\text{Bias} = (+)(-) = $ Negative.
+The estimate of class size's effect is too negative---we attribute to large classes what is actually due to low funding.
+
+ix. When adding a control causes the coefficient of interest to change substantially,
+it suggests the original estimate was confounded.
+Here,
+part of what looked like a "return to education" was actually capturing the fact that higher-ability people get more education and earn more.
+
+**Regression Interpretation Questions:**
+
+x. The coefficient on sqft is 0.15, meaning each additional square foot is associated with $150 more (since price is in $1000s). For 100 square feet: $100 \times 0.15 = 15$, which is $15,000.
+
+xi. The coefficient on bedrooms has a ceteris paribus interpretation: holding square footage and bathrooms constant, an additional bedroom is associated with $8,720 lower price. This doesn't mean bedrooms reduce prices overall—it's the partial effect.
+
+xii. The key is "holding square footage constant." If total space is fixed, adding a bedroom means dividing that space into more (smaller) rooms. Buyers may prefer fewer, larger rooms to more cramped ones. This illustrates why we must interpret multivariate coefficients carefully—they hold other variables constant.
+
+xiii. The coefficient on hours_studied is 0.045, so 10 additional hours predicts: $10 \times 0.045 = 0.45$ standard deviations higher. Since the outcome is standardized, we interpret in standard deviation units.
+
+xiv. The coefficient on parent_college (0.312) is the difference in predicted test scores between students with and without college-educated parents, holding study hours and free lunch status constant. Since test scores are standardized, this is 0.312 standard deviations.
+
+xv. The naive coefficient (0.062) is larger than the controlled coefficient (0.045) because of omitted variable bias. Students from advantaged backgrounds (college-educated parents, higher income) likely study more AND have other advantages (better schools, tutoring, resources) that boost scores. The naive estimate conflates the effect of studying with these background advantages.
+
+:::
+
+::::
+
+:::: {.content-hidden when-format="html"}
+
+*Note: This section contains interactive content only available in the HTML version.*
+
+::::

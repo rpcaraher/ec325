@@ -1,0 +1,1377 @@
+# Statistical Inference {#sec-inference}
+
+```{r}
+#| echo: false
+#| output: false
+#| message: false
+#| warning: false
+
+suppressWarnings(library(tidyverse))
+suppressWarnings(library(patchwork))
+suppressWarnings(library(modelsummary))
+
+options(scipen = 999)
+```
+
+```{=html}
+
+<style>
+.problem {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+.context {
+    background-color: #e8f4f8;
+    padding: 12px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border-left: 4px solid #2874a6;
+}
+.question {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #fff3cd;
+    border-radius: 5px;
+}
+.answer-row {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.answer-row label {
+    min-width: 320px;
+    font-weight: 500;
+}
+select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    min-width: 300px;
+    cursor: pointer;
+}
+select:focus {
+    border-color: #2874a6;
+    outline: none;
+}
+.correct {
+    border-color: #28a745 !important;
+    background-color: #d4edda !important;
+}
+.incorrect {
+    border-color: #dc3545 !important;
+    background-color: #f8d7da !important;
+}
+.explanation {
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #e7f3ff;
+    border-radius: 5px;
+    border-left: 4px solid #2874a6;
+}
+.note {
+    font-size: 0.85em;
+    color: #666;
+    font-style: italic;
+}
+</style>
+
+<script>
+function checkAnswer(selectElement, correctValue) {
+    if (selectElement.value === '') {
+        selectElement.classList.remove('correct', 'incorrect');
+    } else if (selectElement.value === correctValue) {
+        selectElement.classList.remove('incorrect');
+        selectElement.classList.add('correct');
+    } else {
+        selectElement.classList.remove('correct');
+        selectElement.classList.add('incorrect');
+    }
+}
+</script>
+
+```
+
+
+::: {.callout-tip collapse="true"}
+## **Key Questions**
+- How do we know if our OLS estimate reflects a "real" effect or is just due to random chance?
+- What is the sampling distribution of our OLS estimator and why does it matter?
+- How do we conduct hypothesis tests using t-statistics and p-values?
+- What do confidence intervals tell us about our estimates?
+- How do we test multiple hypotheses simultaneously using F-tests?
+- How do we read and interpret regression tables in published research?
+:::
+
+::: {.callout-note collapse="true"}
+## **Suggested Readings**
+- @wooldridge_introductory_2019, Ch. 4
+:::
+
+
+## From Point Estimates to Uncertainty
+
+In the previous chapters, we learned how to estimate the parameters of a regression model using OLS.
+We discussed how, under certain assumptions, our OLS estimator $\hat{\beta}_j$ is *unbiased*---meaning that on average, across many hypothetical samples, our estimate equals the true population parameter $\beta_j$.
+
+But here's the catch: we only ever observe *one* sample.
+Our single estimate might be too high or too low relative to the truth, simply due to the random variation inherent in sampling.
+**Statistical inference** is the set of tools that allows us to quantify this uncertainty and make statements about population parameters based on sample data.
+
+The central question of statistical inference is: *Is our single OLS estimate "real," or is it due to random chance?*
+
+
+## The Sampling Distribution: A Simulation
+
+To understand why uncertainty matters, let's run a simulation.
+Imagine we have a population where the true relationship between $x$ and $y$ is:
+
+$$y = 2.45 + 0 \cdot x + \mu$$
+
+Notice that the true effect of $x$ on $y$ is **exactly zero**.
+In the population, $x$ has no effect on $y$ whatsoever.
+
+But what happens when we draw samples from this population and estimate OLS regressions?
+Let's find out.
+
+```{r}
+#| label: fig-sampling-dist-sim
+#| fig-cap: "Sampling distribution of β̂₁ when the true β₁ = 0. Each bar represents the frequency of estimates across 1,000 different samples."
+#| echo: true
+#| code-fold: true
+
+set.seed(124890)
+
+# Create our "population" data
+pop_data <- tibble(
+  x = sample(1:100, size = 1000, replace = TRUE),
+  err = rnorm(1000),
+  y = 2.45 + 0 * x + err  # True beta_1 = 0
+)
+
+# Number of simulation repetitions
+n_sims <- 1000
+
+# Run the simulation
+sim_results <- map_dfr(1:n_sims, function(i) {
+  # Draw a random sample of 50 observations
+  sample_data <- pop_data |>
+    slice_sample(n = 50, replace = TRUE)
+  
+  # Estimate OLS regression
+  reg <- lm(y ~ x, data = sample_data)
+  
+  # Store the estimate
+  tibble(
+    iteration = i,
+    b1_hat = coef(reg)["x"]
+  )
+})
+
+# Calculate the average estimate
+avg_estimate <- mean(sim_results$b1_hat)
+
+# Create the visualization
+ggplot(sim_results, aes(x = b1_hat)) +
+  geom_histogram(fill = "lightgrey", color = "black", bins = 40) +
+  geom_vline(xintercept = avg_estimate, color = "darkgreen", linewidth = 1.5) +
+  annotate("text", x = avg_estimate + 0.003, y = 85,
+           label = paste0("Average estimate\n= ", round(avg_estimate, 4)),
+           color = "darkgreen", size = 4, hjust = 0) +
+  labs(
+    x = expression(hat(beta)[1]),
+    y = "Frequency"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14)
+  )
+```
+
+Look at what happened!
+Even though the true $\beta_1 = 0$, we got a *distribution* of different estimates ranging from about -0.02 to +0.02.
+Some samples produced positive estimates, others produced negative estimates.
+The average across all samples is very close to zero (as expected from unbiasedness), but any *individual* sample could give us an estimate that deviates from zero.
+
+This distribution of estimates across all possible samples is called the **sampling distribution** of $\hat{\beta}_j$.
+
+
+## Where Does Our Estimate Fall?
+
+Now imagine you only have access to *one* sample---as is always the case in practice.
+You run your regression and get an estimate of, say, $\hat{\beta}_1 = 0.001$.
+
+How do you know if your estimate comes from here (close to the true value):
+
+```{r}
+#| label: fig-estimate-close
+#| fig-cap: "An estimate close to the average is likely consistent with the null hypothesis."
+#| echo: false
+
+ggplot(sim_results, aes(x = b1_hat)) +
+  geom_histogram(fill = "lightgrey", color = "black", bins = 40) +
+  geom_vline(xintercept = avg_estimate, color = "darkgreen", linewidth = 1.5) +
+  geom_vline(xintercept = avg_estimate + 0.001, color = "blue", linewidth = 1.5) +
+  annotate("text", x = avg_estimate + 0.003, y = 85,
+           label = "Average",
+           color = "darkgreen", size = 4, hjust = 0) +
+  annotate("text", x = avg_estimate + 0.001, y = 70,
+           label = "Our estimate?",
+           color = "blue", size = 4, hjust = -0.1) +
+  labs(x = expression(hat(beta)[1]), y = "Frequency") +
+  theme_minimal()
+```
+
+Or from here (far out in the tails):
+
+```{r}
+#| label: fig-estimate-far
+#| fig-cap: "An estimate in the tail is unlikely if the true effect is zero---suggesting the true effect might not be zero."
+#| echo: false
+
+ggplot(sim_results, aes(x = b1_hat)) +
+  geom_histogram(fill = "lightgrey", color = "black", bins = 40) +
+  geom_vline(xintercept = avg_estimate, color = "darkgreen", linewidth = 1.5) +
+  geom_vline(xintercept = avg_estimate + 0.019, color = "red", linewidth = 1.5) +
+  annotate("text", x = avg_estimate + 0.003, y = 85,
+           label = "Average",
+           color = "darkgreen", size = 4, hjust = 0) +
+  annotate("text", x = avg_estimate + 0.019, y = 50,
+           label = "Or here?",
+           color = "red", size = 4, hjust = -0.1) +
+  labs(x = expression(hat(beta)[1]), y = "Frequency") +
+  theme_minimal()
+```
+
+If your estimate falls in the middle of the distribution where $\beta_1 = 0$, it's consistent with the null hypothesis of no effect.
+But if your estimate falls way out in the tails, it suggests that maybe the true $\beta_1$ isn't zero after all---because getting such an extreme estimate would be very unlikely if $\beta_1$ really were zero.
+
+The tools of statistical inference formalize this intuition.
+
+
+## The Sampling Distribution of $\hat{\beta}_j$
+
+To conduct statistical inference, we need to know the *shape* of the sampling distribution.
+We've already established two key properties of our OLS estimator (under the Gauss-Markov assumptions):
+
+**Expected Value (Unbiasedness):**
+$$E[\hat{\beta}_j] = \beta_j$$
+
+**Variance (under homoskedasticity):**
+$$Var(\hat{\beta}_j) = \frac{\sigma^2}{SST_j(1 - R^2_j)}$$
+
+where $SST_j$ is the total sum of squares of $x_j$ and $R^2_j$ is the R-squared from regressing $x_j$ on all other independent variables.
+
+But knowing the mean and variance isn't enough---we need to know the *shape* of the distribution.
+
+
+### The Normality Assumption
+
+To fully characterize the sampling distribution, we make an additional assumption:
+
+::: {.callout-important}
+## Normality Assumption
+The population error $\mu$ is independent of the explanatory variables $x_1, x_2, ..., x_k$ and is normally distributed with zero mean and variance $\sigma^2$:
+
+$$\mu \sim Normal(0, \sigma^2)$$
+
+Equivalently, we can write:
+
+$$y | \mathbf{x} \sim Normal(\beta_0 + \beta_1 x_1 + ... + \beta_k x_k, \sigma^2)$$
+:::
+
+This says that conditional on the independent variables, the outcome $y$ follows a normal distribution centered on the regression line.
+
+Let's visualize what a normal distribution looks like:
+
+```{r}
+#| label: fig-normal-dist
+#| fig-cap: "The normal (Gaussian) distribution---the classic 'bell curve.' The example shows IQ scores, which are designed to follow N(100, 15)."
+#| echo: true
+#| code-fold: true
+
+set.seed(123)
+mu <- 100
+sigma <- 15
+
+normal_data <- tibble(
+  values = rnorm(n = 1000, mean = mu, sd = sigma)
+)
+
+ggplot(normal_data, aes(x = values)) +
+  geom_histogram(aes(y = after_stat(density)),
+                 bins = 30,
+                 fill = "skyblue",
+                 color = "white",
+                 alpha = 0.8) +
+  stat_function(fun = dnorm,
+                args = list(mean = mu, sd = sigma),
+                color = "darkred",
+                linewidth = 1.2) +
+  labs(
+    title = "Normal Distribution with Density Curve",
+    subtitle = paste0("Generated from N(μ = ", mu, ", σ = ", sigma, ")"),
+    x = "Values (e.g., IQ Scores)",
+    y = "Density"
+  ) +
+  theme_minimal()
+```
+
+At first glance, the normality assumption seems quite strong.
+For many economic variables---like wages, which are bounded below by zero and have a right skew---the distribution is clearly not normal.
+However, there's good news: as long as our sample size is large enough, the sampling distribution of $\hat{\beta}_j$ will be approximately normal *even if the errors aren't normally distributed*.
+This result is called **asymptotic normality** and follows from the Central Limit Theorem.
+
+
+### The Normal Sampling Distribution
+
+Under the normality assumption (or with large samples via asymptotic normality), our OLS estimator follows a normal distribution:
+
+$$\hat{\beta}_j \sim Normal\left[\beta_j, Var(\hat{\beta}_j)\right]$$
+
+Let's verify this with a simulation.
+We'll draw many samples and show that the distribution of estimates indeed looks normal:
+
+```{r}
+#| label: fig-normal-sampling
+#| fig-cap: "The sampling distribution of β̂₁ follows a normal distribution (red curve) centered on the true value."
+#| echo: true
+#| code-fold: true
+
+# Overlay a normal density on our simulation results
+ggplot(sim_results, aes(x = b1_hat)) +
+  geom_histogram(aes(y = after_stat(density)),
+                 fill = "lightgrey", color = "black", bins = 40) +
+  stat_function(
+    fun = dnorm,
+    args = list(mean = mean(sim_results$b1_hat), 
+                sd = sd(sim_results$b1_hat)),
+    color = "darkred",
+    linewidth = 1.2
+  ) +
+  geom_vline(xintercept = 0, color = "darkgreen", linewidth = 1.2, linetype = "dashed") +
+  annotate("text", x = 0.012, y = 55,
+           label = "True β₁ = 0", color = "darkgreen", size = 4) +
+  labs(
+    x = expression(hat(beta)[1]),
+    y = "Density"
+  ) +
+  theme_minimal()
+```
+
+The histogram of our 1,000 simulated estimates matches the theoretical normal curve almost perfectly!
+
+
+::: {.problem}
+
+<div class="context">
+**Quick Check: Understanding the Sampling Distribution**
+</div>
+
+<div class="question">
+<div class="answer-row">
+<label>If we draw many samples and estimate $\hat{\beta}_1$ from each, what will the average of all these estimates equal (assuming unbiasedness)?</label>
+<select onchange="checkAnswer(this, 'b')">
+<option value="">Select answer...</option>
+<option value="a">Zero</option>
+<option value="b">The true population parameter β₁</option>
+<option value="c">The sample mean of y</option>
+<option value="d">It depends on the sample size</option>
+</select>
+</div>
+</div>
+
+<div class="question">
+<div class="answer-row">
+<label>If the true $\beta_1 = 0$ and we get an estimate of $\hat{\beta}_1 = 0.5$ with a standard error of 0.1, where does our estimate fall in the sampling distribution?</label>
+<select onchange="checkAnswer(this, 'c')">
+<option value="">Select answer...</option>
+<option value="a">At the center of the distribution</option>
+<option value="b">Slightly to the right of center</option>
+<option value="c">Far in the right tail (5 standard errors away)</option>
+<option value="d">Cannot be determined</option>
+</select>
+</div>
+</div>
+
+:::
+
+
+## Hypothesis Testing
+
+Now that we understand the sampling distribution, we can use it to make inferences about population parameters.
+The key idea is **hypothesis testing**: we hypothesize about the value of $\beta_j$ in the population, then use our sample estimate to evaluate whether the hypothesis is plausible.
+
+
+### The Null and Alternative Hypotheses
+
+In econometrics, we're usually interested in whether a variable has *any* effect on the outcome.
+We formalize this as:
+
+**Null Hypothesis:** $H_0: \beta_j = 0$
+
+The null hypothesis states that the variable $x_j$ has no effect on $y$ in the population (after controlling for other variables).
+
+**Alternative Hypothesis:** We test the null against one of:
+
+- $H_1: \beta_j \neq 0$ (two-sided test, most common)
+- $H_1: \beta_j > 0$ (one-sided, if we expect a positive effect)
+- $H_1: \beta_j < 0$ (one-sided, if we expect a negative effect)
+
+For example, consider the wage equation:
+
+$$wage = \beta_0 + \beta_1(educ) + \beta_2(experience) + \beta_3(tenure) + \mu$$
+
+The null hypothesis $H_0: \beta_2 = 0$ states that, after controlling for education and tenure, experience has no effect on wages.
+
+
+### The t-Statistic
+
+To test our hypothesis, we use the **t-statistic**.
+Under the null hypothesis, the following quantity follows a t-distribution:
+
+$$\frac{\hat{\beta}_j - \beta_j}{se(\hat{\beta}_j)} \sim t_{n-k-1}$$
+
+where $n - k - 1$ are the degrees of freedom (sample size minus the number of parameters).
+
+When testing $H_0: \beta_j = 0$, the t-statistic simplifies to:
+
+$$t_{\hat{\beta}_j} = \frac{\hat{\beta}_j}{se(\hat{\beta}_j)}$$
+
+This is simply the ratio of our estimate to its standard error.
+The t-stat tells us: *how many standard errors away from zero is our estimate?*
+
+
+### Properties of the t-Statistic
+
+The t-statistic has several useful properties:
+
+1. **Same sign as the estimate:** Since $se(\hat{\beta}_j) > 0$, the t-stat has the same sign as $\hat{\beta}_j$
+
+2. **Magnitude matters:** As $\hat{\beta}_j$ grows in magnitude, so does $t_{\hat{\beta}_j}$
+
+3. **Signal-to-noise ratio:** The t-stat measures how large our estimate is *relative to the noise* (uncertainty) in our data
+
+
+### Visualizing the Hypothesis Test
+
+Let's visualize what the t-test is doing.
+Under the null hypothesis $H_0: \beta_j = 0$, we assume that the distribution of possible estimates is centered on zero:
+
+```{r}
+#| label: fig-t-dist-null
+#| fig-cap: "The t-distribution under the null hypothesis H₀: βⱼ = 0. Most estimates will fall near zero."
+#| echo: true
+#| code-fold: true
+
+set.seed(42)
+df_value <- 100  # degrees of freedom
+
+t_sample <- tibble(
+  t_value = rt(10000, df = df_value)
+)
+
+ggplot(t_sample, aes(x = t_value)) +
+  geom_histogram(aes(y = after_stat(density)),
+                 bins = 50,
+                 fill = "lightblue",
+                 color = "black") +
+  stat_function(fun = dt,
+                args = list(df = df_value),
+                color = "darkred",
+                linewidth = 1.2) +
+  geom_vline(xintercept = 0, color = "darkgreen", linewidth = 1.2) +
+  annotate("text", x = 1.5, y = 0.35,
+           label = "Distribution under H₀",
+           color = "darkgreen", size = 5) +
+  labs(x = "t-values", y = "Density") +
+  coord_cartesian(xlim = c(-4, 4)) +
+  theme_minimal()
+```
+
+Now suppose we get a t-statistic from our sample.
+Is it close to zero (consistent with $H_0$) or far from zero (evidence against $H_0$)?
+
+```{r}
+#| label: fig-t-test-comparison
+#| fig-cap: "Two possible t-statistics: one at 0.85 (consistent with H₀) and one at 2.8 (in the tail, suggesting we reject H₀)."
+#| echo: true
+#| code-fold: true
+
+p_close <- ggplot(t_sample, aes(x = t_value)) +
+  geom_histogram(aes(y = after_stat(density)),
+                 bins = 50, fill = "lightblue", color = "black") +
+  stat_function(fun = dt, args = list(df = df_value),
+                color = "darkred", linewidth = 1.2) +
+  geom_vline(xintercept = 0.85, color = "blue", linewidth = 1.5) +
+  annotate("text", x = 0.85, y = 0.42, label = "t = 0.85",
+           color = "blue", size = 4, hjust = -0.1) +
+  labs(x = "t-values", y = "Density", 
+       title = "t-stat close to zero") +
+  coord_cartesian(xlim = c(-4, 4)) +
+  theme_minimal()
+
+p_far <- ggplot(t_sample, aes(x = t_value)) +
+  geom_histogram(aes(y = after_stat(density)),
+                 bins = 50, fill = "lightblue", color = "black") +
+  stat_function(fun = dt, args = list(df = df_value),
+                color = "darkred", linewidth = 1.2) +
+  geom_vline(xintercept = 2.8, color = "red", linewidth = 1.5) +
+  annotate("text", x = 2.8, y = 0.15, label = "t = 2.8",
+           color = "red", size = 4, hjust = -0.1) +
+  labs(x = "t-values", y = "Density",
+       title = "t-stat in the tail") +
+  coord_cartesian(xlim = c(-4, 4)) +
+  theme_minimal()
+
+p_close + p_far
+```
+
+A t-statistic of 0.85 falls well within the "body" of the distribution---values like this occur frequently when $H_0$ is true.
+But a t-statistic of 2.8 is out in the tail---such extreme values are rare when $H_0$ is true.
+
+
+### Critical Values and Rejection Regions
+
+To formalize our decision rule, we need to define:
+
+1. **Significance level ($\alpha$):** The probability of rejecting $H_0$ when it's actually true (Type I error). Common choices: 10%, 5%, or 1%.
+
+2. **Critical value ($c$):** The threshold value of the t-statistic beyond which we reject $H_0$.
+
+For a two-sided test at the 5% level, we reject $H_0$ if $|t_{\hat{\beta}_j}| > c$, where $c$ is the critical value that leaves 2.5% of the distribution in each tail.
+
+```{r}
+#| label: fig-critical-values
+#| fig-cap: "Critical values for a two-sided test at the 5% significance level. We reject H₀ if |t| > 1.96."
+#| echo: true
+#| code-fold: true
+
+# Calculate critical value for 5% significance, two-sided
+alpha <- 0.05
+c_val <- qt(alpha/2, df = df_value, lower.tail = FALSE)
+
+# Create shading data for rejection regions
+t_grid <- seq(-4, 4, length.out = 500)
+t_dens <- dt(t_grid, df = df_value)
+
+shade_data <- tibble(t_value = t_grid, density = t_dens) |>
+  mutate(
+    rejection = t_value < -c_val | t_value > c_val
+  )
+
+ggplot() +
+  # Full distribution
+  geom_area(data = shade_data |> filter(!rejection),
+            aes(x = t_value, y = density),
+            fill = "lightblue", alpha = 0.7) +
+  # Rejection regions
+  geom_area(data = shade_data |> filter(rejection),
+            aes(x = t_value, y = density),
+            fill = "red", alpha = 0.5) +
+  # Distribution curve
+  stat_function(fun = dt, args = list(df = df_value),
+                color = "darkblue", linewidth = 1.2) +
+  # Critical value lines
+  geom_vline(xintercept = c(-c_val, c_val), 
+             color = "darkgoldenrod", linewidth = 1.2, linetype = "dashed") +
+  # Annotations
+  annotate("text", x = -c_val, y = 0.42, 
+           label = paste0("-", round(c_val, 2)),
+           color = "darkgoldenrod", size = 4, hjust = 1.1) +
+  annotate("text", x = c_val, y = 0.42, 
+           label = paste0("+", round(c_val, 2)),
+           color = "darkgoldenrod", size = 4, hjust = -0.1) +
+  annotate("text", x = 0, y = 0.2,
+           label = "Fail to reject H₀\n(95%)",
+           color = "darkblue", size = 4) +
+  annotate("text", x = 3.2, y = 0.05,
+           label = "Reject H₀\n(2.5%)",
+           color = "red", size = 3) +
+  annotate("text", x = -3.2, y = 0.05,
+           label = "Reject H₀\n(2.5%)",
+           color = "red", size = 3) +
+  labs(x = "t-values", y = "Density") +
+  coord_cartesian(xlim = c(-4, 4)) +
+  theme_minimal()
+```
+
+
+### Hypothesis Testing Example
+
+Let's work through a complete example.
+We'll create some simulated housing data and test whether lot area affects sale price:
+
+```{r}
+#| echo: true
+
+# Create simulated housing data
+set.seed(2025)
+n <- 500
+
+housing_data <- tibble(
+  lot_area = runif(n, 5000, 20000),
+  pool_area = rbinom(n, 1, 0.15) * runif(n, 200, 600),
+  garage_area = runif(n, 200, 800),
+  year_built = sample(1960:2020, n, replace = TRUE),
+  year_remod = pmax(year_built, sample(1980:2023, n, replace = TRUE)),
+  # True relationship: lot_area has effect of $1.50 per sq ft
+  sale_price = -2500000 + 1.50 * lot_area + 80 * pool_area + 
+               150 * garage_area + 500 * year_built + 
+               900 * year_remod + rnorm(n, 0, 50000)
+)
+
+# Estimate the regression
+reg_housing <- lm(sale_price ~ lot_area + pool_area + garage_area + 
+                    year_built + year_remod, 
+                  data = housing_data)
+
+summary(reg_housing)
+```
+
+To test $H_0: \beta_1 = 0$ (lot area has no effect):
+
+```{r}
+#| echo: true
+
+# Extract the coefficient and standard error for lot_area
+b1_hat <- coef(reg_housing)["lot_area"]
+se_b1 <- summary(reg_housing)$coefficients["lot_area", "Std. Error"]
+
+# Calculate the t-statistic
+t_stat <- b1_hat / se_b1
+
+# Find the critical value at 5% significance
+sig_level <- 0.05
+n_obs <- nobs(reg_housing)
+k <- 5  # number of independent variables
+df <- n_obs - k - 1
+
+t_crit <- qt(sig_level / 2, df = df, lower.tail = FALSE)
+
+# Display results
+cat("Estimate:", round(b1_hat, 4), "\n")
+cat("Standard Error:", round(se_b1, 4), "\n")
+cat("t-statistic:", round(t_stat, 2), "\n")
+cat("Critical value (5%):", round(t_crit, 2), "\n")
+cat("Reject H₀?", abs(t_stat) > t_crit, "\n")
+```
+
+Since $|t_{\hat{\beta}_1}|$ exceeds the critical value of approximately 1.96, we **reject the null hypothesis** that lot area has no effect on sale price.
+The estimate is **statistically significant at the 5% level**.
+
+
+### Rule of Thumb
+
+With modern datasets that have hundreds or thousands of observations, the critical value for a two-sided 5% test is essentially always **1.96 ≈ 2**.
+
+This gives us a handy rule of thumb:
+
+::: {.callout-tip}
+## The "Rule of 2"
+An estimate is statistically significant at the 5% level if:
+
+$$|\hat{\beta}_j| > 2 \times se(\hat{\beta}_j)$$
+
+In other words, if your estimate is more than twice as large as its standard error, you can reject the null hypothesis of no effect at the 5% level.
+:::
+
+
+## P-Values
+
+While the t-test with a fixed significance level is useful, it has limitations.
+Saying an estimate is "significant at 5%" doesn't tell us *how strongly* we reject the null.
+Was it a narrow rejection or a "knock out"?
+
+The **p-value** answers this question:
+
+::: {.callout-important}
+## Definition: P-Value
+The p-value is the smallest significance level at which we would reject the null hypothesis.
+
+Equivalently: the p-value is the probability of observing a t-statistic as extreme (or more extreme) as the one we calculated, *if the null hypothesis were true*.
+:::
+
+### Visualizing P-Values
+
+```{r}
+#| label: fig-pvalue-viz
+#| fig-cap: "The p-value is the total shaded area in both tails beyond the observed t-statistic."
+#| echo: true
+#| code-fold: true
+
+# Parameters
+df_viz <- 250
+observed_t <- 2.3
+
+# Calculate p-value
+p_val <- 2 * pt(abs(observed_t), df = df_viz, lower.tail = FALSE)
+
+# Create the visualization
+t_grid <- seq(-4, 4, length.out = 500)
+t_dens <- dt(t_grid, df = df_viz)
+
+shade_data <- tibble(t_value = t_grid, density = t_dens) |>
+  mutate(
+    in_tail = abs(t_value) >= abs(observed_t)
+  )
+
+ggplot() +
+  # Main curve
+  geom_line(data = shade_data, aes(x = t_value, y = density),
+            color = "darkblue", linewidth = 1.2) +
+  # Shaded tails (p-value area)
+  geom_area(data = shade_data |> filter(in_tail & t_value > 0),
+            aes(x = t_value, y = density),
+            fill = "red", alpha = 0.6) +
+  geom_area(data = shade_data |> filter(in_tail & t_value < 0),
+            aes(x = t_value, y = density),
+            fill = "red", alpha = 0.6) +
+  # Observed t-statistic lines
+  geom_vline(xintercept = c(-observed_t, observed_t),
+             color = "darkgreen", linewidth = 1, linetype = "dashed") +
+  # Annotations
+  annotate("text", x = observed_t + 0.3, y = 0.05,
+           label = paste0("Observed t = ", observed_t),
+           color = "darkgreen", size = 4, hjust = 0) +
+  annotate("text", x = 0, y = 0.2,
+           label = paste0("P-value = ", round(p_val, 4)),
+           color = "red", size = 5) +
+  labs(
+    title = "P-Value Visualization",
+    subtitle = paste0("df = ", df_viz, ", Observed t = ", observed_t),
+    x = "t-statistic",
+    y = "Density"
+  ) +
+  theme_minimal()
+```
+
+### Interpreting P-Values
+
+The p-value tells us the probability of getting our estimate (or something more extreme) if the null were true:
+
+- **p = 0.035:** There's a 3.5% chance of getting our estimate if $\beta_j = 0$. That's quite unlikely---evidence against $H_0$.
+
+- **p = 0.35:** There's a 35% chance of getting our estimate if $\beta_j = 0$. That's not unusual at all---no evidence against $H_0$.
+
+Common decision rules:
+
+- p < 0.10: Reject $H_0$ at 10% level (weak evidence against $H_0$)
+- p < 0.05: Reject $H_0$ at 5% level (moderate evidence against $H_0$)
+- p < 0.01: Reject $H_0$ at 1% level (strong evidence against $H_0$)
+
+
+### A Note on Language
+
+When we *cannot* reject the null hypothesis, we say:
+
+> "We **fail to reject** the null at the x% level."
+
+We do **not** say we "accept" the null.
+Why? Because there are many possible values of $\beta_j$ that we would also fail to reject.
+Failing to reject $\beta_j = 0$ doesn't mean $\beta_j$ actually equals zero---it just means our data aren't precise enough to distinguish $\beta_j$ from zero.
+
+
+### Statistical vs. Practical Significance
+
+::: {.callout-warning}
+## Important Distinction
+**Statistical significance** and **practical (economic) significance** are not the same thing!
+
+A coefficient can be statistically significant but practically unimportant.
+This is especially common in very large samples, where even tiny effects can be detected.
+:::
+
+For example, suppose we find that an additional year of education increases wages by $0.50 per year, and this is statistically significant with p < 0.001.
+Statistically, we're very confident the effect isn't zero.
+But practically, a 50-cent annual raise is economically trivial.
+
+Always interpret the *magnitude* of coefficients, not just their statistical significance.
+
+
+::: {.problem}
+
+<div class="context">
+**Quick Check: Hypothesis Testing**
+</div>
+
+<div class="question">
+<div class="answer-row">
+<label>If you get a t-statistic of 1.5 (with many degrees of freedom), can you reject H₀ at the 5% level?</label>
+<select onchange="checkAnswer(this, 'b')">
+<option value="">Select answer...</option>
+<option value="a">Yes, because 1.5 > 0</option>
+<option value="b">No, because 1.5 < 1.96</option>
+<option value="c">Yes, because 1.5 > 1</option>
+<option value="d">Cannot determine without the p-value</option>
+</select>
+</div>
+</div>
+
+<div class="question">
+<div class="answer-row">
+<label>A p-value of 0.03 means:</label>
+<select onchange="checkAnswer(this, 'b')">
+<option value="">Select answer...</option>
+<option value="a">There's a 3% chance the null hypothesis is true</option>
+<option value="b">There's a 3% chance of seeing data this extreme if H₀ were true</option>
+<option value="c">The coefficient is 3% of the standard error</option>
+<option value="d">We reject H₀ at the 1% level</option>
+</select>
+</div>
+</div>
+
+<div class="question">
+<div class="answer-row">
+<label>An estimate of β̂ = 0.001 with SE = 0.0001 and p < 0.001 means:</label>
+<select onchange="checkAnswer(this, 'c')">
+<option value="">Select answer...</option>
+<option value="a">The effect is both statistically and practically significant</option>
+<option value="b">The effect is neither statistically nor practically significant</option>
+<option value="c">The effect is statistically significant but may not be practically significant</option>
+<option value="d">The effect is practically significant but not statistically significant</option>
+</select>
+</div>
+</div>
+
+:::
+
+
+## Confidence Intervals
+
+Another way to quantify uncertainty is through **confidence intervals**.
+While hypothesis tests ask "is $\beta_j$ different from zero?", confidence intervals ask "what range of values is $\beta_j$ likely to fall within?"
+
+### Computing a Confidence Interval
+
+A confidence interval at the $(1 - \alpha)$ level is:
+
+$$\hat{\beta}_j \pm c_{\alpha} \times se(\hat{\beta}_j)$$
+
+where $c_{\alpha}$ is the critical value at significance level $\alpha$.
+
+For a 95% confidence interval with large samples:
+
+$$\hat{\beta}_j \pm 1.96 \times se(\hat{\beta}_j)$$
+
+
+### Example
+
+Using our housing regression:
+
+```{r}
+#| echo: true
+
+# 95% confidence interval for lot_area coefficient
+lower <- b1_hat - 1.96 * se_b1
+upper <- b1_hat + 1.96 * se_b1
+
+cat("Point estimate:", round(b1_hat, 4), "\n")
+cat("95% CI: [", round(lower, 4), ",", round(upper, 4), "]\n")
+
+# Or use confint() function
+confint(reg_housing, "lot_area", level = 0.95)
+```
+
+
+### Interpreting Confidence Intervals
+
+> "We are 95% confident that the true effect of lot area on sale price is between $`r round(lower, 2)` and $`r round(upper, 2)` per square foot."
+
+More precisely: if we drew 100 different samples and computed 100 different confidence intervals, about 95 of them would contain the true $\beta_j$.
+
+**Key insight:** If the confidence interval includes zero, the estimate is *not* statistically significant at that level.
+
+
+### Simulation: Understanding Confidence Intervals
+
+Let's run a simulation to see what "95% confidence" really means:
+
+```{r}
+#| label: fig-ci-simulation
+#| fig-cap: "Twenty 95% confidence intervals from different samples. The true β₁ = 1.50 (dashed line). About 95% of intervals capture the true value."
+#| echo: true
+#| code-fold: true
+
+set.seed(456)
+
+# True parameter value
+true_beta1 <- 1.50
+
+# Generate 20 samples and compute CIs
+n_samples <- 20
+
+ci_data <- map_dfr(1:n_samples, function(i) {
+  # Generate new sample
+  sample_data <- tibble(
+    lot_area = runif(500, 5000, 20000),
+    pool_area = rbinom(500, 1, 0.15) * runif(500, 200, 600),
+    garage_area = runif(500, 200, 800),
+    year_built = sample(1960:2020, 500, replace = TRUE),
+    year_remod = pmax(year_built, sample(1980:2023, 500, replace = TRUE)),
+    sale_price = -2500000 + true_beta1 * lot_area + 80 * pool_area + 
+                 150 * garage_area + 500 * year_built + 
+                 900 * year_remod + rnorm(500, 0, 50000)
+  )
+  
+  # Fit model
+  reg <- lm(sale_price ~ lot_area + pool_area + garage_area + 
+              year_built + year_remod, data = sample_data)
+  
+  # Get CI
+  ci <- confint(reg, "lot_area", level = 0.95)
+  
+  tibble(
+    sample = i,
+    estimate = coef(reg)["lot_area"],
+    lower = ci[1],
+    upper = ci[2],
+    covers_true = lower <= true_beta1 & upper >= true_beta1
+  )
+})
+
+ggplot(ci_data, aes(y = sample)) +
+  geom_vline(xintercept = true_beta1, linetype = "dashed", 
+             color = "darkgreen", linewidth = 1) +
+  geom_errorbarh(aes(xmin = lower, xmax = upper, 
+                     color = covers_true),
+                 height = 0.3, linewidth = 0.8) +
+  geom_point(aes(x = estimate, color = covers_true), size = 2) +
+  scale_color_manual(values = c("TRUE" = "steelblue", "FALSE" = "red"),
+                     labels = c("TRUE" = "Contains true value",
+                                "FALSE" = "Misses true value")) +
+  annotate("text", x = true_beta1 + 0.05, y = 21,
+           label = paste0("True β₁ = ", true_beta1),
+           color = "darkgreen", size = 4, hjust = 0) +
+  labs(
+    x = expression(hat(beta)[1]),
+    y = "Sample",
+    color = NULL
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+
+## T-Tests, P-Values, and CIs: A Comparison
+
+These three approaches are closely related but answer slightly different questions:
+
+| Method | Question Answered |
+|--------|-------------------|
+| T-statistic | Is my estimate large relative to the noise in the data? |
+| P-value | What's the probability of seeing my estimate if $H_0$ were true? |
+| Confidence Interval | What range of values is plausible for $\beta_j$? |
+
+All three are mathematically connected:
+
+- If $|t| > 1.96$, then p < 0.05, and the 95% CI excludes zero
+- If p < 0.05, then $|t| > 1.96$, and the 95% CI excludes zero
+- If the 95% CI excludes zero, then p < 0.05 and $|t| > 1.96$
+
+
+## Reading Regression Tables
+
+Now that we understand statistical inference, we can properly interpret the regression tables you'll encounter in academic papers.
+
+### From R Output to Publication Format
+
+When you run `summary()` on a regression in R, you get detailed but messy output.
+Academic papers present this information in a standardized, clean format using tables.
+
+```{r}
+#| echo: true
+
+# Standard R output
+summary(reg_housing)
+```
+
+In a publication, this same information would appear as:
+
+```{r}
+#| echo: false
+#| label: tbl-housing-reg
+#| tbl-cap: "The Effect of Lot Area on Home Sale Price"
+
+modelsummary(
+  list("Sale Price" = reg_housing),
+  stars = c('*' = 0.1, '**' = 0.05, '***' = 0.01),
+  coef_rename = c(
+    "lot_area" = "Lot Area (sq ft)",
+    "pool_area" = "Pool Area",
+    "garage_area" = "Garage Area",
+    "year_built" = "Year Built",
+    "year_remod" = "Year Remodeled"
+  ),
+  gof_map = c("nobs", "r.squared", "adj.r.squared"),
+  notes = "Standard errors in parentheses. * p < 0.1, ** p < 0.05, *** p < 0.01"
+)
+```
+
+### Decoding the Table Structure
+
+**Rows are variables:** The top indicates the dependent variable.
+Rows below show independent variables and the constant (intercept).
+
+**The main numbers are coefficients:** Each cell contains $\hat{\beta}_j$.
+
+**Numbers in parentheses are standard errors:** These are $se(\hat{\beta}_j)$.
+
+**Stars indicate significance levels:**
+
+- \* = significant at 10% level (p < 0.10)
+- \*\* = significant at 5% level (p < 0.05)
+- \*\*\* = significant at 1% level (p < 0.01)
+
+**Bottom statistics:** Sample size (N), R-squared, and sometimes other diagnostics.
+
+
+### Multiple Columns Show Robustness
+
+Most regression tables have multiple columns, each representing a different specification.
+This lets readers see how estimates change as controls are added:
+
+```{r}
+#| echo: true
+
+# Three specifications with increasing controls
+reg1 <- lm(sale_price ~ lot_area, data = housing_data)
+reg2 <- lm(sale_price ~ lot_area + pool_area + garage_area, data = housing_data)
+reg3 <- lm(sale_price ~ lot_area + pool_area + garage_area + 
+             year_built + year_remod, data = housing_data)
+```
+
+```{r}
+#| echo: false
+#| label: tbl-housing-multi
+#| tbl-cap: "The Effect of Lot Area on Home Sale Price: Multiple Specifications"
+
+modelsummary(
+  list("(1)" = reg1, "(2)" = reg2, "(3)" = reg3),
+  stars = c('*' = 0.1, '**' = 0.05, '***' = 0.01),
+  coef_rename = c(
+    "lot_area" = "Lot Area (sq ft)",
+    "pool_area" = "Pool Area",
+    "garage_area" = "Garage Area",
+    "year_built" = "Year Built",
+    "year_remod" = "Year Remodeled"
+  ),
+  gof_map = c("nobs", "r.squared", "adj.r.squared"),
+  notes = "Standard errors in parentheses. * p < 0.1, ** p < 0.05, *** p < 0.01"
+)
+```
+
+Notice how the coefficient on Lot Area changes across specifications.
+In column (1), without controls, the estimate is different from column (3).
+This pattern often reveals omitted variable bias in simpler specifications.
+
+
+### What to Look for in Regression Tables
+
+1. **What is the coefficient on the variable of interest?** How do we interpret it?
+
+2. **Is it statistically significant?** At what level?
+
+3. **How does the coefficient change across specifications?** Does it remain stable or shift dramatically?
+
+4. **Are the sample size and R-squared reasonable?** Very small N or very low R² might raise concerns.
+
+
+::: {.problem}
+
+<div class="context">
+**Practice: Reading a Regression Table**
+
+Consider this table examining the effect of stock performance on CEO salary:
+</div>
+
+```{r}
+#| echo: false
+
+# Simulate CEO salary data
+set.seed(789)
+n_ceo <- 209
+
+ceo_data <- tibble(
+  ros = rnorm(n_ceo, 15, 30),  # return on stock (%)
+  sales = exp(rnorm(n_ceo, 7, 1)),  # sales in millions
+  log_salary = 5 + 0.001 * ros + 0.25 * log(sales) + rnorm(n_ceo, 0, 0.5)
+)
+
+ceo_reg1 <- lm(log_salary ~ ros, data = ceo_data)
+ceo_reg2 <- lm(log_salary ~ ros + log(sales), data = ceo_data)
+
+modelsummary(
+  list("(1)" = ceo_reg1, "(2)" = ceo_reg2),
+  stars = c('*' = 0.1, '**' = 0.05, '***' = 0.01),
+  coef_rename = c(
+    "ros" = "Return on Stock (%)",
+    "log(sales)" = "Log(Sales)"
+  ),
+  gof_map = c("nobs", "adj.r.squared"),
+  title = "Effect of Stock Performance on CEO Salary"
+)
+```
+
+<div class="question">
+<div class="answer-row">
+<label>Is the effect of Return on Stock statistically significant at the 5% level in Column (1)?</label>
+<select onchange="checkAnswer(this, 'b')">
+<option value="">Select answer...</option>
+<option value="a">Yes</option>
+<option value="b">No</option>
+</select>
+</div>
+</div>
+
+<div class="question">
+<div class="answer-row">
+<label>What happens to the Adjusted R² when we add log(Sales) as a control?</label>
+<select onchange="checkAnswer(this, 'a')">
+<option value="">Select answer...</option>
+<option value="a">It increases substantially</option>
+<option value="b">It decreases</option>
+<option value="c">It stays about the same</option>
+</select>
+</div>
+</div>
+
+<div class="question">
+<div class="answer-row">
+<label>Based on this table, which variable appears to be a more important determinant of CEO salary?</label>
+<select onchange="checkAnswer(this, 'b')">
+<option value="">Select answer...</option>
+<option value="a">Return on Stock</option>
+<option value="b">Company Sales</option>
+<option value="c">Both are equally important</option>
+</select>
+</div>
+</div>
+
+:::
+
+
+## F-Tests: Testing Multiple Hypotheses
+
+Sometimes we want to test hypotheses about *multiple* coefficients simultaneously.
+For example: "Do experience AND tenure jointly affect wages?"
+
+The **F-test** allows us to test such joint hypotheses.
+
+
+### Why Not Just Use Multiple t-Tests?
+
+You might think: "Why not just run separate t-tests on each coefficient?"
+
+There are two problems:
+
+1. **No restrictions on other parameters:** A t-test on $\beta_2$ puts no restrictions on $\beta_3$. If the variables are correlated, this can be misleading.
+
+2. **Multiple comparisons problem:** If you run many tests at the 5% level, you'll reject *some* true null hypotheses just by chance. With 20 tests, you'd expect about 1 false rejection even if all nulls are true!
+
+The F-test controls for these issues.
+
+
+### Setting Up the F-Test
+
+Consider the wage model:
+
+$$\log(wage) = \beta_0 + \beta_1(education) + \beta_2(experience) + \beta_3(tenure) + \beta_4(age) + \mu$$
+
+Suppose we want to test whether on-the-job training variables (experience and tenure) matter at all:
+
+$$H_0: \beta_2 = \beta_3 = 0$$
+$$H_1: H_0 \text{ is not true}$$
+
+The alternative is satisfied if *either* $\beta_2 \neq 0$ or $\beta_3 \neq 0$ (or both).
+
+
+### Computing the F-Statistic
+
+The F-test compares two models:
+
+**Unrestricted Model:** The full model with all variables
+$$UR: \widehat{\log(wage)} = \hat{\beta}_0 + \hat{\beta}_1(educ) + \hat{\beta}_2(exper) + \hat{\beta}_3(tenure) + \hat{\beta}_4(age)$$
+
+**Restricted Model:** The model assuming the null is true (dropping the restricted variables)
+$$R: \widehat{\log(wage)} = \hat{\beta}_0 + \hat{\beta}_1(educ) + \hat{\beta}_4(age)$$
+
+The F-statistic is:
+
+$$F = \frac{(SSR_R - SSR_{UR})/q}{SSR_{UR}/df_{UR}}$$
+
+where:
+
+- $SSR_R$ = Sum of squared residuals from restricted model
+- $SSR_{UR}$ = Sum of squared residuals from unrestricted model
+- $q$ = Number of restrictions (variables dropped)
+- $df_{UR}$ = Degrees of freedom in unrestricted model ($n - k - 1$)
+
+
+### F-Test Example
+
+Let's test whether year built and year remodeled jointly affect home prices:
+
+```{r}
+#| echo: true
+
+# Unrestricted model (full model)
+reg_unrestricted <- lm(sale_price ~ lot_area + pool_area + garage_area + 
+                         year_built + year_remod, 
+                       data = housing_data)
+
+# Restricted model (dropping year variables)
+reg_restricted <- lm(sale_price ~ lot_area + pool_area + garage_area,
+                     data = housing_data)
+
+# Compute F-statistic manually
+ssr_r <- sum(resid(reg_restricted)^2)
+ssr_ur <- sum(resid(reg_unrestricted)^2)
+df_ur <- df.residual(reg_unrestricted)
+q <- 2  # number of restrictions
+
+f_numerator <- (ssr_r - ssr_ur) / q
+f_denominator <- ssr_ur / df_ur
+f_stat <- f_numerator / f_denominator
+
+# Critical value at 5% significance
+f_crit <- qf(0.05, df1 = q, df2 = df_ur, lower.tail = FALSE)
+
+cat("F-statistic:", round(f_stat, 2), "\n")
+cat("Critical value (5%):", round(f_crit, 2), "\n")
+cat("Reject H₀?", f_stat > f_crit, "\n")
+```
+
+Since the F-statistic exceeds the critical value, we **reject the null hypothesis**.
+Year built and year remodeled are **jointly statistically significant**---they collectively improve the model's fit.
+
+
+### Using R's anova() Function
+
+In practice, you'll use R's `anova()` function to perform F-tests:
+
+```{r}
+#| echo: true
+
+anova(reg_restricted, reg_unrestricted)
+```
+
+The output shows the F-statistic, degrees of freedom, and p-value directly.
+
+
+### The F-Statistic in Terms of R²
+
+The F-statistic can also be written in terms of R-squared values:
+
+$$F = \frac{(R^2_{UR} - R^2_R)/q}{(1 - R^2_{UR})/df_{UR}}$$
+
+This shows that the F-test is essentially asking: *Does the unrestricted model fit the data significantly better than the restricted model?*
+
+If $R^2_{UR}$ is much larger than $R^2_R$, the F-statistic will be large, and we'll reject the null.
+
+
+::: {.callout-note}
+## Properties of the F-Test
+
+- The F-statistic is always non-negative, so F-tests are always **one-sided**
+- If the null is rejected, we say the variables are **jointly statistically significant**
+- We cannot determine *which* individual variable is significant---only that at least one is
+- If variables are jointly insignificant, it provides justification for dropping them from the model
+:::
+
+
+## Chapter Summary
+
+::: {.callout-tip}
+## Key Takeaways
+
+1. **Statistical inference** allows us to move from sample estimates to statements about population parameters, accounting for sampling variability.
+
+2. The **sampling distribution** of $\hat{\beta}_j$ describes how our estimates would vary across repeated samples. Under the normality assumption (or with large samples), it follows a normal distribution.
+
+3. **Hypothesis testing** uses the t-statistic to determine whether our estimate is "far enough" from zero to reject the null hypothesis: $t = \hat{\beta}_j / se(\hat{\beta}_j)$
+
+4. **P-values** tell us the probability of seeing our data if the null were true. Smaller p-values provide stronger evidence against $H_0$.
+
+5. **Confidence intervals** provide a range of plausible values for the population parameter. A 95% CI excludes zero if and only if the estimate is significant at the 5% level.
+
+6. **Statistical significance ≠ practical significance.** Always consider the magnitude of effects, not just their p-values.
+
+7. **F-tests** allow us to test multiple hypotheses simultaneously, avoiding the multiple comparisons problem.
+
+8. **Regression tables** in academic papers present coefficients, standard errors (in parentheses), and significance stars. Multiple columns show robustness across specifications.
+:::
+
+
+## Practice Exercises
+
+::: {.callout-note collapse="true"}
+## Exercise 1: Interpreting t-Statistics
+
+Consider a regression where $\hat{\beta}_1 = 2.5$ and $se(\hat{\beta}_1) = 0.8$.
+
+a) Calculate the t-statistic for testing $H_0: \beta_1 = 0$.
+b) Is this significant at the 5% level? The 1% level?
+c) Calculate the 95% confidence interval for $\beta_1$.
+d) If someone claimed that $\beta_1 = 4$, would the 95% CI support or contradict this claim?
+
+:::
+
+
+::: {.callout-note collapse="true"}
+## Exercise 2: Understanding P-Values
+
+For each p-value below, state: (i) whether you reject $H_0$ at the 10%, 5%, and 1% levels, and (ii) interpret what the p-value means.
+
+a) p = 0.001
+b) p = 0.047
+c) p = 0.082
+d) p = 0.523
+
+:::
+
+
+::: {.callout-note collapse="true"}
+## Exercise 3: F-Test Application
+
+You estimate a model of house prices with the following variables: lot area, garage size, bedrooms, bathrooms, year built, and neighborhood fixed effects (20 neighborhood dummies).
+
+a) How would you test whether neighborhood matters for house prices?
+b) What is the null hypothesis?
+c) How many restrictions (q) would you be testing?
+d) If the F-statistic is 3.45 and the critical value is 1.57, what do you conclude?
+
+:::
+
+
+::: {.callout-note collapse="true"}
+## Exercise 4: Reading Regression Tables
+
+Find a regression table in a published economics paper (or use one provided by your instructor).
+
+a) Identify the dependent and independent variables.
+b) What is the key coefficient of interest?
+c) Is it statistically significant? At what level?
+d) How does the coefficient change across different specifications?
+e) Is the effect practically significant? Explain your reasoning.
+
+:::
+
+
+::: {.callout-note collapse="true"}
+## Exercise 5: Simulation Exercise
+
+Using R, replicate the sampling distribution simulation from this chapter, but with $\beta_1 = 0.5$ instead of $\beta_1 = 0$. 
+
+a) Generate the sampling distribution using 1,000 simulated samples.
+b) What is the average of your estimates? How does it compare to the true $\beta_1$?
+c) Create a histogram and overlay the theoretical normal distribution.
+d) Calculate how often your 95% confidence intervals contain the true value.
+
+:::
