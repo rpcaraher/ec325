@@ -368,6 +368,8 @@ ggplot(sim_results, aes(x = b1_hat)) +
 The histogram of our 1,000 simulated estimates matches the theoretical normal curve almost perfectly!
 
 
+:::: {.content-visible when-format="html"}
+
 ::: {.problem}
 
 <div class="context">
@@ -401,6 +403,14 @@ The histogram of our 1,000 simulated estimates matches the theoretical normal cu
 </div>
 
 :::
+
+::::
+
+:::: {.content-hidden when-format="html"}
+
+*Quick Check: This section contains interactive content only available in the HTML version.*
+
+::::
 
 
 ## Hypothesis Testing
@@ -795,6 +805,8 @@ But practically, a 50-cent annual raise is economically trivial.
 Always interpret the *magnitude* of coefficients, not just their statistical significance.
 
 
+:::: {.content-visible when-format="html"}
+
 ::: {.problem}
 
 <div class="context">
@@ -841,6 +853,14 @@ Always interpret the *magnitude* of coefficients, not just their statistical sig
 </div>
 
 :::
+
+::::
+
+:::: {.content-hidden when-format="html"}
+
+*Quick Check: This section contains interactive content only available in the HTML version.*
+
+::::
 
 
 ## Confidence Intervals
@@ -1311,67 +1331,361 @@ If $R^2_{UR}$ is much larger than $R^2_R$, the F-statistic will be large, and we
 
 ## Practice Exercises
 
-::: {.callout-note collapse="true"}
-## Exercise 1: Interpreting t-Statistics
+:::: {.content-visible when-format="html"}
 
-Consider a regression where $\hat{\beta}_1 = 2.5$ and $se(\hat{\beta}_1) = 0.8$.
+```{=html}
+<div class="problem">
 
-a) Calculate the t-statistic for testing $H_0: \beta_1 = 0$.
-b) Is this significant at the 5% level? The 1% level?
-c) Calculate the 95% confidence interval for $\beta_1$.
-d) If someone claimed that $\beta_1 = 4$, would the 95% CI support or contradict this claim?
+<div class="context" style="margin-bottom: 20px;">
+<strong>Practice: Interpreting t-Statistics and Hypothesis Testing</strong>
+</div>
+
+<div class="context" style="margin-bottom: 20px;">
+<strong>Scenario:</strong> Consider a regression where \(\hat{\beta}_1 = 2.5\) and \(se(\hat{\beta}_1) = 0.8\). Assume a large sample size (df > 100).
+</div>
+
+<div class="question">
+<div class="answer-row">
+    <label>i. The t-statistic for testing \(H_0: \beta_1 = 0\) is: </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">2.0</option>
+        <option value="b">2.5</option>
+        <option value="c">3.125</option>
+        <option value="d">0.32</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>ii. Is this estimate statistically significant at the 5% level? </label>
+    <select onchange="checkAnswer(this, 'a')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Yes, because |t| > 1.96</option>
+        <option value="b">No, because |t| < 1.96</option>
+        <option value="c">Yes, because the estimate is positive</option>
+        <option value="d">Cannot determine without the p-value</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iii. Is this estimate statistically significant at the 1% level (critical value ≈ 2.58)? </label>
+    <select onchange="checkAnswer(this, 'a')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Yes, because |t| > 2.58</option>
+        <option value="b">No, because |t| < 2.58</option>
+        <option value="c">Yes, because it was significant at 5%</option>
+        <option value="d">Cannot determine</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iv. The 95% confidence interval for \(\beta_1\) is approximately: </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">[1.70, 3.30]</option>
+        <option value="b">[0.93, 4.07]</option>
+        <option value="c">[2.50, 4.50]</option>
+        <option value="d">[0.00, 5.00]</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>v. If someone claimed that \(\beta_1 = 4\), does the 95% CI support or contradict this claim? </label>
+    <select onchange="checkAnswer(this, 'a')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The CI includes 4, so we cannot reject β₁ = 4</option>
+        <option value="b">The CI excludes 4, so we can reject β₁ = 4</option>
+        <option value="c">CIs cannot be used to evaluate claims about specific values</option>
+        <option value="d">We need the p-value to answer this</option>
+    </select>
+</div>
+</div>
+
+<div class="context" style="margin-top: 30px; margin-bottom: 20px;">
+<strong>Practice: Understanding P-Values</strong>
+</div>
+
+<div class="question">
+<div class="answer-row">
+    <label>vi. A p-value of 0.001 means: </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">There is a 0.1% chance the null hypothesis is true</option>
+        <option value="b">If H₀ were true, there's a 0.1% chance of seeing data this extreme</option>
+        <option value="c">The coefficient equals 0.001</option>
+        <option value="d">We should accept the null hypothesis</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>vii. With p = 0.001, we can reject H₀ at which significance levels? </label>
+    <select onchange="checkAnswer(this, 'd')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Only the 10% level</option>
+        <option value="b">The 10% and 5% levels</option>
+        <option value="c">Only the 1% level</option>
+        <option value="d">The 10%, 5%, and 1% levels</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>viii. With p = 0.047, we can reject H₀ at which significance levels? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Only the 10% level</option>
+        <option value="b">The 10% and 5% levels, but not the 1% level</option>
+        <option value="c">The 10%, 5%, and 1% levels</option>
+        <option value="d">None of these levels</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>ix. With p = 0.082, we can reject H₀ at which significance levels? </label>
+    <select onchange="checkAnswer(this, 'a')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Only the 10% level</option>
+        <option value="b">The 10% and 5% levels</option>
+        <option value="c">The 10%, 5%, and 1% levels</option>
+        <option value="d">None of these levels</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>x. With p = 0.523, we can reject H₀ at which significance levels? </label>
+    <select onchange="checkAnswer(this, 'd')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Only the 10% level</option>
+        <option value="b">The 10% and 5% levels</option>
+        <option value="c">The 10%, 5%, and 1% levels</option>
+        <option value="d">None of these levels</option>
+    </select>
+</div>
+</div>
+
+<div class="context" style="margin-top: 30px; margin-bottom: 20px;">
+<strong>Practice: Statistical vs. Practical Significance</strong>
+</div>
+
+<div class="question">
+<div class="answer-row">
+    <label>xi. A study finds that an additional year of education increases annual wages by $50, with p < 0.001 (n = 500,000). This effect is: </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Both statistically and practically significant</option>
+        <option value="b">Neither statistically nor practically significant</option>
+        <option value="c">Statistically significant but practically insignificant</option>
+        <option value="d">Practically significant but not statistically significant</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>xii. Why can very large samples detect tiny, unimportant effects? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Large samples have more bias</option>
+        <option value="b">Standard errors shrink as n increases, making small effects detectable</option>
+        <option value="c">P-values are calculated differently for large samples</option>
+        <option value="d">The critical value increases with sample size</option>
+    </select>
+</div>
+</div>
+
+<div class="context" style="margin-top: 30px; margin-bottom: 20px;">
+<strong>Practice: F-Tests for Joint Hypotheses</strong>
+</div>
+
+<div class="context" style="margin-bottom: 20px;">
+<strong>Scenario:</strong> You estimate a model of house prices with: lot area, garage size, bedrooms, bathrooms, year built, and 20 neighborhood dummy variables. You want to test whether neighborhood matters for house prices.
+</div>
+
+<div class="question">
+<div class="answer-row">
+    <label>xiii. The null hypothesis for testing whether "neighborhood matters" is: </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">H₀: At least one neighborhood coefficient equals zero</option>
+        <option value="b">H₀: All 20 neighborhood coefficients equal zero</option>
+        <option value="c">H₀: The neighborhood coefficients are all equal to each other</option>
+        <option value="d">H₀: The F-statistic equals zero</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>xiv. How many restrictions (q) are you testing? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">1</option>
+        <option value="b">5</option>
+        <option value="c">20</option>
+        <option value="d">21</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>xv. If the F-statistic is 3.45 and the critical value is 1.57, what do you conclude? </label>
+    <select onchange="checkAnswer(this, 'a')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Reject H₀; neighborhoods are jointly significant</option>
+        <option value="b">Fail to reject H₀; neighborhoods are not significant</option>
+        <option value="c">Cannot determine without the p-value</option>
+        <option value="d">The test is invalid because F > 1</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>xvi. If the F-test rejects the null, can we conclude that every individual neighborhood dummy is statistically significant? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Yes, rejecting the joint null means all are significant</option>
+        <option value="b">No, we only know at least one is different from zero</option>
+        <option value="c">Yes, if F > critical value then each t > critical value</option>
+        <option value="d">Cannot determine</option>
+    </select>
+</div>
+</div>
+
+<div class="context" style="margin-top: 30px; margin-bottom: 20px;">
+<strong>Practice: Reading Regression Tables</strong>
+</div>
+
+<div class="context" style="margin-bottom: 20px;">
+<strong>Regression Output:</strong> A researcher studies the determinants of college GPA:
+<pre style="background-color: #f5f5f5; padding: 10px; margin-top: 10px; font-family: monospace;">
+Dependent variable: college_gpa (scale: 0-4)
+
+                 Estimate  Std. Error   p-value
+(Intercept)        1.250      0.180     < 0.001
+high_school_gpa    0.520      0.045     < 0.001
+sat_score          0.001      0.0003    < 0.001
+athlete           -0.085      0.062      0.171
+legacy             0.142      0.058      0.015
+
+n = 2,450, Adjusted R-squared = 0.31
+</pre>
+<em>Note: athlete = 1 if varsity athlete; legacy = 1 if parent attended the college</em>
+</div>
+
+<div class="question">
+<div class="answer-row">
+    <label>xvii. A 100-point increase in SAT score is associated with what change in college GPA? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">0.001 points</option>
+        <option value="b">0.1 points (one-tenth of a GPA point)</option>
+        <option value="c">1.0 points</option>
+        <option value="d">0.01 points</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>xviii. The coefficient on "athlete" is: </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Statistically significant at the 5% level</option>
+        <option value="b">Not statistically significant at the 5% level</option>
+        <option value="c">Statistically significant at the 1% level</option>
+        <option value="d">Cannot determine from this output</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>xix. Comparing two students with identical high school GPAs and SAT scores, where one is a legacy and one is not, the legacy student has a predicted college GPA that is: </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">0.142 points lower</option>
+        <option value="b">14.2% higher</option>
+        <option value="c">0.142 points higher</option>
+        <option value="d">Cannot determine without knowing athlete status</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>xx. <strong>(Challenge)</strong> Based on the standard error for "athlete" (0.062), the 95% CI for the athlete effect is approximately: </label>
+    <select onchange="checkAnswer(this, 'a')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">[-0.207, 0.037]</option>
+        <option value="b">[-0.147, -0.023]</option>
+        <option value="c">[0.023, 0.147]</option>
+        <option value="d">[-0.085, 0.085]</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>xxi. <strong>(Challenge)</strong> The fact that the athlete CI includes zero is consistent with: </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Athletes definitely have the same GPA as non-athletes</option>
+        <option value="b">The coefficient is biased</option>
+        <option value="c">The p-value being greater than 0.05</option>
+        <option value="d">A statistically significant result</option>
+    </select>
+</div>
+</div>
+
+</div>
+```
+
+::: {.callout-tip collapse="true"}
+## Show Explanation
+
+**t-Statistics and Hypothesis Testing (i-v):**
+
+i. The t-statistic is calculated as $t = \hat{\beta}_1 / se(\hat{\beta}_1) = 2.5 / 0.8 = 3.125$.
+
+ii. Since $|t| = 3.125 > 1.96$, we reject $H_0$ at the 5% level. The estimate is statistically significant.
+
+iii. Since $|t| = 3.125 > 2.58$, we also reject $H_0$ at the 1% level. The estimate is highly significant.
+
+iv. The 95% CI is $\hat{\beta}_1 \pm 1.96 \times se(\hat{\beta}_1) = 2.5 \pm 1.96 \times 0.8 = 2.5 \pm 1.568 = [0.93, 4.07]$.
+
+v. Since 4 falls within the confidence interval [0.93, 4.07], we cannot reject the hypothesis that $\beta_1 = 4$ at the 5% level. The CI supports (or at least doesn't contradict) this claim.
+
+**Understanding P-Values (vi-x):**
+
+vi. The p-value is the probability of observing data as extreme as ours *if the null hypothesis were true*. It is NOT the probability that the null is true.
+
+vii. With p = 0.001, we can reject at all three levels (10%, 5%, and 1%) because 0.001 < 0.01 < 0.05 < 0.10.
+
+viii. With p = 0.047, we can reject at 10% (0.047 < 0.10) and 5% (0.047 < 0.05), but not at 1% (0.047 > 0.01).
+
+ix. With p = 0.082, we can only reject at 10% (0.082 < 0.10), but not at 5% (0.082 > 0.05) or 1%.
+
+x. With p = 0.523, we cannot reject at any conventional level. There is a 52.3% chance of seeing data this extreme if $H_0$ were true---not unusual at all.
+
+**Statistical vs. Practical Significance (xi-xii):**
+
+xi. A $50/year effect is statistically significant (p < 0.001) but practically trivial. This is less than 25 cents per hour---hardly worth an extra year of schooling! Large samples can detect tiny effects.
+
+xii. The standard error shrinks as $n$ increases (specifically, $se \propto 1/\sqrt{n}$). With huge samples, even tiny deviations from zero become "detectable" statistically, even if they're meaningless practically.
+
+**F-Tests (xiii-xvi):**
+
+xiii. The null hypothesis is that ALL 20 neighborhood coefficients equal zero jointly: $H_0: \beta_{n1} = \beta_{n2} = ... = \beta_{n20} = 0$. If any neighborhood differs from the baseline, $H_0$ is false.
+
+xiv. You are testing 20 restrictions---one for each neighborhood dummy variable set to zero.
+
+xv. Since F = 3.45 > 1.57 = critical value, we reject $H_0$. Neighborhoods are jointly statistically significant---they collectively help explain house prices.
+
+xvi. Rejecting the joint null only tells us that at least one neighborhood coefficient differs from zero. Some individual neighborhoods might not be significantly different from the baseline---we'd need individual t-tests to determine which ones.
+
+**Reading Regression Tables (xvii-xxi):**
+
+xvii. The coefficient on SAT is 0.001, meaning each 1-point increase in SAT is associated with a 0.001 increase in GPA. For 100 points: $100 \times 0.001 = 0.1$ GPA points.
+
+xviii. The p-value for athlete is 0.171, which is greater than 0.05. Therefore, the coefficient is NOT statistically significant at the 5% level.
+
+xix. The coefficient on legacy (0.142) is the difference in predicted GPA between legacy and non-legacy students, holding other variables constant. Legacy students are predicted to have GPAs 0.142 points higher.
+
+xx. The 95% CI is $-0.085 \pm 1.96 \times 0.062 = -0.085 \pm 0.122 = [-0.207, 0.037]$. This interval includes zero.
+
+xxi. When a 95% CI includes zero, it means we cannot reject $H_0: \beta = 0$ at the 5% level---which is consistent with the p-value being 0.171 > 0.05. The CI and hypothesis test always agree.
 
 :::
 
+::::
 
-::: {.callout-note collapse="true"}
-## Exercise 2: Understanding P-Values
+:::: {.content-hidden when-format="html"}
 
-For each p-value below, state: (i) whether you reject $H_0$ at the 10%, 5%, and 1% levels, and (ii) interpret what the p-value means.
+*Note: This section contains interactive content only available in the HTML version.*
 
-a) p = 0.001
-b) p = 0.047
-c) p = 0.082
-d) p = 0.523
-
-:::
-
-
-::: {.callout-note collapse="true"}
-## Exercise 3: F-Test Application
-
-You estimate a model of house prices with the following variables: lot area, garage size, bedrooms, bathrooms, year built, and neighborhood fixed effects (20 neighborhood dummies).
-
-a) How would you test whether neighborhood matters for house prices?
-b) What is the null hypothesis?
-c) How many restrictions (q) would you be testing?
-d) If the F-statistic is 3.45 and the critical value is 1.57, what do you conclude?
-
-:::
-
-
-::: {.callout-note collapse="true"}
-## Exercise 4: Reading Regression Tables
-
-Find a regression table in a published economics paper (or use one provided by your instructor).
-
-a) Identify the dependent and independent variables.
-b) What is the key coefficient of interest?
-c) Is it statistically significant? At what level?
-d) How does the coefficient change across different specifications?
-e) Is the effect practically significant? Explain your reasoning.
-
-:::
-
-
-::: {.callout-note collapse="true"}
-## Exercise 5: Simulation Exercise
-
-Using R, replicate the sampling distribution simulation from this chapter, but with $\beta_1 = 0.5$ instead of $\beta_1 = 0$. 
-
-a) Generate the sampling distribution using 1,000 simulated samples.
-b) What is the average of your estimates? How does it compare to the true $\beta_1$?
-c) Create a histogram and overlay the theoretical normal distribution.
-d) Calculate how often your 95% confidence intervals contain the true value.
-
-:::
+::::
