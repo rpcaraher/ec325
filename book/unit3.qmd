@@ -167,12 +167,14 @@ The conditional expectation is often the central quantity we want to model and e
 ### Example: Education and Wages
 
 Suppose $X$ represents education level,
-which can take values $\{hsdeg, colldeg, profdeg\}$ (high school degree,
+which can take values $X = \{\text{hsdeg}, \text{colldeg}, \text{profdeg}\}$ (high school degree,
 college degree,
 professional degree),
 and $Y$ represents hourly wage.
+
 For each education level,
 we can compute the average wage among people in that group.
+This will gives us a good idea of how wages are related to education.
 
 ```{r}
 #| echo: false
@@ -214,8 +216,11 @@ ggplot(df, aes(x = educ, y = y)) +
   theme(axis.text.x = element_text(size = 10))
 ```
 
-The red points in @fig-cond-exp-example show the conditional expectations---the average wage within each education category.
-These averages tell us how wages vary with education,
+@fig-cond-exp-example is a scatterplot with an indiviudal's wage on the y-axis and their education level on the x-axis, with each point plotted in blue.
+The red points in @fig-cond-exp-example show the conditional expectations---the average wage for individuals *within each education category,*
+i.e., $E[Y|X=HS], E[Y|X=College], \text{and} E[Y|X=Prof]$.
+
+These averages tell us how we can expect wages to change when we increase education,
 which is precisely what we set out to measure.
 
 
@@ -305,6 +310,11 @@ on average.
 
 ## The Regression Line: Predicted Values and Residuals
 
+The entire goal of linear regression is to use our *sample* of the data from the wider *population*
+to estimate the values of $\beta_0$ and $\beta_1$ that are the best possible estimates we can generate.
+We call these estimates $\hat{\beta_0}$ and $\hat{\beta_1}$,
+and the method we use to calculate these estimates the **estimator**.
+
 Before we derive estimators for $\beta_0$ and $\beta_1$,
 let's introduce some key concepts that will guide our approach.
 
@@ -338,11 +348,12 @@ negative residuals mean we overpredicted.
 
 ```{r}
 #| echo: false
+#| message: false
+#| warning: false
+#| code-fold: true
 #| label: fig-regression-components
-#| fig-cap: "Components of the regression line. Black points show actual values (yᵢ), the blue line shows predicted values (ŷᵢ), and the salmon segment illustrates a residual (ûᵢ = yᵢ - ŷᵢ)."
-#| fig-width: 7
-#| fig-height: 5
-#| out-width: "80%"
+#| fig-cap: "Components of the regression line. Black points show actual values, the blue line shows predicted values, and the salmon segment illustrates a residual."
+
 
 # Using mtcars for illustration
 data(mtcars)
@@ -369,13 +380,13 @@ ggplot(mtcars_ex, aes(x = hp, y = mpg)) +
     linewidth = 1.2,
     arrow = arrow(length = unit(0.2, "cm"), ends = "both")
   ) +
-  annotate("text", x = x_point + 18, y = (y_actual + y_predicted)/2,
+  annotate("text", x = 180, y = (y_actual + y_predicted)/2,
            label = expression(hat(mu)[i] == y[i] - hat(y)[i]),
            color = "salmon", size = 5, parse = TRUE) +
-  annotate("text", x = 280, y = 12,
+  annotate("text", x = 290, y = 14,
            label = expression(hat(y) == hat(beta)[0] + hat(beta)[1] * x),
            color = "steelblue", size = 5, parse = TRUE) +
-  annotate("text", x = 55, y = 27, label = expression(y[i]), size = 5) +
+  annotate("text", x = 62, y = 30, label = expression(y[i]), size = 5) +
   labs(x = "Horsepower", y = "Miles per Gallon") +
   theme_minimal()
 ```
@@ -446,7 +457,7 @@ we have a **sample** of data and must *estimate* the population parameters.
 
 ### The Minimization Problem
 
-Suppose we have a random sample of $n$ observations,
+Suppose we have a sample of $n$ observations,
 $\{(x_i, y_i): i = 1, 2, ..., n\}$.
 As discussed above,
 we want to find the values of $\hat{\beta}_0$ and $\hat{\beta}_1$ that minimize the sum of squared residuals:
@@ -455,7 +466,7 @@ $$
 \min_{\hat{\beta}_0, \hat{\beta}_1} \sum_{i=1}^{n} (y_i - \hat{\beta}_0 - \hat{\beta}_1 x_i)^2
 $$
 
-This is a calculus optimization problem.
+This is a calculus optimization problem!
 The SSR is a function of two unknowns ($\hat{\beta}_0$ and $\hat{\beta}_1$),
 and we want to find the values that minimize it.
 

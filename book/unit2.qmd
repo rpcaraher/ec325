@@ -263,13 +263,157 @@ $$
 
 where $\bar{Y}_n$ is the sample average and $\text{plim}$ denotes the probability limit (what the value converges to as $n \to \infty$).
 
+### Seeing the LLN in Action: Rolling Dice
+
+To see the Law of Large Numbers at work, consider a simple example: rolling a fair six-sided die. The expected value (average outcome) of a single roll is:
+
+$$
+\mu = \frac{1 + 2 + 3 + 4 + 5 + 6}{6} = 3.5
+$$
+
+If we roll a die just once or twice, we might get values far from 3.5 (like a 1 or a 6). 
+But what happens if we roll it many, many times?
+Let's see what happens!
+
+First, we will "pretend" rolling a dice by using the `sample()` function.
+This function will randomly select `n` numbers from a vector, here the numbers 1-6.
+
+Let's first roll the dice once.
+We will set the `size` argument in the `sample()` function to `size = 1` to generate a single random number from our vector.
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# Set seed for reproducibility
+set.seed(1248)
+
+# Create a vector which represents the possible outcomes of a dice roll
+dice <- c(1, 2, 3, 4, 5, 6)
+
+# Now "roll" the dice using the sample() function
+
+roll_1 <- sample(dice, size = 1, replace = TRUE)
+
+# Print the result of the dice roll
+roll_1
+
+```
+
+With 1 dice roll, we get a value of 2.
+Obviously pretty far from the expected value $\mu = 3.5$.
+
+Now, let's roll it 5 times and take the average of our 5 different rolls using the `mean()` function:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+roll_5 <- sample(dice, size = 5, replace = TRUE)
+
+# Print the 5 different dice rolls
+roll_5
+
+# Find the mean of the 5 different dice rolls
+mean(roll_5)
+
+```
+
+
+With just 5 rolls, our average is a little closer to the expected value.
+Now, let's try to roll it 25 times, 50 times, and 100 times and find the average values of our dice roll!
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# Continue rolling to get 10 total rolls
+rolls_25 <- sample(dice, size = 10, replace = TRUE)
+mean(rolls_25)
+
+# Keep going to 50 rolls
+rolls_50 <- sample(dice, size = 50, replace = TRUE)
+mean(rolls_50)
+
+# And finally 100 rolls
+rolls_100 <- sample(1:6, size = 100, replace = TRUE)
+mean(rolls_100)
+
+```
+
+Notice how the average tends to get closer to 3.5 as we increase the number of rolls. 
+This isn't guaranteed on any single attempt (randomness still plays a role), but the general tendency is clear.
+
+Now let's see what happens when we roll the die many times and track the running average at each step.
+In @fig-lln-dice, I plot the *sample average* of our dice rolls on the y-axis,
+and the number of times I roll the dice on the x-axis.
+The population mean, 3.5, is plotted with a dashed red line.
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| code-fold: true
+#| label: fig-lln-dice
+#| fig-cap: "The Law of Large Numbers in action. As we roll a die more times, the average of all rolls converges to the expected value of 3.5."
+
+# Set seed for reproducibility
+set.seed(12345)
+
+# Number of dice rolls to simulate
+n_rolls <- 1000
+
+# Simulate rolling a six-sided die n_rolls times
+dice_rolls <- sample(1:6, size = n_rolls, replace = TRUE)
+
+# Calculate the running average after each roll
+running_avg <- cumsum(dice_rolls) / 1:n_rolls
+
+# Create a data frame for plotting
+dice_data <- tibble(
+  roll_number = 1:n_rolls,
+  running_average = running_avg
+)
+
+# Plot the running average
+ggplot(dice_data, aes(x = roll_number, y = running_average)) +
+  geom_line(color = "steelblue", linewidth = 0.8) +
+  geom_hline(yintercept = 3.5, linetype = "dashed", color = "red", linewidth = 1) +
+  annotate("text", x = 750, y = 3.7, label = "Expected value = 3.5", 
+           color = "red", size = 4) +
+  labs(
+    x = "Number of Rolls",
+    y = "Running Average",
+    title = "Convergence to Expected Value"
+  ) +
+  theme_minimal() +
+  coord_cartesian(ylim = c(2.5, 4.5))
+```
+
+Notice several key features about @fig-lln-dice:
+
+- **Early volatility**: In the first few rolls, the running average bounces around wildly. After just 10 rolls, we might be at 4.2 or 2.9.
+- **Gradual stabilization**: As we accumulate more rolls (say, 100 or 200), the average starts to settle down closer to 3.5.
+- **Long-run convergence**: By the time we've rolled 1,000 times, the average is very close to the theoretical expected value of 3.5.
+
+This is the Law of Large Numbers in action: **with enough observations, sample averages converge to population averages**. The key word is "enough"---we need a sufficiently large sample for the convergence to occur.
+
+### How the LLN Enables Causal Inference
+
 When we randomly assign individuals to treatment and control groups,
 we are essentially drawing random samples from the same underlying population.
 The LLN guarantees that,
 with a large enough sample,
-the average characteristics of each group will converge to the population average---and therefore to each other.
+the average characteristics of each group will converge to the population average---and therefore, to each other.
 
-### A Simulation
+This is why randomization eliminates selection bias: the treatment and control groups become statistically identical in all characteristics---both observed and unobserved---as the sample size grows.
+
+
+
+## How Randomization Eliminates Selection Bias: A Simulation
 
 ::: {.callout-note}
 ## What is a Simulation?
@@ -284,12 +428,16 @@ By manipulating features of the simulation---such as sample size or how treatmen
 Think of simulations as a laboratory where we can run controlled experiments on statistical methods themselves.
 :::
 
-To see the Law of Large Numbers in action,
-consider a simulation where we have a population with three observable characteristics:
+Let's look at a more complex version of how the LLN works in the context of a randomized control trial.
+Consider a simulation where we have a population with three observable characteristics:
 light-colored eyes,
 dark hair,
 and being tall.
-Suppose these characteristics are correlated with both treatment status and outcomes in observational data (i.e., without random assignment).
+Suppose these characteristics are correlated with both treatment status and outcomes in the observational data (i.e., without random assignment).
+Specifically,
+having light-colored eyes will be *strongly positively correlated* with the treatment and the outcome;
+having dark hair will be *moderately positively correlated* with the treatment and the outcome,
+and being tall will be *slightly negatively correlated* with the treatment and the outcome. 
 Critically, we set the true causal effect of treatment on the outcome to **zero**.
 
 ::: {.callout-tip}
@@ -303,13 +451,11 @@ As you progress through the course,
 more of this code will start to make sense.
 :::
 
-::: {.callout-note collapse="true"}
-## Show Code: Generating the Simulated Data
-
 ```{r}
 #| echo: true
 #| message: false
 #| warning: false
+#| code-fold: true
 
 # Load the tidyverse package for data manipulation and plotting
 library(tidyverse)
@@ -359,30 +505,14 @@ dat <- tibble(
   big_feet = big_feet
 )
 
-# Let's see how many people ended up in each group
-cat("Number in each group:\n")
-count(dat, treated)
 ```
-
-:::
-
-When we simply compare treated and untreated individuals *without* random assignment,
-we see large differences between groups---not just in outcomes,
-but in their baseline characteristics.
-The treated group has more people with light eyes,
-more people with dark hair,
-and so on.
-These differences in characteristics lead to a misleading difference in outcomes,
-even though the true causal effect is zero.
-
-::: {.callout-note collapse="true"}
-## Show Code: Visualizing Baseline Differences (No Randomization)
 
 ```{r}
 #| echo: true
 #| message: false
 #| warning: false
 #| label: fig-baseline-diffs
+#| code-fold: true
 #| fig-cap: "Baseline differences between treated and untreated groups without randomization. Despite the true causal effect being zero, we observe large differences in both characteristics and outcomes."
 
 # Calculate the mean of each variable for treated vs untreated groups
@@ -426,28 +556,19 @@ ggplot(baseline_diffs) +
   )
 ```
 
-:::
 
-Notice how the treated and untreated groups look very different!
+Notice in @fig-baseline-diffs how the treated and untreated groups look very different!
 The treated group has a higher proportion of people with light eyes and dark hair.
 Most importantly,
 the treated group has a higher mean outcome---even though **we know the true causal effect is zero**.
 This is selection bias in action:
 people who "select into" treatment have characteristics that also lead to better outcomes.
 
-Now let's see what happens when we randomly assign treatment.
-Starting with a small sample (N=10),
-random assignment reduces but doesn't eliminate the differences between groups.
-With such a small sample,
-random chance can still produce imbalanced groups.
-
-::: {.callout-note collapse="true"}
-## Show Code: Random Assignment Simulation
-
 ```{r}
 #| echo: true
 #| message: false
 #| warning: false
+#| code-fold: true
 
 # Function to run the random assignment simulation for a given sample size
 run_random_assignment <- function(data, sample_size, seed = 181247) {
@@ -488,9 +609,12 @@ results_n10 <- run_random_assignment(dat, sample_size = 10)
 results_n25 <- run_random_assignment(dat, sample_size = 25)
 results_n50 <- run_random_assignment(dat, sample_size = 50)
 results_n100 <- run_random_assignment(dat, sample_size = 100)
+results_n500 <- run_random_assignment(dat, sample_size = 500)
+
 
 # Combine all results
-all_results <- bind_rows(results_n10, results_n25, results_n50, results_n100)
+all_results <- bind_rows(results_n10, results_n25, results_n50, 
+  results_n100, results_n500)
 
 # Reshape for plotting
 all_results_long <- all_results |>
@@ -505,7 +629,15 @@ all_results_long <- all_results |>
   )
 ```
 
-:::
+
+Now let's see what happens when we randomly assign treatment.
+Starting with a small sample (N=10),
+we see in @fig-random-n10 that
+random assignment reduces but doesn't eliminate the differences between groups.
+With such a small sample,
+random chance can still produce imbalanced groups.
+With only 10 people,
+we still see noticeable differences between the randomly assigned treatment and control groups.
 
 ```{r}
 #| echo: false
@@ -535,26 +667,22 @@ all_results_long |>
   )
 ```
 
-With only 10 people,
-we still see noticeable differences between the randomly assigned treatment and control groups.
-This is not selection bias---it's just random chance with a small sample.
-
 As we increase the sample size to N=25 and N=50,
+as shown in @fig-random-n25 and @fig-random-n50,
 the differences between treatment and control groups shrink.
 The LLN is at work:
-larger samples produce more balanced groups.
+larger samples produce more balanced groups in terms of their background characteristics.
 
 ```{r}
 #| echo: false
 #| message: false
 #| warning: false
-#| label: fig-random-n25-n50
-#| fig-cap: "Random assignment with N=25 (top) and N=50 (bottom). As sample size increases, the groups become more balanced."
-#| fig-height: 8
+#| label: fig-random-n25
+#| fig-cap: "Random assignment with N=25."
 
 # Plot for N = 25 and N = 50
 all_results_long |>
-  filter(sample_size %in% c(25, 50)) |>
+  filter(sample_size %in% c(25)) |>
   mutate(sample_size_label = factor(
     sample_size_label, 
     levels = c("N = 25", "N = 50")
@@ -564,7 +692,7 @@ all_results_long |>
     aes(x = group, y = value, fill = group),
     stat = "identity"
   ) +
-  facet_grid(sample_size_label ~ variable, scales = "free_y") +
+  facet_wrap(~variable, nrow = 1, scales = "free_y") +
   labs(
     x = "Random Assignment",
     y = "Value"
@@ -580,12 +708,44 @@ all_results_long |>
 #| echo: false
 #| message: false
 #| warning: false
-#| label: fig-random-n100
-#| fig-cap: "Random assignment with N=100. The treatment and control groups are now nearly identical in their characteristics, and the difference in outcomes is close to the true causal effect of zero."
+#| label: fig-random-n50
+#| fig-cap: "Random assignment with N=50."
+
+# Plot for N = 25 and N = 50
+all_results_long |>
+  filter(sample_size %in% c(50)) |>
+  mutate(sample_size_label = factor(
+    sample_size_label, 
+    levels = c("N = 25", "N = 50")
+  )) |>
+  ggplot() +
+  geom_bar(
+    aes(x = group, y = value, fill = group),
+    stat = "identity"
+  ) +
+  facet_wrap(~variable, nrow = 1, scales = "free_y") +
+  labs(
+    x = "Random Assignment",
+    y = "Value"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    strip.text = element_text(size = 11)
+  )
+```
+
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-random-n500
+#| fig-cap: "Random assignment with N=500. The treatment and control groups are now nearly identical in their characteristics, and the difference in outcomes is close to the true causal effect of zero."
 
 # Plot for N = 100
 all_results_long |>
-  filter(sample_size == 100) |>
+  filter(sample_size == 500) |>
   ggplot() +
   geom_bar(
     aes(x = group, y = value, fill = group),
@@ -595,7 +755,7 @@ all_results_long |>
   labs(
     x = "Random Assignment",
     y = "Value",
-    title = "Random Assignment: N = 100"
+    title = NULL
   ) +
   theme_minimal() +
   theme(
@@ -604,7 +764,8 @@ all_results_long |>
   )
 ```
 
-By N=100,
+By N=500,
+as show in @fig-random-n500,
 the treatment and control groups are nearly identical across all characteristics.
 The difference in outcomes between groups is now close to zero---the true causal effect!
 Any remaining difference is just random variation,
@@ -614,7 +775,7 @@ not systematic selection bias.
 ## The Potential Outcomes Framework
 
 Now that we intuitively understand why simple comparisons can be misleading and how randomization addresses this problem,
-let's formalize these concepts mathematically using the **potential outcomes framework**.
+let's formalize these concepts mathematically using the **Potential Outcomes Framework**.
 
 ### Defining Potential Outcomes
 
@@ -636,13 +797,6 @@ $Y_{1i}$ is College Morty's wage,
 $Y_{0i}$ is Morty C-137's wage,
 and $\kappa_i$ is the causal effect of college for Morty.
 
-:::{#fig-fork-road}
-
-![](images/fork_in_the_road.png){width=60%}
-
-The potential outcomes framework conceptualizes causal effects as the comparison between two paths at a fork in the road.
-
-:::
 
 ### The Fundamental Problem of Causal Inference
 

@@ -513,7 +513,8 @@ E[Y | X = x]
 </section>
 <section id="example-education-and-wages" class="level3" data-number="3.1.2">
 <h3 data-number="3.1.2" class="anchored" data-anchor-id="example-education-and-wages"><span class="header-section-number">3.1.2</span> Example: Education and Wages</h3>
-<p>Suppose <span class="math inline">\(X\)</span> represents education level, which can take values <span class="math inline">\(\{hsdeg, colldeg, profdeg\}\)</span> (high school degree, college degree, professional degree), and <span class="math inline">\(Y\)</span> represents hourly wage. For each education level, we can compute the average wage among people in that group.</p>
+<p>Suppose <span class="math inline">\(X\)</span> represents education level, which can take values <span class="math inline">\(X = \{\text{hsdeg}, \text{colldeg}, \text{profdeg}\}\)</span> (high school degree, college degree, professional degree), and <span class="math inline">\(Y\)</span> represents hourly wage.</p>
+<p>For each education level, we can compute the average wage among people in that group. This will gives us a good idea of how wages are related to education.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-cond-exp-example" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -528,7 +529,8 @@ Figure&nbsp;3.1: Wages by education level. Each point represents an individual. 
 </div>
 </div>
 </div>
-<p>The red points in <a href="#fig-cond-exp-example" class="quarto-xref">Figure&nbsp;<span>3.1</span></a> show the conditional expectations—the average wage within each education category. These averages tell us how wages vary with education, which is precisely what we set out to measure.</p>
+<p><a href="#fig-cond-exp-example" class="quarto-xref">Figure&nbsp;<span>3.1</span></a> is a scatterplot with an indiviudal’s wage on the y-axis and their education level on the x-axis, with each point plotted in blue. The red points in <a href="#fig-cond-exp-example" class="quarto-xref">Figure&nbsp;<span>3.1</span></a> show the conditional expectations—the average wage for individuals <em>within each education category,</em> i.e., <span class="math inline">\(E[Y|X=HS], E[Y|X=College], \text{and} E[Y|X=Prof]\)</span>.</p>
+<p>These averages tell us how we can expect wages to change when we increase education, which is precisely what we set out to measure.</p>
 </section>
 </section>
 <section id="the-population-regression-model" class="level2" data-number="3.2">
@@ -593,6 +595,7 @@ wage = \beta_0 + \beta_1 \cdot educ + \mu
 </section>
 <section id="the-regression-line-predicted-values-and-residuals" class="level2" data-number="3.3">
 <h2 data-number="3.3" class="anchored" data-anchor-id="the-regression-line-predicted-values-and-residuals"><span class="header-section-number">3.3</span> The Regression Line: Predicted Values and Residuals</h2>
+<p>The entire goal of linear regression is to use our <em>sample</em> of the data from the wider <em>population</em> to estimate the values of <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> that are the best possible estimates we can generate. We call these estimates <span class="math inline">\(\hat{\beta_0}\)</span> and <span class="math inline">\(\hat{\beta_1}\)</span>, and the method we use to calculate these estimates the <strong>estimator</strong>.</p>
 <p>Before we derive estimators for <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span>, let’s introduce some key concepts that will guide our approach.</p>
 <section id="fitted-values-and-the-regression-line" class="level3" data-number="3.3.1">
 <h3 data-number="3.3.1" class="anchored" data-anchor-id="fitted-values-and-the-regression-line"><span class="header-section-number">3.3.1</span> Fitted Values and the Regression Line</h3>
@@ -610,32 +613,14 @@ wage = \beta_0 + \beta_1 \cdot educ + \mu
 \]</span></p>
 <p>The residual measures how much our prediction “misses” for each observation. Positive residuals mean we underpredicted; negative residuals mean we overpredicted.</p>
 <div class="cell">
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in geom_segment(aes(x = x_point, y = y_actual, xend = x_point, yend = y_predicted), : All aesthetics have length 1, but the data has 32 rows.
-ℹ Please consider using `annotate()` or provide this layer with data containing
-  a single row.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in is.na(x): is.na() applied to non-(list or vector) of type
-'expression'</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in is.na(x): is.na() applied to non-(list or vector) of type
-'expression'
-Warning in is.na(x): is.na() applied to non-(list or vector) of type
-'expression'</code></pre>
-</div>
 <div class="cell-output-display">
 <div id="fig-regression-components" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-regression-components-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3.2: Components of the regression line. Black points show actual values (yᵢ), the blue line shows predicted values (ŷᵢ), and the salmon segment illustrates a residual (ûᵢ = yᵢ - ŷᵢ).
+Figure&nbsp;3.2: Components of the regression line. Black points show actual values, the blue line shows predicted values, and the salmon segment illustrates a residual.
 </figcaption>
 <div aria-describedby="fig-regression-components-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="unit3_files/figure-html/fig-regression-components-1.png" class="img-fluid figure-img" style="width:80.0%">
+<img src="unit3_files/figure-html/fig-regression-components-1.png" class="img-fluid figure-img" width="672">
 </div>
 </figure>
 </div>
@@ -737,11 +722,11 @@ SSR = \sum_{i=1}^{n} \hat{\mu}_i^2 = \sum_{i=1}^{n} (y_i - \hat{\beta}_0 - \hat{
 <p>Now we turn to the mechanics of estimation. The <strong>population</strong> regression model describes the true relationship, but we never observe the entire population or the true values of <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span>. Instead, we have a <strong>sample</strong> of data and must <em>estimate</em> the population parameters.</p>
 <section id="the-minimization-problem" class="level3" data-number="3.4.1">
 <h3 data-number="3.4.1" class="anchored" data-anchor-id="the-minimization-problem"><span class="header-section-number">3.4.1</span> The Minimization Problem</h3>
-<p>Suppose we have a random sample of <span class="math inline">\(n\)</span> observations, <span class="math inline">\(\{(x_i, y_i): i = 1, 2, ..., n\}\)</span>. As discussed above, we want to find the values of <span class="math inline">\(\hat{\beta}_0\)</span> and <span class="math inline">\(\hat{\beta}_1\)</span> that minimize the sum of squared residuals:</p>
+<p>Suppose we have a sample of <span class="math inline">\(n\)</span> observations, <span class="math inline">\(\{(x_i, y_i): i = 1, 2, ..., n\}\)</span>. As discussed above, we want to find the values of <span class="math inline">\(\hat{\beta}_0\)</span> and <span class="math inline">\(\hat{\beta}_1\)</span> that minimize the sum of squared residuals:</p>
 <p><span class="math display">\[
 \min_{\hat{\beta}_0, \hat{\beta}_1} \sum_{i=1}^{n} (y_i - \hat{\beta}_0 - \hat{\beta}_1 x_i)^2
 \]</span></p>
-<p>This is a calculus optimization problem. The SSR is a function of two unknowns (<span class="math inline">\(\hat{\beta}_0\)</span> and <span class="math inline">\(\hat{\beta}_1\)</span>), and we want to find the values that minimize it.</p>
+<p>This is a calculus optimization problem! The SSR is a function of two unknowns (<span class="math inline">\(\hat{\beta}_0\)</span> and <span class="math inline">\(\hat{\beta}_1\)</span>), and we want to find the values that minimize it.</p>
 </section>
 <section id="first-order-conditions" class="level3" data-number="3.4.2">
 <h3 data-number="3.4.2" class="anchored" data-anchor-id="first-order-conditions"><span class="header-section-number">3.4.2</span> First-Order Conditions</h3>
@@ -833,8 +818,8 @@ The OLS Slope Formula
 <section id="basic-syntax" class="level3" data-number="3.5.1">
 <h3 data-number="3.5.1" class="anchored" data-anchor-id="basic-syntax"><span class="header-section-number">3.5.1</span> Basic Syntax</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># General syntax</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">lm</span>(y <span class="sc">~</span> x, <span class="at">data =</span> your_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># General syntax</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">lm</span>(y <span class="sc">~</span> x, <span class="at">data =</span> your_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The formula <code>y ~ x</code> specifies that <span class="math inline">\(y\)</span> is the dependent variable and <span class="math inline">\(x\)</span> is the independent variable. An intercept is included by default.</p>
 </section>
@@ -842,14 +827,14 @@ The OLS Slope Formula
 <h3 data-number="3.5.2" class="anchored" data-anchor-id="example-mpg-and-horsepower"><span class="header-section-number">3.5.2</span> Example: MPG and Horsepower</h3>
 <p>Let’s estimate the relationship between fuel efficiency (MPG) and engine horsepower using the built-in <code>mtcars</code> dataset:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the data</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(mtcars)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimate the regression</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>lm_mpg <span class="ot">&lt;-</span> <span class="fu">lm</span>(mpg <span class="sc">~</span> hp, <span class="at">data =</span> mtcars)</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># View the results</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm_mpg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the data</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(mtcars)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimate the regression</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>lm_mpg <span class="ot">&lt;-</span> <span class="fu">lm</span>(mpg <span class="sc">~</span> hp, <span class="at">data =</span> mtcars)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># View the results</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm_mpg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
@@ -1146,38 +1131,38 @@ Show Code: Unbiasedness Simulation
 <div id="callout-11" class="callout-11-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a "population" with known parameters</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1248</span>)</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>n_pop <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>x_pop <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">100</span>, <span class="at">size =</span> n_pop, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>err_pop <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n_pop)</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># True model: y = 3.5 + 2.21*x + error</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>pop_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> x_pop,</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="fl">3.5</span> <span class="sc">+</span> <span class="fl">2.21</span> <span class="sc">*</span> x <span class="sc">+</span> err_pop</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Draw many samples and estimate beta_1 each time</span></span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">812476</span>)</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>n_simulations <span class="ot">&lt;-</span> <span class="dv">500</span></span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>sample_size <span class="ot">&lt;-</span> <span class="dv">25</span></span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>sim_results <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(<span class="dv">1</span><span class="sc">:</span>n_simulations, <span class="cf">function</span>(i) {</span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Draw a random sample</span></span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>  sample_data <span class="ot">&lt;-</span> <span class="fu">slice_sample</span>(pop_data, <span class="at">n =</span> sample_size, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Estimate OLS</span></span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>  reg <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> x, <span class="at">data =</span> sample_data)</span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(</span>
-<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">iteration =</span> i,</span>
-<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">b1_hat =</span> <span class="fu">coef</span>(reg)[<span class="dv">2</span>]</span>
-<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the average of all estimates</span></span>
-<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>mean_b1 <span class="ot">&lt;-</span> <span class="fu">mean</span>(sim_results<span class="sc">$</span>b1_hat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a "population" with known parameters</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1248</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>n_pop <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>x_pop <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">100</span>, <span class="at">size =</span> n_pop, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>err_pop <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n_pop)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># True model: y = 3.5 + 2.21*x + error</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>pop_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> x_pop,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="fl">3.5</span> <span class="sc">+</span> <span class="fl">2.21</span> <span class="sc">*</span> x <span class="sc">+</span> err_pop</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Draw many samples and estimate beta_1 each time</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">812476</span>)</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>n_simulations <span class="ot">&lt;-</span> <span class="dv">500</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>sample_size <span class="ot">&lt;-</span> <span class="dv">25</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>sim_results <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(<span class="dv">1</span><span class="sc">:</span>n_simulations, <span class="cf">function</span>(i) {</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Draw a random sample</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  sample_data <span class="ot">&lt;-</span> <span class="fu">slice_sample</span>(pop_data, <span class="at">n =</span> sample_size, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Estimate OLS</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  reg <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> x, <span class="at">data =</span> sample_data)</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">iteration =</span> i,</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">b1_hat =</span> <span class="fu">coef</span>(reg)[<span class="dv">2</span>]</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the average of all estimates</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>mean_b1 <span class="ot">&lt;-</span> <span class="fu">mean</span>(sim_results<span class="sc">$</span>b1_hat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -1282,8 +1267,8 @@ se(\hat{\beta}_1) = \frac{\hat{\sigma}}{\sqrt{SST_x}}
 <p>where <span class="math inline">\(\hat{\sigma} = \sqrt{\frac{SSR}{n-2}}\)</span> is the estimated standard deviation of the errors.</p>
 <p>Standard errors quantify the precision of our estimates and are essential for hypothesis testing and confidence intervals (which we’ll cover in the next chapter).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># R reports standard errors automatically</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm_mpg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># R reports standard errors automatically</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm_mpg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
