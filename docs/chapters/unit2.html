@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>2&nbsp; Causality and Randomized Control Trials – EC325 Workbook</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/unit3.html" rel="next">
+<link href="../chapters/intro.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/unit2.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Causality and Randomized Control Trials</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">EC325 Workbook</a> 
+        <div class="sidebar-tools-main">
+    <div class="dropdown">
+      <a href="" title="Download" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label="Download"><i class="bi bi-download"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="../EC325-Workbook.pdf">
+              <i class="bi bi-file-pdf pe-1"></i>
+            Download PDF
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="../EC325-Workbook.epub">
+              <i class="bi bi-journal pe-1"></i>
+            Download ePub
+            </a>
+          </li>
+      </ul>
+    </div>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/unit2.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Causality and Randomized Control Trials</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/unit3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Bivariate Regression and Ordinary Least Squares</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/unit4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Multivariate Regression</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/unit5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Statistical Inference</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/installingR.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Intro to R and RStudio</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/statsreview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Statistics and Probability Review</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#the-problem-with-simple-comparisons" id="toc-the-problem-with-simple-comparisons" class="nav-link active" data-scroll-target="#the-problem-with-simple-comparisons"><span class="header-section-number">2.1</span> The Problem with Simple Comparisons</a></li>
+  <li><a href="#the-multiverse-of-possibilities" id="toc-the-multiverse-of-possibilities" class="nav-link" data-scroll-target="#the-multiverse-of-possibilities"><span class="header-section-number">2.2</span> The Multiverse of Possibilities</a>
+  <ul class="collapse">
+  <li><a href="#the-causal-effect-of-college" id="toc-the-causal-effect-of-college" class="nav-link" data-scroll-target="#the-causal-effect-of-college"><span class="header-section-number">2.2.1</span> The Causal Effect of College</a></li>
+  <li><a href="#the-fundamental-problem" id="toc-the-fundamental-problem" class="nav-link" data-scroll-target="#the-fundamental-problem"><span class="header-section-number">2.2.2</span> The Fundamental Problem</a></li>
+  </ul></li>
+  <li><a href="#randomized-control-trials-the-next-best-thing" id="toc-randomized-control-trials-the-next-best-thing" class="nav-link" data-scroll-target="#randomized-control-trials-the-next-best-thing"><span class="header-section-number">2.3</span> Randomized Control Trials: The Next Best Thing</a></li>
+  <li><a href="#the-law-of-large-numbers" id="toc-the-law-of-large-numbers" class="nav-link" data-scroll-target="#the-law-of-large-numbers"><span class="header-section-number">2.4</span> The Law of Large Numbers</a>
+  <ul class="collapse">
+  <li><a href="#seeing-the-lln-in-action-rolling-dice" id="toc-seeing-the-lln-in-action-rolling-dice" class="nav-link" data-scroll-target="#seeing-the-lln-in-action-rolling-dice"><span class="header-section-number">2.4.1</span> Seeing the LLN in Action: Rolling Dice</a></li>
+  <li><a href="#how-the-lln-enables-causal-inference" id="toc-how-the-lln-enables-causal-inference" class="nav-link" data-scroll-target="#how-the-lln-enables-causal-inference"><span class="header-section-number">2.4.2</span> How the LLN Enables Causal Inference</a></li>
+  </ul></li>
+  <li><a href="#how-randomization-eliminates-selection-bias-a-simulation" id="toc-how-randomization-eliminates-selection-bias-a-simulation" class="nav-link" data-scroll-target="#how-randomization-eliminates-selection-bias-a-simulation"><span class="header-section-number">2.5</span> How Randomization Eliminates Selection Bias: A Simulation</a></li>
+  <li><a href="#the-potential-outcomes-framework" id="toc-the-potential-outcomes-framework" class="nav-link" data-scroll-target="#the-potential-outcomes-framework"><span class="header-section-number">2.6</span> The Potential Outcomes Framework</a>
+  <ul class="collapse">
+  <li><a href="#defining-potential-outcomes" id="toc-defining-potential-outcomes" class="nav-link" data-scroll-target="#defining-potential-outcomes"><span class="header-section-number">2.6.1</span> Defining Potential Outcomes</a></li>
+  <li><a href="#the-fundamental-problem-of-causal-inference" id="toc-the-fundamental-problem-of-causal-inference" class="nav-link" data-scroll-target="#the-fundamental-problem-of-causal-inference"><span class="header-section-number">2.6.2</span> The Fundamental Problem of Causal Inference</a></li>
+  <li><a href="#selection-bias-formalized" id="toc-selection-bias-formalized" class="nav-link" data-scroll-target="#selection-bias-formalized"><span class="header-section-number">2.6.3</span> Selection Bias Formalized</a></li>
+  <li><a href="#how-randomization-eliminates-selection-bias" id="toc-how-randomization-eliminates-selection-bias" class="nav-link" data-scroll-target="#how-randomization-eliminates-selection-bias"><span class="header-section-number">2.6.4</span> How Randomization Eliminates Selection Bias</a></li>
+  </ul></li>
+  <li><a href="#the-oregon-health-insurance-experiment" id="toc-the-oregon-health-insurance-experiment" class="nav-link" data-scroll-target="#the-oregon-health-insurance-experiment"><span class="header-section-number">2.7</span> The Oregon Health Insurance Experiment</a>
+  <ul class="collapse">
+  <li><a href="#context-medicaid-expansion" id="toc-context-medicaid-expansion" class="nav-link" data-scroll-target="#context-medicaid-expansion"><span class="header-section-number">2.7.1</span> Context: Medicaid Expansion</a></li>
+  <li><a href="#the-lottery" id="toc-the-lottery" class="nav-link" data-scroll-target="#the-lottery"><span class="header-section-number">2.7.2</span> The Lottery</a></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results"><span class="header-section-number">2.7.3</span> Results</a></li>
+  </ul></li>
+  <li><a href="#summary-and-conclusion" id="toc-summary-and-conclusion" class="nav-link" data-scroll-target="#summary-and-conclusion"><span class="header-section-number">2.8</span> Summary and Conclusion</a>
+  <ul class="collapse">
+  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">2.8.1</span> Key Takeaways</a></li>
+  </ul></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">2.9</span> Check Your Understanding</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span id="sec-rcts" class="quarto-section-identifier"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Causality and Randomized Control Trials</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+
+<style>
+.problem {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+.context {
+    background-color: #e8f4f8;
+    padding: 12px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border-left: 4px solid #2874a6;
+}
+.question {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #fff3cd;
+    border-radius: 5px;
+}
+.answer-row {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.answer-row label {
+    min-width: 320px;
+    font-weight: 500;
+}
+select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    min-width: 300px;
+    cursor: pointer;
+}
+select:focus {
+    border-color: #2874a6;
+    outline: none;
+}
+.correct {
+    border-color: #28a745 !important;
+    background-color: #d4edda !important;
+}
+.incorrect {
+    border-color: #dc3545 !important;
+    background-color: #f8d7da !important;
+}
+.explanation {
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #e7f3ff;
+    border-radius: 5px;
+    border-left: 4px solid #2874a6;
+}
+.note {
+    font-size: 0.85em;
+    color: #666;
+    font-style: italic;
+}
+</style>
+
+<script>
+function checkAnswer(selectElement, correctValue) {
+    if (selectElement.value === '') {
+        selectElement.classList.remove('correct', 'incorrect');
+    } else if (selectElement.value === correctValue) {
+        selectElement.classList.remove('incorrect');
+        selectElement.classList.add('correct');
+    } else {
+        selectElement.classList.remove('correct');
+        selectElement.classList.add('incorrect');
+    }
+}
+</script>
+
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<strong>Key Questions</strong>
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ul>
+<li>Why can’t we interpret correlations as causal effects?</li>
+<li>What is selection bias and how does it arise?</li>
+<li>How do randomized control trials eliminate selection bias?</li>
+<li>What is the potential outcomes framework and how does it formalize causal inference?</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<strong>Suggested Readings</strong>
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ul>
+<li><span class="citation" data-cites="angrist_mastering_2014">Angrist and Pischke (<a href="references.html#ref-angrist_mastering_2014" role="doc-biblioref">2014</a>)</span>, Ch. 1</li>
+</ul>
+</div>
+</div>
+</div>
+<p>In <a href="intro.html" class="quarto-xref"><span>Chapter 1</span></a>, we discussed how econometrics focuses on identifying <strong>causal effects</strong> rather than mere correlations. We used the example of health insurance: while people with health insurance tend to be healthier than people without insurance, we cannot immediately conclude that health insurance <em>causes</em> better health. This chapter develops the conceptual and mathematical tools we need to think rigorously about causality, and introduces the randomized control trial (RCT) as the gold standard for causal inference.</p>
+<section id="the-problem-with-simple-comparisons" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="the-problem-with-simple-comparisons"><span class="header-section-number">2.1</span> The Problem with Simple Comparisons</h2>
+<p>Let’s return to our health insurance example. People with health insurance are, on average, healthier than people without it. This correlation is undeniable. But can we interpret this as evidence that insurance <em>causes</em> better health?</p>
+<p>The problem is that people who have health insurance differ from those who don’t in many ways beyond just their insurance status. Those with insurance tend to be wealthier, more educated, and have more stable employment. All of these factors independently affect health outcomes. When we compare the health of insured and uninsured individuals, we’re not just comparing the effect of insurance—we’re comparing people who differ along many dimensions.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Selection Bias
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Selection bias</strong> occurs when we compare groups that differ systematically in ways beyond just the treatment we’re studying. In other words, we are comparing <strong>apples to oranges</strong>.</p>
+</div>
+</div>
+<p>The comparison we <em>want</em> to make is between two otherwise identical people who differ only in whether they have health insurance. In other words, we want an <strong>apples to apples</strong> comparison. This is the essence of the <em>ceteris paribus</em> condition: <strong>all else being equal</strong>, the difference between treated and untreated units reveals the causal effect of treatment.</p>
+</section>
+<section id="the-multiverse-of-possibilities" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="the-multiverse-of-possibilities"><span class="header-section-number">2.2</span> The Multiverse of Possibilities</h2>
+<p>To build intuition for causal inference, consider the television show <em>Rick and Morty</em>. In this show, the character Rick possesses a “portal gun” that allows him to travel across infinite parallel universes. In each universe, there exists a version of his grandson Morty who is identical in every way except for one characteristic—Cowboy Morty, Evil Morty, Hammer Morty, and so on. Each Morty has the same home, same parents, same sister, same <em>everything else</em>.</p>
+<div id="fig-rick-and-morty" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-rick-and-morty-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.1: Rick and Morty: A show about infinite parallel universes.
+</figcaption>
+<div aria-describedby="fig-rick-and-morty-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/rick_and_morty_title.png" class="img-fluid figure-img" style="width:50.0%">
+</div>
+</figure>
+</div>
+<p>This multiverse provides the perfect setting for causal inference! Comparisons between different Mortys are truly <em>ceteris paribus</em> comparisons because everything except the one characteristic of interest is held constant.</p>
+<section id="the-causal-effect-of-college" class="level3" data-number="2.2.1">
+<h3 data-number="2.2.1" class="anchored" data-anchor-id="the-causal-effect-of-college"><span class="header-section-number">2.2.1</span> The Causal Effect of College</h3>
+<p>Suppose we want to know the causal effect of attending college on wages. We can’t simply compare the wages of college graduates to non-graduates because these groups likely differ in many unobserved ways (motivation, family background, innate ability, etc.).</p>
+<p>But imagine we could observe two versions of Morty from parallel universes: Morty C-137 (who didn’t attend college) and College Morty (who did). These two Mortys are identical in every way—same intelligence, same family, same opportunities—except that one went to college and the other didn’t.</p>
+<div id="fig-morty-comparison" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-morty-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.2: Morty C-137 (left) and College Morty (right). The wage difference between them represents the true causal effect of college.
+</figcaption>
+<div aria-describedby="fig-morty-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-morty-comparison" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-mortyc137" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<figcaption class="quarto-float-caption-top quarto-subfloat-caption quarto-subfloat-fig" id="fig-mortyc137-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Morty C-137
+</figcaption>
+<div aria-describedby="fig-mortyc137-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/c137_morty.png" class="img-fluid figure-img" data-ref-parent="fig-morty-comparison" width="300">
+</div>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-morty-comparison" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-collegemorty" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<figcaption class="quarto-float-caption-top quarto-subfloat-caption quarto-subfloat-fig" id="fig-collegemorty-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) College Morty
+</figcaption>
+<div aria-describedby="fig-collegemorty-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/college_morty.png" class="img-fluid figure-img" data-ref-parent="fig-morty-comparison" width="300">
+</div>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</figure>
+</div>
+<p>The difference in wages between College Morty and Morty C-137 would be a genuine <em>ceteris paribus</em> difference—the true causal effect of college on wages.</p>
+</section>
+<section id="the-fundamental-problem" class="level3" data-number="2.2.2">
+<h3 data-number="2.2.2" class="anchored" data-anchor-id="the-fundamental-problem"><span class="header-section-number">2.2.2</span> The Fundamental Problem</h3>
+<p>Of course, the fundamental problem of causal inference is that <strong>we don’t have a portal gun</strong>. We only observe one version of reality, not parallel universes. We can never observe what would have happened to a college graduate had they <em>not</em> gone to college, or what would have happened to a non-graduate had they attended. This unobserved “what if” scenario is called the <strong>counterfactual</strong>.</p>
+</section>
+</section>
+<section id="randomized-control-trials-the-next-best-thing" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="randomized-control-trials-the-next-best-thing"><span class="header-section-number">2.3</span> Randomized Control Trials: The Next Best Thing</h2>
+<p>Since we can’t travel between parallel universes, we need another way to make valid causal comparisons. The solution that comes closest to achieving <em>ceteris paribus</em> conditions in the real world is the <strong>randomized control trial</strong> (RCT).</p>
+<p>Consider how a pharmaceutical company tests whether a new drug works. They don’t just give the drug to sick people and see if they get better—that would be subject to all sorts of selection bias. Instead, they conduct an RCT:</p>
+<ol type="1">
+<li><strong>Sample</strong> a group of volunteers from the population of interest</li>
+<li><strong>Randomly assign</strong> some volunteers to receive the drug (the “treatment” group) and others to receive a placebo (the “control” group)</li>
+<li><strong>Compare</strong> the average outcomes between the treatment and control groups</li>
+</ol>
+<p>The key insight is that <strong>random assignment eliminates selection bias</strong>. When treatment is assigned randomly, there is no systematic relationship between who receives treatment and their underlying characteristics. On average, the treatment group and control group will be identical in terms of age, health status, income, motivation, and every other characteristic—both observed and unobserved.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Why Randomization Works
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Random assignment ensures that, on average, the treatment and control groups have identical characteristics. Any difference in outcomes between the groups can therefore be attributed to the treatment itself, not to pre-existing differences between the groups.</p>
+</div>
+</div>
+</section>
+<section id="the-law-of-large-numbers" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="the-law-of-large-numbers"><span class="header-section-number">2.4</span> The Law of Large Numbers</h2>
+<p>Why exactly does randomization eliminate selection bias? The answer lies in a fundamental result from probability theory: the <strong>Law of Large Numbers</strong> (LLN).</p>
+<p>The LLN states that as the sample size increases, the sample average converges to the population average. Formally, if <span class="math inline">\(Y_1, Y_2, ..., Y_n\)</span> are independent, identically distributed random variables with mean <span class="math inline">\(\mu\)</span>, then:</p>
+<p><span class="math display">\[
+\text{plim}(\bar{Y}_n) = \mu
+\]</span></p>
+<p>where <span class="math inline">\(\bar{Y}_n\)</span> is the sample average and <span class="math inline">\(\text{plim}\)</span> denotes the probability limit (what the value converges to as <span class="math inline">\(n \to \infty\)</span>).</p>
+<section id="seeing-the-lln-in-action-rolling-dice" class="level3" data-number="2.4.1">
+<h3 data-number="2.4.1" class="anchored" data-anchor-id="seeing-the-lln-in-action-rolling-dice"><span class="header-section-number">2.4.1</span> Seeing the LLN in Action: Rolling Dice</h3>
+<p>To see the Law of Large Numbers at work, consider a simple example: rolling a fair six-sided die. The expected value (average outcome) of a single roll is:</p>
+<p><span class="math display">\[
+\mu = \frac{1 + 2 + 3 + 4 + 5 + 6}{6} = 3.5
+\]</span></p>
+<p>If we roll a die just once or twice, we might get values far from 3.5 (like a 1 or a 6). But what happens if we roll it many, many times? Let’s see what happens!</p>
+<p>First, we will “pretend” rolling a dice by using the <code>sample()</code> function. This function will randomly select <code>n</code> numbers from a vector, here the numbers 1-6.</p>
+<p>Let’s first roll the dice once. We will set the <code>size</code> argument in the <code>sample()</code> function to <code>size = 1</code> to generate a single random number from our vector.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set seed for reproducibility</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1248</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a vector which represents the possible outcomes of a dice roll</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>dice <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Now "roll" the dice using the sample() function</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>roll_1 <span class="ot">&lt;-</span> <span class="fu">sample</span>(dice, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the result of the dice roll</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>roll_1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2</code></pre>
+</div>
+</div>
+<p>With 1 dice roll, we get a value of 2. Obviously pretty far from the expected value <span class="math inline">\(\mu = 3.5\)</span>.</p>
+<p>Now, let’s roll it 5 times and take the average of our 5 different rolls using the <code>mean()</code> function:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>roll_5 <span class="ot">&lt;-</span> <span class="fu">sample</span>(dice, <span class="at">size =</span> <span class="dv">5</span>, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the 5 different dice rolls</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>roll_5</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1 5 2 5 1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Find the mean of the 5 different dice rolls</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(roll_5)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2.8</code></pre>
+</div>
+</div>
+<p>With just 5 rolls, our average is a little closer to the expected value. Now, let’s try to roll it 25 times, 50 times, and 100 times and find the average values of our dice roll!</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Continue rolling to get 10 total rolls</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>rolls_25 <span class="ot">&lt;-</span> <span class="fu">sample</span>(dice, <span class="at">size =</span> <span class="dv">10</span>, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(rolls_25)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2.3</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Keep going to 50 rolls</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>rolls_50 <span class="ot">&lt;-</span> <span class="fu">sample</span>(dice, <span class="at">size =</span> <span class="dv">50</span>, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(rolls_50)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 3.68</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># And finally 100 rolls</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>rolls_100 <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>, <span class="at">size =</span> <span class="dv">100</span>, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(rolls_100)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 3.35</code></pre>
+</div>
+</div>
+<p>Notice how the average tends to get closer to 3.5 as we increase the number of rolls. This isn’t guaranteed on any single attempt (randomness still plays a role), but the general tendency is clear.</p>
+<p>Now let’s see what happens when we roll the die many times and track the running average at each step. In <a href="#fig-lln-dice" class="quarto-xref">Figure&nbsp;<span>2.3</span></a>, I plot the <em>sample average</em> of our dice rolls on the y-axis, and the number of times I roll the dice on the x-axis. The population mean, 3.5, is plotted with a dashed red line.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set seed for reproducibility</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">12345</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Number of dice rolls to simulate</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>n_rolls <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulate rolling a six-sided die n_rolls times</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>dice_rolls <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>, <span class="at">size =</span> n_rolls, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the running average after each roll</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>running_avg <span class="ot">&lt;-</span> <span class="fu">cumsum</span>(dice_rolls) <span class="sc">/</span> <span class="dv">1</span><span class="sc">:</span>n_rolls</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a data frame for plotting</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>dice_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">roll_number =</span> <span class="dv">1</span><span class="sc">:</span>n_rolls,</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">running_average =</span> running_avg</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the running average</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dice_data, <span class="fu">aes</span>(<span class="at">x =</span> roll_number, <span class="at">y =</span> running_average)) <span class="sc">+</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"steelblue"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">3.5</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="dv">750</span>, <span class="at">y =</span> <span class="fl">3.7</span>, <span class="at">label =</span> <span class="st">"Expected value = 3.5"</span>, </span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>           <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">size =</span> <span class="dv">4</span>) <span class="sc">+</span></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Number of Rolls"</span>,</span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Running Average"</span>,</span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Convergence to Expected Value"</span></span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="fl">2.5</span>, <span class="fl">4.5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-lln-dice" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-lln-dice-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.3: The Law of Large Numbers in action. As we roll a die more times, the average of all rolls converges to the expected value of 3.5.
+</figcaption>
+<div aria-describedby="fig-lln-dice-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="unit2_files/figure-html/fig-lln-dice-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p>Notice several key features about <a href="#fig-lln-dice" class="quarto-xref">Figure&nbsp;<span>2.3</span></a>:</p>
+<ul>
+<li><strong>Early volatility</strong>: In the first few rolls, the running average bounces around wildly. After just 10 rolls, we might be at 4.2 or 2.9.</li>
+<li><strong>Gradual stabilization</strong>: As we accumulate more rolls (say, 100 or 200), the average starts to settle down closer to 3.5.</li>
+<li><strong>Long-run convergence</strong>: By the time we’ve rolled 1,000 times, the average is very close to the theoretical expected value of 3.5.</li>
+</ul>
+<p>This is the Law of Large Numbers in action: <strong>with enough observations, sample averages converge to population averages</strong>. The key word is “enough”—we need a sufficiently large sample for the convergence to occur.</p>
+</section>
+<section id="how-the-lln-enables-causal-inference" class="level3" data-number="2.4.2">
+<h3 data-number="2.4.2" class="anchored" data-anchor-id="how-the-lln-enables-causal-inference"><span class="header-section-number">2.4.2</span> How the LLN Enables Causal Inference</h3>
+<p>When we randomly assign individuals to treatment and control groups, we are essentially drawing random samples from the same underlying population. The LLN guarantees that, with a large enough sample, the average characteristics of each group will converge to the population average—and therefore, to each other.</p>
+<p>This is why randomization eliminates selection bias: the treatment and control groups become statistically identical in all characteristics—both observed and unobserved—as the sample size grows.</p>
+</section>
+</section>
+<section id="how-randomization-eliminates-selection-bias-a-simulation" class="level2" data-number="2.5">
+<h2 data-number="2.5" class="anchored" data-anchor-id="how-randomization-eliminates-selection-bias-a-simulation"><span class="header-section-number">2.5</span> How Randomization Eliminates Selection Bias: A Simulation</h2>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+What is a Simulation?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A <strong>simulation</strong> is a computer-based experiment where we generate artificial data according to rules we specify. Unlike real-world data, we know exactly how the simulated data was created—including the true causal effects, which variables influence which outcomes, and how treatment was assigned.</p>
+<p>Simulations are powerful learning tools because they let us see what <em>should</em> happen under ideal conditions. If we set the true causal effect to zero and then compare treated and untreated groups, any difference we observe must be due to something other than a real treatment effect (like selection bias or random chance). By manipulating features of the simulation—such as sample size or how treatment is assigned—we can build intuition for how these factors affect our ability to recover causal effects. Think of simulations as a laboratory where we can run controlled experiments on statistical methods themselves.</p>
+</div>
+</div>
+<p>Let’s look at a more complex version of how the LLN works in the context of a randomized control trial. Consider a simulation where we have a population with three observable characteristics: light-colored eyes, dark hair, and being tall. Suppose these characteristics are correlated with both treatment status and outcomes in the observational data (i.e., without random assignment). Specifically, having light-colored eyes will be <em>strongly positively correlated</em> with the treatment and the outcome; having dark hair will be <em>moderately positively correlated</em> with the treatment and the outcome, and being tall will be <em>slightly negatively correlated</em> with the treatment and the outcome. Critically, we set the true causal effect of treatment on the outcome to <strong>zero</strong>.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+A Note on the Code Below
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The R code in the following sections is more advanced than what we’ve covered so far in the course. Don’t worry if you don’t understand every line! The code is provided for those who are curious and want to see how simulations work “under the hood.” Even if the syntax is unfamiliar, reading through the comments can help you understand the logic of what we’re doing. As you progress through the course, more of this code will start to make sense.</p>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the tidyverse package for data manipulation and plotting</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Set a "seed" for reproducibility</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co"># This ensures we get the same random numbers each time we run the code</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">181247</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the TRUE causal effect of treatment</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co"># We're setting this to ZERO so we know any observed difference is bias!</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>causal_effect <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a population of 10,000 individuals</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>n_population <span class="ot">&lt;-</span> <span class="dv">10000</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate three random characteristics for each person</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Each characteristic is randomly 0 or 1 (like a coin flip)</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>eye_light <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>), <span class="at">size =</span> n_population, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>hair_dark <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>), <span class="at">size =</span> n_population, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>big_feet <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>), <span class="at">size =</span> n_population, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate random "noise" - unexplained variation in outcomes</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>err <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n_population)</span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Create an underlying "propensity" for treatment</span></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Notice: people with light eyes are MUCH more likely to be treated (coefficient = 2.1)</span></span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a><span class="co"># People with dark hair are moderately more likely (coefficient = 0.83)</span></span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Big feet has a small negative effect (coefficient = -0.11)</span></span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>treatment_propensity <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">+</span> <span class="fl">2.1</span> <span class="sc">*</span> eye_light <span class="sc">+</span> <span class="fl">0.83</span> <span class="sc">*</span> hair_dark <span class="sc">-</span> <span class="fl">0.11</span> <span class="sc">*</span> big_feet <span class="sc">+</span> err</span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Assign treatment based on this propensity (treated if propensity &gt; 2.25)</span></span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a><span class="co"># This creates SELECTION BIAS: treatment is correlated with characteristics</span></span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>treated <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(treatment_propensity <span class="sc">&gt;</span> <span class="fl">2.25</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the outcome variable</span></span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a><span class="co"># The outcome depends on the same characteristics that predict treatment!</span></span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a><span class="co"># But notice: we add "treated * causal_effect" which equals zero</span></span>
+<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a><span class="co"># So treatment has NO real effect on the outcome</span></span>
+<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a>outcome <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">+</span> <span class="fl">2.2</span> <span class="sc">*</span> eye_light <span class="sc">+</span> <span class="fl">1.2</span> <span class="sc">*</span> hair_dark <span class="sc">-</span> <span class="fl">0.01</span> <span class="sc">*</span> big_feet <span class="sc">+</span> treated <span class="sc">*</span> causal_effect</span>
+<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine everything into a data frame</span></span>
+<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a>  <span class="at">outcome =</span> outcome,</span>
+<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a>  <span class="at">treated =</span> treated,</span>
+<span id="cb14-44"><a href="#cb14-44" aria-hidden="true" tabindex="-1"></a>  <span class="at">eye_light =</span> eye_light,</span>
+<span id="cb14-45"><a href="#cb14-45" aria-hidden="true" tabindex="-1"></a>  <span class="at">hair_dark =</span> hair_dark,</span>
+<span id="cb14-46"><a href="#cb14-46" aria-hidden="true" tabindex="-1"></a>  <span class="at">big_feet =</span> big_feet</span>
+<span id="cb14-47"><a href="#cb14-47" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the mean of each variable for treated vs untreated groups</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>baseline_diffs <span class="ot">&lt;-</span> dat <span class="sc">|&gt;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Group the data by treatment status</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(treated) <span class="sc">|&gt;</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calculate summary statistics for each group</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">Outcome =</span> <span class="fu">mean</span>(outcome),</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Prop. light eyes</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">mean</span>(eye_light),</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Prop. dark hair</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">mean</span>(hair_dark),</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Prop. big feet</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">mean</span>(big_feet)</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Reshape data from "wide" to "long" format for plotting</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> Outcome<span class="sc">:</span><span class="st">`</span><span class="at">Prop. big feet</span><span class="st">`</span>,</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"variable"</span>,</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"value"</span></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create nice labels for the treatment groups</span></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">group =</span> <span class="fu">ifelse</span>(treated <span class="sc">==</span> <span class="dv">1</span>, <span class="st">"Treated"</span>, <span class="st">"Untreated"</span>))</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the bar plot</span></span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(baseline_diffs) <span class="sc">+</span></span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x =</span> group, <span class="at">y =</span> value, <span class="at">fill =</span> group),</span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">stat =</span> <span class="st">"identity"</span></span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create separate panels for each variable</span></span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>variable, <span class="at">nrow =</span> <span class="dv">1</span>, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Group"</span>,</span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Value"</span>,</span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Baseline Differences: No Randomization"</span></span>
+<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"none"</span>,</span>
+<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">11</span>)</span>
+<span id="cb15-39"><a href="#cb15-39" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-baseline-diffs" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-baseline-diffs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.4: Baseline differences between treated and untreated groups without randomization. Despite the true causal effect being zero, we observe large differences in both characteristics and outcomes.
+</figcaption>
+<div aria-describedby="fig-baseline-diffs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="unit2_files/figure-html/fig-baseline-diffs-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p>Notice in <a href="#fig-baseline-diffs" class="quarto-xref">Figure&nbsp;<span>2.4</span></a> how the treated and untreated groups look very different! The treated group has a higher proportion of people with light eyes and dark hair. Most importantly, the treated group has a higher mean outcome—even though <strong>we know the true causal effect is zero</strong>. This is selection bias in action: people who “select into” treatment have characteristics that also lead to better outcomes.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Function to run the random assignment simulation for a given sample size</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>run_random_assignment <span class="ot">&lt;-</span> <span class="cf">function</span>(data, sample_size, <span class="at">seed =</span> <span class="dv">181247</span>) {</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Set seed for reproducibility</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(seed)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Take a random sample from the untreated population</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># (We use untreated only to avoid any prior treatment effects)</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  sample_data <span class="ot">&lt;-</span> data <span class="sc">|&gt;</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(treated <span class="sc">==</span> <span class="dv">0</span>) <span class="sc">|&gt;</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">slice_sample</span>(<span class="at">n =</span> sample_size)</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># RANDOMLY assign treatment - this is the key step!</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Each person has a 50% chance of being assigned to treatment</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># This assignment is INDEPENDENT of their characteristics</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>  random_treatment <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>), <span class="at">size =</span> sample_size, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add the random treatment assignment to our sample</span></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>  sample_data <span class="ot">&lt;-</span> sample_data <span class="sc">|&gt;</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">rand_treat =</span> random_treatment)</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calculate means for each randomly assigned group</span></span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>  sample_data <span class="sc">|&gt;</span></span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(rand_treat) <span class="sc">|&gt;</span></span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>      <span class="at">Outcome =</span> <span class="fu">mean</span>(outcome),</span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Prop. light eyes</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">mean</span>(eye_light),</span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Prop. dark hair</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">mean</span>(hair_dark),</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Prop. big feet</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">mean</span>(big_feet),</span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>      <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">sample_size =</span> sample_size)</span>
+<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Run the simulation for different sample sizes</span></span>
+<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a>results_n10 <span class="ot">&lt;-</span> <span class="fu">run_random_assignment</span>(dat, <span class="at">sample_size =</span> <span class="dv">10</span>)</span>
+<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a>results_n25 <span class="ot">&lt;-</span> <span class="fu">run_random_assignment</span>(dat, <span class="at">sample_size =</span> <span class="dv">25</span>)</span>
+<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a>results_n50 <span class="ot">&lt;-</span> <span class="fu">run_random_assignment</span>(dat, <span class="at">sample_size =</span> <span class="dv">50</span>)</span>
+<span id="cb16-39"><a href="#cb16-39" aria-hidden="true" tabindex="-1"></a>results_n100 <span class="ot">&lt;-</span> <span class="fu">run_random_assignment</span>(dat, <span class="at">sample_size =</span> <span class="dv">100</span>)</span>
+<span id="cb16-40"><a href="#cb16-40" aria-hidden="true" tabindex="-1"></a>results_n500 <span class="ot">&lt;-</span> <span class="fu">run_random_assignment</span>(dat, <span class="at">sample_size =</span> <span class="dv">500</span>)</span>
+<span id="cb16-41"><a href="#cb16-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-42"><a href="#cb16-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-43"><a href="#cb16-43" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine all results</span></span>
+<span id="cb16-44"><a href="#cb16-44" aria-hidden="true" tabindex="-1"></a>all_results <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(results_n10, results_n25, results_n50, </span>
+<span id="cb16-45"><a href="#cb16-45" aria-hidden="true" tabindex="-1"></a>  results_n100, results_n500)</span>
+<span id="cb16-46"><a href="#cb16-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-47"><a href="#cb16-47" aria-hidden="true" tabindex="-1"></a><span class="co"># Reshape for plotting</span></span>
+<span id="cb16-48"><a href="#cb16-48" aria-hidden="true" tabindex="-1"></a>all_results_long <span class="ot">&lt;-</span> all_results <span class="sc">|&gt;</span></span>
+<span id="cb16-49"><a href="#cb16-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb16-50"><a href="#cb16-50" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> Outcome<span class="sc">:</span><span class="st">`</span><span class="at">Prop. big feet</span><span class="st">`</span>,</span>
+<span id="cb16-51"><a href="#cb16-51" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"variable"</span>,</span>
+<span id="cb16-52"><a href="#cb16-52" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"value"</span></span>
+<span id="cb16-53"><a href="#cb16-53" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb16-54"><a href="#cb16-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb16-55"><a href="#cb16-55" aria-hidden="true" tabindex="-1"></a>    <span class="at">group =</span> <span class="fu">ifelse</span>(rand_treat <span class="sc">==</span> <span class="dv">1</span>, <span class="st">"Treated"</span>, <span class="st">"Control"</span>),</span>
+<span id="cb16-56"><a href="#cb16-56" aria-hidden="true" tabindex="-1"></a>    <span class="at">sample_size_label =</span> <span class="fu">paste</span>(<span class="st">"N ="</span>, sample_size)</span>
+<span id="cb16-57"><a href="#cb16-57" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Now let’s see what happens when we randomly assign treatment. Starting with a small sample (N=10), we see in <a href="#fig-random-n10" class="quarto-xref">Figure&nbsp;<span>2.5</span></a> that random assignment reduces but doesn’t eliminate the differences between groups. With such a small sample, random chance can still produce imbalanced groups. With only 10 people, we still see noticeable differences between the randomly assigned treatment and control groups.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-random-n10" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-random-n10-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.5: Random assignment with N=10. Some imbalance remains due to small sample size.
+</figcaption>
+<div aria-describedby="fig-random-n10-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="unit2_files/figure-html/fig-random-n10-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p>As we increase the sample size to N=25 and N=50, as shown in <a href="#fig-random-n25" class="quarto-xref">Figure&nbsp;<span>2.6</span></a> and <a href="#fig-random-n50" class="quarto-xref">Figure&nbsp;<span>2.7</span></a>, the differences between treatment and control groups shrink. The LLN is at work: larger samples produce more balanced groups in terms of their background characteristics.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-random-n25" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-random-n25-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.6: Random assignment with N=25.
+</figcaption>
+<div aria-describedby="fig-random-n25-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="unit2_files/figure-html/fig-random-n25-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-random-n50" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-random-n50-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.7: Random assignment with N=50.
+</figcaption>
+<div aria-describedby="fig-random-n50-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="unit2_files/figure-html/fig-random-n50-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-random-n500" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-random-n500-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.8: Random assignment with N=500. The treatment and control groups are now nearly identical in their characteristics, and the difference in outcomes is close to the true causal effect of zero.
+</figcaption>
+<div aria-describedby="fig-random-n500-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="unit2_files/figure-html/fig-random-n500-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p>By N=500, as show in <a href="#fig-random-n500" class="quarto-xref">Figure&nbsp;<span>2.8</span></a>, the treatment and control groups are nearly identical across all characteristics. The difference in outcomes between groups is now close to zero—the true causal effect! Any remaining difference is just random variation, not systematic selection bias.</p>
+</section>
+<section id="the-potential-outcomes-framework" class="level2" data-number="2.6">
+<h2 data-number="2.6" class="anchored" data-anchor-id="the-potential-outcomes-framework"><span class="header-section-number">2.6</span> The Potential Outcomes Framework</h2>
+<p>Now that we intuitively understand why simple comparisons can be misleading and how randomization addresses this problem, let’s formalize these concepts mathematically using the <strong>Potential Outcomes Framework</strong>.</p>
+<section id="defining-potential-outcomes" class="level3" data-number="2.6.1">
+<h3 data-number="2.6.1" class="anchored" data-anchor-id="defining-potential-outcomes"><span class="header-section-number">2.6.1</span> Defining Potential Outcomes</h3>
+<p>Consider our example of estimating the causal effect of college on wages. For any individual <span class="math inline">\(i\)</span>, we can define two <strong>potential outcomes</strong>:</p>
+<ul>
+<li><span class="math inline">\(Y_{1i}\)</span>: The wage individual <span class="math inline">\(i\)</span> would earn <strong>if they attend college</strong></li>
+<li><span class="math inline">\(Y_{0i}\)</span>: The wage individual <span class="math inline">\(i\)</span> would earn <strong>if they do not attend college</strong></li>
+</ul>
+<p>The causal effect of college for individual <span class="math inline">\(i\)</span> is simply the difference between these potential outcomes:</p>
+<p><span class="math display">\[
+\kappa_i = Y_{1i} - Y_{0i}
+\]</span></p>
+<p>This framework captures the “multiverse” intuition: <span class="math inline">\(Y_{1i}\)</span> is College Morty’s wage, <span class="math inline">\(Y_{0i}\)</span> is Morty C-137’s wage, and <span class="math inline">\(\kappa_i\)</span> is the causal effect of college for Morty.</p>
+</section>
+<section id="the-fundamental-problem-of-causal-inference" class="level3" data-number="2.6.2">
+<h3 data-number="2.6.2" class="anchored" data-anchor-id="the-fundamental-problem-of-causal-inference"><span class="header-section-number">2.6.2</span> The Fundamental Problem of Causal Inference</h3>
+<p>The fundamental problem is that we only observe <strong>one</strong> potential outcome for each individual. If person <span class="math inline">\(i\)</span> attends college, we observe <span class="math inline">\(Y_{1i}\)</span> but never see <span class="math inline">\(Y_{0i}\)</span>. If they don’t attend, we observe <span class="math inline">\(Y_{0i}\)</span> but never see <span class="math inline">\(Y_{1i}\)</span>. We never observe both potential outcomes for the same individual.</p>
+<p>Let <span class="math inline">\(D_i\)</span> be a treatment indicator:</p>
+<p><span class="math display">\[
+D_i = \begin{cases}
+1 &amp; \text{if individual } i \text{ is treated (attends college)} \\
+0 &amp; \text{otherwise}
+\end{cases}
+\]</span></p>
+<p>What we actually observe is:</p>
+<p><span class="math display">\[
+Y_i = D_i \cdot Y_{1i} + (1 - D_i) \cdot Y_{0i}
+\]</span></p>
+<p>That is, we observe the treated outcome for treated individuals and the untreated outcome for untreated individuals—but never both.</p>
+</section>
+<section id="selection-bias-formalized" class="level3" data-number="2.6.3">
+<h3 data-number="2.6.3" class="anchored" data-anchor-id="selection-bias-formalized"><span class="header-section-number">2.6.3</span> Selection Bias Formalized</h3>
+<p>Now we can formally see why simple comparisons are problematic. Suppose we compare average outcomes between those who are treated (<span class="math inline">\(D_i = 1\)</span>) and those who are untreated (<span class="math inline">\(D_i = 0\)</span>). The difference in group means is:</p>
+<p><span class="math display">\[
+E[Y_i | D_i = 1] - E[Y_i | D_i = 0]
+\]</span></p>
+<p>Since we only observe <span class="math inline">\(Y_{1i}\)</span> for the treated and <span class="math inline">\(Y_{0i}\)</span> for the untreated, this becomes:</p>
+<p><span class="math display">\[
+E[Y_{1i} | D_i = 1] - E[Y_{0i} | D_i = 0]
+\]</span></p>
+<p>Here’s the key insight. Let’s add and subtract a term that represents the counterfactual—what the treated group’s outcome would have been without treatment:</p>
+<p><span class="math display">\[
+E[Y_{1i} | D_i = 1] - E[Y_{0i} | D_i = 0] + \underbrace{\{E[Y_{0i} | D_i = 1] - E[Y_{0i} | D_i = 1]\}}_{= 0}
+\]</span></p>
+<p>Rearranging terms:</p>
+<p><span class="math display">\[
+\underbrace{E[Y_{1i} | D_i = 1] - E[Y_{0i} | D_i = 1]}_{\text{Causal effect for the treated}} + \underbrace{\{E[Y_{0i} | D_i = 1] - E[Y_{0i} | D_i = 0]\}}_{\text{Selection bias}}
+\]</span></p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The Selection Bias Decomposition
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A simple difference in group means equals the causal effect <strong>plus</strong> selection bias:</p>
+<p><span class="math display">\[
+\underbrace{E[Y_i | D_i = 1] - E[Y_i | D_i = 0]}_{\text{Observed difference}} = \underbrace{\kappa}_{\text{Causal effect}} + \underbrace{\{E[Y_{0i} | D_i = 1] - E[Y_{0i} | D_i = 0]\}}_{\text{Selection bias}}
+\]</span></p>
+</div>
+</div>
+<p>The selection bias term compares the <strong>untreated potential outcomes</strong> of the treated group to the untreated potential outcomes of the control group. In the health insurance example, this captures differences in baseline health (absent insurance) between those who choose to get insurance and those who don’t. If people who get insurance would be healthier even without insurance (perhaps because they’re wealthier or more health-conscious), then selection bias is positive, and the simple comparison overstates the causal effect.</p>
+</section>
+<section id="how-randomization-eliminates-selection-bias" class="level3" data-number="2.6.4">
+<h3 data-number="2.6.4" class="anchored" data-anchor-id="how-randomization-eliminates-selection-bias"><span class="header-section-number">2.6.4</span> How Randomization Eliminates Selection Bias</h3>
+<p>When treatment is randomly assigned, the treatment and control groups are drawn from the same population. By the Law of Large Numbers, their average characteristics—including their average potential outcomes—converge to each other. Formally:</p>
+<p><span class="math display">\[
+E[Y_{0i} | D_i = 1] = E[Y_{0i} | D_i = 0]
+\]</span></p>
+<p>This says that the average untreated potential outcome is the same for both groups. Plugging this into our decomposition:</p>
+<p><span class="math display">\[
+E[Y_i | D_i = 1] - E[Y_i | D_i = 0] = \kappa + \{E[Y_{0i} | D_i = 1] - E[Y_{0i} | D_i = 0]\} = \kappa + 0 = \kappa
+\]</span></p>
+<p><strong>With random assignment, the simple difference in means equals the causal effect.</strong> Selection bias disappears.</p>
+</section>
+</section>
+<section id="the-oregon-health-insurance-experiment" class="level2" data-number="2.7">
+<h2 data-number="2.7" class="anchored" data-anchor-id="the-oregon-health-insurance-experiment"><span class="header-section-number">2.7</span> The Oregon Health Insurance Experiment</h2>
+<p>Most econometric research cannot rely on randomization to identify causal effects. We typically work with observational data where treatment is not randomly assigned, and much of this course focuses on methods for addressing selection bias in such settings. However, there have been a few landmark studies that used randomization to study important policy questions. One of the most influential is the <strong>Oregon Health Insurance Experiment</strong>.</p>
+<section id="context-medicaid-expansion" class="level3" data-number="2.7.1">
+<h3 data-number="2.7.1" class="anchored" data-anchor-id="context-medicaid-expansion"><span class="header-section-number">2.7.1</span> Context: Medicaid Expansion</h3>
+<p>Throughout the 2000s, many U.S. states expanded their Medicaid programs to cover more low-income residents. Most states simply extended coverage to everyone who became newly eligible. But in 2008, Oregon did something unique: facing limited resources, they offered Medicaid coverage through a public lottery.</p>
+</section>
+<section id="the-lottery" class="level3" data-number="2.7.2">
+<h3 data-number="2.7.2" class="anchored" data-anchor-id="the-lottery"><span class="header-section-number">2.7.2</span> The Lottery</h3>
+<p>Oregon’s approach created a natural randomized experiment. People who wanted coverage could sign up for the lottery. Winners received the opportunity to apply for the Oregon Health Plan (the state’s Medicaid program), while losers remained uninsured. To be eligible, applicants had to be legal Oregon residents aged 19-64, uninsured for the past six months, with income below the federal poverty line, and not otherwise eligible for health insurance.</p>
+<p>Because lottery winners were chosen randomly, the comparison between winners and losers provides a valid causal estimate of the effect of health insurance—free from the selection bias that plagues observational studies.</p>
+</section>
+<section id="results" class="level3" data-number="2.7.3">
+<h3 data-number="2.7.3" class="anchored" data-anchor-id="results"><span class="header-section-number">2.7.3</span> Results</h3>
+<p>Researchers followed lottery participants and found that lottery winners (relative to losers) experienced:</p>
+<ol type="1">
+<li><strong>Increased take-up of Medicaid:</strong> The lottery actually changed insurance status, confirming the treatment “worked”</li>
+<li><strong>Increased use of medical resources:</strong> Winners used more hospital and outpatient services</li>
+<li><strong>Small improvements in overall health:</strong> Physical health improvements were modest, though mental health and financial security improved substantially</li>
+</ol>
+<p>These findings are important because they come from a rigorous RCT rather than observational comparisons. The study provides some of the cleanest evidence we have on what health insurance actually <em>causes</em>, as opposed to what it merely correlates with.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Discussion Question
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The Oregon experiment found modest effects of insurance on physical health. Does this mean expanding health insurance is not worthwhile? What other outcomes might matter for policy decisions?</p>
+</div>
+</div>
+</section>
+</section>
+<section id="summary-and-conclusion" class="level2" data-number="2.8">
+<h2 data-number="2.8" class="anchored" data-anchor-id="summary-and-conclusion"><span class="header-section-number">2.8</span> Summary and Conclusion</h2>
+<p>This chapter introduced the fundamental concepts underlying causal inference in econometrics. We began with the intuition that simple comparisons between treated and untreated groups can be misleading due to selection bias—the groups may differ in ways beyond just the treatment. The “multiverse” thought experiment illustrated what we really want: <em>ceteris paribus</em> comparisons where everything except the treatment is held constant.</p>
+<p>Randomized control trials approximate this ideal by randomly assigning treatment, which ensures that treatment and control groups are comparable on average. The Law of Large Numbers guarantees that with large enough samples, random assignment eliminates selection bias.</p>
+<p>We then formalized these ideas using the potential outcomes framework, which defines causal effects as the difference between what would happen with and without treatment. The fundamental problem is that we only observe one potential outcome per individual. Simple comparisons of means capture both the causal effect and selection bias, but random assignment makes selection bias vanish.</p>
+<section id="key-takeaways" class="level3" data-number="2.8.1">
+<h3 data-number="2.8.1" class="anchored" data-anchor-id="key-takeaways"><span class="header-section-number">2.8.1</span> Key Takeaways</h3>
+<ul>
+<li><p><strong>Selection bias</strong> arises when treated and untreated groups differ systematically beyond just the treatment—we’re comparing apples to oranges</p></li>
+<li><p><strong>Ceteris paribus</strong> (“all else equal”) comparisons isolate the causal effect by holding everything constant except the treatment</p></li>
+<li><p><strong>Randomized control trials</strong> eliminate selection bias by ensuring treatment and control groups are drawn from the same population</p></li>
+<li><p>The <strong>Law of Large Numbers</strong> guarantees that with large samples, randomly assigned groups have identical average characteristics</p></li>
+<li><p>The <strong>potential outcomes framework</strong> formalizes causal effects as <span class="math inline">\(\kappa = Y_{1i} - Y_{0i}\)</span>, but we only observe one potential outcome per individual</p></li>
+<li><p>Simple differences in means equal: <span class="math inline">\(\text{Causal effect} + \text{Selection bias}\)</span>. Randomization sets selection bias to zero.</p></li>
+</ul>
+</section>
+</section>
+<section id="check-your-understanding" class="level2" data-number="2.9">
+<h2 data-number="2.9" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">2.9</span> Check Your Understanding</h2>
+<p>For each question below, select the best answer from the dropdown menu. The dropdown will turn green if correct and red if incorrect. Click the “Show Explanation” toggle to see a full explanation of the answer after attempting each question.</p>
+<div class="question">
+<div class="answer-row">
+    <label>i. A researcher compares test scores of students who attended tutoring to those who didn't, finding tutored students score higher. What is the most likely concern with concluding that tutoring <em>caused</em> higher scores? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The sample size is too small</option>
+        <option value="b">Test scores are hard to measure</option>
+        <option value="c">Students who seek tutoring may differ in motivation or ability</option>
+        <option value="d">Tutoring has no effect on learning</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>ii. What does "ceteris paribus" mean in the context of causal inference? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The treatment effect varies across individuals</option>
+        <option value="b">All else being equal</option>
+        <option value="c">Correlation implies causation</option>
+        <option value="d">The sample is representative</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iii. In an RCT, why does random assignment eliminate selection bias? </label>
+    <select onchange="checkAnswer(this, 'a')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">It ensures treatment and control groups have the same average characteristics</option>
+        <option value="b">It increases the sample size</option>
+        <option value="c">It removes measurement error</option>
+        <option value="d">It guarantees perfect compliance with treatment</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iv. In the potential outcomes framework, <em>Y</em><sub>0<em>i</em></sub> represents: </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The outcome for individual i if they are treated</option>
+        <option value="b">The outcome for individual i if they are not treated</option>
+        <option value="c">The average outcome in the control group</option>
+        <option value="d">The selection bias for individual i</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>v. The "fundamental problem of causal inference" refers to: </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Sample sizes are always too small</option>
+        <option value="b">Randomization is impossible</option>
+        <option value="c">We can only observe one potential outcome per individual</option>
+        <option value="d">Correlation and causation are the same</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>vi. <strong>(Challenge)</strong> If E[<em>Y</em><sub>0<em>i</em></sub> | <em>D<sub>i</sub></em> = 1] &gt; E[<em>Y</em><sub>0<em>i</em></sub> | <em>D<sub>i</sub></em> = 0], what does this imply? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The treatment has a positive causal effect</option>
+        <option value="b">Selection bias is positive—simple comparisons overstate the causal effect</option>
+        <option value="c">Selection bias is negative—simple comparisons understate the causal effect</option>
+        <option value="d">Randomization was successful</option>
+    </select>
+</div>
+</div>
+
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Show Explanation
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="i">
+<li><p>Students who seek out tutoring are likely more motivated, more concerned about their grades, or struggling in ways that prompt intervention. These characteristics affect test scores independently of tutoring. This is selection bias: tutored and non-tutored students are not comparable.</p></li>
+<li><p>“Ceteris paribus” is Latin for “all else being equal.” In causal inference, it refers to the ideal comparison where two groups (or two versions of the same individual) differ only in the treatment, with all other characteristics held constant.</p></li>
+<li><p>Random assignment means each individual has the same probability of being in treatment or control, regardless of their characteristics. By the Law of Large Numbers, this ensures both groups have the same average characteristics, eliminating systematic differences (selection bias).</p></li>
+<li><p><span class="math inline">\(Y_{0i}\)</span> denotes the potential outcome for individual <span class="math inline">\(i\)</span> under the control condition (no treatment). <span class="math inline">\(Y_{1i}\)</span> would be the potential outcome under treatment. The causal effect is <span class="math inline">\(Y_{1i} - Y_{0i}\)</span>.</p></li>
+<li><p>The fundamental problem is that for any individual, we observe either their treated outcome or their untreated outcome, but never both. We cannot directly observe the counterfactual—what would have happened under the alternative treatment status.</p></li>
+<li><p>This inequality says the untreated potential outcome is higher for the treated group than for the control group. In other words, the treated group would have better outcomes <em>even without treatment</em>. This means selection bias is positive: when we compare groups, part of the difference reflects this pre-existing advantage, not the causal effect. Simple comparisons overstate how much the treatment actually helps.</p></li>
+</ol>
+</div>
+</div>
+</div>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-angrist_mastering_2014" class="csl-entry" role="listitem">
+Angrist, Joshua D., and Jörn-Steffen Pischke. 2014. <em>Mastering ’Metrics: The Path from Cause to Effect</em>. Princeton University Press.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/intro.html" class="pagination-link" aria-label="Introduction">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/unit3.html" class="pagination-link" aria-label="Bivariate Regression and Ordinary Least Squares">
+        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Bivariate Regression and Ordinary Least Squares</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p><span class="faux-block"> © 2025 Raymond Caraher. All rights reserved. </span></p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
