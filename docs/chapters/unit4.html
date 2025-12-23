@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>4&nbsp; Multivariate Regression – EC325 Workbook</title>
+<title>5&nbsp; Multivariate Regression – EC325 Workbook</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -164,7 +164,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/unit4.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Multivariate Regression</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/unit4.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Multivariate Regression</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -222,26 +222,32 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../chapters/unit1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Good Data Practices</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../chapters/unit2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Causality and Randomized Control Trials</span></span></a>
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Causality and Randomized Control Trials</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/unit3.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Bivariate Regression and Ordinary Least Squares</span></span></a>
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Bivariate Regression and Ordinary Least Squares</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/unit4.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Multivariate Regression</span></span></a>
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Multivariate Regression</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/unit5.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Statistical Inference</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Statistical Inference</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -283,71 +289,71 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#the-problem-with-bivariate-ols" id="toc-the-problem-with-bivariate-ols" class="nav-link active" data-scroll-target="#the-problem-with-bivariate-ols"><span class="header-section-number">4.1</span> The Problem with Bivariate OLS</a></li>
-  <li><a href="#the-multivariate-solution" id="toc-the-multivariate-solution" class="nav-link" data-scroll-target="#the-multivariate-solution"><span class="header-section-number">4.2</span> The Multivariate Solution</a>
+  <li><a href="#the-problem-with-bivariate-ols" id="toc-the-problem-with-bivariate-ols" class="nav-link active" data-scroll-target="#the-problem-with-bivariate-ols"><span class="header-section-number">5.1</span> The Problem with Bivariate OLS</a></li>
+  <li><a href="#the-multivariate-solution" id="toc-the-multivariate-solution" class="nav-link" data-scroll-target="#the-multivariate-solution"><span class="header-section-number">5.2</span> The Multivariate Solution</a>
   <ul class="collapse">
-  <li><a href="#the-general-multivariate-model" id="toc-the-general-multivariate-model" class="nav-link" data-scroll-target="#the-general-multivariate-model"><span class="header-section-number">4.2.1</span> The General Multivariate Model</a></li>
-  <li><a href="#interpreting-coefficients" id="toc-interpreting-coefficients" class="nav-link" data-scroll-target="#interpreting-coefficients"><span class="header-section-number">4.2.2</span> Interpreting Coefficients</a></li>
-  <li><a href="#the-zero-conditional-mean-assumption" id="toc-the-zero-conditional-mean-assumption" class="nav-link" data-scroll-target="#the-zero-conditional-mean-assumption"><span class="header-section-number">4.2.3</span> The Zero Conditional Mean Assumption</a></li>
+  <li><a href="#the-general-multivariate-model" id="toc-the-general-multivariate-model" class="nav-link" data-scroll-target="#the-general-multivariate-model"><span class="header-section-number">5.2.1</span> The General Multivariate Model</a></li>
+  <li><a href="#interpreting-coefficients" id="toc-interpreting-coefficients" class="nav-link" data-scroll-target="#interpreting-coefficients"><span class="header-section-number">5.2.2</span> Interpreting Coefficients</a></li>
+  <li><a href="#the-zero-conditional-mean-assumption" id="toc-the-zero-conditional-mean-assumption" class="nav-link" data-scroll-target="#the-zero-conditional-mean-assumption"><span class="header-section-number">5.2.3</span> The Zero Conditional Mean Assumption</a></li>
   </ul></li>
-  <li><a href="#deriving-the-multivariate-ols-estimator" id="toc-deriving-the-multivariate-ols-estimator" class="nav-link" data-scroll-target="#deriving-the-multivariate-ols-estimator"><span class="header-section-number">4.3</span> Deriving the Multivariate OLS Estimator</a>
+  <li><a href="#deriving-the-multivariate-ols-estimator" id="toc-deriving-the-multivariate-ols-estimator" class="nav-link" data-scroll-target="#deriving-the-multivariate-ols-estimator"><span class="header-section-number">5.3</span> Deriving the Multivariate OLS Estimator</a>
   <ul class="collapse">
-  <li><a href="#the-minimization-problem" id="toc-the-minimization-problem" class="nav-link" data-scroll-target="#the-minimization-problem"><span class="header-section-number">4.3.1</span> The Minimization Problem</a></li>
-  <li><a href="#first-order-conditions" id="toc-first-order-conditions" class="nav-link" data-scroll-target="#first-order-conditions"><span class="header-section-number">4.3.2</span> First-Order Conditions</a></li>
+  <li><a href="#the-minimization-problem" id="toc-the-minimization-problem" class="nav-link" data-scroll-target="#the-minimization-problem"><span class="header-section-number">5.3.1</span> The Minimization Problem</a></li>
+  <li><a href="#first-order-conditions" id="toc-first-order-conditions" class="nav-link" data-scroll-target="#first-order-conditions"><span class="header-section-number">5.3.2</span> First-Order Conditions</a></li>
   </ul></li>
-  <li><a href="#estimating-multivariate-ols-in-r" id="toc-estimating-multivariate-ols-in-r" class="nav-link" data-scroll-target="#estimating-multivariate-ols-in-r"><span class="header-section-number">4.4</span> Estimating Multivariate OLS in R</a>
+  <li><a href="#estimating-multivariate-ols-in-r" id="toc-estimating-multivariate-ols-in-r" class="nav-link" data-scroll-target="#estimating-multivariate-ols-in-r"><span class="header-section-number">5.4</span> Estimating Multivariate OLS in R</a>
   <ul class="collapse">
-  <li><a href="#example-mpg-horsepower-and-weight" id="toc-example-mpg-horsepower-and-weight" class="nav-link" data-scroll-target="#example-mpg-horsepower-and-weight"><span class="header-section-number">4.4.1</span> Example: MPG, Horsepower, and Weight</a></li>
-  <li><a href="#interpreting-the-results" id="toc-interpreting-the-results" class="nav-link" data-scroll-target="#interpreting-the-results"><span class="header-section-number">4.4.2</span> Interpreting the Results</a></li>
+  <li><a href="#example-mpg-horsepower-and-weight" id="toc-example-mpg-horsepower-and-weight" class="nav-link" data-scroll-target="#example-mpg-horsepower-and-weight"><span class="header-section-number">5.4.1</span> Example: MPG, Horsepower, and Weight</a></li>
+  <li><a href="#interpreting-the-results" id="toc-interpreting-the-results" class="nav-link" data-scroll-target="#interpreting-the-results"><span class="header-section-number">5.4.2</span> Interpreting the Results</a></li>
   </ul></li>
-  <li><a href="#multivariate-ols-as-matching" id="toc-multivariate-ols-as-matching" class="nav-link" data-scroll-target="#multivariate-ols-as-matching"><span class="header-section-number">4.5</span> Multivariate OLS as Matching</a>
+  <li><a href="#multivariate-ols-as-matching" id="toc-multivariate-ols-as-matching" class="nav-link" data-scroll-target="#multivariate-ols-as-matching"><span class="header-section-number">5.5</span> Multivariate OLS as Matching</a>
   <ul class="collapse">
-  <li><a href="#the-returns-to-education-example" id="toc-the-returns-to-education-example" class="nav-link" data-scroll-target="#the-returns-to-education-example"><span class="header-section-number">4.5.1</span> The Returns to Education Example</a></li>
-  <li><a href="#the-naive-comparison" id="toc-the-naive-comparison" class="nav-link" data-scroll-target="#the-naive-comparison"><span class="header-section-number">4.5.2</span> The Naive Comparison</a></li>
-  <li><a href="#step-1-compute-within-industry-differences" id="toc-step-1-compute-within-industry-differences" class="nav-link" data-scroll-target="#step-1-compute-within-industry-differences"><span class="header-section-number">4.5.3</span> Step 1: Compute Within-Industry Differences</a></li>
-  <li><a href="#step-2-compute-weights" id="toc-step-2-compute-weights" class="nav-link" data-scroll-target="#step-2-compute-weights"><span class="header-section-number">4.5.4</span> Step 2: Compute Weights</a></li>
-  <li><a href="#step-3-compute-weighted-average" id="toc-step-3-compute-weighted-average" class="nav-link" data-scroll-target="#step-3-compute-weighted-average"><span class="header-section-number">4.5.5</span> Step 3: Compute Weighted Average</a></li>
-  <li><a href="#the-regression-equivalent" id="toc-the-regression-equivalent" class="nav-link" data-scroll-target="#the-regression-equivalent"><span class="header-section-number">4.5.6</span> The Regression Equivalent</a></li>
+  <li><a href="#the-returns-to-education-example" id="toc-the-returns-to-education-example" class="nav-link" data-scroll-target="#the-returns-to-education-example"><span class="header-section-number">5.5.1</span> The Returns to Education Example</a></li>
+  <li><a href="#the-naive-comparison" id="toc-the-naive-comparison" class="nav-link" data-scroll-target="#the-naive-comparison"><span class="header-section-number">5.5.2</span> The Naive Comparison</a></li>
+  <li><a href="#step-1-compute-within-industry-differences" id="toc-step-1-compute-within-industry-differences" class="nav-link" data-scroll-target="#step-1-compute-within-industry-differences"><span class="header-section-number">5.5.3</span> Step 1: Compute Within-Industry Differences</a></li>
+  <li><a href="#step-2-compute-weights" id="toc-step-2-compute-weights" class="nav-link" data-scroll-target="#step-2-compute-weights"><span class="header-section-number">5.5.4</span> Step 2: Compute Weights</a></li>
+  <li><a href="#step-3-compute-weighted-average" id="toc-step-3-compute-weighted-average" class="nav-link" data-scroll-target="#step-3-compute-weighted-average"><span class="header-section-number">5.5.5</span> Step 3: Compute Weighted Average</a></li>
+  <li><a href="#the-regression-equivalent" id="toc-the-regression-equivalent" class="nav-link" data-scroll-target="#the-regression-equivalent"><span class="header-section-number">5.5.6</span> The Regression Equivalent</a></li>
   </ul></li>
-  <li><a href="#goodness-of-fit-adjusted-r-squared" id="toc-goodness-of-fit-adjusted-r-squared" class="nav-link" data-scroll-target="#goodness-of-fit-adjusted-r-squared"><span class="header-section-number">4.6</span> Goodness-of-Fit: Adjusted R-Squared</a>
+  <li><a href="#goodness-of-fit-adjusted-r-squared" id="toc-goodness-of-fit-adjusted-r-squared" class="nav-link" data-scroll-target="#goodness-of-fit-adjusted-r-squared"><span class="header-section-number">5.6</span> Goodness-of-Fit: Adjusted R-Squared</a>
   <ul class="collapse">
-  <li><a href="#the-problem-with-r-squared" id="toc-the-problem-with-r-squared" class="nav-link" data-scroll-target="#the-problem-with-r-squared"><span class="header-section-number">4.6.1</span> The Problem with R-Squared</a></li>
-  <li><a href="#the-adjusted-r-squared" id="toc-the-adjusted-r-squared" class="nav-link" data-scroll-target="#the-adjusted-r-squared"><span class="header-section-number">4.6.2</span> The Adjusted R-Squared</a></li>
+  <li><a href="#the-problem-with-r-squared" id="toc-the-problem-with-r-squared" class="nav-link" data-scroll-target="#the-problem-with-r-squared"><span class="header-section-number">5.6.1</span> The Problem with R-Squared</a></li>
+  <li><a href="#the-adjusted-r-squared" id="toc-the-adjusted-r-squared" class="nav-link" data-scroll-target="#the-adjusted-r-squared"><span class="header-section-number">5.6.2</span> The Adjusted R-Squared</a></li>
   </ul></li>
-  <li><a href="#gauss-markov-assumptions-for-multivariate-ols" id="toc-gauss-markov-assumptions-for-multivariate-ols" class="nav-link" data-scroll-target="#gauss-markov-assumptions-for-multivariate-ols"><span class="header-section-number">4.7</span> Gauss-Markov Assumptions for Multivariate OLS</a>
+  <li><a href="#gauss-markov-assumptions-for-multivariate-ols" id="toc-gauss-markov-assumptions-for-multivariate-ols" class="nav-link" data-scroll-target="#gauss-markov-assumptions-for-multivariate-ols"><span class="header-section-number">5.7</span> Gauss-Markov Assumptions for Multivariate OLS</a>
   <ul class="collapse">
-  <li><a href="#assumption-1-linear-in-parameters" id="toc-assumption-1-linear-in-parameters" class="nav-link" data-scroll-target="#assumption-1-linear-in-parameters"><span class="header-section-number">4.7.1</span> Assumption 1: Linear in Parameters</a></li>
-  <li><a href="#assumption-2-random-sampling" id="toc-assumption-2-random-sampling" class="nav-link" data-scroll-target="#assumption-2-random-sampling"><span class="header-section-number">4.7.2</span> Assumption 2: Random Sampling</a></li>
-  <li><a href="#assumption-3-no-perfect-multicollinearity" id="toc-assumption-3-no-perfect-multicollinearity" class="nav-link" data-scroll-target="#assumption-3-no-perfect-multicollinearity"><span class="header-section-number">4.7.3</span> Assumption 3: No Perfect Multicollinearity</a></li>
-  <li><a href="#assumption-4-zero-conditional-mean" id="toc-assumption-4-zero-conditional-mean" class="nav-link" data-scroll-target="#assumption-4-zero-conditional-mean"><span class="header-section-number">4.7.4</span> Assumption 4: Zero Conditional Mean</a></li>
-  <li><a href="#assumption-5-homoskedasticity" id="toc-assumption-5-homoskedasticity" class="nav-link" data-scroll-target="#assumption-5-homoskedasticity"><span class="header-section-number">4.7.5</span> Assumption 5: Homoskedasticity</a></li>
+  <li><a href="#assumption-1-linear-in-parameters" id="toc-assumption-1-linear-in-parameters" class="nav-link" data-scroll-target="#assumption-1-linear-in-parameters"><span class="header-section-number">5.7.1</span> Assumption 1: Linear in Parameters</a></li>
+  <li><a href="#assumption-2-random-sampling" id="toc-assumption-2-random-sampling" class="nav-link" data-scroll-target="#assumption-2-random-sampling"><span class="header-section-number">5.7.2</span> Assumption 2: Random Sampling</a></li>
+  <li><a href="#assumption-3-no-perfect-multicollinearity" id="toc-assumption-3-no-perfect-multicollinearity" class="nav-link" data-scroll-target="#assumption-3-no-perfect-multicollinearity"><span class="header-section-number">5.7.3</span> Assumption 3: No Perfect Multicollinearity</a></li>
+  <li><a href="#assumption-4-zero-conditional-mean" id="toc-assumption-4-zero-conditional-mean" class="nav-link" data-scroll-target="#assumption-4-zero-conditional-mean"><span class="header-section-number">5.7.4</span> Assumption 4: Zero Conditional Mean</a></li>
+  <li><a href="#assumption-5-homoskedasticity" id="toc-assumption-5-homoskedasticity" class="nav-link" data-scroll-target="#assumption-5-homoskedasticity"><span class="header-section-number">5.7.5</span> Assumption 5: Homoskedasticity</a></li>
   </ul></li>
-  <li><a href="#the-omitted-variable-bias-formula" id="toc-the-omitted-variable-bias-formula" class="nav-link" data-scroll-target="#the-omitted-variable-bias-formula"><span class="header-section-number">4.8</span> The Omitted Variable Bias Formula</a>
+  <li><a href="#the-omitted-variable-bias-formula" id="toc-the-omitted-variable-bias-formula" class="nav-link" data-scroll-target="#the-omitted-variable-bias-formula"><span class="header-section-number">5.8</span> The Omitted Variable Bias Formula</a>
   <ul class="collapse">
-  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup"><span class="header-section-number">4.8.1</span> Setup</a></li>
-  <li><a href="#the-ovb-formula" id="toc-the-ovb-formula" class="nav-link" data-scroll-target="#the-ovb-formula"><span class="header-section-number">4.8.2</span> The OVB Formula</a></li>
-  <li><a href="#interpreting-the-bias-formula" id="toc-interpreting-the-bias-formula" class="nav-link" data-scroll-target="#interpreting-the-bias-formula"><span class="header-section-number">4.8.3</span> Interpreting the Bias Formula</a></li>
-  <li><a href="#example-education-wages-and-ability" id="toc-example-education-wages-and-ability" class="nav-link" data-scroll-target="#example-education-wages-and-ability"><span class="header-section-number">4.8.4</span> Example: Education, Wages, and Ability</a></li>
-  <li><a href="#example-policing-crime-and-poverty" id="toc-example-policing-crime-and-poverty" class="nav-link" data-scroll-target="#example-policing-crime-and-poverty"><span class="header-section-number">4.8.5</span> Example: Policing, Crime, and Poverty</a></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup"><span class="header-section-number">5.8.1</span> Setup</a></li>
+  <li><a href="#the-ovb-formula" id="toc-the-ovb-formula" class="nav-link" data-scroll-target="#the-ovb-formula"><span class="header-section-number">5.8.2</span> The OVB Formula</a></li>
+  <li><a href="#interpreting-the-bias-formula" id="toc-interpreting-the-bias-formula" class="nav-link" data-scroll-target="#interpreting-the-bias-formula"><span class="header-section-number">5.8.3</span> Interpreting the Bias Formula</a></li>
+  <li><a href="#example-education-wages-and-ability" id="toc-example-education-wages-and-ability" class="nav-link" data-scroll-target="#example-education-wages-and-ability"><span class="header-section-number">5.8.4</span> Example: Education, Wages, and Ability</a></li>
+  <li><a href="#example-policing-crime-and-poverty" id="toc-example-policing-crime-and-poverty" class="nav-link" data-scroll-target="#example-policing-crime-and-poverty"><span class="header-section-number">5.8.5</span> Example: Policing, Crime, and Poverty</a></li>
   </ul></li>
-  <li><a href="#variance-in-multivariate-ols" id="toc-variance-in-multivariate-ols" class="nav-link" data-scroll-target="#variance-in-multivariate-ols"><span class="header-section-number">4.9</span> Variance in Multivariate OLS</a>
+  <li><a href="#variance-in-multivariate-ols" id="toc-variance-in-multivariate-ols" class="nav-link" data-scroll-target="#variance-in-multivariate-ols"><span class="header-section-number">5.9</span> Variance in Multivariate OLS</a>
   <ul class="collapse">
-  <li><a href="#what-increases-variance" id="toc-what-increases-variance" class="nav-link" data-scroll-target="#what-increases-variance"><span class="header-section-number">4.9.1</span> What Increases Variance?</a></li>
-  <li><a href="#standard-errors" id="toc-standard-errors" class="nav-link" data-scroll-target="#standard-errors"><span class="header-section-number">4.9.2</span> Standard Errors</a></li>
+  <li><a href="#what-increases-variance" id="toc-what-increases-variance" class="nav-link" data-scroll-target="#what-increases-variance"><span class="header-section-number">5.9.1</span> What Increases Variance?</a></li>
+  <li><a href="#standard-errors" id="toc-standard-errors" class="nav-link" data-scroll-target="#standard-errors"><span class="header-section-number">5.9.2</span> Standard Errors</a></li>
   </ul></li>
-  <li><a href="#the-bias-variance-tradeoff" id="toc-the-bias-variance-tradeoff" class="nav-link" data-scroll-target="#the-bias-variance-tradeoff"><span class="header-section-number">4.10</span> The Bias-Variance Tradeoff</a>
+  <li><a href="#the-bias-variance-tradeoff" id="toc-the-bias-variance-tradeoff" class="nav-link" data-scroll-target="#the-bias-variance-tradeoff"><span class="header-section-number">5.10</span> The Bias-Variance Tradeoff</a>
   <ul class="collapse">
-  <li><a href="#the-costs-of-omitting-a-relevant-variable" id="toc-the-costs-of-omitting-a-relevant-variable" class="nav-link" data-scroll-target="#the-costs-of-omitting-a-relevant-variable"><span class="header-section-number">4.10.1</span> The Costs of Omitting a Relevant Variable</a></li>
-  <li><a href="#the-costs-of-including-an-irrelevant-variable" id="toc-the-costs-of-including-an-irrelevant-variable" class="nav-link" data-scroll-target="#the-costs-of-including-an-irrelevant-variable"><span class="header-section-number">4.10.2</span> The Costs of Including an Irrelevant Variable</a></li>
-  <li><a href="#the-tradeoff" id="toc-the-tradeoff" class="nav-link" data-scroll-target="#the-tradeoff"><span class="header-section-number">4.10.3</span> The Tradeoff</a></li>
-  <li><a href="#practical-guidance" id="toc-practical-guidance" class="nav-link" data-scroll-target="#practical-guidance"><span class="header-section-number">4.10.4</span> Practical Guidance</a></li>
+  <li><a href="#the-costs-of-omitting-a-relevant-variable" id="toc-the-costs-of-omitting-a-relevant-variable" class="nav-link" data-scroll-target="#the-costs-of-omitting-a-relevant-variable"><span class="header-section-number">5.10.1</span> The Costs of Omitting a Relevant Variable</a></li>
+  <li><a href="#the-costs-of-including-an-irrelevant-variable" id="toc-the-costs-of-including-an-irrelevant-variable" class="nav-link" data-scroll-target="#the-costs-of-including-an-irrelevant-variable"><span class="header-section-number">5.10.2</span> The Costs of Including an Irrelevant Variable</a></li>
+  <li><a href="#the-tradeoff" id="toc-the-tradeoff" class="nav-link" data-scroll-target="#the-tradeoff"><span class="header-section-number">5.10.3</span> The Tradeoff</a></li>
+  <li><a href="#practical-guidance" id="toc-practical-guidance" class="nav-link" data-scroll-target="#practical-guidance"><span class="header-section-number">5.10.4</span> Practical Guidance</a></li>
   </ul></li>
-  <li><a href="#simulation-bias-vs.-variance" id="toc-simulation-bias-vs.-variance" class="nav-link" data-scroll-target="#simulation-bias-vs.-variance"><span class="header-section-number">4.11</span> Simulation: Bias vs.&nbsp;Variance</a></li>
-  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">4.12</span> Summary</a>
+  <li><a href="#simulation-bias-vs.-variance" id="toc-simulation-bias-vs.-variance" class="nav-link" data-scroll-target="#simulation-bias-vs.-variance"><span class="header-section-number">5.11</span> Simulation: Bias vs.&nbsp;Variance</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">5.12</span> Summary</a>
   <ul class="collapse">
-  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">4.12.1</span> Key Takeaways</a></li>
+  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">5.12.1</span> Key Takeaways</a></li>
   </ul></li>
-  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">4.13</span> Check Your Understanding</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">5.13</span> Check Your Understanding</a></li>
   </ul>
 </nav>
     </div>
@@ -356,7 +362,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span id="sec-multivariate" class="quarto-section-identifier"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Multivariate Regression</span></span></h1>
+<h1 class="title"><span id="sec-multivariate" class="quarto-section-identifier"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Multivariate Regression</span></span></h1>
 </div>
 
 
@@ -495,10 +501,10 @@ function checkAnswer(selectElement, correctValue) {
 </div>
 </div>
 </div>
-<p>In <a href="unit3.html" class="quarto-xref"><span>Chapter 3</span></a>, we introduced bivariate OLS and saw that causal interpretation requires the zero conditional mean assumption: <span class="math inline">\(E[\mu | x] = 0\)</span>. We also saw that this assumption is frequently violated due to omitted variables—factors in the error term that are correlated with both <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>.</p>
+<p>In <a href="unit3.html" class="quarto-xref"><span>Chapter 4</span></a>, we introduced bivariate OLS and saw that causal interpretation requires the zero conditional mean assumption: <span class="math inline">\(E[\mu | x] = 0\)</span>. We also saw that this assumption is frequently violated due to omitted variables—factors in the error term that are correlated with both <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>.</p>
 <p>This chapter introduces <strong>multivariate OLS</strong>, which allows us to explicitly control for confounding variables. By including additional variables on the right-hand side of our regression, we can make the zero conditional mean assumption more plausible and get closer to causal estimates.</p>
-<section id="the-problem-with-bivariate-ols" class="level2" data-number="4.1">
-<h2 data-number="4.1" class="anchored" data-anchor-id="the-problem-with-bivariate-ols"><span class="header-section-number">4.1</span> The Problem with Bivariate OLS</h2>
+<section id="the-problem-with-bivariate-ols" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="the-problem-with-bivariate-ols"><span class="header-section-number">5.1</span> The Problem with Bivariate OLS</h2>
 <p>Let’s revisit why bivariate OLS often fails to give us causal estimates.</p>
 <p>Consider a regression of wages on education:</p>
 <p><span class="math display">\[
@@ -520,20 +526,20 @@ The Core Problem
 </div>
 </div>
 </section>
-<section id="the-multivariate-solution" class="level2" data-number="4.2">
-<h2 data-number="4.2" class="anchored" data-anchor-id="the-multivariate-solution"><span class="header-section-number">4.2</span> The Multivariate Solution</h2>
+<section id="the-multivariate-solution" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="the-multivariate-solution"><span class="header-section-number">5.2</span> The Multivariate Solution</h2>
 <p>Multivariate OLS offers a solution: <strong>explicitly control</strong> for variables that might be confounders.</p>
 <p>If we’re worried that family income confounds the education-wage relationship, we can include it in our model:</p>
 <p><span class="math display">\[
 wage = \beta_0 + \beta_1 \cdot educ + \beta_2 \cdot family\_income + \mu
 \]</span></p>
 <p>Now <span class="math inline">\(\beta_1\)</span> represents the effect of education on wages <strong>holding family income constant</strong>. The error term <span class="math inline">\(\mu\)</span> no longer contains family income, so that source of bias is eliminated.</p>
-<section id="the-general-multivariate-model" class="level3" data-number="4.2.1">
-<h3 data-number="4.2.1" class="anchored" data-anchor-id="the-general-multivariate-model"><span class="header-section-number">4.2.1</span> The General Multivariate Model</h3>
+<section id="the-general-multivariate-model" class="level3" data-number="5.2.1">
+<h3 data-number="5.2.1" class="anchored" data-anchor-id="the-general-multivariate-model"><span class="header-section-number">5.2.1</span> The General Multivariate Model</h3>
 <p>The general multivariate linear regression model with <span class="math inline">\(k\)</span> independent variables is:</p>
 <p><span id="eq-multivariate"><span class="math display">\[
 y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots + \beta_k x_k + \mu
-\tag{4.1}\]</span></span></p>
+\tag{5.1}\]</span></span></p>
 <p>where:</p>
 <ul>
 <li><span class="math inline">\(y\)</span> is the dependent variable</li>
@@ -543,8 +549,8 @@ y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots + \beta_k x_k + \mu
 <li><span class="math inline">\(\mu\)</span> is the error term containing all factors not included in the model</li>
 </ul>
 </section>
-<section id="interpreting-coefficients" class="level3" data-number="4.2.2">
-<h3 data-number="4.2.2" class="anchored" data-anchor-id="interpreting-coefficients"><span class="header-section-number">4.2.2</span> Interpreting Coefficients</h3>
+<section id="interpreting-coefficients" class="level3" data-number="5.2.2">
+<h3 data-number="5.2.2" class="anchored" data-anchor-id="interpreting-coefficients"><span class="header-section-number">5.2.2</span> Interpreting Coefficients</h3>
 <p>In multivariate regression, each coefficient has a <strong>ceteris paribus</strong> interpretation:</p>
 <p><span class="math display">\[
 \beta_j = \frac{\partial y}{\partial x_j}
@@ -559,8 +565,8 @@ wage = \beta_0 + \beta_1 \cdot educ + \beta_2 \cdot family\_income + \mu
 <li><span class="math inline">\(\beta_2\)</span>: The change in wages for one additional dollar of family income, <strong>holding education constant</strong></li>
 </ul>
 </section>
-<section id="the-zero-conditional-mean-assumption" class="level3" data-number="4.2.3">
-<h3 data-number="4.2.3" class="anchored" data-anchor-id="the-zero-conditional-mean-assumption"><span class="header-section-number">4.2.3</span> The Zero Conditional Mean Assumption</h3>
+<section id="the-zero-conditional-mean-assumption" class="level3" data-number="5.2.3">
+<h3 data-number="5.2.3" class="anchored" data-anchor-id="the-zero-conditional-mean-assumption"><span class="header-section-number">5.2.3</span> The Zero Conditional Mean Assumption</h3>
 <p>In multivariate OLS, the zero conditional mean assumption becomes:</p>
 <p><span class="math display">\[
 E[\mu | x_1, x_2, \ldots, x_k] = 0
@@ -569,18 +575,18 @@ E[\mu | x_1, x_2, \ldots, x_k] = 0
 <p>This assumption is much more plausible than its bivariate counterpart. By including relevant control variables, we’ve removed them from <span class="math inline">\(\mu\)</span>, making it more likely that what remains is uncorrelated with our variables of interest.</p>
 </section>
 </section>
-<section id="deriving-the-multivariate-ols-estimator" class="level2" data-number="4.3">
-<h2 data-number="4.3" class="anchored" data-anchor-id="deriving-the-multivariate-ols-estimator"><span class="header-section-number">4.3</span> Deriving the Multivariate OLS Estimator</h2>
+<section id="deriving-the-multivariate-ols-estimator" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="deriving-the-multivariate-ols-estimator"><span class="header-section-number">5.3</span> Deriving the Multivariate OLS Estimator</h2>
 <p>The derivation follows the same logic as bivariate OLS: we minimize the sum of squared residuals.</p>
-<section id="the-minimization-problem" class="level3" data-number="4.3.1">
-<h3 data-number="4.3.1" class="anchored" data-anchor-id="the-minimization-problem"><span class="header-section-number">4.3.1</span> The Minimization Problem</h3>
+<section id="the-minimization-problem" class="level3" data-number="5.3.1">
+<h3 data-number="5.3.1" class="anchored" data-anchor-id="the-minimization-problem"><span class="header-section-number">5.3.1</span> The Minimization Problem</h3>
 <p>Given a sample of <span class="math inline">\(n\)</span> observations, we want to find values <span class="math inline">\(\hat{\beta}_0, \hat{\beta}_1, \ldots, \hat{\beta}_k\)</span> that minimize:</p>
 <p><span class="math display">\[
 SSR = \sum_{i=1}^{n} (y_i - \hat{\beta}_0 - \hat{\beta}_1 x_{1i} - \hat{\beta}_2 x_{2i} - \cdots - \hat{\beta}_k x_{ki})^2
 \]</span></p>
 </section>
-<section id="first-order-conditions" class="level3" data-number="4.3.2">
-<h3 data-number="4.3.2" class="anchored" data-anchor-id="first-order-conditions"><span class="header-section-number">4.3.2</span> First-Order Conditions</h3>
+<section id="first-order-conditions" class="level3" data-number="5.3.2">
+<h3 data-number="5.3.2" class="anchored" data-anchor-id="first-order-conditions"><span class="header-section-number">5.3.2</span> First-Order Conditions</h3>
 <p>Taking partial derivatives with respect to each <span class="math inline">\(\hat{\beta}_j\)</span> and setting them equal to zero yields <span class="math inline">\(k + 1\)</span> first-order conditions:</p>
 <p><span class="math display">\[
 \sum_{i=1}^{n}(y_i - \hat{\beta}_0 - \hat{\beta}_1 x_{1i} - \cdots - \hat{\beta}_k x_{ki}) = 0
@@ -597,11 +603,11 @@ SSR = \sum_{i=1}^{n} (y_i - \hat{\beta}_0 - \hat{\beta}_1 x_{1i} - \hat{\beta}_2
 <p>Solving this system of equations yields the OLS estimates. The algebra is tedious (and typically handled with matrix methods), so we won’t derive the explicit formulas here. Fortunately, your computer does this effortlessly.</p>
 </section>
 </section>
-<section id="estimating-multivariate-ols-in-r" class="level2" data-number="4.4">
-<h2 data-number="4.4" class="anchored" data-anchor-id="estimating-multivariate-ols-in-r"><span class="header-section-number">4.4</span> Estimating Multivariate OLS in R</h2>
+<section id="estimating-multivariate-ols-in-r" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="estimating-multivariate-ols-in-r"><span class="header-section-number">5.4</span> Estimating Multivariate OLS in R</h2>
 <p>In R, we estimate multivariate regression using the same <code>lm()</code> function, simply adding variables with the <code>+</code> symbol.</p>
-<section id="example-mpg-horsepower-and-weight" class="level3" data-number="4.4.1">
-<h3 data-number="4.4.1" class="anchored" data-anchor-id="example-mpg-horsepower-and-weight"><span class="header-section-number">4.4.1</span> Example: MPG, Horsepower, and Weight</h3>
+<section id="example-mpg-horsepower-and-weight" class="level3" data-number="5.4.1">
+<h3 data-number="5.4.1" class="anchored" data-anchor-id="example-mpg-horsepower-and-weight"><span class="header-section-number">5.4.1</span> Example: MPG, Horsepower, and Weight</h3>
 <p>Let’s estimate the effect of horsepower on fuel efficiency, first without and then with a control for vehicle weight.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load data</span></span>
@@ -663,8 +669,8 @@ F-statistic: 69.21 on 2 and 29 DF,  p-value: 9.109e-12</code></pre>
 </div>
 </div>
 </section>
-<section id="interpreting-the-results" class="level3" data-number="4.4.2">
-<h3 data-number="4.4.2" class="anchored" data-anchor-id="interpreting-the-results"><span class="header-section-number">4.4.2</span> Interpreting the Results</h3>
+<section id="interpreting-the-results" class="level3" data-number="5.4.2">
+<h3 data-number="5.4.2" class="anchored" data-anchor-id="interpreting-the-results"><span class="header-section-number">5.4.2</span> Interpreting the Results</h3>
 <p>In the <strong>bivariate</strong> regression, the coefficient on horsepower is <span class="math inline">\(-0.068\)</span>: each additional unit of horsepower is associated with 0.068 fewer miles per gallon.</p>
 <p>In the <strong>multivariate</strong> regression (controlling for weight), the coefficient on horsepower drops to <span class="math inline">\(-0.032\)</span>—less than half the size!</p>
 <p>What happened? Horsepower and weight are positively correlated (more powerful engines tend to be in heavier vehicles), and weight independently reduces fuel efficiency. The bivariate estimate was conflating the effect of horsepower with the effect of weight. Once we control for weight, we isolate the effect of horsepower alone.</p>
@@ -683,11 +689,11 @@ What Changed?
 </div>
 </section>
 </section>
-<section id="multivariate-ols-as-matching" class="level2" data-number="4.5">
-<h2 data-number="4.5" class="anchored" data-anchor-id="multivariate-ols-as-matching"><span class="header-section-number">4.5</span> Multivariate OLS as Matching</h2>
+<section id="multivariate-ols-as-matching" class="level2" data-number="5.5">
+<h2 data-number="5.5" class="anchored" data-anchor-id="multivariate-ols-as-matching"><span class="header-section-number">5.5</span> Multivariate OLS as Matching</h2>
 <p>There’s an intuitive way to understand what multivariate OLS does: it’s essentially a <strong>matching</strong> estimator. When we “control for” a variable, we’re comparing observations that have similar values of that control variable.</p>
-<section id="the-returns-to-education-example" class="level3" data-number="4.5.1">
-<h3 data-number="4.5.1" class="anchored" data-anchor-id="the-returns-to-education-example"><span class="header-section-number">4.5.1</span> The Returns to Education Example</h3>
+<section id="the-returns-to-education-example" class="level3" data-number="5.5.1">
+<h3 data-number="5.5.1" class="anchored" data-anchor-id="the-returns-to-education-example"><span class="header-section-number">5.5.1</span> The Returns to Education Example</h3>
 <p>Suppose we want to estimate the effect of education on wages. A simple comparison of average wages across education levels might be misleading because people with more education tend to work in higher-paying industries. Part of the apparent “return to education” might actually be an “industry premium.”</p>
 <p>Let’s work through this with simulated data to see exactly how controlling for industry works.</p>
 <div class="cell">
@@ -725,8 +731,8 @@ What Changed?
 <span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="the-naive-comparison" class="level3" data-number="4.5.2">
-<h3 data-number="4.5.2" class="anchored" data-anchor-id="the-naive-comparison"><span class="header-section-number">4.5.2</span> The Naive Comparison</h3>
+<section id="the-naive-comparison" class="level3" data-number="5.5.2">
+<h3 data-number="5.5.2" class="anchored" data-anchor-id="the-naive-comparison"><span class="header-section-number">5.5.2</span> The Naive Comparison</h3>
 <p>First, let’s compute average wages by education level without any controls:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>naive_means <span class="ot">&lt;-</span> wage_data <span class="sc">|&gt;</span></span>
@@ -775,8 +781,8 @@ What Changed?
 <p>The naive comparison suggests that going from high school to some college is associated with about $8,386 higher wages, and going from high school to a bachelor’s degree is associated with about $17,766 higher wages.</p>
 <p>But wait—the true effect of education in our simulation is only $3,000 per year (so $6,000 for 2 extra years and $12,000 for 4 extra years). The naive estimates are too large! This is because more educated workers are more likely to be in high-paying industries.</p>
 </section>
-<section id="step-1-compute-within-industry-differences" class="level3" data-number="4.5.3">
-<h3 data-number="4.5.3" class="anchored" data-anchor-id="step-1-compute-within-industry-differences"><span class="header-section-number">4.5.3</span> Step 1: Compute Within-Industry Differences</h3>
+<section id="step-1-compute-within-industry-differences" class="level3" data-number="5.5.3">
+<h3 data-number="5.5.3" class="anchored" data-anchor-id="step-1-compute-within-industry-differences"><span class="header-section-number">5.5.3</span> Step 1: Compute Within-Industry Differences</h3>
 <p>To control for industry, we first compute average wages separately for each education-industry combination:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>cell_means <span class="ot">&lt;-</span> wage_data <span class="sc">|&gt;</span></span>
@@ -793,7 +799,7 @@ What Changed?
 <div id="tbl-matching-detailed" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-matching-detailed-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;4.1: Average wages by education and industry
+Table&nbsp;5.1: Average wages by education and industry
 </figcaption>
 <div aria-describedby="tbl-matching-detailed-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
@@ -906,8 +912,8 @@ Table&nbsp;4.1: Average wages by education and industry
 </div>
 <p>Notice that the within-industry differences are much closer to the true values ($6,000 for Some College, $12,000 for Bachelor’s+).</p>
 </section>
-<section id="step-2-compute-weights" class="level3" data-number="4.5.4">
-<h3 data-number="4.5.4" class="anchored" data-anchor-id="step-2-compute-weights"><span class="header-section-number">4.5.4</span> Step 2: Compute Weights</h3>
+<section id="step-2-compute-weights" class="level3" data-number="5.5.4">
+<h3 data-number="5.5.4" class="anchored" data-anchor-id="step-2-compute-weights"><span class="header-section-number">5.5.4</span> Step 2: Compute Weights</h3>
 <p>To combine these within-industry estimates into a single number, we take a <strong>weighted average</strong>. The weights are based on the number of observations in each industry:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Total workers in each industry</span></span>
@@ -945,8 +951,8 @@ Table&nbsp;4.1: Average wages by education and industry
 </div>
 </div>
 </section>
-<section id="step-3-compute-weighted-average" class="level3" data-number="4.5.5">
-<h3 data-number="4.5.5" class="anchored" data-anchor-id="step-3-compute-weighted-average"><span class="header-section-number">4.5.5</span> Step 3: Compute Weighted Average</h3>
+<section id="step-3-compute-weighted-average" class="level3" data-number="5.5.5">
+<h3 data-number="5.5.5" class="anchored" data-anchor-id="step-3-compute-weighted-average"><span class="header-section-number">5.5.5</span> Step 3: Compute Weighted Average</h3>
 <p>Now we combine the within-industry differences using these weights. Let’s do this for the Bachelor’s+ vs HS comparison:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the within-industry differences for Bachelor's+</span></span>
@@ -992,8 +998,8 @@ Table&nbsp;4.1: Average wages by education and industry
 \]</span></p>
 <p>This is much closer to the true effect of $12,000!</p>
 </section>
-<section id="the-regression-equivalent" class="level3" data-number="4.5.6">
-<h3 data-number="4.5.6" class="anchored" data-anchor-id="the-regression-equivalent"><span class="header-section-number">4.5.6</span> The Regression Equivalent</h3>
+<section id="the-regression-equivalent" class="level3" data-number="5.5.6">
+<h3 data-number="5.5.6" class="anchored" data-anchor-id="the-regression-equivalent"><span class="header-section-number">5.5.6</span> The Regression Equivalent</h3>
 <p>Now let’s see what regression gives us:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create numeric education variable (years beyond HS)</span></span>
@@ -1057,16 +1063,16 @@ Multivariate OLS as Matching
 </div>
 </section>
 </section>
-<section id="goodness-of-fit-adjusted-r-squared" class="level2" data-number="4.6">
-<h2 data-number="4.6" class="anchored" data-anchor-id="goodness-of-fit-adjusted-r-squared"><span class="header-section-number">4.6</span> Goodness-of-Fit: Adjusted R-Squared</h2>
+<section id="goodness-of-fit-adjusted-r-squared" class="level2" data-number="5.6">
+<h2 data-number="5.6" class="anchored" data-anchor-id="goodness-of-fit-adjusted-r-squared"><span class="header-section-number">5.6</span> Goodness-of-Fit: Adjusted R-Squared</h2>
 <p>In bivariate OLS, we used <span class="math inline">\(R^2\)</span> to measure how much variation in <span class="math inline">\(y\)</span> our model explains. The same concept applies to multivariate OLS, but with an important caveat.</p>
-<section id="the-problem-with-r-squared" class="level3" data-number="4.6.1">
-<h3 data-number="4.6.1" class="anchored" data-anchor-id="the-problem-with-r-squared"><span class="header-section-number">4.6.1</span> The Problem with R-Squared</h3>
+<section id="the-problem-with-r-squared" class="level3" data-number="5.6.1">
+<h3 data-number="5.6.1" class="anchored" data-anchor-id="the-problem-with-r-squared"><span class="header-section-number">5.6.1</span> The Problem with R-Squared</h3>
 <p>The <span class="math inline">\(R^2\)</span> can never decrease when you add more variables—it can only increase or stay the same. This is because adding variables can only improve (or maintain) the fit, even if those variables are irrelevant.</p>
 <p>This creates a problem: <span class="math inline">\(R^2\)</span> mechanically increases as you add more variables, potentially making a bloated model look better than a parsimonious one.</p>
 </section>
-<section id="the-adjusted-r-squared" class="level3" data-number="4.6.2">
-<h3 data-number="4.6.2" class="anchored" data-anchor-id="the-adjusted-r-squared"><span class="header-section-number">4.6.2</span> The Adjusted R-Squared</h3>
+<section id="the-adjusted-r-squared" class="level3" data-number="5.6.2">
+<h3 data-number="5.6.2" class="anchored" data-anchor-id="the-adjusted-r-squared"><span class="header-section-number">5.6.2</span> The Adjusted R-Squared</h3>
 <p>The <strong>adjusted R-squared</strong> penalizes for the number of parameters:</p>
 <p><span class="math display">\[
 \bar{R}^2 = 1 - \frac{(1 - R^2)(n - 1)}{n - k - 1}
@@ -1095,22 +1101,22 @@ Multivariate Adj R-sq
 </div>
 </section>
 </section>
-<section id="gauss-markov-assumptions-for-multivariate-ols" class="level2" data-number="4.7">
-<h2 data-number="4.7" class="anchored" data-anchor-id="gauss-markov-assumptions-for-multivariate-ols"><span class="header-section-number">4.7</span> Gauss-Markov Assumptions for Multivariate OLS</h2>
+<section id="gauss-markov-assumptions-for-multivariate-ols" class="level2" data-number="5.7">
+<h2 data-number="5.7" class="anchored" data-anchor-id="gauss-markov-assumptions-for-multivariate-ols"><span class="header-section-number">5.7</span> Gauss-Markov Assumptions for Multivariate OLS</h2>
 <p>The Gauss-Markov assumptions extend naturally to the multivariate case, with one important addition.</p>
-<section id="assumption-1-linear-in-parameters" class="level3" data-number="4.7.1">
-<h3 data-number="4.7.1" class="anchored" data-anchor-id="assumption-1-linear-in-parameters"><span class="header-section-number">4.7.1</span> Assumption 1: Linear in Parameters</h3>
+<section id="assumption-1-linear-in-parameters" class="level3" data-number="5.7.1">
+<h3 data-number="5.7.1" class="anchored" data-anchor-id="assumption-1-linear-in-parameters"><span class="header-section-number">5.7.1</span> Assumption 1: Linear in Parameters</h3>
 <p><span class="math display">\[
 y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots + \beta_k x_k + \mu
 \]</span></p>
 <p>As in the bivariate case, we can transform variables to model non-linear relationships while maintaining linearity in parameters.</p>
 </section>
-<section id="assumption-2-random-sampling" class="level3" data-number="4.7.2">
-<h3 data-number="4.7.2" class="anchored" data-anchor-id="assumption-2-random-sampling"><span class="header-section-number">4.7.2</span> Assumption 2: Random Sampling</h3>
+<section id="assumption-2-random-sampling" class="level3" data-number="5.7.2">
+<h3 data-number="5.7.2" class="anchored" data-anchor-id="assumption-2-random-sampling"><span class="header-section-number">5.7.2</span> Assumption 2: Random Sampling</h3>
 <p>We have a random sample <span class="math inline">\(\{(x_{1i}, x_{2i}, \ldots, x_{ki}, y_i) : i = 1, \ldots, n\}\)</span> from the population.</p>
 </section>
-<section id="assumption-3-no-perfect-multicollinearity" class="level3" data-number="4.7.3">
-<h3 data-number="4.7.3" class="anchored" data-anchor-id="assumption-3-no-perfect-multicollinearity"><span class="header-section-number">4.7.3</span> Assumption 3: No Perfect Multicollinearity</h3>
+<section id="assumption-3-no-perfect-multicollinearity" class="level3" data-number="5.7.3">
+<h3 data-number="5.7.3" class="anchored" data-anchor-id="assumption-3-no-perfect-multicollinearity"><span class="header-section-number">5.7.3</span> Assumption 3: No Perfect Multicollinearity</h3>
 <p>This assumption has two parts:</p>
 <ol type="1">
 <li><strong>No constant variables:</strong> Each independent variable must have some variation in the sample</li>
@@ -1137,8 +1143,8 @@ Perfect Multicollinearity
 </div>
 </div>
 </section>
-<section id="assumption-4-zero-conditional-mean" class="level3" data-number="4.7.4">
-<h3 data-number="4.7.4" class="anchored" data-anchor-id="assumption-4-zero-conditional-mean"><span class="header-section-number">4.7.4</span> Assumption 4: Zero Conditional Mean</h3>
+<section id="assumption-4-zero-conditional-mean" class="level3" data-number="5.7.4">
+<h3 data-number="5.7.4" class="anchored" data-anchor-id="assumption-4-zero-conditional-mean"><span class="header-section-number">5.7.4</span> Assumption 4: Zero Conditional Mean</h3>
 <p><span class="math display">\[
 E[\mu | x_1, x_2, \ldots, x_k] = 0
 \]</span></p>
@@ -1150,19 +1156,19 @@ E[\mu | x_1, x_2, \ldots, x_k] = 0
 <li>Simultaneous causality</li>
 </ul>
 </section>
-<section id="assumption-5-homoskedasticity" class="level3" data-number="4.7.5">
-<h3 data-number="4.7.5" class="anchored" data-anchor-id="assumption-5-homoskedasticity"><span class="header-section-number">4.7.5</span> Assumption 5: Homoskedasticity</h3>
+<section id="assumption-5-homoskedasticity" class="level3" data-number="5.7.5">
+<h3 data-number="5.7.5" class="anchored" data-anchor-id="assumption-5-homoskedasticity"><span class="header-section-number">5.7.5</span> Assumption 5: Homoskedasticity</h3>
 <p><span class="math display">\[
 Var(\mu | x_1, x_2, \ldots, x_k) = \sigma^2
 \]</span></p>
 <p>The variance of the error term is constant across all combinations of independent variable values.</p>
 </section>
 </section>
-<section id="the-omitted-variable-bias-formula" class="level2" data-number="4.8">
-<h2 data-number="4.8" class="anchored" data-anchor-id="the-omitted-variable-bias-formula"><span class="header-section-number">4.8</span> The Omitted Variable Bias Formula</h2>
+<section id="the-omitted-variable-bias-formula" class="level2" data-number="5.8">
+<h2 data-number="5.8" class="anchored" data-anchor-id="the-omitted-variable-bias-formula"><span class="header-section-number">5.8</span> The Omitted Variable Bias Formula</h2>
 <p>Even when we can’t include an omitted variable (perhaps because it’s unobservable), we can still reason about the <strong>direction</strong> of the bias.</p>
-<section id="setup" class="level3" data-number="4.8.1">
-<h3 data-number="4.8.1" class="anchored" data-anchor-id="setup"><span class="header-section-number">4.8.1</span> Setup</h3>
+<section id="setup" class="level3" data-number="5.8.1">
+<h3 data-number="5.8.1" class="anchored" data-anchor-id="setup"><span class="header-section-number">5.8.1</span> Setup</h3>
 <p>Suppose the true model is:</p>
 <p><span class="math display">\[
 y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \mu
@@ -1173,12 +1179,12 @@ y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \mu
 \]</span></p>
 <p>where the tilde (<span class="math inline">\(\tilde{}\)</span>) indicates estimates from the misspecified model.</p>
 </section>
-<section id="the-ovb-formula" class="level3" data-number="4.8.2">
-<h3 data-number="4.8.2" class="anchored" data-anchor-id="the-ovb-formula"><span class="header-section-number">4.8.2</span> The OVB Formula</h3>
+<section id="the-ovb-formula" class="level3" data-number="5.8.2">
+<h3 data-number="5.8.2" class="anchored" data-anchor-id="the-ovb-formula"><span class="header-section-number">5.8.2</span> The OVB Formula</h3>
 <p>It can be shown that:</p>
 <p><span id="eq-ovb-formula"><span class="math display">\[
 \tilde{\beta}_1 = \hat{\beta}_1 + \hat{\beta}_2 \tilde{\delta}_1
-\tag{4.2}\]</span></span></p>
+\tag{5.2}\]</span></span></p>
 <p>where <span class="math inline">\(\tilde{\delta}_1\)</span> is the coefficient from regressing <span class="math inline">\(x_2\)</span> on <span class="math inline">\(x_1\)</span>:</p>
 <p><span class="math display">\[
 x_2 = \tilde{\delta}_0 + \tilde{\delta}_1 x_1 + \text{error}
@@ -1190,10 +1196,10 @@ E[\tilde{\beta}_1] = \beta_1 + \beta_2 \tilde{\delta}_1
 <p>Therefore, the <strong>bias</strong> is:</p>
 <p><span id="eq-ovb-bias"><span class="math display">\[
 \text{Bias}(\tilde{\beta}_1) = \beta_2 \cdot \tilde{\delta}_1
-\tag{4.3}\]</span></span></p>
+\tag{5.3}\]</span></span></p>
 </section>
-<section id="interpreting-the-bias-formula" class="level3" data-number="4.8.3">
-<h3 data-number="4.8.3" class="anchored" data-anchor-id="interpreting-the-bias-formula"><span class="header-section-number">4.8.3</span> Interpreting the Bias Formula</h3>
+<section id="interpreting-the-bias-formula" class="level3" data-number="5.8.3">
+<h3 data-number="5.8.3" class="anchored" data-anchor-id="interpreting-the-bias-formula"><span class="header-section-number">5.8.3</span> Interpreting the Bias Formula</h3>
 <p>The bias depends on two factors:</p>
 <ol type="1">
 <li><strong><span class="math inline">\(\beta_2\)</span>:</strong> The effect of the omitted variable on <span class="math inline">\(y\)</span></li>
@@ -1227,8 +1233,8 @@ E[\tilde{\beta}_1] = \beta_1 + \beta_2 \tilde{\delta}_1
 </tbody>
 </table>
 </section>
-<section id="example-education-wages-and-ability" class="level3" data-number="4.8.4">
-<h3 data-number="4.8.4" class="anchored" data-anchor-id="example-education-wages-and-ability"><span class="header-section-number">4.8.4</span> Example: Education, Wages, and Ability</h3>
+<section id="example-education-wages-and-ability" class="level3" data-number="5.8.4">
+<h3 data-number="5.8.4" class="anchored" data-anchor-id="example-education-wages-and-ability"><span class="header-section-number">5.8.4</span> Example: Education, Wages, and Ability</h3>
 <p>Consider estimating the return to education while omitting ability:</p>
 <ul>
 <li><strong><span class="math inline">\(\beta_2\)</span> (effect of ability on wages):</strong> Positive (more able people earn more)</li>
@@ -1237,8 +1243,8 @@ E[\tilde{\beta}_1] = \beta_1 + \beta_2 \tilde{\delta}_1
 <p>Therefore: <span class="math display">\[\text{Bias} = (+)(+) = \text{Positive}\]</span></p>
 <p>Our estimate of the return to education is <strong>too large</strong>—it includes part of the return to ability.</p>
 </section>
-<section id="example-policing-crime-and-poverty" class="level3" data-number="4.8.5">
-<h3 data-number="4.8.5" class="anchored" data-anchor-id="example-policing-crime-and-poverty"><span class="header-section-number">4.8.5</span> Example: Policing, Crime, and Poverty</h3>
+<section id="example-policing-crime-and-poverty" class="level3" data-number="5.8.5">
+<h3 data-number="5.8.5" class="anchored" data-anchor-id="example-policing-crime-and-poverty"><span class="header-section-number">5.8.5</span> Example: Policing, Crime, and Poverty</h3>
 <p>Consider estimating the effect of policing on crime while omitting local poverty:</p>
 <ul>
 <li><strong>Effect of poverty on crime (<span class="math inline">\(\beta_2\)</span>):</strong> Positive (higher poverty → more crime)</li>
@@ -1248,21 +1254,21 @@ E[\tilde{\beta}_1] = \beta_1 + \beta_2 \tilde{\delta}_1
 <p>Our estimate suggests policing <em>increases</em> crime more than it actually does (or reduces it less than it actually does). This is why naive correlations between police presence and crime can be misleading.</p>
 </section>
 </section>
-<section id="variance-in-multivariate-ols" class="level2" data-number="4.9">
-<h2 data-number="4.9" class="anchored" data-anchor-id="variance-in-multivariate-ols"><span class="header-section-number">4.9</span> Variance in Multivariate OLS</h2>
+<section id="variance-in-multivariate-ols" class="level2" data-number="5.9">
+<h2 data-number="5.9" class="anchored" data-anchor-id="variance-in-multivariate-ols"><span class="header-section-number">5.9</span> Variance in Multivariate OLS</h2>
 <p>Under the Gauss-Markov assumptions, the variance of <span class="math inline">\(\hat{\beta}_j\)</span> is:</p>
 <p><span id="eq-multivar-variance"><span class="math display">\[
 Var(\hat{\beta}_j) = \frac{\sigma^2}{SST_j (1 - R_j^2)}
-\tag{4.4}\]</span></span></p>
+\tag{5.4}\]</span></span></p>
 <p>where:</p>
 <ul>
 <li><span class="math inline">\(\sigma^2\)</span> is the error variance</li>
 <li><span class="math inline">\(SST_j = \sum(x_{ji} - \bar{x}_j)^2\)</span> is the total variation in <span class="math inline">\(x_j\)</span></li>
 <li><span class="math inline">\(R_j^2\)</span> is the R-squared from regressing <span class="math inline">\(x_j\)</span> on all other independent variables</li>
 </ul>
-<section id="what-increases-variance" class="level3" data-number="4.9.1">
-<h3 data-number="4.9.1" class="anchored" data-anchor-id="what-increases-variance"><span class="header-section-number">4.9.1</span> What Increases Variance?</h3>
-<p>From <a href="#eq-multivar-variance" class="quarto-xref">Equation&nbsp;<span>4.4</span></a>, the variance of <span class="math inline">\(\hat{\beta}_j\)</span> increases when:</p>
+<section id="what-increases-variance" class="level3" data-number="5.9.1">
+<h3 data-number="5.9.1" class="anchored" data-anchor-id="what-increases-variance"><span class="header-section-number">5.9.1</span> What Increases Variance?</h3>
+<p>From <a href="#eq-multivar-variance" class="quarto-xref">Equation&nbsp;<span>5.4</span></a>, the variance of <span class="math inline">\(\hat{\beta}_j\)</span> increases when:</p>
 <ol type="1">
 <li><strong>More noise (<span class="math inline">\(\sigma^2\)</span>):</strong> Higher error variance means less precise estimates</li>
 <li><strong>Less variation in <span class="math inline">\(x_j\)</span> (<span class="math inline">\(SST_j\)</span>):</strong> Less information about how <span class="math inline">\(x_j\)</span> relates to <span class="math inline">\(y\)</span></li>
@@ -1270,8 +1276,8 @@ Var(\hat{\beta}_j) = \frac{\sigma^2}{SST_j (1 - R_j^2)}
 </ol>
 <p>The third point is crucial: when your variable of interest is highly correlated with control variables, your estimate becomes less precise. This is sometimes called <strong>imperfect multicollinearity</strong> or the <strong>multicollinearity problem</strong>.</p>
 </section>
-<section id="standard-errors" class="level3" data-number="4.9.2">
-<h3 data-number="4.9.2" class="anchored" data-anchor-id="standard-errors"><span class="header-section-number">4.9.2</span> Standard Errors</h3>
+<section id="standard-errors" class="level3" data-number="5.9.2">
+<h3 data-number="5.9.2" class="anchored" data-anchor-id="standard-errors"><span class="header-section-number">5.9.2</span> Standard Errors</h3>
 <p>The standard error is estimated as:</p>
 <p><span class="math display">\[
 se(\hat{\beta}_j) = \frac{\hat{\sigma}}{\sqrt{SST_j(1 - R_j^2)}}
@@ -1279,23 +1285,23 @@ se(\hat{\beta}_j) = \frac{\hat{\sigma}}{\sqrt{SST_j(1 - R_j^2)}}
 <p>where <span class="math inline">\(\hat{\sigma}^2 = \frac{SSR}{n - k - 1}\)</span> is the estimated error variance, and <span class="math inline">\(n - k - 1\)</span> represents the <strong>degrees of freedom</strong>.</p>
 </section>
 </section>
-<section id="the-bias-variance-tradeoff" class="level2" data-number="4.10">
-<h2 data-number="4.10" class="anchored" data-anchor-id="the-bias-variance-tradeoff"><span class="header-section-number">4.10</span> The Bias-Variance Tradeoff</h2>
+<section id="the-bias-variance-tradeoff" class="level2" data-number="5.10">
+<h2 data-number="5.10" class="anchored" data-anchor-id="the-bias-variance-tradeoff"><span class="header-section-number">5.10</span> The Bias-Variance Tradeoff</h2>
 <p>Should you include a variable in your regression? The answer depends on a tradeoff.</p>
-<section id="the-costs-of-omitting-a-relevant-variable" class="level3" data-number="4.10.1">
-<h3 data-number="4.10.1" class="anchored" data-anchor-id="the-costs-of-omitting-a-relevant-variable"><span class="header-section-number">4.10.1</span> The Costs of Omitting a Relevant Variable</h3>
+<section id="the-costs-of-omitting-a-relevant-variable" class="level3" data-number="5.10.1">
+<h3 data-number="5.10.1" class="anchored" data-anchor-id="the-costs-of-omitting-a-relevant-variable"><span class="header-section-number">5.10.1</span> The Costs of Omitting a Relevant Variable</h3>
 <p>If a variable truly belongs in the model (<span class="math inline">\(\beta_2 \neq 0\)</span>) and is correlated with <span class="math inline">\(x_1\)</span>, omitting it causes <strong>bias</strong>. Your estimate systematically misses the true value.</p>
 </section>
-<section id="the-costs-of-including-an-irrelevant-variable" class="level3" data-number="4.10.2">
-<h3 data-number="4.10.2" class="anchored" data-anchor-id="the-costs-of-including-an-irrelevant-variable"><span class="header-section-number">4.10.2</span> The Costs of Including an Irrelevant Variable</h3>
+<section id="the-costs-of-including-an-irrelevant-variable" class="level3" data-number="5.10.2">
+<h3 data-number="5.10.2" class="anchored" data-anchor-id="the-costs-of-including-an-irrelevant-variable"><span class="header-section-number">5.10.2</span> The Costs of Including an Irrelevant Variable</h3>
 <p>What if you include a variable that doesn’t belong (<span class="math inline">\(\beta_2 = 0\)</span>)?</p>
 <p>From the OVB formula: <span class="math display">\[E[\hat{\beta}_1] = \beta_1 + (0) \cdot \tilde{\delta}_1 = \beta_1\]</span></p>
 <p>No bias! Including an irrelevant variable doesn’t bias your estimate.</p>
 <p>But look at the variance formula. Including an extra variable increases <span class="math inline">\(R_1^2\)</span> (the correlation between <span class="math inline">\(x_1\)</span> and other variables), which increases the variance of <span class="math inline">\(\hat{\beta}_1\)</span>.</p>
 <p><strong>Including irrelevant variables inflates variance without reducing bias.</strong></p>
 </section>
-<section id="the-tradeoff" class="level3" data-number="4.10.3">
-<h3 data-number="4.10.3" class="anchored" data-anchor-id="the-tradeoff"><span class="header-section-number">4.10.3</span> The Tradeoff</h3>
+<section id="the-tradeoff" class="level3" data-number="5.10.3">
+<h3 data-number="5.10.3" class="anchored" data-anchor-id="the-tradeoff"><span class="header-section-number">5.10.3</span> The Tradeoff</h3>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -1323,8 +1329,8 @@ se(\hat{\beta}_j) = \frac{\hat{\sigma}}{\sqrt{SST_j(1 - R_j^2)}}
 <li>If you’re too liberal (include everything), you inflate variance</li>
 </ul>
 </section>
-<section id="practical-guidance" class="level3" data-number="4.10.4">
-<h3 data-number="4.10.4" class="anchored" data-anchor-id="practical-guidance"><span class="header-section-number">4.10.4</span> Practical Guidance</h3>
+<section id="practical-guidance" class="level3" data-number="5.10.4">
+<h3 data-number="5.10.4" class="anchored" data-anchor-id="practical-guidance"><span class="header-section-number">5.10.4</span> Practical Guidance</h3>
 <p>There’s no perfect solution, but some principles help:</p>
 <ol type="1">
 <li><p><strong>Include variables you have strong theoretical reasons to believe are confounders.</strong> Use economic theory and prior research to guide variable selection.</p></li>
@@ -1334,15 +1340,15 @@ se(\hat{\beta}_j) = \frac{\hat{\sigma}}{\sqrt{SST_j(1 - R_j^2)}}
 </ol>
 </section>
 </section>
-<section id="simulation-bias-vs.-variance" class="level2" data-number="4.11">
-<h2 data-number="4.11" class="anchored" data-anchor-id="simulation-bias-vs.-variance"><span class="header-section-number">4.11</span> Simulation: Bias vs.&nbsp;Variance</h2>
+<section id="simulation-bias-vs.-variance" class="level2" data-number="5.11">
+<h2 data-number="5.11" class="anchored" data-anchor-id="simulation-bias-vs.-variance"><span class="header-section-number">5.11</span> Simulation: Bias vs.&nbsp;Variance</h2>
 <p>Let’s see the bias-variance tradeoff in action with a simulation.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-bias-variance" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-bias-variance-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4.1: The bias-variance tradeoff. Left: When x₂ doesn’t affect y (β₂=0), including it adds variance without reducing bias. Right: When x₂ does affect y (β₂≠0), omitting it causes bias.
+Figure&nbsp;5.1: The bias-variance tradeoff. Left: When x₂ doesn’t affect y (β₂=0), including it adds variance without reducing bias. Right: When x₂ does affect y (β₂≠0), omitting it causes bias.
 </figcaption>
 <div aria-describedby="fig-bias-variance-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="unit4_files/figure-html/fig-bias-variance-1.png" class="img-fluid figure-img" style="width:95.0%">
@@ -1354,11 +1360,11 @@ Figure&nbsp;4.1: The bias-variance tradeoff. Left: When x₂ doesn’t affect y 
 <p>In <strong>Case 1</strong> (left panel), <span class="math inline">\(x_2\)</span> doesn’t actually affect <span class="math inline">\(y\)</span>. Including it (coral) doesn’t reduce bias (both distributions are centered on the true value), but it does increase variance (the coral distribution is wider).</p>
 <p>In <strong>Case 2</strong> (right panel), <span class="math inline">\(x_2\)</span> does affect <span class="math inline">\(y\)</span>. Omitting it (blue) causes bias—the distribution is centered away from the true value. Including it (coral) eliminates the bias, even though variance is slightly higher.</p>
 </section>
-<section id="summary" class="level2" data-number="4.12">
-<h2 data-number="4.12" class="anchored" data-anchor-id="summary"><span class="header-section-number">4.12</span> Summary</h2>
+<section id="summary" class="level2" data-number="5.12">
+<h2 data-number="5.12" class="anchored" data-anchor-id="summary"><span class="header-section-number">5.12</span> Summary</h2>
 <p>This chapter extended OLS to the multivariate case, allowing us to control for confounding variables.</p>
-<section id="key-takeaways" class="level3" data-number="4.12.1">
-<h3 data-number="4.12.1" class="anchored" data-anchor-id="key-takeaways"><span class="header-section-number">4.12.1</span> Key Takeaways</h3>
+<section id="key-takeaways" class="level3" data-number="5.12.1">
+<h3 data-number="5.12.1" class="anchored" data-anchor-id="key-takeaways"><span class="header-section-number">5.12.1</span> Key Takeaways</h3>
 <ul>
 <li><p><strong>Multivariate OLS</strong> includes multiple independent variables: <span class="math display">\[y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots + \beta_k x_k + \mu\]</span></p></li>
 <li><p><strong>Coefficients have ceteris paribus interpretations:</strong> <span class="math inline">\(\beta_j\)</span> is the effect of <span class="math inline">\(x_j\)</span> holding all other variables constant</p></li>
@@ -1370,8 +1376,8 @@ Figure&nbsp;4.1: The bias-variance tradeoff. Left: When x₂ doesn’t affect y 
 </ul>
 </section>
 </section>
-<section id="check-your-understanding" class="level2" data-number="4.13">
-<h2 data-number="4.13" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">4.13</span> Check Your Understanding</h2>
+<section id="check-your-understanding" class="level2" data-number="5.13">
+<h2 data-number="5.13" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">5.13</span> Check Your Understanding</h2>
 <div class="question">
 <div class="answer-row">
     <label>i. In the model \(y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \mu\), what does \(\beta_1\) represent? </label>
@@ -2051,12 +2057,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
       <a href="../chapters/unit3.html" class="pagination-link" aria-label="Bivariate Regression and Ordinary Least Squares">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Bivariate Regression and Ordinary Least Squares</span></span>
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Bivariate Regression and Ordinary Least Squares</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="../chapters/unit5.html" class="pagination-link" aria-label="Statistical Inference">
-        <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Statistical Inference</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Statistical Inference</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

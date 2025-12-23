@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>3&nbsp; Bivariate Regression and Ordinary Least Squares – EC325 Workbook</title>
+<title>4&nbsp; Bivariate Regression and Ordinary Least Squares – EC325 Workbook</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -164,7 +164,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/unit3.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Bivariate Regression and Ordinary Least Squares</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/unit3.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Bivariate Regression and Ordinary Least Squares</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -222,26 +222,32 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../chapters/unit1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Good Data Practices</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../chapters/unit2.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Causality and Randomized Control Trials</span></span></a>
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Causality and Randomized Control Trials</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/unit3.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Bivariate Regression and Ordinary Least Squares</span></span></a>
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Bivariate Regression and Ordinary Least Squares</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/unit4.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Multivariate Regression</span></span></a>
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Multivariate Regression</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/unit5.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Statistical Inference</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Statistical Inference</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -283,71 +289,71 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#modeling-relationships-between-variables" id="toc-modeling-relationships-between-variables" class="nav-link active" data-scroll-target="#modeling-relationships-between-variables"><span class="header-section-number">3.1</span> Modeling Relationships Between Variables</a>
+  <li><a href="#modeling-relationships-between-variables" id="toc-modeling-relationships-between-variables" class="nav-link active" data-scroll-target="#modeling-relationships-between-variables"><span class="header-section-number">4.1</span> Modeling Relationships Between Variables</a>
   <ul class="collapse">
-  <li><a href="#conditional-expectations" id="toc-conditional-expectations" class="nav-link" data-scroll-target="#conditional-expectations"><span class="header-section-number">3.1.1</span> Conditional Expectations</a></li>
-  <li><a href="#example-education-and-wages" id="toc-example-education-and-wages" class="nav-link" data-scroll-target="#example-education-and-wages"><span class="header-section-number">3.1.2</span> Example: Education and Wages</a></li>
+  <li><a href="#conditional-expectations" id="toc-conditional-expectations" class="nav-link" data-scroll-target="#conditional-expectations"><span class="header-section-number">4.1.1</span> Conditional Expectations</a></li>
+  <li><a href="#example-education-and-wages" id="toc-example-education-and-wages" class="nav-link" data-scroll-target="#example-education-and-wages"><span class="header-section-number">4.1.2</span> Example: Education and Wages</a></li>
   </ul></li>
-  <li><a href="#the-population-regression-model" id="toc-the-population-regression-model" class="nav-link" data-scroll-target="#the-population-regression-model"><span class="header-section-number">3.2</span> The Population Regression Model</a>
+  <li><a href="#the-population-regression-model" id="toc-the-population-regression-model" class="nav-link" data-scroll-target="#the-population-regression-model"><span class="header-section-number">4.2</span> The Population Regression Model</a>
   <ul class="collapse">
-  <li><a href="#the-bivariate-model" id="toc-the-bivariate-model" class="nav-link" data-scroll-target="#the-bivariate-model"><span class="header-section-number">3.2.1</span> The Bivariate Model</a></li>
-  <li><a href="#connecting-to-conditional-expectations" id="toc-connecting-to-conditional-expectations" class="nav-link" data-scroll-target="#connecting-to-conditional-expectations"><span class="header-section-number">3.2.2</span> Connecting to Conditional Expectations</a></li>
-  <li><a href="#interpreting-the-coefficients" id="toc-interpreting-the-coefficients" class="nav-link" data-scroll-target="#interpreting-the-coefficients"><span class="header-section-number">3.2.3</span> Interpreting the Coefficients</a></li>
-  <li><a href="#example-education-and-wages-1" id="toc-example-education-and-wages-1" class="nav-link" data-scroll-target="#example-education-and-wages-1"><span class="header-section-number">3.2.4</span> Example: Education and Wages</a></li>
+  <li><a href="#the-bivariate-model" id="toc-the-bivariate-model" class="nav-link" data-scroll-target="#the-bivariate-model"><span class="header-section-number">4.2.1</span> The Bivariate Model</a></li>
+  <li><a href="#connecting-to-conditional-expectations" id="toc-connecting-to-conditional-expectations" class="nav-link" data-scroll-target="#connecting-to-conditional-expectations"><span class="header-section-number">4.2.2</span> Connecting to Conditional Expectations</a></li>
+  <li><a href="#interpreting-the-coefficients" id="toc-interpreting-the-coefficients" class="nav-link" data-scroll-target="#interpreting-the-coefficients"><span class="header-section-number">4.2.3</span> Interpreting the Coefficients</a></li>
+  <li><a href="#example-education-and-wages-1" id="toc-example-education-and-wages-1" class="nav-link" data-scroll-target="#example-education-and-wages-1"><span class="header-section-number">4.2.4</span> Example: Education and Wages</a></li>
   </ul></li>
-  <li><a href="#the-regression-line-predicted-values-and-residuals" id="toc-the-regression-line-predicted-values-and-residuals" class="nav-link" data-scroll-target="#the-regression-line-predicted-values-and-residuals"><span class="header-section-number">3.3</span> The Regression Line: Predicted Values and Residuals</a>
+  <li><a href="#the-regression-line-predicted-values-and-residuals" id="toc-the-regression-line-predicted-values-and-residuals" class="nav-link" data-scroll-target="#the-regression-line-predicted-values-and-residuals"><span class="header-section-number">4.3</span> The Regression Line: Predicted Values and Residuals</a>
   <ul class="collapse">
-  <li><a href="#fitted-values-and-the-regression-line" id="toc-fitted-values-and-the-regression-line" class="nav-link" data-scroll-target="#fitted-values-and-the-regression-line"><span class="header-section-number">3.3.1</span> Fitted Values and the Regression Line</a></li>
-  <li><a href="#residuals-the-prediction-errors" id="toc-residuals-the-prediction-errors" class="nav-link" data-scroll-target="#residuals-the-prediction-errors"><span class="header-section-number">3.3.2</span> Residuals: The Prediction Errors</a></li>
-  <li><a href="#a-numerical-example" id="toc-a-numerical-example" class="nav-link" data-scroll-target="#a-numerical-example"><span class="header-section-number">3.3.3</span> A Numerical Example</a></li>
-  <li><a href="#the-key-insight-minimize-the-residuals" id="toc-the-key-insight-minimize-the-residuals" class="nav-link" data-scroll-target="#the-key-insight-minimize-the-residuals"><span class="header-section-number">3.3.4</span> The Key Insight: Minimize the Residuals</a></li>
+  <li><a href="#fitted-values-and-the-regression-line" id="toc-fitted-values-and-the-regression-line" class="nav-link" data-scroll-target="#fitted-values-and-the-regression-line"><span class="header-section-number">4.3.1</span> Fitted Values and the Regression Line</a></li>
+  <li><a href="#residuals-the-prediction-errors" id="toc-residuals-the-prediction-errors" class="nav-link" data-scroll-target="#residuals-the-prediction-errors"><span class="header-section-number">4.3.2</span> Residuals: The Prediction Errors</a></li>
+  <li><a href="#a-numerical-example" id="toc-a-numerical-example" class="nav-link" data-scroll-target="#a-numerical-example"><span class="header-section-number">4.3.3</span> A Numerical Example</a></li>
+  <li><a href="#the-key-insight-minimize-the-residuals" id="toc-the-key-insight-minimize-the-residuals" class="nav-link" data-scroll-target="#the-key-insight-minimize-the-residuals"><span class="header-section-number">4.3.4</span> The Key Insight: Minimize the Residuals</a></li>
   </ul></li>
-  <li><a href="#deriving-the-ols-estimator" id="toc-deriving-the-ols-estimator" class="nav-link" data-scroll-target="#deriving-the-ols-estimator"><span class="header-section-number">3.4</span> Deriving the OLS Estimator</a>
+  <li><a href="#deriving-the-ols-estimator" id="toc-deriving-the-ols-estimator" class="nav-link" data-scroll-target="#deriving-the-ols-estimator"><span class="header-section-number">4.4</span> Deriving the OLS Estimator</a>
   <ul class="collapse">
-  <li><a href="#the-minimization-problem" id="toc-the-minimization-problem" class="nav-link" data-scroll-target="#the-minimization-problem"><span class="header-section-number">3.4.1</span> The Minimization Problem</a></li>
-  <li><a href="#first-order-conditions" id="toc-first-order-conditions" class="nav-link" data-scroll-target="#first-order-conditions"><span class="header-section-number">3.4.2</span> First-Order Conditions</a></li>
-  <li><a href="#solving-for-the-intercept" id="toc-solving-for-the-intercept" class="nav-link" data-scroll-target="#solving-for-the-intercept"><span class="header-section-number">3.4.3</span> Solving for the Intercept</a></li>
-  <li><a href="#solving-for-the-slope" id="toc-solving-for-the-slope" class="nav-link" data-scroll-target="#solving-for-the-slope"><span class="header-section-number">3.4.4</span> Solving for the Slope</a></li>
-  <li><a href="#confirming-its-a-minimum" id="toc-confirming-its-a-minimum" class="nav-link" data-scroll-target="#confirming-its-a-minimum"><span class="header-section-number">3.4.5</span> Confirming It’s a Minimum</a></li>
+  <li><a href="#the-minimization-problem" id="toc-the-minimization-problem" class="nav-link" data-scroll-target="#the-minimization-problem"><span class="header-section-number">4.4.1</span> The Minimization Problem</a></li>
+  <li><a href="#first-order-conditions" id="toc-first-order-conditions" class="nav-link" data-scroll-target="#first-order-conditions"><span class="header-section-number">4.4.2</span> First-Order Conditions</a></li>
+  <li><a href="#solving-for-the-intercept" id="toc-solving-for-the-intercept" class="nav-link" data-scroll-target="#solving-for-the-intercept"><span class="header-section-number">4.4.3</span> Solving for the Intercept</a></li>
+  <li><a href="#solving-for-the-slope" id="toc-solving-for-the-slope" class="nav-link" data-scroll-target="#solving-for-the-slope"><span class="header-section-number">4.4.4</span> Solving for the Slope</a></li>
+  <li><a href="#confirming-its-a-minimum" id="toc-confirming-its-a-minimum" class="nav-link" data-scroll-target="#confirming-its-a-minimum"><span class="header-section-number">4.4.5</span> Confirming It’s a Minimum</a></li>
   </ul></li>
-  <li><a href="#computing-ols-in-r" id="toc-computing-ols-in-r" class="nav-link" data-scroll-target="#computing-ols-in-r"><span class="header-section-number">3.5</span> Computing OLS in R</a>
+  <li><a href="#computing-ols-in-r" id="toc-computing-ols-in-r" class="nav-link" data-scroll-target="#computing-ols-in-r"><span class="header-section-number">4.5</span> Computing OLS in R</a>
   <ul class="collapse">
-  <li><a href="#basic-syntax" id="toc-basic-syntax" class="nav-link" data-scroll-target="#basic-syntax"><span class="header-section-number">3.5.1</span> Basic Syntax</a></li>
-  <li><a href="#example-mpg-and-horsepower" id="toc-example-mpg-and-horsepower" class="nav-link" data-scroll-target="#example-mpg-and-horsepower"><span class="header-section-number">3.5.2</span> Example: MPG and Horsepower</a></li>
+  <li><a href="#basic-syntax" id="toc-basic-syntax" class="nav-link" data-scroll-target="#basic-syntax"><span class="header-section-number">4.5.1</span> Basic Syntax</a></li>
+  <li><a href="#example-mpg-and-horsepower" id="toc-example-mpg-and-horsepower" class="nav-link" data-scroll-target="#example-mpg-and-horsepower"><span class="header-section-number">4.5.2</span> Example: MPG and Horsepower</a></li>
   </ul></li>
-  <li><a href="#goodness-of-fit-r-squared" id="toc-goodness-of-fit-r-squared" class="nav-link" data-scroll-target="#goodness-of-fit-r-squared"><span class="header-section-number">3.6</span> Goodness-of-Fit: R-Squared</a></li>
-  <li><a href="#the-gauss-markov-assumptions" id="toc-the-gauss-markov-assumptions" class="nav-link" data-scroll-target="#the-gauss-markov-assumptions"><span class="header-section-number">3.7</span> The Gauss-Markov Assumptions</a>
+  <li><a href="#goodness-of-fit-r-squared" id="toc-goodness-of-fit-r-squared" class="nav-link" data-scroll-target="#goodness-of-fit-r-squared"><span class="header-section-number">4.6</span> Goodness-of-Fit: R-Squared</a></li>
+  <li><a href="#the-gauss-markov-assumptions" id="toc-the-gauss-markov-assumptions" class="nav-link" data-scroll-target="#the-gauss-markov-assumptions"><span class="header-section-number">4.7</span> The Gauss-Markov Assumptions</a>
   <ul class="collapse">
-  <li><a href="#assumption-1-linear-in-parameters" id="toc-assumption-1-linear-in-parameters" class="nav-link" data-scroll-target="#assumption-1-linear-in-parameters"><span class="header-section-number">3.7.1</span> Assumption 1: Linear in Parameters</a></li>
-  <li><a href="#assumption-2-random-sampling" id="toc-assumption-2-random-sampling" class="nav-link" data-scroll-target="#assumption-2-random-sampling"><span class="header-section-number">3.7.2</span> Assumption 2: Random Sampling</a></li>
-  <li><a href="#assumption-3-variation-in-the-independent-variable" id="toc-assumption-3-variation-in-the-independent-variable" class="nav-link" data-scroll-target="#assumption-3-variation-in-the-independent-variable"><span class="header-section-number">3.7.3</span> Assumption 3: Variation in the Independent Variable</a></li>
-  <li><a href="#assumption-4-zero-conditional-mean" id="toc-assumption-4-zero-conditional-mean" class="nav-link" data-scroll-target="#assumption-4-zero-conditional-mean"><span class="header-section-number">3.7.4</span> Assumption 4: Zero Conditional Mean</a></li>
-  <li><a href="#assumption-5-homoskedasticity" id="toc-assumption-5-homoskedasticity" class="nav-link" data-scroll-target="#assumption-5-homoskedasticity"><span class="header-section-number">3.7.5</span> Assumption 5: Homoskedasticity</a></li>
-  <li><a href="#summary-which-assumptions-matter-for-what" id="toc-summary-which-assumptions-matter-for-what" class="nav-link" data-scroll-target="#summary-which-assumptions-matter-for-what"><span class="header-section-number">3.7.6</span> Summary: Which Assumptions Matter for What?</a></li>
+  <li><a href="#assumption-1-linear-in-parameters" id="toc-assumption-1-linear-in-parameters" class="nav-link" data-scroll-target="#assumption-1-linear-in-parameters"><span class="header-section-number">4.7.1</span> Assumption 1: Linear in Parameters</a></li>
+  <li><a href="#assumption-2-random-sampling" id="toc-assumption-2-random-sampling" class="nav-link" data-scroll-target="#assumption-2-random-sampling"><span class="header-section-number">4.7.2</span> Assumption 2: Random Sampling</a></li>
+  <li><a href="#assumption-3-variation-in-the-independent-variable" id="toc-assumption-3-variation-in-the-independent-variable" class="nav-link" data-scroll-target="#assumption-3-variation-in-the-independent-variable"><span class="header-section-number">4.7.3</span> Assumption 3: Variation in the Independent Variable</a></li>
+  <li><a href="#assumption-4-zero-conditional-mean" id="toc-assumption-4-zero-conditional-mean" class="nav-link" data-scroll-target="#assumption-4-zero-conditional-mean"><span class="header-section-number">4.7.4</span> Assumption 4: Zero Conditional Mean</a></li>
+  <li><a href="#assumption-5-homoskedasticity" id="toc-assumption-5-homoskedasticity" class="nav-link" data-scroll-target="#assumption-5-homoskedasticity"><span class="header-section-number">4.7.5</span> Assumption 5: Homoskedasticity</a></li>
+  <li><a href="#summary-which-assumptions-matter-for-what" id="toc-summary-which-assumptions-matter-for-what" class="nav-link" data-scroll-target="#summary-which-assumptions-matter-for-what"><span class="header-section-number">4.7.6</span> Summary: Which Assumptions Matter for What?</a></li>
   </ul></li>
-  <li><a href="#unbiasedness-of-ols" id="toc-unbiasedness-of-ols" class="nav-link" data-scroll-target="#unbiasedness-of-ols"><span class="header-section-number">3.8</span> Unbiasedness of OLS</a>
+  <li><a href="#unbiasedness-of-ols" id="toc-unbiasedness-of-ols" class="nav-link" data-scroll-target="#unbiasedness-of-ols"><span class="header-section-number">4.8</span> Unbiasedness of OLS</a>
   <ul class="collapse">
-  <li><a href="#population-parameters-vs.-sample-estimates" id="toc-population-parameters-vs.-sample-estimates" class="nav-link" data-scroll-target="#population-parameters-vs.-sample-estimates"><span class="header-section-number">3.8.1</span> Population Parameters vs.&nbsp;Sample Estimates</a></li>
-  <li><a href="#what-does-unbiasedness-mean" id="toc-what-does-unbiasedness-mean" class="nav-link" data-scroll-target="#what-does-unbiasedness-mean"><span class="header-section-number">3.8.2</span> What Does Unbiasedness Mean?</a></li>
-  <li><a href="#proof-sketch" id="toc-proof-sketch" class="nav-link" data-scroll-target="#proof-sketch"><span class="header-section-number">3.8.3</span> Proof Sketch</a></li>
-  <li><a href="#simulation-unbiasedness-in-action" id="toc-simulation-unbiasedness-in-action" class="nav-link" data-scroll-target="#simulation-unbiasedness-in-action"><span class="header-section-number">3.8.4</span> Simulation: Unbiasedness in Action</a></li>
+  <li><a href="#population-parameters-vs.-sample-estimates" id="toc-population-parameters-vs.-sample-estimates" class="nav-link" data-scroll-target="#population-parameters-vs.-sample-estimates"><span class="header-section-number">4.8.1</span> Population Parameters vs.&nbsp;Sample Estimates</a></li>
+  <li><a href="#what-does-unbiasedness-mean" id="toc-what-does-unbiasedness-mean" class="nav-link" data-scroll-target="#what-does-unbiasedness-mean"><span class="header-section-number">4.8.2</span> What Does Unbiasedness Mean?</a></li>
+  <li><a href="#proof-sketch" id="toc-proof-sketch" class="nav-link" data-scroll-target="#proof-sketch"><span class="header-section-number">4.8.3</span> Proof Sketch</a></li>
+  <li><a href="#simulation-unbiasedness-in-action" id="toc-simulation-unbiasedness-in-action" class="nav-link" data-scroll-target="#simulation-unbiasedness-in-action"><span class="header-section-number">4.8.4</span> Simulation: Unbiasedness in Action</a></li>
   </ul></li>
-  <li><a href="#omitted-variable-bias" id="toc-omitted-variable-bias" class="nav-link" data-scroll-target="#omitted-variable-bias"><span class="header-section-number">3.9</span> Omitted Variable Bias</a></li>
-  <li><a href="#unbiasedness-and-causality-why-this-all-matters" id="toc-unbiasedness-and-causality-why-this-all-matters" class="nav-link" data-scroll-target="#unbiasedness-and-causality-why-this-all-matters"><span class="header-section-number">3.10</span> Unbiasedness and Causality: Why This All Matters</a>
+  <li><a href="#omitted-variable-bias" id="toc-omitted-variable-bias" class="nav-link" data-scroll-target="#omitted-variable-bias"><span class="header-section-number">4.9</span> Omitted Variable Bias</a></li>
+  <li><a href="#unbiasedness-and-causality-why-this-all-matters" id="toc-unbiasedness-and-causality-why-this-all-matters" class="nav-link" data-scroll-target="#unbiasedness-and-causality-why-this-all-matters"><span class="header-section-number">4.10</span> Unbiasedness and Causality: Why This All Matters</a>
   <ul class="collapse">
-  <li><a href="#when-can-we-interpret-hatbeta_1-causally" id="toc-when-can-we-interpret-hatbeta_1-causally" class="nav-link" data-scroll-target="#when-can-we-interpret-hatbeta_1-causally"><span class="header-section-number">3.10.1</span> When Can We Interpret <span class="math inline">\(\hat{\beta}_1\)</span> Causally?</a></li>
-  <li><a href="#correlation-vs.-causation-revisited" id="toc-correlation-vs.-causation-revisited" class="nav-link" data-scroll-target="#correlation-vs.-causation-revisited"><span class="header-section-number">3.10.2</span> Correlation vs.&nbsp;Causation, Revisited</a></li>
+  <li><a href="#when-can-we-interpret-hatbeta_1-causally" id="toc-when-can-we-interpret-hatbeta_1-causally" class="nav-link" data-scroll-target="#when-can-we-interpret-hatbeta_1-causally"><span class="header-section-number">4.10.1</span> When Can We Interpret <span class="math inline">\(\hat{\beta}_1\)</span> Causally?</a></li>
+  <li><a href="#correlation-vs.-causation-revisited" id="toc-correlation-vs.-causation-revisited" class="nav-link" data-scroll-target="#correlation-vs.-causation-revisited"><span class="header-section-number">4.10.2</span> Correlation vs.&nbsp;Causation, Revisited</a></li>
   </ul></li>
-  <li><a href="#variance-of-the-ols-estimator" id="toc-variance-of-the-ols-estimator" class="nav-link" data-scroll-target="#variance-of-the-ols-estimator"><span class="header-section-number">3.11</span> Variance of the OLS Estimator</a></li>
-  <li><a href="#standard-errors" id="toc-standard-errors" class="nav-link" data-scroll-target="#standard-errors"><span class="header-section-number">3.12</span> Standard Errors</a></li>
-  <li><a href="#ols-is-blue" id="toc-ols-is-blue" class="nav-link" data-scroll-target="#ols-is-blue"><span class="header-section-number">3.13</span> OLS is BLUE</a></li>
-  <li><a href="#summary-and-conclusion" id="toc-summary-and-conclusion" class="nav-link" data-scroll-target="#summary-and-conclusion"><span class="header-section-number">3.14</span> Summary and Conclusion</a>
+  <li><a href="#variance-of-the-ols-estimator" id="toc-variance-of-the-ols-estimator" class="nav-link" data-scroll-target="#variance-of-the-ols-estimator"><span class="header-section-number">4.11</span> Variance of the OLS Estimator</a></li>
+  <li><a href="#standard-errors" id="toc-standard-errors" class="nav-link" data-scroll-target="#standard-errors"><span class="header-section-number">4.12</span> Standard Errors</a></li>
+  <li><a href="#ols-is-blue" id="toc-ols-is-blue" class="nav-link" data-scroll-target="#ols-is-blue"><span class="header-section-number">4.13</span> OLS is BLUE</a></li>
+  <li><a href="#summary-and-conclusion" id="toc-summary-and-conclusion" class="nav-link" data-scroll-target="#summary-and-conclusion"><span class="header-section-number">4.14</span> Summary and Conclusion</a>
   <ul class="collapse">
-  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">3.14.1</span> Key Takeaways</a></li>
+  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">4.14.1</span> Key Takeaways</a></li>
   </ul></li>
-  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">3.15</span> Check Your Understanding</a>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">4.15</span> Check Your Understanding</a>
   <ul class="collapse">
-  <li><a href="#practice-interpreting-regression-output" id="toc-practice-interpreting-regression-output" class="nav-link" data-scroll-target="#practice-interpreting-regression-output"><span class="header-section-number">3.15.1</span> Practice: Interpreting Regression Output</a></li>
+  <li><a href="#practice-interpreting-regression-output" id="toc-practice-interpreting-regression-output" class="nav-link" data-scroll-target="#practice-interpreting-regression-output"><span class="header-section-number">4.15.1</span> Practice: Interpreting Regression Output</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -357,7 +363,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span id="sec-ols" class="quarto-section-identifier"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Bivariate Regression and Ordinary Least Squares</span></span></h1>
+<h1 class="title"><span id="sec-ols" class="quarto-section-identifier"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Bivariate Regression and Ordinary Least Squares</span></span></h1>
 </div>
 
 
@@ -497,22 +503,22 @@ function checkAnswer(selectElement, correctValue) {
 </div>
 </div>
 </div>
-<p>In <a href="unit2.html" class="quarto-xref"><span>Chapter 2</span></a>, we learned that randomized control trials provide the gold standard for causal inference by eliminating selection bias through random assignment. But most economic questions cannot be answered with experiments. We typically work with observational data where “treatment” is not randomly assigned. This chapter introduces <strong>Ordinary Least Squares (OLS)</strong> regression, the workhorse tool of econometrics. We focus here on the <strong>bivariate</strong> case—a single independent variable—to build intuition before extending to multiple variables.</p>
-<section id="modeling-relationships-between-variables" class="level2" data-number="3.1">
-<h2 data-number="3.1" class="anchored" data-anchor-id="modeling-relationships-between-variables"><span class="header-section-number">3.1</span> Modeling Relationships Between Variables</h2>
+<p>In <a href="unit2.html" class="quarto-xref"><span>Chapter 3</span></a>, we learned that randomized control trials provide the gold standard for causal inference by eliminating selection bias through random assignment. But most economic questions cannot be answered with experiments. We typically work with observational data where “treatment” is not randomly assigned. This chapter introduces <strong>Ordinary Least Squares (OLS)</strong> regression, the workhorse tool of econometrics. We focus here on the <strong>bivariate</strong> case—a single independent variable—to build intuition before extending to multiple variables.</p>
+<section id="modeling-relationships-between-variables" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="modeling-relationships-between-variables"><span class="header-section-number">4.1</span> Modeling Relationships Between Variables</h2>
 <p>Suppose we have two variables, <span class="math inline">\(y\)</span> and <span class="math inline">\(x\)</span>. In econometrics, we are often interested in one of several related goals: estimating the <strong>causal effect</strong> of <span class="math inline">\(x\)</span> on <span class="math inline">\(y\)</span>, explaining variation in <span class="math inline">\(y\)</span> using <span class="math inline">\(x\)</span>, or simply describing how <span class="math inline">\(y\)</span> varies with <span class="math inline">\(x\)</span>. OLS is a tool that can help with all of these—though as we’ll see, whether we can interpret results causally depends on assumptions that may or may not hold.</p>
 <p>But what do we even <em>mean</em> when we say we want to study “how <span class="math inline">\(x\)</span> is related to <span class="math inline">\(y\)</span>”? We need a precise, mathematical way to operationalize this question. The most straightforward approach is to ask: what is the <em>average</em> value of <span class="math inline">\(y\)</span> for each different value that <span class="math inline">\(x\)</span> can take?</p>
 <p>Consider some examples. How can we quantify the gender pay gap? We compare the <em>average</em> wage for men versus women. How do we measure the returns to education? We compare the <em>average</em> wage of people with different levels of education. In both cases, we are asking about how the average of one variable changes across values of another.</p>
-<section id="conditional-expectations" class="level3" data-number="3.1.1">
-<h3 data-number="3.1.1" class="anchored" data-anchor-id="conditional-expectations"><span class="header-section-number">3.1.1</span> Conditional Expectations</h3>
+<section id="conditional-expectations" class="level3" data-number="4.1.1">
+<h3 data-number="4.1.1" class="anchored" data-anchor-id="conditional-expectations"><span class="header-section-number">4.1.1</span> Conditional Expectations</h3>
 <p>This idea of finding “the average value of <span class="math inline">\(y\)</span> for a given value of <span class="math inline">\(x\)</span>” is exactly what we call the <strong>conditional expectation</strong>. Formally, the conditional expectation of <span class="math inline">\(y\)</span> given <span class="math inline">\(x\)</span> is written as:</p>
 <p><span class="math display">\[
 E[Y | X = x]
 \]</span></p>
 <p>This notation asks: if we knew that <span class="math inline">\(X\)</span> took on some specific value <span class="math inline">\(x\)</span>, what would we expect <span class="math inline">\(Y\)</span> to be, on average? The conditional expectation is often the central quantity we want to model and estimate in econometrics.</p>
 </section>
-<section id="example-education-and-wages" class="level3" data-number="3.1.2">
-<h3 data-number="3.1.2" class="anchored" data-anchor-id="example-education-and-wages"><span class="header-section-number">3.1.2</span> Example: Education and Wages</h3>
+<section id="example-education-and-wages" class="level3" data-number="4.1.2">
+<h3 data-number="4.1.2" class="anchored" data-anchor-id="example-education-and-wages"><span class="header-section-number">4.1.2</span> Example: Education and Wages</h3>
 <p>Suppose <span class="math inline">\(X\)</span> represents education level, which can take values <span class="math inline">\(X = \{\text{hsdeg}, \text{colldeg}, \text{profdeg}\}\)</span> (high school degree, college degree, professional degree), and <span class="math inline">\(Y\)</span> represents hourly wage.</p>
 <p>For each education level, we can compute the average wage among people in that group. This will gives us a good idea of how wages are related to education.</p>
 <div class="cell">
@@ -520,7 +526,7 @@ E[Y | X = x]
 <div id="fig-cond-exp-example" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-cond-exp-example-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3.1: Wages by education level. Each point represents an individual. Red points show the conditional expectation (average wage) for each education group.
+Figure&nbsp;4.1: Wages by education level. Each point represents an individual. Red points show the conditional expectation (average wage) for each education group.
 </figcaption>
 <div aria-describedby="fig-cond-exp-example-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="unit3_files/figure-html/fig-cond-exp-example-1.png" class="img-fluid figure-img" style="width:80.0%">
@@ -529,19 +535,19 @@ Figure&nbsp;3.1: Wages by education level. Each point represents an individual. 
 </div>
 </div>
 </div>
-<p><a href="#fig-cond-exp-example" class="quarto-xref">Figure&nbsp;<span>3.1</span></a> is a scatterplot with an indiviudal’s wage on the y-axis and their education level on the x-axis, with each point plotted in blue. The red points in <a href="#fig-cond-exp-example" class="quarto-xref">Figure&nbsp;<span>3.1</span></a> show the conditional expectations—the average wage for individuals <em>within each education category,</em> i.e., <span class="math inline">\(E[Y|X=HS], E[Y|X=College], \text{and} E[Y|X=Prof]\)</span>.</p>
+<p><a href="#fig-cond-exp-example" class="quarto-xref">Figure&nbsp;<span>4.1</span></a> is a scatterplot with an indiviudal’s wage on the y-axis and their education level on the x-axis, with each point plotted in blue. The red points in <a href="#fig-cond-exp-example" class="quarto-xref">Figure&nbsp;<span>4.1</span></a> show the conditional expectations—the average wage for individuals <em>within each education category,</em> i.e., <span class="math inline">\(E[Y|X=HS], E[Y|X=College], \text{and} E[Y|X=Prof]\)</span>.</p>
 <p>These averages tell us how we can expect wages to change when we increase education, which is precisely what we set out to measure.</p>
 </section>
 </section>
-<section id="the-population-regression-model" class="level2" data-number="3.2">
-<h2 data-number="3.2" class="anchored" data-anchor-id="the-population-regression-model"><span class="header-section-number">3.2</span> The Population Regression Model</h2>
+<section id="the-population-regression-model" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="the-population-regression-model"><span class="header-section-number">4.2</span> The Population Regression Model</h2>
 <p>Now that we understand what we want to estimate (the conditional expectation), we need a framework for <em>how</em> to estimate it. Before we can estimate anything, we must first describe the underlying relationship we believe exists in the population.</p>
-<section id="the-bivariate-model" class="level3" data-number="3.2.1">
-<h3 data-number="3.2.1" class="anchored" data-anchor-id="the-bivariate-model"><span class="header-section-number">3.2.1</span> The Bivariate Model</h3>
+<section id="the-bivariate-model" class="level3" data-number="4.2.1">
+<h3 data-number="4.2.1" class="anchored" data-anchor-id="the-bivariate-model"><span class="header-section-number">4.2.1</span> The Bivariate Model</h3>
 <p>The simplest specification is called the <strong>bivariate</strong> (or simple) regression model:</p>
 <p><span id="eq-pop-reg"><span class="math display">\[
 y = \beta_0 + \beta_1 x + \mu
-\tag{3.1}\]</span></span></p>
+\tag{4.1}\]</span></span></p>
 <p>where:</p>
 <ul>
 <li><span class="math inline">\(y\)</span> is the <strong>dependent variable</strong> (also called the explained, response, or outcome variable)</li>
@@ -563,17 +569,17 @@ The Error Term
 </div>
 </div>
 </section>
-<section id="connecting-to-conditional-expectations" class="level3" data-number="3.2.2">
-<h3 data-number="3.2.2" class="anchored" data-anchor-id="connecting-to-conditional-expectations"><span class="header-section-number">3.2.2</span> Connecting to Conditional Expectations</h3>
+<section id="connecting-to-conditional-expectations" class="level3" data-number="4.2.2">
+<h3 data-number="4.2.2" class="anchored" data-anchor-id="connecting-to-conditional-expectations"><span class="header-section-number">4.2.2</span> Connecting to Conditional Expectations</h3>
 <p>How does this regression model relate to our goal of estimating <span class="math inline">\(E[Y|X]\)</span>? If we assume that the error term has mean zero conditional on <span class="math inline">\(x\)</span>—that is, <span class="math inline">\(E[\mu | x] = 0\)</span>—then:</p>
 <p><span class="math display">\[
 E[y | x] = E[\beta_0 + \beta_1 x + \mu | x] = \beta_0 + \beta_1 x + E[\mu | x] = \beta_0 + \beta_1 x
 \]</span></p>
 <p>This is exactly the conditional expectation we set out to estimate! The regression line <span class="math inline">\(\beta_0 + \beta_1 x\)</span> traces out the average value of <span class="math inline">\(y\)</span> for each value of <span class="math inline">\(x\)</span>.</p>
 </section>
-<section id="interpreting-the-coefficients" class="level3" data-number="3.2.3">
-<h3 data-number="3.2.3" class="anchored" data-anchor-id="interpreting-the-coefficients"><span class="header-section-number">3.2.3</span> Interpreting the Coefficients</h3>
-<p>The coefficients in <a href="#eq-pop-reg" class="quarto-xref">Equation&nbsp;<span>3.1</span></a> have specific interpretations:</p>
+<section id="interpreting-the-coefficients" class="level3" data-number="4.2.3">
+<h3 data-number="4.2.3" class="anchored" data-anchor-id="interpreting-the-coefficients"><span class="header-section-number">4.2.3</span> Interpreting the Coefficients</h3>
+<p>The coefficients in <a href="#eq-pop-reg" class="quarto-xref">Equation&nbsp;<span>4.1</span></a> have specific interpretations:</p>
 <ul>
 <li><p><strong><span class="math inline">\(\beta_0\)</span> (the intercept):</strong> The predicted value of <span class="math inline">\(y\)</span> when <span class="math inline">\(x = 0\)</span>. Depending on the context, this may or may not have a meaningful interpretation.</p></li>
 <li><p><strong><span class="math inline">\(\beta_1\)</span> (the slope):</strong> The <strong>marginal effect</strong> of <span class="math inline">\(x\)</span> on <span class="math inline">\(y\)</span>. Mathematically, it is the derivative:</p></li>
@@ -583,8 +589,8 @@ E[y | x] = E[\beta_0 + \beta_1 x + \mu | x] = \beta_0 + \beta_1 x + E[\mu | x] =
 \]</span></p>
 <p>This tells us: when <span class="math inline">\(x\)</span> increases by one unit, <span class="math inline">\(y\)</span> changes by <span class="math inline">\(\beta_1\)</span> units, on average.</p>
 </section>
-<section id="example-education-and-wages-1" class="level3" data-number="3.2.4">
-<h3 data-number="3.2.4" class="anchored" data-anchor-id="example-education-and-wages-1"><span class="header-section-number">3.2.4</span> Example: Education and Wages</h3>
+<section id="example-education-and-wages-1" class="level3" data-number="4.2.4">
+<h3 data-number="4.2.4" class="anchored" data-anchor-id="example-education-and-wages-1"><span class="header-section-number">4.2.4</span> Example: Education and Wages</h3>
 <p>A regression model relating years of education to hourly wages might be:</p>
 <p><span class="math display">\[
 wage = \beta_0 + \beta_1 \cdot educ + \mu
@@ -593,20 +599,20 @@ wage = \beta_0 + \beta_1 \cdot educ + \mu
 <p>If <span class="math inline">\(\beta_1 = 2.50\)</span>, this would mean that each additional year of education is associated with $2.50 higher hourly wages, on average.</p>
 </section>
 </section>
-<section id="the-regression-line-predicted-values-and-residuals" class="level2" data-number="3.3">
-<h2 data-number="3.3" class="anchored" data-anchor-id="the-regression-line-predicted-values-and-residuals"><span class="header-section-number">3.3</span> The Regression Line: Predicted Values and Residuals</h2>
+<section id="the-regression-line-predicted-values-and-residuals" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="the-regression-line-predicted-values-and-residuals"><span class="header-section-number">4.3</span> The Regression Line: Predicted Values and Residuals</h2>
 <p>The entire goal of linear regression is to use our <em>sample</em> of the data from the wider <em>population</em> to estimate the values of <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> that are the best possible estimates we can generate. We call these estimates <span class="math inline">\(\hat{\beta_0}\)</span> and <span class="math inline">\(\hat{\beta_1}\)</span>, and the method we use to calculate these estimates the <strong>estimator</strong>.</p>
 <p>Before we derive estimators for <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span>, let’s introduce some key concepts that will guide our approach.</p>
-<section id="fitted-values-and-the-regression-line" class="level3" data-number="3.3.1">
-<h3 data-number="3.3.1" class="anchored" data-anchor-id="fitted-values-and-the-regression-line"><span class="header-section-number">3.3.1</span> Fitted Values and the Regression Line</h3>
+<section id="fitted-values-and-the-regression-line" class="level3" data-number="4.3.1">
+<h3 data-number="4.3.1" class="anchored" data-anchor-id="fitted-values-and-the-regression-line"><span class="header-section-number">4.3.1</span> Fitted Values and the Regression Line</h3>
 <p>Once we have estimates <span class="math inline">\(\hat{\beta}_0\)</span> and <span class="math inline">\(\hat{\beta}_1\)</span>, we can construct the <strong>OLS regression line</strong> (or fitted line):</p>
 <p><span class="math display">\[
 \hat{y} = \hat{\beta}_0 + \hat{\beta}_1 x
 \]</span></p>
 <p>For any value of <span class="math inline">\(x\)</span>, this line gives us <span class="math inline">\(\hat{y}\)</span>, the <strong>predicted value</strong> (or <strong>fitted value</strong>) of <span class="math inline">\(y\)</span>. The regression line represents our best guess for the average value of <span class="math inline">\(y\)</span> at each level of <span class="math inline">\(x\)</span>.</p>
 </section>
-<section id="residuals-the-prediction-errors" class="level3" data-number="3.3.2">
-<h3 data-number="3.3.2" class="anchored" data-anchor-id="residuals-the-prediction-errors"><span class="header-section-number">3.3.2</span> Residuals: The Prediction Errors</h3>
+<section id="residuals-the-prediction-errors" class="level3" data-number="4.3.2">
+<h3 data-number="4.3.2" class="anchored" data-anchor-id="residuals-the-prediction-errors"><span class="header-section-number">4.3.2</span> Residuals: The Prediction Errors</h3>
 <p>Of course, our predictions won’t be perfect. The <strong>residual</strong> for observation <span class="math inline">\(i\)</span> is the difference between the actual value and the predicted value:</p>
 <p><span class="math display">\[
 \hat{\mu}_i = y_i - \hat{y}_i = y_i - (\hat{\beta}_0 + \hat{\beta}_1 x_i)
@@ -617,7 +623,7 @@ wage = \beta_0 + \beta_1 \cdot educ + \mu
 <div id="fig-regression-components" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-regression-components-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3.2: Components of the regression line. Black points show actual values, the blue line shows predicted values, and the salmon segment illustrates a residual.
+Figure&nbsp;4.2: Components of the regression line. Black points show actual values, the blue line shows predicted values, and the salmon segment illustrates a residual.
 </figcaption>
 <div aria-describedby="fig-regression-components-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="unit3_files/figure-html/fig-regression-components-1.png" class="img-fluid figure-img" width="672">
@@ -627,14 +633,14 @@ Figure&nbsp;3.2: Components of the regression line. Black points show actual val
 </div>
 </div>
 </section>
-<section id="a-numerical-example" class="level3" data-number="3.3.3">
-<h3 data-number="3.3.3" class="anchored" data-anchor-id="a-numerical-example"><span class="header-section-number">3.3.3</span> A Numerical Example</h3>
+<section id="a-numerical-example" class="level3" data-number="4.3.3">
+<h3 data-number="4.3.3" class="anchored" data-anchor-id="a-numerical-example"><span class="header-section-number">4.3.3</span> A Numerical Example</h3>
 <p>Let’s see these concepts with actual numbers. The table below shows the first six observations from a regression of MPG on horsepower, along with the predicted values and residuals:</p>
 <div class="cell">
 <div id="tbl-regression-example" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-regression-example-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;3.1: Example regression data showing actual values, predicted values, and residuals.
+Table&nbsp;4.1: Example regression data showing actual values, predicted values, and residuals.
 </figcaption>
 <div aria-describedby="tbl-regression-example-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
@@ -707,8 +713,8 @@ Table&nbsp;3.1: Example regression data showing actual values, predicted values,
 </div>
 <p>Notice how the residual column equals the actual value minus the predicted value. For the first observation, the car has 110 horsepower and gets 21 MPG. Our regression predicts it should get about 22.59 MPG, so the residual is <span class="math inline">\(21 - 22.59 = -1.59\)</span>. The negative residual means we <em>overpredicted</em>—the car actually gets slightly worse fuel economy than our model predicted.</p>
 </section>
-<section id="the-key-insight-minimize-the-residuals" class="level3" data-number="3.3.4">
-<h3 data-number="3.3.4" class="anchored" data-anchor-id="the-key-insight-minimize-the-residuals"><span class="header-section-number">3.3.4</span> The Key Insight: Minimize the Residuals</h3>
+<section id="the-key-insight-minimize-the-residuals" class="level3" data-number="4.3.4">
+<h3 data-number="4.3.4" class="anchored" data-anchor-id="the-key-insight-minimize-the-residuals"><span class="header-section-number">4.3.4</span> The Key Insight: Minimize the Residuals</h3>
 <p>Here’s the crucial idea: we want to choose <span class="math inline">\(\hat{\beta}_0\)</span> and <span class="math inline">\(\hat{\beta}_1\)</span> so that our predictions are as good as possible. In other words, we want to make the residuals as small as possible.</p>
 <p>But we can’t simply minimize the sum of residuals <span class="math inline">\(\sum \hat{\mu}_i\)</span>, because positive and negative residuals would cancel out. Instead, we minimize the <strong>Sum of Squared Residuals (SSR)</strong>:</p>
 <p><span class="math display">\[
@@ -717,19 +723,19 @@ SSR = \sum_{i=1}^{n} \hat{\mu}_i^2 = \sum_{i=1}^{n} (y_i - \hat{\beta}_0 - \hat{
 <p>This is exactly where the name “Ordinary Least Squares” comes from: we find the estimates that make the sum of squared residuals as small as possible.</p>
 </section>
 </section>
-<section id="deriving-the-ols-estimator" class="level2" data-number="3.4">
-<h2 data-number="3.4" class="anchored" data-anchor-id="deriving-the-ols-estimator"><span class="header-section-number">3.4</span> Deriving the OLS Estimator</h2>
+<section id="deriving-the-ols-estimator" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="deriving-the-ols-estimator"><span class="header-section-number">4.4</span> Deriving the OLS Estimator</h2>
 <p>Now we turn to the mechanics of estimation. The <strong>population</strong> regression model describes the true relationship, but we never observe the entire population or the true values of <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span>. Instead, we have a <strong>sample</strong> of data and must <em>estimate</em> the population parameters.</p>
-<section id="the-minimization-problem" class="level3" data-number="3.4.1">
-<h3 data-number="3.4.1" class="anchored" data-anchor-id="the-minimization-problem"><span class="header-section-number">3.4.1</span> The Minimization Problem</h3>
+<section id="the-minimization-problem" class="level3" data-number="4.4.1">
+<h3 data-number="4.4.1" class="anchored" data-anchor-id="the-minimization-problem"><span class="header-section-number">4.4.1</span> The Minimization Problem</h3>
 <p>Suppose we have a sample of <span class="math inline">\(n\)</span> observations, <span class="math inline">\(\{(x_i, y_i): i = 1, 2, ..., n\}\)</span>. As discussed above, we want to find the values of <span class="math inline">\(\hat{\beta}_0\)</span> and <span class="math inline">\(\hat{\beta}_1\)</span> that minimize the sum of squared residuals:</p>
 <p><span class="math display">\[
 \min_{\hat{\beta}_0, \hat{\beta}_1} \sum_{i=1}^{n} (y_i - \hat{\beta}_0 - \hat{\beta}_1 x_i)^2
 \]</span></p>
 <p>This is a calculus optimization problem! The SSR is a function of two unknowns (<span class="math inline">\(\hat{\beta}_0\)</span> and <span class="math inline">\(\hat{\beta}_1\)</span>), and we want to find the values that minimize it.</p>
 </section>
-<section id="first-order-conditions" class="level3" data-number="3.4.2">
-<h3 data-number="3.4.2" class="anchored" data-anchor-id="first-order-conditions"><span class="header-section-number">3.4.2</span> First-Order Conditions</h3>
+<section id="first-order-conditions" class="level3" data-number="4.4.2">
+<h3 data-number="4.4.2" class="anchored" data-anchor-id="first-order-conditions"><span class="header-section-number">4.4.2</span> First-Order Conditions</h3>
 <p>To find the minimum, we take partial derivatives with respect to each parameter, set them equal to zero, and solve. These are called the <strong>first-order conditions</strong>.</p>
 <p><strong>Partial derivative with respect to <span class="math inline">\(\hat{\beta}_0\)</span>:</strong></p>
 <p><span class="math display">\[
@@ -748,8 +754,8 @@ SSR = \sum_{i=1}^{n} \hat{\mu}_i^2 = \sum_{i=1}^{n} (y_i - \hat{\beta}_0 - \hat{
 \sum_{i=1}^{n} x_i(y_i - \hat{\beta}_0 - \hat{\beta}_1 x_i) = 0
 \]</span></p>
 </section>
-<section id="solving-for-the-intercept" class="level3" data-number="3.4.3">
-<h3 data-number="3.4.3" class="anchored" data-anchor-id="solving-for-the-intercept"><span class="header-section-number">3.4.3</span> Solving for the Intercept</h3>
+<section id="solving-for-the-intercept" class="level3" data-number="4.4.3">
+<h3 data-number="4.4.3" class="anchored" data-anchor-id="solving-for-the-intercept"><span class="header-section-number">4.4.3</span> Solving for the Intercept</h3>
 <p>From the first condition, distributing the summation:</p>
 <p><span class="math display">\[
 \sum_{i=1}^{n} y_i - n\hat{\beta}_0 - \hat{\beta}_1 \sum_{i=1}^{n} x_i = 0
@@ -761,12 +767,12 @@ SSR = \sum_{i=1}^{n} \hat{\mu}_i^2 = \sum_{i=1}^{n} (y_i - \hat{\beta}_0 - \hat{
 <p>Solving for the intercept:</p>
 <p><span id="eq-b0-formula"><span class="math display">\[
 \hat{\beta}_0 = \bar{y} - \hat{\beta}_1 \bar{x}
-\tag{3.2}\]</span></span></p>
+\tag{4.2}\]</span></span></p>
 <p>This tells us that the regression line always passes through the point <span class="math inline">\((\bar{x}, \bar{y})\)</span>—the “center” of the data.</p>
 </section>
-<section id="solving-for-the-slope" class="level3" data-number="3.4.4">
-<h3 data-number="3.4.4" class="anchored" data-anchor-id="solving-for-the-slope"><span class="header-section-number">3.4.4</span> Solving for the Slope</h3>
-<p>Substituting <a href="#eq-b0-formula" class="quarto-xref">Equation&nbsp;<span>3.2</span></a> into the second first-order condition and working through the algebra (using summation properties from <a href="statsreview.html" class="quarto-xref"><span>Appendix B</span></a>):</p>
+<section id="solving-for-the-slope" class="level3" data-number="4.4.4">
+<h3 data-number="4.4.4" class="anchored" data-anchor-id="solving-for-the-slope"><span class="header-section-number">4.4.4</span> Solving for the Slope</h3>
+<p>Substituting <a href="#eq-b0-formula" class="quarto-xref">Equation&nbsp;<span>4.2</span></a> into the second first-order condition and working through the algebra (using summation properties from <a href="statsreview.html" class="quarto-xref"><span>Appendix B</span></a>):</p>
 <p><span class="math display">\[
 \sum_{i=1}^{n} x_i[y_i - (\bar{y} - \hat{\beta}_1\bar{x}) - \hat{\beta}_1 x_i] = 0
 \]</span></p>
@@ -781,10 +787,10 @@ SSR = \sum_{i=1}^{n} \hat{\mu}_i^2 = \sum_{i=1}^{n} (y_i - \hat{\beta}_0 - \hat{
 <p>Solving for <span class="math inline">\(\hat{\beta}_1\)</span>:</p>
 <p><span id="eq-b1-formula"><span class="math display">\[
 \hat{\beta}_1 = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{\sum_{i=1}^{n}(x_i - \bar{x})^2}
-\tag{3.3}\]</span></span></p>
+\tag{4.3}\]</span></span></p>
 </section>
-<section id="confirming-its-a-minimum" class="level3" data-number="3.4.5">
-<h3 data-number="3.4.5" class="anchored" data-anchor-id="confirming-its-a-minimum"><span class="header-section-number">3.4.5</span> Confirming It’s a Minimum</h3>
+<section id="confirming-its-a-minimum" class="level3" data-number="4.4.5">
+<h3 data-number="4.4.5" class="anchored" data-anchor-id="confirming-its-a-minimum"><span class="header-section-number">4.4.5</span> Confirming It’s a Minimum</h3>
 <p>How do we know this critical point is a minimum rather than a maximum? We check the second-order conditions. The second partial derivative of SSR with respect to <span class="math inline">\(\hat{\beta}_1\)</span> is:</p>
 <p><span class="math display">\[
 \frac{\partial^2 SSR}{\partial \hat{\beta}_1^2} = 2\sum_{i=1}^{n} x_i^2 &gt; 0
@@ -812,19 +818,19 @@ The OLS Slope Formula
 <p>This last expression reveals something important: bivariate OLS is essentially a scaled version of the correlation between <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>. And as we discussed in <a href="intro.html" class="quarto-xref"><span>Chapter 1</span></a>, correlation does not imply causation! We must be very careful about interpreting bivariate OLS results causally.</p>
 </section>
 </section>
-<section id="computing-ols-in-r" class="level2" data-number="3.5">
-<h2 data-number="3.5" class="anchored" data-anchor-id="computing-ols-in-r"><span class="header-section-number">3.5</span> Computing OLS in R</h2>
+<section id="computing-ols-in-r" class="level2" data-number="4.5">
+<h2 data-number="4.5" class="anchored" data-anchor-id="computing-ols-in-r"><span class="header-section-number">4.5</span> Computing OLS in R</h2>
 <p>While we derived the formulas by hand, in practice we use software to compute OLS estimates. In R, the <code>lm()</code> function (for “linear model”) performs OLS regression.</p>
-<section id="basic-syntax" class="level3" data-number="3.5.1">
-<h3 data-number="3.5.1" class="anchored" data-anchor-id="basic-syntax"><span class="header-section-number">3.5.1</span> Basic Syntax</h3>
+<section id="basic-syntax" class="level3" data-number="4.5.1">
+<h3 data-number="4.5.1" class="anchored" data-anchor-id="basic-syntax"><span class="header-section-number">4.5.1</span> Basic Syntax</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># General syntax</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">lm</span>(y <span class="sc">~</span> x, <span class="at">data =</span> your_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The formula <code>y ~ x</code> specifies that <span class="math inline">\(y\)</span> is the dependent variable and <span class="math inline">\(x\)</span> is the independent variable. An intercept is included by default.</p>
 </section>
-<section id="example-mpg-and-horsepower" class="level3" data-number="3.5.2">
-<h3 data-number="3.5.2" class="anchored" data-anchor-id="example-mpg-and-horsepower"><span class="header-section-number">3.5.2</span> Example: MPG and Horsepower</h3>
+<section id="example-mpg-and-horsepower" class="level3" data-number="4.5.2">
+<h3 data-number="4.5.2" class="anchored" data-anchor-id="example-mpg-and-horsepower"><span class="header-section-number">4.5.2</span> Example: MPG and Horsepower</h3>
 <p>Let’s estimate the relationship between fuel efficiency (MPG) and engine horsepower using the built-in <code>mtcars</code> dataset:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the data</span></span>
@@ -859,8 +865,8 @@ F-statistic: 45.46 on 1 and 30 DF,  p-value: 1.788e-07</code></pre>
 <p>The output shows our estimates: <span class="math inline">\(\hat{\beta}_0 = 30.10\)</span> and <span class="math inline">\(\hat{\beta}_1 = -0.07\)</span>. The slope suggests that each additional unit of horsepower is associated with about 0.07 fewer miles per gallon.</p>
 </section>
 </section>
-<section id="goodness-of-fit-r-squared" class="level2" data-number="3.6">
-<h2 data-number="3.6" class="anchored" data-anchor-id="goodness-of-fit-r-squared"><span class="header-section-number">3.6</span> Goodness-of-Fit: R-Squared</h2>
+<section id="goodness-of-fit-r-squared" class="level2" data-number="4.6">
+<h2 data-number="4.6" class="anchored" data-anchor-id="goodness-of-fit-r-squared"><span class="header-section-number">4.6</span> Goodness-of-Fit: R-Squared</h2>
 <p>How well does our regression line fit the data? The <strong>R-squared</strong> (<span class="math inline">\(R^2\)</span>) provides one measure of goodness-of-fit.</p>
 <p>Define:</p>
 <ul>
@@ -887,12 +893,12 @@ Interpreting R-Squared
 </div>
 </div>
 </section>
-<section id="the-gauss-markov-assumptions" class="level2" data-number="3.7">
-<h2 data-number="3.7" class="anchored" data-anchor-id="the-gauss-markov-assumptions"><span class="header-section-number">3.7</span> The Gauss-Markov Assumptions</h2>
+<section id="the-gauss-markov-assumptions" class="level2" data-number="4.7">
+<h2 data-number="4.7" class="anchored" data-anchor-id="the-gauss-markov-assumptions"><span class="header-section-number">4.7</span> The Gauss-Markov Assumptions</h2>
 <p>We’ve derived the OLS formulas, but how do we know if the estimates are any good? The formulas will always give us <em>some</em> numbers, but whether those numbers have useful statistical properties depends on certain conditions being met.</p>
 <p>The <strong>Gauss-Markov assumptions</strong> are a set of conditions under which OLS has desirable properties. Understanding these assumptions is crucial: they tell us when we can trust our estimates and when we should be skeptical.</p>
-<section id="assumption-1-linear-in-parameters" class="level3" data-number="3.7.1">
-<h3 data-number="3.7.1" class="anchored" data-anchor-id="assumption-1-linear-in-parameters"><span class="header-section-number">3.7.1</span> Assumption 1: Linear in Parameters</h3>
+<section id="assumption-1-linear-in-parameters" class="level3" data-number="4.7.1">
+<h3 data-number="4.7.1" class="anchored" data-anchor-id="assumption-1-linear-in-parameters"><span class="header-section-number">4.7.1</span> Assumption 1: Linear in Parameters</h3>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -915,8 +921,8 @@ Gauss-Markov Assumption 1: Linear in Parameters
 </ul>
 <p><strong>What would violate this assumption:</strong> Models where parameters enter non-linearly, such as <span class="math inline">\(y = \beta_0 + x^{\beta_1} + \mu\)</span> or <span class="math inline">\(y = \frac{1}{1 + e^{-\beta_0 - \beta_1 x}} + \mu\)</span> (a logistic function). These require different estimation techniques.</p>
 </section>
-<section id="assumption-2-random-sampling" class="level3" data-number="3.7.2">
-<h3 data-number="3.7.2" class="anchored" data-anchor-id="assumption-2-random-sampling"><span class="header-section-number">3.7.2</span> Assumption 2: Random Sampling</h3>
+<section id="assumption-2-random-sampling" class="level3" data-number="4.7.2">
+<h3 data-number="4.7.2" class="anchored" data-anchor-id="assumption-2-random-sampling"><span class="header-section-number">4.7.2</span> Assumption 2: Random Sampling</h3>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -940,8 +946,8 @@ Gauss-Markov Assumption 2: Random Sampling
 <li><p><strong>Clustered data:</strong> Students within the same classroom, or workers within the same firm, may be more similar to each other than to randomly selected individuals.</p></li>
 </ul>
 </section>
-<section id="assumption-3-variation-in-the-independent-variable" class="level3" data-number="3.7.3">
-<h3 data-number="3.7.3" class="anchored" data-anchor-id="assumption-3-variation-in-the-independent-variable"><span class="header-section-number">3.7.3</span> Assumption 3: Variation in the Independent Variable</h3>
+<section id="assumption-3-variation-in-the-independent-variable" class="level3" data-number="4.7.3">
+<h3 data-number="4.7.3" class="anchored" data-anchor-id="assumption-3-variation-in-the-independent-variable"><span class="header-section-number">4.7.3</span> Assumption 3: Variation in the Independent Variable</h3>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -963,8 +969,8 @@ Gauss-Markov Assumption 3: Sample Variation in <span class="math inline">\(x\)</
 <p>If all <span class="math inline">\(x_i\)</span> equal <span class="math inline">\(\bar{x}\)</span>, the denominator is zero, and the formula is undefined. Intuitively, if everyone has 12 years of education, we have no way to estimate what would happen with 13 years of education.</p>
 <p><strong>In practice:</strong> This assumption is almost always satisfied. It would only fail in unusual circumstances, like if you accidentally collected a sample where everyone happened to have the exact same value of <span class="math inline">\(x\)</span>. However, having <em>little</em> variation in <span class="math inline">\(x\)</span> (even if not zero) can lead to imprecise estimates, as we’ll see when discussing variance.</p>
 </section>
-<section id="assumption-4-zero-conditional-mean" class="level3" data-number="3.7.4">
-<h3 data-number="3.7.4" class="anchored" data-anchor-id="assumption-4-zero-conditional-mean"><span class="header-section-number">3.7.4</span> Assumption 4: Zero Conditional Mean</h3>
+<section id="assumption-4-zero-conditional-mean" class="level3" data-number="4.7.4">
+<h3 data-number="4.7.4" class="anchored" data-anchor-id="assumption-4-zero-conditional-mean"><span class="header-section-number">4.7.4</span> Assumption 4: Zero Conditional Mean</h3>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -988,8 +994,8 @@ Gauss-Markov Assumption 4: Zero Conditional Mean
 <p><strong>Why it matters:</strong> When this assumption fails, OLS is <strong>biased</strong>. The estimate <span class="math inline">\(\hat{\beta}_1\)</span> will systematically overshoot or undershoot the true <span class="math inline">\(\beta_1\)</span>. In the education example, if high-ability people get more education, our estimate of the “return to education” will partly capture the “return to ability,” making education look more valuable than it really is.</p>
 <p>This is the essence of <strong>omitted variable bias</strong>, which we’ll explore in detail shortly.</p>
 </section>
-<section id="assumption-5-homoskedasticity" class="level3" data-number="3.7.5">
-<h3 data-number="3.7.5" class="anchored" data-anchor-id="assumption-5-homoskedasticity"><span class="header-section-number">3.7.5</span> Assumption 5: Homoskedasticity</h3>
+<section id="assumption-5-homoskedasticity" class="level3" data-number="4.7.5">
+<h3 data-number="4.7.5" class="anchored" data-anchor-id="assumption-5-homoskedasticity"><span class="header-section-number">4.7.5</span> Assumption 5: Homoskedasticity</h3>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1016,7 +1022,7 @@ Gauss-Markov Assumption 5: Homoskedasticity
 <div id="fig-homohetero" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-homohetero-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3.3: Left: Homoskedasticity—the spread of points around the line is constant. Right: Heteroskedasticity—the spread increases with x.
+Figure&nbsp;4.3: Left: Homoskedasticity—the spread of points around the line is constant. Right: Heteroskedasticity—the spread increases with x.
 </figcaption>
 <div aria-describedby="fig-homohetero-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="unit3_files/figure-html/fig-homohetero-1.png" class="img-fluid figure-img" style="width:90.0%">
@@ -1028,8 +1034,8 @@ Figure&nbsp;3.3: Left: Homoskedasticity—the spread of points around the line i
 <p><strong>Why it matters:</strong> Unlike Assumption 4, violating homoskedasticity does <strong>not</strong> make OLS biased. Your estimate of <span class="math inline">\(\beta_1\)</span> is still centered on the true value. However, heteroskedasticity affects the <em>variance</em> and <em>standard errors</em> of the estimator. The usual standard error formulas become incorrect, which can lead to invalid hypothesis tests and confidence intervals.</p>
 <p>We’ll discuss how to handle heteroskedasticity later in the course using <strong>robust standard errors</strong>.</p>
 </section>
-<section id="summary-which-assumptions-matter-for-what" class="level3" data-number="3.7.6">
-<h3 data-number="3.7.6" class="anchored" data-anchor-id="summary-which-assumptions-matter-for-what"><span class="header-section-number">3.7.6</span> Summary: Which Assumptions Matter for What?</h3>
+<section id="summary-which-assumptions-matter-for-what" class="level3" data-number="4.7.6">
+<h3 data-number="4.7.6" class="anchored" data-anchor-id="summary-which-assumptions-matter-for-what"><span class="header-section-number">4.7.6</span> Summary: Which Assumptions Matter for What?</h3>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 16%">
@@ -1074,11 +1080,11 @@ Figure&nbsp;3.3: Left: Homoskedasticity—the spread of points around the line i
 <p>The key insight: Assumptions 1-4 are required for OLS to be <strong>unbiased</strong> (on average, we hit the target). Assumption 5 is additionally required for the usual standard error formulas to be valid and for OLS to be <strong>BLUE</strong> (Best Linear Unbiased Estimator).</p>
 </section>
 </section>
-<section id="unbiasedness-of-ols" class="level2" data-number="3.8">
-<h2 data-number="3.8" class="anchored" data-anchor-id="unbiasedness-of-ols"><span class="header-section-number">3.8</span> Unbiasedness of OLS</h2>
+<section id="unbiasedness-of-ols" class="level2" data-number="4.8">
+<h2 data-number="4.8" class="anchored" data-anchor-id="unbiasedness-of-ols"><span class="header-section-number">4.8</span> Unbiasedness of OLS</h2>
 <p>Before discussing unbiasedness, let’s revisit an important distinction we introduced in <a href="statsreview.html" class="quarto-xref"><span>Appendix B</span></a>: the difference between the <strong>population</strong> and the <strong>sample</strong>.</p>
-<section id="population-parameters-vs.-sample-estimates" class="level3" data-number="3.8.1">
-<h3 data-number="3.8.1" class="anchored" data-anchor-id="population-parameters-vs.-sample-estimates"><span class="header-section-number">3.8.1</span> Population Parameters vs.&nbsp;Sample Estimates</h3>
+<section id="population-parameters-vs.-sample-estimates" class="level3" data-number="4.8.1">
+<h3 data-number="4.8.1" class="anchored" data-anchor-id="population-parameters-vs.-sample-estimates"><span class="header-section-number">4.8.1</span> Population Parameters vs.&nbsp;Sample Estimates</h3>
 <p>The <strong>population</strong> represents the entire group we’re interested in studying. In our wage-education example, the population might be all workers in the U.S. economy. The population regression model describes the <em>true</em> relationship in this population:</p>
 <p><span class="math display">\[
 y = \beta_0 + \beta_1 x + \mu
@@ -1087,8 +1093,8 @@ y = \beta_0 + \beta_1 x + \mu
 <p>Instead, we collect a <strong>sample</strong>—a subset of observations from the population. Using this sample, we compute <strong>estimates</strong> <span class="math inline">\(\hat{\beta}_0\)</span> and <span class="math inline">\(\hat{\beta}_1\)</span>. These estimates are our best guesses for the unknown population parameters.</p>
 <p>Here’s the key insight: <em>if we drew a different sample, we would get different estimates</em>. Your classmate analyzing a different random sample of workers would compute different values of <span class="math inline">\(\hat{\beta}_0\)</span> and <span class="math inline">\(\hat{\beta}_1\)</span> than you would. This randomness in the estimates is called <strong>sampling variability</strong>.</p>
 </section>
-<section id="what-does-unbiasedness-mean" class="level3" data-number="3.8.2">
-<h3 data-number="3.8.2" class="anchored" data-anchor-id="what-does-unbiasedness-mean"><span class="header-section-number">3.8.2</span> What Does Unbiasedness Mean?</h3>
+<section id="what-does-unbiasedness-mean" class="level3" data-number="4.8.2">
+<h3 data-number="4.8.2" class="anchored" data-anchor-id="what-does-unbiasedness-mean"><span class="header-section-number">4.8.2</span> What Does Unbiasedness Mean?</h3>
 <p>Given that estimates vary from sample to sample, how do we know if our estimation procedure is any good? One desirable property is <strong>unbiasedness</strong>.</p>
 <p>An estimator <span class="math inline">\(\hat{\theta}\)</span> is <strong>unbiased</strong> if its expected value equals the true population parameter:</p>
 <p><span class="math display">\[
@@ -1104,8 +1110,8 @@ E[\hat{\theta}] = \theta
 <p>…then that average would equal the true <span class="math inline">\(\beta_1\)</span>.</p>
 <p>In other words, our estimation procedure doesn’t systematically overshoot or undershoot the target. Individual estimates might be too high or too low, but on average, we get it right.</p>
 </section>
-<section id="proof-sketch" class="level3" data-number="3.8.3">
-<h3 data-number="3.8.3" class="anchored" data-anchor-id="proof-sketch"><span class="header-section-number">3.8.3</span> Proof Sketch</h3>
+<section id="proof-sketch" class="level3" data-number="4.8.3">
+<h3 data-number="4.8.3" class="anchored" data-anchor-id="proof-sketch"><span class="header-section-number">4.8.3</span> Proof Sketch</h3>
 <p>Starting from our formula for <span class="math inline">\(\hat{\beta}_1\)</span> and substituting the true model <span class="math inline">\(y_i = \beta_0 + \beta_1 x_i + \mu_i\)</span>:</p>
 <p><span class="math display">\[
 \hat{\beta}_1 = \beta_1 + \frac{\sum_{i=1}^{n}(x_i - \bar{x})\mu_i}{\sum_{i=1}^{n}(x_i - \bar{x})^2}
@@ -1116,8 +1122,8 @@ E[\hat{\beta}_1] = \beta_1 + \frac{\sum_{i=1}^{n}(x_i - \bar{x}) \cdot 0}{\sum_{
 \]</span></p>
 <p>Thus, OLS is unbiased when the Gauss-Markov assumptions hold.</p>
 </section>
-<section id="simulation-unbiasedness-in-action" class="level3" data-number="3.8.4">
-<h3 data-number="3.8.4" class="anchored" data-anchor-id="simulation-unbiasedness-in-action"><span class="header-section-number">3.8.4</span> Simulation: Unbiasedness in Action</h3>
+<section id="simulation-unbiasedness-in-action" class="level3" data-number="4.8.4">
+<h3 data-number="4.8.4" class="anchored" data-anchor-id="simulation-unbiasedness-in-action"><span class="header-section-number">4.8.4</span> Simulation: Unbiasedness in Action</h3>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -1172,7 +1178,7 @@ Show Code: Unbiasedness Simulation
 <div id="fig-unbiasedness" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-unbiasedness-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3.4: Distribution of OLS slope estimates across 500 samples. The green line shows the average of all estimates, which equals the true value (2.21), demonstrating unbiasedness.
+Figure&nbsp;4.4: Distribution of OLS slope estimates across 500 samples. The green line shows the average of all estimates, which equals the true value (2.21), demonstrating unbiasedness.
 </figcaption>
 <div aria-describedby="fig-unbiasedness-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="unit3_files/figure-html/fig-unbiasedness-1.png" class="img-fluid figure-img" style="width:80.0%">
@@ -1181,11 +1187,11 @@ Figure&nbsp;3.4: Distribution of OLS slope estimates across 500 samples. The gre
 </div>
 </div>
 </div>
-<p>The simulation in <a href="#fig-unbiasedness" class="quarto-xref">Figure&nbsp;<span>3.4</span></a> confirms the theory: while individual estimates vary around the true value, the average across many samples equals the true parameter.</p>
+<p>The simulation in <a href="#fig-unbiasedness" class="quarto-xref">Figure&nbsp;<span>4.4</span></a> confirms the theory: while individual estimates vary around the true value, the average across many samples equals the true parameter.</p>
 </section>
 </section>
-<section id="omitted-variable-bias" class="level2" data-number="3.9">
-<h2 data-number="3.9" class="anchored" data-anchor-id="omitted-variable-bias"><span class="header-section-number">3.9</span> Omitted Variable Bias</h2>
+<section id="omitted-variable-bias" class="level2" data-number="4.9">
+<h2 data-number="4.9" class="anchored" data-anchor-id="omitted-variable-bias"><span class="header-section-number">4.9</span> Omitted Variable Bias</h2>
 <p>What happens when the zero conditional mean assumption fails? The most common culprit is <strong>omitted variable bias</strong>: we’ve left out a variable that affects both <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>.</p>
 <p>Consider the true model:</p>
 <p><span class="math display">\[
@@ -1198,7 +1204,7 @@ y = \beta_0 + \beta_1 x + \beta_2 z + \mu
 <div id="fig-ovb" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-ovb-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3.5: With omitted variable bias, the average of OLS estimates (green) systematically differs from the true value (red). The bias persists even with many samples.
+Figure&nbsp;4.5: With omitted variable bias, the average of OLS estimates (green) systematically differs from the true value (red). The bias persists even with many samples.
 </figcaption>
 <div aria-describedby="fig-ovb-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="unit3_files/figure-html/fig-ovb-1.png" class="img-fluid figure-img" style="width:80.0%">
@@ -1208,19 +1214,19 @@ Figure&nbsp;3.5: With omitted variable bias, the average of OLS estimates (green
 </div>
 </div>
 </section>
-<section id="unbiasedness-and-causality-why-this-all-matters" class="level2" data-number="3.10">
-<h2 data-number="3.10" class="anchored" data-anchor-id="unbiasedness-and-causality-why-this-all-matters"><span class="header-section-number">3.10</span> Unbiasedness and Causality: Why This All Matters</h2>
-<p>Let’s step back and connect what we’ve learned to the bigger picture. In <a href="unit2.html" class="quarto-xref"><span>Chapter 2</span></a>, we discussed how the fundamental challenge of causal inference is selection bias: people who receive “treatment” (more education, a new drug, a policy intervention) may differ systematically from those who don’t. This makes it hard to know whether differences in outcomes are caused by the treatment or by those pre-existing differences.</p>
+<section id="unbiasedness-and-causality-why-this-all-matters" class="level2" data-number="4.10">
+<h2 data-number="4.10" class="anchored" data-anchor-id="unbiasedness-and-causality-why-this-all-matters"><span class="header-section-number">4.10</span> Unbiasedness and Causality: Why This All Matters</h2>
+<p>Let’s step back and connect what we’ve learned to the bigger picture. In <a href="unit2.html" class="quarto-xref"><span>Chapter 3</span></a>, we discussed how the fundamental challenge of causal inference is selection bias: people who receive “treatment” (more education, a new drug, a policy intervention) may differ systematically from those who don’t. This makes it hard to know whether differences in outcomes are caused by the treatment or by those pre-existing differences.</p>
 <p>Now we can see the same problem through the lens of regression. <strong>The zero conditional mean assumption is essentially a “no selection bias” assumption.</strong></p>
-<section id="when-can-we-interpret-hatbeta_1-causally" class="level3" data-number="3.10.1">
-<h3 data-number="3.10.1" class="anchored" data-anchor-id="when-can-we-interpret-hatbeta_1-causally"><span class="header-section-number">3.10.1</span> When Can We Interpret <span class="math inline">\(\hat{\beta}_1\)</span> Causally?</h3>
+<section id="when-can-we-interpret-hatbeta_1-causally" class="level3" data-number="4.10.1">
+<h3 data-number="4.10.1" class="anchored" data-anchor-id="when-can-we-interpret-hatbeta_1-causally"><span class="header-section-number">4.10.1</span> When Can We Interpret <span class="math inline">\(\hat{\beta}_1\)</span> Causally?</h3>
 <p>Consider our wage regression: <span class="math display">\[wage = \beta_0 + \beta_1 \cdot educ + \mu\]</span></p>
 <p>When <span class="math inline">\(E[\mu | educ] = 0\)</span>, our OLS estimate <span class="math inline">\(\hat{\beta}_1\)</span> is unbiased for <span class="math inline">\(\beta_1\)</span>. But what does <span class="math inline">\(\beta_1\)</span> actually represent?</p>
 <p>If the zero conditional mean assumption holds, then <span class="math inline">\(\beta_1\)</span> represents the <strong>causal effect</strong> of education on wages: how much wages would change if we could take a person and give them one more year of education, holding everything else constant. In this case, <span class="math inline">\(\hat{\beta}_1\)</span> is an unbiased estimate of this causal effect.</p>
 <p>But if <span class="math inline">\(E[\mu | educ] \neq 0\)</span>—say, because high-ability people get more education—then <span class="math inline">\(\beta_1\)</span> no longer represents a pure causal effect. It conflates the effect of education with the effect of ability. Our estimate <span class="math inline">\(\hat{\beta}_1\)</span> is biased, and we cannot interpret it as the causal effect of education.</p>
 </section>
-<section id="correlation-vs.-causation-revisited" class="level3" data-number="3.10.2">
-<h3 data-number="3.10.2" class="anchored" data-anchor-id="correlation-vs.-causation-revisited"><span class="header-section-number">3.10.2</span> Correlation vs.&nbsp;Causation, Revisited</h3>
+<section id="correlation-vs.-causation-revisited" class="level3" data-number="4.10.2">
+<h3 data-number="4.10.2" class="anchored" data-anchor-id="correlation-vs.-causation-revisited"><span class="header-section-number">4.10.2</span> Correlation vs.&nbsp;Causation, Revisited</h3>
 <p>Recall that the OLS slope can be written as: <span class="math display">\[\hat{\beta}_1 = \rho_{xy} \frac{\sigma_y}{\sigma_x}\]</span></p>
 <p>Bivariate OLS is fundamentally measuring the <em>correlation</em> between <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>, scaled by their relative standard deviations. Correlation becomes causation <strong>only when the Gauss-Markov assumptions hold</strong>—especially the zero conditional mean assumption.</p>
 <p>This is why we emphasize these assumptions so heavily. Without them:</p>
@@ -1244,8 +1250,8 @@ The Key Insight
 </div>
 </section>
 </section>
-<section id="variance-of-the-ols-estimator" class="level2" data-number="3.11">
-<h2 data-number="3.11" class="anchored" data-anchor-id="variance-of-the-ols-estimator"><span class="header-section-number">3.11</span> Variance of the OLS Estimator</h2>
+<section id="variance-of-the-ols-estimator" class="level2" data-number="4.11">
+<h2 data-number="4.11" class="anchored" data-anchor-id="variance-of-the-ols-estimator"><span class="header-section-number">4.11</span> Variance of the OLS Estimator</h2>
 <p>Even when OLS is unbiased, our estimates vary from sample to sample. The <strong>variance</strong> of <span class="math inline">\(\hat{\beta}_1\)</span> tells us how much variation to expect.</p>
 <p>Under the Gauss-Markov assumptions:</p>
 <p><span class="math display">\[
@@ -1258,8 +1264,8 @@ Var(\hat{\beta}_1) = \frac{\sigma^2}{SST_x}
 <li><p><strong>More variation in <span class="math inline">\(x\)</span> means less variance:</strong> Spreading out our observations of <span class="math inline">\(x\)</span> gives us more information and more precise estimates. This also implies that larger samples (which have more total variation) yield more precise estimates.</p></li>
 </ol>
 </section>
-<section id="standard-errors" class="level2" data-number="3.12">
-<h2 data-number="3.12" class="anchored" data-anchor-id="standard-errors"><span class="header-section-number">3.12</span> Standard Errors</h2>
+<section id="standard-errors" class="level2" data-number="4.12">
+<h2 data-number="4.12" class="anchored" data-anchor-id="standard-errors"><span class="header-section-number">4.12</span> Standard Errors</h2>
 <p>The <strong>standard error</strong> of <span class="math inline">\(\hat{\beta}_1\)</span> is the square root of the variance:</p>
 <p><span class="math display">\[
 se(\hat{\beta}_1) = \frac{\hat{\sigma}}{\sqrt{SST_x}}
@@ -1292,8 +1298,8 @@ F-statistic: 45.46 on 1 and 30 DF,  p-value: 1.788e-07</code></pre>
 </div>
 <p>The standard error of <span class="math inline">\(\hat{\beta}_1\)</span> is 0.01, shown in the <code>Std. Error</code> column.</p>
 </section>
-<section id="ols-is-blue" class="level2" data-number="3.13">
-<h2 data-number="3.13" class="anchored" data-anchor-id="ols-is-blue"><span class="header-section-number">3.13</span> OLS is BLUE</h2>
+<section id="ols-is-blue" class="level2" data-number="4.13">
+<h2 data-number="4.13" class="anchored" data-anchor-id="ols-is-blue"><span class="header-section-number">4.13</span> OLS is BLUE</h2>
 <p>Under all five Gauss-Markov assumptions, OLS is <strong>BLUE</strong>:</p>
 <ul>
 <li><strong>B</strong>est: Lowest variance among all linear unbiased estimators</li>
@@ -1303,14 +1309,14 @@ F-statistic: 45.46 on 1 and 30 DF,  p-value: 1.788e-07</code></pre>
 </ul>
 <p>This is a powerful result: among all estimators that are linear and unbiased, OLS has the smallest variance. You cannot do better without either using non-linear methods or accepting some bias.</p>
 </section>
-<section id="summary-and-conclusion" class="level2" data-number="3.14">
-<h2 data-number="3.14" class="anchored" data-anchor-id="summary-and-conclusion"><span class="header-section-number">3.14</span> Summary and Conclusion</h2>
+<section id="summary-and-conclusion" class="level2" data-number="4.14">
+<h2 data-number="4.14" class="anchored" data-anchor-id="summary-and-conclusion"><span class="header-section-number">4.14</span> Summary and Conclusion</h2>
 <p>This chapter introduced Ordinary Least Squares regression, the foundational tool of econometrics. We started with the goal of modeling how the conditional expectation <span class="math inline">\(E[Y|X]\)</span> varies with <span class="math inline">\(x\)</span>, and showed how the linear regression model <span class="math inline">\(y = \beta_0 + \beta_1 x + \mu\)</span> provides a framework for this.</p>
 <p>We derived the OLS estimator by minimizing the sum of squared residuals, learned to compute regressions in R, and explored the properties of the OLS regression line. We then turned to the statistical properties of OLS, introducing the Gauss-Markov assumptions and proving that OLS is unbiased when these assumptions hold. When the zero conditional mean assumption fails—typically due to omitted variables—our estimates become biased.</p>
 <p>Crucially, we connected unbiasedness to causality: the zero conditional mean assumption is what allows us to interpret OLS coefficients as causal effects rather than mere correlations. Without this assumption, OLS still produces numbers, but those numbers cannot be given a causal interpretation.</p>
 <p>Finally, we discussed the variance of OLS estimates and the conditions under which OLS is the best linear unbiased estimator.</p>
-<section id="key-takeaways" class="level3" data-number="3.14.1">
-<h3 data-number="3.14.1" class="anchored" data-anchor-id="key-takeaways"><span class="header-section-number">3.14.1</span> Key Takeaways</h3>
+<section id="key-takeaways" class="level3" data-number="4.14.1">
+<h3 data-number="4.14.1" class="anchored" data-anchor-id="key-takeaways"><span class="header-section-number">4.14.1</span> Key Takeaways</h3>
 <ul>
 <li><p><strong>The goal</strong> is to estimate the conditional expectation <span class="math inline">\(E[Y|X] = \beta_0 + \beta_1 x\)</span></p></li>
 <li><p><strong>The OLS slope</strong> equals the covariance of <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> divided by the variance of <span class="math inline">\(x\)</span>: <span class="math display">\[\hat{\beta}_1 = \frac{Cov(x,y)}{Var(x)}\]</span></p></li>
@@ -1322,8 +1328,8 @@ F-statistic: 45.46 on 1 and 30 DF,  p-value: 1.788e-07</code></pre>
 </ul>
 </section>
 </section>
-<section id="check-your-understanding" class="level2" data-number="3.15">
-<h2 data-number="3.15" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">3.15</span> Check Your Understanding</h2>
+<section id="check-your-understanding" class="level2" data-number="4.15">
+<h2 data-number="4.15" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">4.15</span> Check Your Understanding</h2>
 <div class="question">
 <div class="answer-row">
     <label>i. In the model \(y = \beta_0 + \beta_1 x + \mu\), what does \(\beta_1\) represent? </label>
@@ -1426,8 +1432,8 @@ Show Explanation
 </div>
 </div>
 </div>
-<section id="practice-interpreting-regression-output" class="level3" data-number="3.15.1">
-<h3 data-number="3.15.1" class="anchored" data-anchor-id="practice-interpreting-regression-output"><span class="header-section-number">3.15.1</span> Practice: Interpreting Regression Output</h3>
+<section id="practice-interpreting-regression-output" class="level3" data-number="4.15.1">
+<h3 data-number="4.15.1" class="anchored" data-anchor-id="practice-interpreting-regression-output"><span class="header-section-number">4.15.1</span> Practice: Interpreting Regression Output</h3>
 <p>The following questions present regression results for you to interpret.</p>
 <div class="context" style="margin-bottom: 20px;">
 <strong>Regression 1:</strong> A researcher estimates the relationship between test scores and class size using data from California elementary schools:
@@ -1992,12 +1998,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
       <a href="../chapters/unit2.html" class="pagination-link" aria-label="Causality and Randomized Control Trials">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Causality and Randomized Control Trials</span></span>
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Causality and Randomized Control Trials</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="../chapters/unit4.html" class="pagination-link" aria-label="Multivariate Regression">
-        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Multivariate Regression</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Multivariate Regression</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

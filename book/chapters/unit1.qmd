@@ -1,0 +1,895 @@
+# Good Data Practices {#sec-data-practices}
+
+```{r}
+#| echo: false
+#| output: false
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(modelsummary)
+library(palmerpenguins)
+
+```
+
+```{=html}
+
+<style>
+.problem {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+.context {
+    background-color: #e8f4f8;
+    padding: 12px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border-left: 4px solid #2874a6;
+}
+.question {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #fff3cd;
+    border-radius: 5px;
+}
+.answer-row {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.answer-row label {
+    min-width: 320px;
+    font-weight: 500;
+}
+select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    min-width: 300px;
+    cursor: pointer;
+}
+select:focus {
+    border-color: #2874a6;
+    outline: none;
+}
+.correct {
+    border-color: #28a745 !important;
+    background-color: #d4edda !important;
+}
+.incorrect {
+    border-color: #dc3545 !important;
+    background-color: #f8d7da !important;
+}
+.explanation {
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #e7f3ff;
+    border-radius: 5px;
+    border-left: 4px solid #2874a6;
+}
+.note {
+    font-size: 0.85em;
+    color: #666;
+    font-style: italic;
+}
+</style>
+
+<script>
+function checkAnswer(selectElement, correctValue) {
+    if (selectElement.value === '') {
+        selectElement.classList.remove('correct', 'incorrect');
+    } else if (selectElement.value === correctValue) {
+        selectElement.classList.remove('incorrect');
+        selectElement.classList.add('correct');
+    } else {
+        selectElement.classList.remove('correct');
+        selectElement.classList.add('incorrect');
+    }
+}
+</script>
+
+```
+
+
+::: {.callout-tip collapse="true"}
+## **Key Questions**
+- Why do data errors matter for econometric analysis?
+- What are descriptive statistics and why should we examine them?
+- How can data visualization help us detect problems?
+- What is replication and why is it fundamental to credible research?
+:::
+
+::: {.callout-note collapse="true"}
+## **Suggested Readings**
+- @bailey_real_2020, Ch. 2
+:::
+
+
+Before we dive into sophisticated econometric methods,
+we need to establish good habits for working with data.
+Even the most advanced statistical techniques cannot rescue an analysis built on flawed or misunderstood data.
+This chapter focuses on the essential first steps:
+understanding our data through descriptive statistics and visualization,
+and documenting our work so that others (including our future selves) can verify and build upon it.
+
+
+## When Good Economists Use Bad Data
+
+In 2010,
+economists Carmen Reinhart and Kenneth Rogoff published influential research on government debt and economic growth.
+Their analysis covered more than 3,700 annual observations from countries around the world,
+and their key finding was striking:
+when a country's government debt exceeded 90% of GDP,
+economic growth dropped dramatically.
+
+The policy implications seemed clear:
+governments should be cautious about using deficit spending to fight unemployment.
+This finding influenced policy debates across the world during a period when many countries were considering how aggressively to respond to the Great Recession.
+
+There was just one problem.
+The data didn't quite say what Reinhart and Rogoff thought it did.
+
+In 2014,
+a graduate student named Thomas Herndon was trying to replicate their results for a homework assignment.
+He couldn't get the numbers to match.
+After obtaining the original Excel spreadsheet from Reinhart and Rogoff,
+Herndon and his advisors discovered three issues:
+some observations had been mistakenly excluded from key calculations,
+others contained typos,
+and---most embarrassingly---some cells in the Excel spreadsheet had simply not been included in the formula calculating the average.
+
+When the data were corrected,
+the dramatic "cliff" in economic growth disappeared.
+While growth did decline somewhat as debt increased,
+the relationship was much more gradual than originally reported.
+The corrected analysis told a very different policy story.
+
+::: {.callout-important}
+## The Lesson
+Even accomplished researchers can make data mistakes.
+The best defense is establishing habits that minimize errors and make them easier to detect when they occur.
+:::
+
+Reinhart and Rogoff's experience teaches us that data management is not just tedious housekeeping---it's fundamental to credible research.
+No amount of sophisticated econometric technique can compensate for errors in the underlying data.
+This chapter introduces practices that help us avoid such problems.
+
+
+## Know Your Data
+
+The first rule of data analysis is simple:
+**know your data**.
+This means examining it carefully before conducting any formal analysis.
+We want to understand what we're working with,
+detect potential errors,
+and develop intuition about the relationships we might find.
+
+### Descriptive Statistics
+
+For every variable in our dataset,
+we should know several key statistics:
+the number of observations,
+the mean,
+the standard deviation,
+and the minimum and maximum values.
+These statistics give us a feel for the data and help us spot problems.
+
+Let's look at a simple example.
+Suppose we're studying the relationship between education and wages.
+Here's simulated data for 100 individuals:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| code-fold: true
+
+# Set seed for reproducibility
+set.seed(42)
+
+# Generate simulated wage and education data
+n <- 100
+education <- round(rnorm(n, mean = 14, sd = 2.5))
+education <- pmax(8, pmin(education, 20))  # Constrain between 8 and 20 years
+
+# Generate wages with some relationship to education
+wages <- 10 + 2.5 * education + rnorm(n, mean = 0, sd = 5)
+wages <- pmax(wages, 8)  # Minimum wage floor
+
+# Create age variable
+age <- round(rnorm(n, mean = 35, sd = 10))
+age <- pmax(age, 22)  # Minimum age
+
+# Create a tibble
+wage_data <- tibble(
+  id = 1:n,
+  education = education,
+  wage = wages,
+  age = age
+)
+
+# Display descriptive statistics
+datasummary_skim(wage_data |> select(education, wage, age),
+                 title = "Descriptive Statistics: Education and Wages",
+                 histogram = FALSE)
+```
+
+These statistics immediately tell us several things.
+We have 100 observations with no missing data (N = 100 for all variables).
+Education ranges from 8 to 20 years,
+with a mean around 14 years---this seems reasonable for a sample of working adults.
+Wages range from about $8 to $63 per hour,
+with substantial variation (standard deviation of about $10).
+
+But what if our summary statistics looked like this instead?
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+# Create problematic version
+wage_data_bad <- wage_data
+wage_data_bad$wage[25] <- 850  # Unrealistic wage
+wage_data_bad$education[50] <- -5  # Impossible education value
+wage_data_bad$age[75] <- 200  # Impossible age
+
+datasummary_skim(wage_data_bad |> select(education, wage, age),
+                 title = "Problematic Data: Notice the Issues",
+                 histogram = FALSE)
+```
+
+Now we have a problem!
+The maximum wage of $850 per hour seems suspicious---is this real or a data entry error?
+The minimum education value of -5 years is impossible.
+And an age of 200 is clearly wrong.
+These obvious errors suggest we need to investigate our data more carefully.
+
+::: {.callout-note}
+## The Standard Deviation
+The **standard deviation** measures how dispersed the values of a variable are around the mean.
+A larger standard deviation indicates more spread-out values.
+For a variable $X$ with mean $\bar{X}$,
+the standard deviation is:
+$$
+SD(X) = \sqrt{\frac{1}{N}\sum_{i=1}^{N}(X_i - \bar{X})^2}
+$$
+:::
+
+### Examining Distributions
+
+When a variable takes on a limited number of values,
+it's helpful to examine the frequency distribution.
+Suppose we have a variable indicating whether someone has a college degree (1 = yes, 0 = no):
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| code-fold: true
+
+# Add college degree variable
+wage_data <- wage_data |>
+  mutate(college = ifelse(education >= 16, 1, 0))
+
+# Create frequency table
+wage_data |>
+  count(college) |>
+  mutate(percent = n / sum(n) * 100) |>
+  knitr::kable(
+    col.names = c("College Degree", "Count", "Percent"),
+    digits = 1,
+    caption = "Distribution of College Degree"
+  )
+```
+
+This tells us that 29% of our sample has a college degree.
+But imagine our frequency table looked like this:
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+# Create problematic version
+tibble(
+  college = c(0, 1, 100),
+  n = c(30, 20, 1),
+  percent = c(58.8, 39.2, 2.0)
+) |>
+  knitr::kable(
+    col.names = c("College Degree", "Count", "Percent"),
+    digits = 1,
+    caption = "A Problematic Distribution"
+  )
+```
+
+We have a value of 100 for the college degree variable.
+Either we have someone with 100 college degrees (unlikely),
+or---much more probably---we have a coding error.
+This is the kind of problem that descriptive statistics help us catch.
+
+
+## Visualizing Data
+
+Numbers are useful,
+but graphs often reveal patterns and problems that summary statistics miss.
+Effective data visualization is both a diagnostic tool and a way to understand relationships in our data.
+In econometrics,
+we rely heavily on visualizations to explore data,
+diagnose problems,
+and communicate results.
+
+::: {.callout-important}
+## Why Visualization Matters
+A good data visualization translates complex data into a clear visual format,
+revealing patterns,
+trends,
+and relationships that would be difficult to see in tables of numbers.
+The goal is to tell an accurate and compelling story that allows your audience to quickly grasp key insights.
+:::
+
+### The Grammar of Graphics: ggplot2
+
+We'll use `ggplot2` (part of the tidyverse) for creating visualizations.
+The "gg" stands for "grammar of graphics"---a systematic way of thinking about how to build plots.
+
+Every ggplot has two main components:
+
+1. **The scaffolding**: titles, axis labels, legends, sources
+2. **The content**: the actual data encoded as visual elements (points, lines, bars, etc.)
+
+The key insight of ggplot2 is that we build plots **layer by layer**,
+adding elements one at a time until we have a complete visualization.
+
+### Getting Started: The Palmer Penguins
+
+Let's use real data to learn ggplot2.
+The Palmer Penguins dataset contains measurements of 344 penguins from three species collected near Palmer Station, Antarctica.
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# Load the penguins data
+library(palmerpenguins)
+
+# Take a look at the data
+glimpse(penguins)
+```
+
+The data includes species,
+island location,
+bill measurements,
+flipper length,
+body mass,
+sex,
+and year of observation.
+
+### Building a Plot: Step by Step
+
+Let's answer a research question: **Do penguins with longer flippers weigh more?**
+
+We start by creating an empty plot object:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| label: fig-empty-plot
+#| fig-cap: "An empty ggplot object with no layers."
+
+ggplot(data = penguins)
+```
+
+This creates the plotting area but doesn't show any data yet.
+
+Now let's add a layer with points.
+We need to specify:
+- The **geometry** (what shape): `geom_point()` for a scatterplot
+- The **aesthetic mapping** (which variables go where): `aes(x = ..., y = ...)`
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| label: fig-basic-scatter
+#| fig-cap: "A basic scatterplot showing flipper length versus body mass."
+
+ggplot(data = penguins) +
+  geom_point(aes(x = flipper_length_mm, y = body_mass_g))
+```
+
+The plot clearly shows a positive relationship:
+penguins with longer flippers tend to be heavier.
+
+### Adding More Information: Color and Shape
+
+But wait---could this relationship be driven by different penguin species?
+Maybe larger species have both longer flippers and greater body mass.
+We can encode species information using color:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| label: fig-scatter-color
+#| fig-cap: "Scatterplot with species indicated by color. The positive relationship holds within each species."
+
+ggplot(data = penguins) +
+  geom_point(aes(x = flipper_length_mm, y = body_mass_g, color = species))
+```
+
+Now we can see that:
+- Gentoo penguins (blue) are generally larger
+- The positive relationship between flipper length and body mass exists **within each species**
+- This suggests the relationship isn't just due to species differences
+
+### Adding a Regression Line
+
+Let's add the regression line to visualize the overall trend.
+This requires a new **layer** (not a new aesthetic):
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| label: fig-scatter-regression
+#| fig-cap: "Scatterplot with regression line. The blue line shows the estimated linear relationship."
+
+ggplot(data = penguins) +
+  geom_point(aes(x = flipper_length_mm, y = body_mass_g, color = species)) +
+  geom_smooth(aes(x = flipper_length_mm, y = body_mass_g), method = "lm")
+```
+
+The `geom_smooth()` layer adds a line of best fit using linear regression (`method = "lm"`).
+
+### Proper Labeling
+
+Our plot conveys information well,
+but the axis labels and title need improvement.
+Good labels are essential for clear communication:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| label: fig-scatter-labeled
+#| fig-cap: "A properly labeled scatterplot with clear titles and axis labels."
+
+ggplot(data = penguins) +
+  geom_point(aes(x = flipper_length_mm, y = body_mass_g, color = species, shape = species)) +
+  geom_smooth(aes(x = flipper_length_mm, y = body_mass_g), method = "lm") +
+  labs(
+    title = "Body Mass and Flipper Length by Species",
+    subtitle = "Data from Palmer Station, Antarctica",
+    x = "Flipper Length (mm)",
+    y = "Body Mass (g)",
+    color = "Penguin Species",
+    shape = "Penguin Species"
+  ) +
+  theme_minimal()
+```
+
+Notice how much clearer this is!
+The plot now includes:
+- A descriptive title
+- Proper axis labels with units
+- A data source in the subtitle
+- Readable legend labels
+
+### Histograms for Distributions
+
+Histograms show the distribution of a continuous variable by dividing it into bins:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| label: fig-histogram
+#| fig-cap: "Histogram showing the distribution of penguin body mass."
+
+ggplot(penguins) +
+  geom_histogram(aes(x = body_mass_g), binwidth = 200, fill = "steelblue", alpha = 0.7) +
+  labs(
+    title = "Distribution of Penguin Body Mass",
+    x = "Body Mass (g)",
+    y = "Count"
+  ) +
+  theme_minimal()
+```
+
+The `binwidth` parameter controls how wide each bar is.
+Smaller binwidths create more bars and show more detail.
+
+### A Simple Example with Our Wage Data
+
+Let's apply these principles to our wage and education data:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| label: fig-education-wages-final
+#| fig-cap: "The relationship between education and wages with proper labeling and styling."
+
+ggplot(wage_data, aes(x = education, y = wage)) +
+  geom_point(alpha = 0.6, size = 2, color = "steelblue") +
+  geom_smooth(method = "lm", se = TRUE, color = "darkblue") +
+  labs(
+    title = "Education and Hourly Wages",
+    subtitle = "Simulated data for demonstration",
+    x = "Years of Education",
+    y = "Hourly Wage ($)"
+  ) +
+  theme_minimal()
+```
+
+::: {.callout-tip}
+## Building Intuition
+The layered approach of ggplot2 mirrors how we think about data analysis:
+- Start with the data
+- Add visual representations
+- Refine with labels and formatting
+Experiment with different geometries,
+aesthetics,
+and layers to find the visualization that best tells your data's story.
+:::
+
+
+## Replication: The Foundation of Credible Research
+
+Science depends on replication.
+If other researchers cannot reproduce our results using the information we provide,
+then our findings cannot be verified or built upon.
+This is not just an abstract principle---it's a practical necessity.
+
+::: {.callout-important}
+## The Replication Standard
+Research meets the **replication standard** when an independent researcher can exactly duplicate the results using only the information provided.
+:::
+
+### Why Replication Matters
+
+Replication serves several crucial purposes.
+First,
+it allows others to check our work.
+The Reinhart-Rogoff example shows why this matters:
+only because they shared their data could Thomas Herndon discover the errors.
+Without replication materials,
+the mistakes might never have been found.
+
+Second,
+replication enables others to probe our analysis.
+Statistical results often hinge on seemingly small decisions---which observations to include,
+how to handle missing data,
+which variables to control for.
+Skeptical readers (which should be everyone!) want to see whether reasonable alternative approaches produce similar conclusions.
+If a certain choice substantially changes our results,
+we need to pay attention.
+
+Third,
+committing to a replication standard keeps our work honest.
+If we know others will check our work,
+we're less likely to make choices based on getting the "right" answer rather than statistical merit.
+
+Finally,
+replication helps our future selves.
+Even a moderately complex project can involve hundreds of decisions over weeks or months.
+What seemed obvious at the time can become completely opaque later.
+Good documentation means we can return to a project after a break and immediately understand what we did.
+
+### What Makes Good Replication Materials?
+
+Effective replication files have two components:
+a **codebook** that documents the data,
+and **analysis code** that shows exactly how results were produced.
+
+The codebook describes where each variable comes from and any transformations applied.
+For example:
+
+- **Variable name**: `wage`
+- **Description**: Hourly wage in dollars, calculated as annual salary divided by hours worked in past year
+- **Source**: National Longitudinal Survey of Youth, 1996 wave
+- **Notes**: Wages above $200/hour were excluded as likely data errors
+
+The analysis code shows the exact steps used to produce each result.
+This means providing the actual R code,
+not just descriptions of what we did.
+And crucially,
+the code should include comments explaining *why* we made certain choices:
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Estimate relationship between education and wages
+# We control for age because it affects both education and wages
+# (older workers have had more time to complete education and gain experience)
+
+model <- lm(wage ~ education + age, data = wage_data)
+summary(model)
+```
+
+### Good Coding Practices
+
+As we write code for our analysis,
+several practices make our work easier to understand and verify:
+
+**Use descriptive variable names**.
+Compare `x1` versus `years_education`---the second is much clearer.
+
+**Comment extensively**.
+Explain what each section of code does and why you made certain choices.
+Your future self will thank you.
+
+**Organize your code logically**.
+Start with data loading and cleaning,
+then move to analysis,
+then to creating tables and figures.
+
+**Make your code reproducible**.
+Use `set.seed()` before any random operations so results don't change each time you run the code.
+
+Here's an example of well-documented code:
+
+```{r}
+#| echo: true
+#| eval: false
+
+# =============================================================================
+# Analysis of Education and Wages
+# Author: Your Name
+# Date: December 2024
+# =============================================================================
+
+# Load required packages
+library(tidyverse)
+
+# Set seed for reproducibility
+set.seed(42)
+
+# -----------------------------------------------------------------------------
+# 1. LOAD AND CLEAN DATA
+# -----------------------------------------------------------------------------
+
+# Load data from National Longitudinal Survey
+# Downloaded from: https://www.nlsinfo.org/content/cohorts/nlsy79
+# Download date: December 1, 2024
+wage_data <- read_csv("nlsy_wages.csv")
+
+# Remove observations with missing wage data
+# This affects 23 observations (2.3% of sample)
+wage_data <- wage_data |>
+  filter(!is.na(wage))
+
+# Create college degree indicator
+# Defined as 16+ years of education (bachelor's degree)
+wage_data <- wage_data |>
+  mutate(college = ifelse(education >= 16, 1, 0))
+
+# -----------------------------------------------------------------------------
+# 2. DESCRIPTIVE STATISTICS
+# -----------------------------------------------------------------------------
+
+# Summary statistics for main variables
+summary(wage_data |> select(wage, education, age))
+
+# -----------------------------------------------------------------------------
+# 3. MAIN ANALYSIS
+# -----------------------------------------------------------------------------
+
+# Estimate basic relationship between education and wages
+# Simple regression without controls
+model1 <- lm(wage ~ education, data = wage_data)
+
+# Add age as control variable
+# Age affects both education completion and wage levels
+model2 <- lm(wage ~ education + age, data = wage_data)
+```
+
+
+## A Quick Example: State Crime Data
+
+Let's practice these principles with a small example.
+We'll look at violent crime rates across U.S. states and potential correlates.
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| code-fold: true
+
+# Create simulated state crime data for demonstration
+set.seed(123)
+n_states <- 50
+
+state_data <- tibble(
+  state = state.abb,
+  violent_crime = rnorm(n_states, mean = 400, sd = 150),
+  percent_urban = rnorm(n_states, mean = 70, sd = 15),
+  percent_poverty = rnorm(n_states, mean = 14, sd = 3)
+) |>
+  mutate(
+    violent_crime = pmax(violent_crime, 100),  # Keep positive
+    percent_urban = pmax(20, pmin(percent_urban, 100)),  # Constrain to 0-100
+    percent_poverty = pmax(8, pmin(percent_poverty, 22))  # Reasonable range
+  )
+
+# Display descriptive statistics
+datasummary_skim(state_data |> select(-state),
+                 title = "State Crime Data: Descriptive Statistics",
+                 histogram = FALSE)
+```
+
+The descriptive statistics look reasonable.
+Crime rates range from about 150 to 750 per 100,000 people.
+The urbanization variable is measured on a 0-100 scale,
+while poverty is measured as a percentage (8% to 22%).
+Understanding these scales is important for interpreting results.
+
+Now let's visualize the relationship between urbanization and crime:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| code-fold: true
+#| label: fig-crime-urban
+#| fig-cap: "Relationship between urbanization and violent crime rates across U.S. states."
+
+ggplot(state_data, aes(x = percent_urban, y = violent_crime)) +
+  geom_point(alpha = 0.6, size = 2.5) +
+  geom_smooth(method = "lm", se = FALSE, color = "steelblue") +
+  labs(
+    x = "Percent Urban (%)",
+    y = "Violent Crime Rate (per 100,000)",
+    title = "Urbanization and Violent Crime"
+  ) +
+  theme_minimal()
+```
+
+The scatterplot suggests a positive relationship:
+more urbanized states tend to have higher violent crime rates.
+But this is just correlation,
+not causation.
+Many factors differ between urban and rural states beyond just population density,
+and any of these could be driving the relationship we observe.
+This is precisely the kind of endogeneity problem that motivates the econometric methods we'll study in later chapters.
+
+
+## Summary
+
+Good data practices are the foundation of credible econometric analysis.
+Before conducting any formal statistical tests,
+we must understand our data through descriptive statistics and visualization.
+These diagnostic tools help us catch errors,
+understand variable scales and distributions,
+and develop intuition about relationships in the data.
+
+Equally important is documenting our work so that others can replicate our results.
+A replication file should include a codebook describing data sources and transformations,
+plus the complete analysis code with clear comments explaining our choices.
+This commitment to transparency keeps our work honest,
+enables others to verify and build on our findings,
+and helps our future selves understand what we did months or years later.
+
+The Reinhart-Rogoff case reminds us that even accomplished researchers make data mistakes.
+The best defense is establishing good habits:
+examine your data carefully,
+document everything,
+and write code that your future self (and others) can understand.
+
+
+## Check Your Understanding
+
+:::: {.content-visible when-format="html"}
+
+For each question below, 
+select the best answer from the dropdown menu. 
+The dropdown will turn green if correct and red if incorrect. 
+Click the "Show Explanation" toggle to see a full explanation of the answer after attempting each question.
+
+```{=html}
+<div class="question">
+<div class="answer-row">
+    <label>i. You obtain a dataset on student test scores and notice the maximum value is 1,500 on a test that's supposed to be scored 0-100. What should you do? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Ignore it and proceed with analysis</option>
+        <option value="b">Investigate the data to identify and correct the error</option>
+        <option value="c">Delete all test score data</option>
+        <option value="d">Assume the test scale was changed</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>ii. What is the primary purpose of creating a codebook? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">To make the analysis take longer</option>
+        <option value="b">To satisfy journal requirements</option>
+        <option value="c">To document data sources and transformations so others can understand and verify your work</option>
+        <option value="d">To hide your methods from competitors</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iii. Why did Herndon, Ash, and Pollin discover errors in Reinhart and Rogoff's work? </label>
+    <select onchange="checkAnswer(this, 'a')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Reinhart and Rogoff shared their data and code, enabling replication</option>
+        <option value="b">The errors were obvious from the published paper</option>
+        <option value="c">They used better statistical methods</option>
+        <option value="d">They had access to more data</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iv. A scatterplot shows a positive relationship between ice cream sales and crime. What can we conclude? </label>
+    <select onchange="checkAnswer(this, 'd')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Ice cream causes crime</option>
+        <option value="b">Crime causes people to buy ice cream</option>
+        <option value="c">There is no relationship between the variables</option>
+        <option value="d">The variables are correlated, but we cannot conclude causation without further analysis</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>v. What makes results "robust"? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">They are statistically significant</option>
+        <option value="b">They don't change substantially when reasonable alternative approaches are used</option>
+        <option value="c">They confirm the researcher's hypothesis</option>
+        <option value="d">They use a large sample size</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>vi. <strong>(Challenge)</strong> Why should we include comments in our code even if we're the only person who will use it? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">It makes the code run faster</option>
+        <option value="b">It's required by R</option>
+        <option value="c">Our future self will need to understand what we did and why we made certain choices</option>
+        <option value="d">It prevents coding errors</option>
+    </select>
+</div>
+
+</div>
+
+```
+
+::: {.callout-tip collapse="true"}
+## Show Explanation
+
+i. This is an obvious data error---no test scored 0-100 should have values over 1,500. We need to investigate whether this is a typo, a unit conversion issue, or another problem. Simply ignoring it or deleting the data without investigation would be irresponsible.
+
+ii. A codebook documents where variables come from, what transformations were applied, and any important details about the data. This allows others (and your future self) to understand exactly what the data represents and to verify that it was handled correctly.
+
+iii. The key is that Reinhart and Rogoff made their data and code available (eventually, after being asked). This enabled Herndon to attempt replication, which revealed the errors. Without access to the original materials, the mistakes might never have been discovered. This illustrates why the replication standard matters.
+
+iv. Correlation does not imply causation. Ice cream sales and crime are both higher in summer (when it's warm), which could explain their correlation. This is a classic example of a confounding variable. We'll need econometric techniques to establish causal relationships.
+
+v. Results are robust if they hold up when we make reasonable alternative choices---different control variables, different samples, different specifications. If results change dramatically based on small methodological choices, we should be cautious about drawing strong conclusions.
+
+vi. Even if we write code for ourselves today, we will become strangers to our own code after a few weeks or months. Comments explain what we did and why, making it much easier to return to the project later. Plus, we might later decide to share the work, or we might be asked to show it to a skeptical reviewer.
+
+:::
+
+::::
+
+:::: {.content-hidden when-format="html"}
+
+*Note: This section contains interactive content only available in the HTML version.*
+
+::::
