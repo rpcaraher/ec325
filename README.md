@@ -14,7 +14,7 @@ If you don't already have one, create a free account at [github.com](https://git
 2. Go to **File → New Project → Version Control → Git**
 3. In the "Repository URL" field, paste:
    ```
-   https://github.com/YOUR-USERNAME/ec325-materials.git
+   https://github.com/rpcaraher/ec325.git
    ```
 4. Choose a location on your computer to save the project (e.g., your Documents folder)
 5. Click **Create Project**
@@ -25,7 +25,8 @@ RStudio will download all the course materials to your computer.
 
 ### Step 3: Open the Project
 
-After cloning, always open the course materials by double-clicking the `ec325-materials.Rproj` file. This ensures your working directory is set correctly and file paths in the code will work.
+After cloning, always open the course materials by double-clicking the `ec325.Rproj` file. 
+This ensures your working directory is set correctly and file paths in the code will work.
 
 ## Updating Course Materials
 
@@ -42,12 +43,12 @@ That's it! Your materials are now up to date.
 ## Repository Structure
 
 ```
-ec325-notes/
-├── chapters/          # Book chapters (.qmd files)
+ec325/
+├── book/              # Raw book chapters (.qmd files)
 ├── data/              # Datasets for labs and problem sets
 ├── labs/              # In-class lab exercises
 ├── problem-sets/      # Problem set instructions
-├── student-work/      # YOUR work goes here (not tracked by Git)
+├── student-work/      # YOUR work goes here (not tracked by Git!)
 └── docs/              # Rendered book (also viewable online)
 ```
 
