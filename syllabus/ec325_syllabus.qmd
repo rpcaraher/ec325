@@ -1,0 +1,443 @@
+---
+title: "EC325: Econometrics"
+subtitle: "Colby College | Spring 2026"
+author: "Prof. Ray Caraher"
+author-title: "Instructor"
+date: last-modified
+published-title: "Last Updated"
+bibliography: references.bib
+embed-resources: true
+format:
+  html: default
+  pdf: default
+---
+
+```{r}
+#| echo: false
+#| warning: false
+#| results: asis
+
+library(yaml)
+
+
+```
+
+---
+
+::::{.columns}
+::: {.column}
+- Email: [rcaraher@colby.edu](mailto:rcaraher@colby.edu)
+- Office: 365 Diamond Building
+- Office Hours: TBD (or by [appointment](https://calendar.app.google/2zmghrhr5z5an7Ar5))
+:::
+::: {.column}
+
+- Course Meetings: Tue/Thu 11:00am - 12:15pm
+- Classroom: TBD
+
+:::
+::::
+
+---
+
+## Course Description
+
+This course explores the measurement and evaluation of economic models,
+bridging economic theory with empirical analysis. 
+The emphasis throughout is on building intuitive understanding and applying econometric techniques to real-world problems encountered in public policy.
+With a focus on *causality* as our guiding theme, 
+we begin by establishing a framework for causal inference based on the gold standard of randomized trials---a 
+foundation that will inform our approach throughout the course. 
+We then introduce the workhorse of econometric analysis: the linear regression model. 
+You'll learn about its statistical properties and limitations, and how to interpret and communicate econometric results effectively.
+Building on this foundation, 
+we explore how to apply these tools to real-life scenarios, covering categorical variables, non-linear relationships, binary outcomes, and other specialized models. 
+The course concludes with advanced econometric techniques for analyzing two particularly powerful types of data: panel data and time series data.
+Econometrics demands a diverse skill set encompassing mathematics, statistics, economic theory, programming, and written and verbal communication.
+Perhaps most importantly, it requires developing strong intuition.
+This course will equip you with the analytical tools and empirical methods essential for modern economic research and policy analysis.
+
+## Learning Objectives
+
+1. **Understand Core Econometric Techniques**
+    - Develop a solid understanding of major econometric concepts and their applications in analyzing social science data
+
+2. **Distinguish Correlation from Causation**
+    - Explore techniques to identify and evaluate causal relationships in data, differentiating them from mere correlations, with applications in policy evaluation
+
+3. **Gain Proficiency in Statistical Software**
+    - Build hands-on experience with modern tools for data analysis, visualization, and maintaining reproducible research workflows.
+
+4. **Apply Econometric Techniques to Real Questions**
+    - Utilize econometric methods to analyze real-world datasets, including in your own project, drawing meaningful conclusions and policy implications
+
+5. **Communicate Analytical Results Clearly**
+    - Learn to effectively present, interpret, and document econometric findings
+
+## Contacting Me
+
+Please reach out if you have questions or need assistance!
+The best way to contact me is via email.
+I will do my best to respond within 24 hours on weekdays.
+
+Especially for an econometrics course, it can be difficult to answer questions solely over email.
+I strongly recommend you come to my office hours or schedule an appointment if you have a question that requires more than a few sentences to answer.
+If the office hours listed above do not work for you, please schedule an appointment with the link above.
+
+## Course Materials
+
+This class will pull from three primary texts.
+I recommend you obtain all three, but none are required.
+
+1. [Introductory Econometrics: A Modern Approach](https://www.google.com/books/edition/Introductory_Econometrics_A_Modern_Appro/0p9_tQEACAAJ?hl=en&kptab=overview) by Jeffrey M. Wooldridge (2019)
+    - The 7th edition is the most recent, but any edition 5 or above will work. We will primarily use this text for part of the course more reliant on statistical theory.
+
+2. [Real Econometrics](https://www.google.com/books/edition/Real_Econometrics/sbMEvgEACAAJ?hl=en) by Michael Bailey (2020)
+    - This is a good, more "applied" version of the Wooldridge text.
+
+3. [Mastering 'Metrics](https://books.google.com/books/about/Mastering_Metrics.html?id=dEh-BAAAQBAJ) by Joshua D. Angrist and Jörn-Steffen Pischke (2015)
+    - This text is an excellent companion to the other texts, but is not like a traditional textbook.
+
+You will also need reliable access to a computer (such as your personal laptop) to use the following software:
+
+- [R](https://cran.rstudio.com), an open-source software for statistical analyses and graphics
+- [R Studio](https://posit.co/download/rstudio-desktop/), 
+an integrated development environment (IDE), which provides an interface for working with R
+
+The first week of class we will go over how to install these software.
+
+The most important set of materials you need are the course lecture notes,
+which you are required to read each week.
+These lecture notes include built-in practice questions,
+and you are expected to come to class having reviewed these notes.
+
+## Prerequisites
+
+I expect you to have completed the following courses or their equivalents:
+
+- EC 223: Microeconomic Theory
+- EC 293: Research Methods and Statistics
+
+If you have not taken these courses please speak with me the first week of class to discuss whether you are prepared for this course.
+It is especially important that you are comfortable with the content of EC 293.
+
+## Assessments
+
+### Concept Checks
+
+This is a fast-paced, difficult course which attempts to cover a huge amount of material in a relatively
+short period of time.
+As a result, it is very important to stay on top of the material.
+To assist you in doing so, each week, you will be required to complete a short concept check which tests your understanding of the concepts covered in the readings and lectures, and your ability to implement them with code
+These will be due each Friday at 11:59pm at the end of each week (with some exceptions to be noted),
+although you are welcome to complete them earlier in the week if that is preferred.
+These will be graded on a 3 point scale (0 = no attempt, 1 = unsatisfactory, 2 = satisfactory, 3 = excellent).
+There will never be extensions granted for missed Concept Check.
+However, your lowest 2 grades will be dropped at the end of the semester.
+Be sure to use these wisely!
+
+These concept checks must be completed individually,
+and there can be no collaboration with your classmates.
+However, you are allowed to ask me questions via email or come to office hours.
+There is no formal time limit to complete each concept check,
+but they will be designed to take about 30 minutes for each week.
+
+### Problem Sets
+
+In addition to the weekly quizzes,
+there will be 4 problem sets during the semester.
+Each module of the course will have a problem set that will require you to apply the concepts and techniques we discuss in class.
+In these problem sets,
+you will be required to do some combination of: 
+i) data analysis using R, 
+ii) interpreting econometric results, 
+and iii) answering theoretical questions.
+Most problem sets will require you to replicate the results of major papers in economics.
+These will be due on Moodle by 11:59pm on the specified date.
+They are worth a considerable portion of your final grade,
+so you should consider each problem set as a mini-project and begin working on it well before its due date.
+
+### Exams
+
+There will be 2 exams in this course: a midterm and a final. 
+Both exams will be in-person, 
+and you are permitted to bring one double-sided note sheet as a reference. 
+These exams will primarily be conceptual, and you will not use software, though you may be required to analyze output from a statistical software package.
+The midterm exam will (tentatively) take place as noted on the syllabus during the standard class meeting time.
+The final exam will take place according to the slot scheduled by the registrar.
+More information about
+these exams will be provided in class.
+
+### Engaged Learning
+
+Active and engaged learning participation in class are crucial for your success in this course, 
+and thus count as a percentage of your overall grade. 
+You can demonstrate engaged learning through a multitude of ways, 
+including asking and answering questions in class, 
+coming to office hours, 
+coordinating group members, 
+and helping your classmates with the course material.
+
+### Final Project
+
+The capstone of this course will be a research project to be completed in groups of 3-4 students. 
+This project will require you to apply the econometric tools introduced in class to analyze a social science phenomenon, 
+topic, or policy of your choice. 
+Each group will be required to submit a written report and give a presentation to the class during the final week of the semester. 
+This project will be a considerable portion of your overall grade and 
+will require significant time and effort to complete successfully. 
+To help facilitate your work on the final project, 
+we will have several check-in deadlines throughout the semester.
+
+This includes:
+
+- A 1 page project proposal due in week 5
+- A data summary due in week 8
+- A preliminary findings report due in week 10
+- A final presentation during the last week of class
+- A final written report due during the last day of finals
+- A peer review that evaluates your personal contribution as well as your group mates
+
+Each group will only submit one version of each deliverable.
+Early in the semester, I will distribute a survey asking you to rank economics subfields that interest you for your project. 
+Based on your responses, I will form groups of students with similar interests. 
+Each group will then select a specific topic within their assigned subfield.
+
+At the end of the semester,
+you will also be required to complete a peer review survey,
+which asks about each group member individually about their contributions to the project,
+as well as about the other group members' contributions to the final project.
+The responses to the peer review survey will be considered in the determination of the Engaged Learning grade.
+
+## Grading
+
+The standard grading scale will be used. 
+I reserve the right to curve the scale dependent on overall class scores at the end of the semester. 
+Any curve will only ever make it easier to obtain a certain letter grade.
+The grade will count the assessments using the following proportions:
+
+- 25% of your grade will be determined by the problem sets
+- 15% will be determined by the midterm exam
+- 15% will be determined by the final exam
+- 30% will be determined by the final project
+- 10% will be determined by your concept checks
+- 5% will be determined by your engaged learning
+
+## Course Policies
+
+### Attendance Policy
+
+Unless otherwise noted, all classes will be in-person and attendance is required.
+However, please do not come to class if you are feeling unwell. 
+You are not required to produce a formal doctors note, 
+but please let me know via email to check-in and help prevent you from falling behind.
+Any unexcused absences will count against your engaged learning grade.
+
+### Assignment Submission
+
+Please submit all your assignments as either Microsoft Word files (.doc/.docx) or PDF files. 
+All files must be submitted via Moodle (do not email them to me),
+generally at 11:59pm on the date they are due.
+You must confirm that your files can be opened and are not corrupt before you turn them in.
+
+### Late Assignments
+
+All assignments must be completed on time.
+Only under the most dire circumstances will an extension be provided for a problem set. 
+Under no circumstances will I accept a late quiz.
+If there are extenuating circumstances that prevent you from completing a component of the final project on time, 
+please reach out to me as soon as possible to discuss your options.
+
+### AI Policy
+
+AI tools such as ChatGPT, Gemini, Claude, and others may be useful in helping you learn econometrics,
+especially with questions related to coding. 
+However, fully understanding the material and the process of coding is essential for success in this course and your long-term career as an econometrician. 
+Over-reliance on AI tools may hinder your ability to get the most out of your learning experience and develop critical thinking skills, 
+which are as essential for the art of econometrics as any other field.
+This is something that is seen too often in this course;
+for students who lean on AI too much, it quickly becomes a crutch, and even the most basic tasks cannot be completed without the use of these tools.
+I do not want to prohibit the use of potentially useful learning tools, 
+but I also want to mitigate the risk of over-reliance on them. 
+Therefore, the course policy regarding the use of AI tools is as follows:
+
+1. You are allowed to use AI tools on your problem sets and in your final project to **troubleshoot coding-related questions only.**
+All functions you will need to complete the assignments will be covered in the readings, problem sets, or lectures.
+You cannot directly ask the AI tool to fully complete a question on an assignment.
+Examples of acceptable uses will be shown during class.
+
+2. Any use of an AI tool must be attributed to the tool in your submission. 
+Since AI-generated materials cannot be retrieved by graders and are not attributable to a specific individual,  students
+should cite the creator of the AI tool (e.g., cite OpenAI when directly quoting ChatGPT).
+
+3. You must **understand** the AI-assisted code you submit, 
+and you must be prepared to explain it in your own words if prompted.
+
+If you are unsure if a use case of an AI tool is allowed, you should ask the instructor for clarification.
+**Any use of AI outside of these parameters or
+without approval from the instructor will be considered a violation of Colby’s Academic Honesty policies.**
+If you choose to use AI, 
+I strongly encourage you to use Google Gemini with your Colby College account. 
+Colby has worked with Google to help keep your data secure when interacting with this tool.
+Review the resources at the [Davis Institute for AI](https://sites.google.com/colby.edu/explore-ai/home?authuser=0) for more information.
+
+### Academic Integrity and Honesty
+
+Honesty, integrity, and personal responsibility are cornerstones of a Colby education and provide the
+foundation for scholarly inquiry, intellectual discourse, and an open and welcoming campus community.
+These values are articulated in the Colby Affirmation and are central to this course. 
+You are expected to demonstrate academic honesty in all aspects of this course. 
+If you understand our course expectations,
+give credit to those whose work you rely on, 
+and submit your best work, you are highly unlikely to commit an act of academic dishonesty. 
+Academic dishonesty includes, but is not limited to: 
+violating clearly stated rules for taking an exam or completing homework; 
+plagiarism (including material from sources without a citation and quotation marks around any borrowed words); 
+claiming another’s work or a modification of another’s work as one’s own; 
+buying or attempting to buy papers or projects for a course; 
+fabricating information or citations; 
+knowingly assisting others in acts of academic dishonesty;  
+misrepresentations to faculty within the context of a course; 
+and submitting the same work, including an essay that you wrote, 
+in more than one course without the permission of the instructors. 
+Academic dishonesty is a serious offense against the college. 
+Sanctions for academic dishonesty are assigned by an academic review board and may include: 
+failure on the assignment, failure in the course, or suspension or expulsion from the College. 
+For more on recognizing and avoiding plagiarism, see: [libguides.colby.edu/avoidingplagiarism](ibguides.colby.edu/avoidingplagiarism). 
+For resources and information on academic integrity, see: [https://www.colby.edu/academics/academic-integrity/](https://www.colby.edu/academics/academic-integrity/).
+
+### Accommodations for Disabilities
+
+I am committed to creating a course that is inclusive in its design. 
+If you encounter barriers, 
+please let me know immediately so we can determine if there is a design adjustment that can be made. 
+I am happy to consider creative solutions as long as they do not compromise the intent of the assessment or learning activity. 
+If you are a student with a disability, or think you may have a disability, 
+you are also welcome to initiate this conversation with the Dean of Students Office. 
+The Dean of Students Office works with students with disabilities and faculty members to identify reasonable accommodations. 
+Please visit their website for contact and other information: 
+[https://www.colby.edu/studentadvising/student-access-and-disability-services/](https://www.colby.edu/studentadvising/student-access-and-disability-services/). 
+If you have already been approved for academic accommodations, 
+please connect within the two weeks of the start of the semester so the office can develop an implementation plan.
+
+### Mental and Emotional Health
+
+I am invested in the mental and emotional health of my students. 
+Even as I establish and maintain the academic standards of my course, 
+I value each of you as individuals with complex lives, identities, and challenges. 
+Throughout the semester, the responsibilities of your Colby education may interact with 
+situational as well as ongoing mental and emotional challenges in foreseeable and unforeseeable ways.
+If you are in need of reasonable flexibility due to an emotional situation or an ongoing mental health issue, 
+please communicate as openly as possible with your Class Dean, and/or members of the office of Access and Disability Services, preferably in advance of the need, 
+so that we can discuss how your circumstances interface with course requirements. 
+Together, we will consider what is needed and what is possible. 
+If we can discuss the situation, we can manage the situation together. 
+Please do not allow academic responsibilities to prevent you from getting help you need. 
+Our Colby Counseling Services staff (207-859-4490) and the staff in the Dean of Studies office (207-859-4560) are available to connect with you. 
+The safety of my students and every member of this community is paramount. 
+If you or someone you know is struggling with thoughts of suicide or may be a danger to themselves or others, 
+please call the on-call counselor immediately (207-859-4490, press ’0’).
+
+### Respect for Diversity
+
+It is my intent that students from diverse backgrounds and perspectives be well-served by this course, 
+that students’ learning needs be addressed both in and out of class, 
+and that the diversity that students bring to this class be viewed as a resource, strength and benefit. 
+I expect you to feel challenged and sometimes outside of your comfort zone in this course, 
+but it is my intent to present materials and activities that are inclusive and respectful of all persons, 
+no matter their gender, sexual orientation, disability, age, socioeconomic status, ethnicity, race, culture, perspective, and other background characteristics. 
+Class rosters are provided to each instructor with the student’s legal name. 
+I will gladly honor your request to address you by an alternate name and/or gender pronoun. 
+Please advise me of this early in the semester so that I may make appropriate changes to my records.
+
+### College-Sponsored Activities and Attendance
+
+While Colby College is supportive of college-sponsored extracurricular activities such as athletic participation by its students, academics take priority over these activities. 
+For example, both NCAA and Colby rules prohibit missing class for practices. 
+In the case of overlapping commitments between class and college-sponsored extracurricular activities, 
+the student must meet with the professor as soon as possible to discuss these overlaps. 
+The student may request permission to miss class and make up the missed work; 
+the instructor has final authority either to grant or to withhold permission.
+
+### Religious Holidays
+
+I have attempted to avoid scheduling exams during major religious holidays. 
+If, however, I have inadvertently scheduled an exam or major deadline that creates a conflict with your religious observances, 
+please let me know within two weeks of the start of classes so that we can make other arrangements. 
+Colby College is supportive of the religious practices of its students, faculty, and staff. 
+The College is committed to ensuring that all students are able to observe their religious beliefs without academic penalty.
+
+### Sexual Misconduct/Title IX Statement
+
+Colby College prohibits and will not tolerate sexual misconduct or gender-based discrimination of any kind. 
+Colby is legally obligated to investigate sexual misconduct 
+(including, but not limited to, sexual assault and sexual harassment) 
+and other specific forms of behavior that violate federal and state laws
+(Title IX and Title VII, and the Maine Human Rights Act). 
+Such behavior also requires the College to
+fulfill certain obligations under two other federal laws, 
+the Violence Against Women Act (VAWA) and
+the Jeanne Clery Disclosure of Campus Security Policy and Campus Statistics Act (Clery Act). 
+To learn more about what constitutes sexual misconduct or to report an incident, review the Student Handbook.
+I am committed to all Colby students feeling safe, accepted, 
+and included in all aspects of their college experiences, including this course. 
+Colby prohibits and will not tolerate sexual misconduct or gender based discrimination of any kind and is obligated, 
+by federal and state laws, to respond to reports and provide resources to students. 
+As your professor I am considered a "responsible employee" 
+which requires me to report incidence of sexual assault, sexual harassment, dating violence, or stalking to the Title IX Coordinator. 
+
+If you wish to access confidential support services, you may contact:
+
+- The Counseling Center: 207-859-4490
+- The Title IX Confidential Advocate: 207-509-9122
+- The Office of Religious and Spiritual Life: 207-859-4272
+- Maine’s 24/7 Sexual Assault Helpline: 1-800-871-7741
+
+### In-Class Recordings by Students and Unauthorized Distribution of Notes
+
+Students may only use the notes they take from class for their own personal use or to share with Access and Disabilities Services. 
+Students cannot share or sell these notes via an outside vendor or entity without the instructor’s permission. 
+This pertains to in-class recordings as well. 
+Usage of the notes or in-class recordings in this way without instructor permission is a violation of instructor copyright protection.
+
+## Course Content and Schedule
+
+The schedule is tentative and subject to change.
+
+#### Module 1: Introduction to Causality and Regression
+
+- Unit 1: Introduction
+
+- Unit 2: Good Data Practices and Replication
+
+- Unit 3: Causality and Randomized Controlled Trials
+
+- Unit 4: Bivariate Regression and Ordinary Least Squares
+
+- Unit 5: Multivariate Regression
+
+- Unit 6: Statistical Inference
+
+#### Module 2: Advanced Modeling Tools
+
+- Unit 7: Dummy Variables and Other Non-Linearities
+
+- Unit 8: Interaction Terms
+
+- Unit 9: Binary Outcomes
+
+#### Module 3: Panel Data and Difference-in-Differences
+
+- Unit 10: Panel Data and Fixed Effects
+
+- Unit 11: Introduction to Difference-in-Differences
+
+- Unit 12: Topics in Difference-in-Differences and Research Design
+
+#### Module 4: Other Econometric Methods
+
+- Unit 13: Instrumental Variables
+
+- Unit 14: Introduction to Time Series
+
+
