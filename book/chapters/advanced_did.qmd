@@ -1,0 +1,970 @@
+# Advanced Difference-in-Differences {#sec-advanced-did}
+
+```{r}
+#| echo: false
+#| output: false
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(fixest)
+library(wooldridge)
+library(modelsummary)
+library(fastDummies)
+
+options(scipen = 999)
+
+```
+
+```{=html}
+
+<style>
+.problem {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+.context {
+    background-color: #e8f4f8;
+    padding: 12px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border-left: 4px solid #2874a6;
+}
+.question {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #fff3cd;
+    border-radius: 5px;
+}
+.answer-row {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.answer-row label {
+    min-width: 320px;
+    font-weight: 500;
+}
+select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    min-width: 300px;
+    cursor: pointer;
+}
+select:focus {
+    border-color: #2874a6;
+    outline: none;
+}
+.correct {
+    border-color: #28a745 !important;
+    background-color: #d4edda !important;
+}
+.incorrect {
+    border-color: #dc3545 !important;
+    background-color: #f8d7da !important;
+}
+.explanation {
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #e7f3ff;
+    border-radius: 5px;
+    border-left: 4px solid #2874a6;
+}
+.note {
+    font-size: 0.85em;
+    color: #666;
+    font-style: italic;
+}
+</style>
+
+<script>
+function checkAnswer(selectElement, correctValue) {
+    if (selectElement.value === '') {
+        selectElement.classList.remove('correct', 'incorrect');
+    } else if (selectElement.value === correctValue) {
+        selectElement.classList.remove('incorrect');
+        selectElement.classList.add('correct');
+    } else {
+        selectElement.classList.remove('correct');
+        selectElement.classList.add('incorrect');
+    }
+}
+</script>
+
+```
+
+
+::: {.callout-tip collapse="true"}
+## **Key Questions**
+- How can we use data to select better control units for DiD?
+- What are propensity scores and how do they improve DiD estimates?
+- How do we estimate treatment effects that change over time?
+- What is an event study and how do we interpret it?
+- Why do we need cluster-robust standard errors in panel data?
+:::
+
+::: {.callout-note collapse="true"}
+## **Suggested Readings**
+- TBD
+:::
+
+
+The basic difference-in-differences framework is powerful,
+but real-world applications often require more sophisticated tools.
+This chapter covers three important extensions:
+**data-driven control selection** using propensity scores,
+**dynamic DiD** for effects that evolve over time,
+and **cluster-robust standard errors** for proper inference with grouped data.
+
+
+## Data-Driven Control Selection
+
+### The Problem: Systematically Different Treatment and Control Groups
+
+In the previous chapter,
+we emphasized that your DiD estimate is only as good as your counterfactual.
+When treated and control groups are systematically different,
+the parallel trends assumption becomes implausible.
+
+Consider estimating the effect of the Affordable Care Act (ACA) Medicaid expansion on uninsured rates.
+States that expanded Medicaid are very different from states that didn't:
+they tend to be more politically liberal,
+have different demographics,
+different industries,
+and different baseline health care systems.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+# Simulate ACA expansion data
+set.seed(8675309)
+
+n_states <- 200
+years <- 2010:2018
+policy_year <- 2014
+true_att <- -5.0
+
+# Generate state characteristics
+states <- tibble(
+    state_id = 1:n_states,
+    X1 = rnorm(n_states, mean = 0, sd = 1),  # Political leaning
+    X2 = rbinom(n_states, 1, 0.4),            # Region
+    X3 = rnorm(n_states, mean = 12, sd = 3)   # Poverty rate
+) |>
+    mutate(
+        linear_pred = -0.5 + 1.5 * X1 - 1.2 * X2 + 0.3 * (X3 - 12),
+        prob_expand = plogis(linear_pred),
+        is_expanded = rbinom(n(), 1, prob_expand)
+    )
+
+# Generate panel data with parallel trends violation
+panel_data <- expand_grid(state_id = states$state_id, year = years) |>
+    left_join(states, by = "state_id") |>
+    mutate(
+        post = if_else(year >= policy_year, 1, 0),
+        treat_active = is_expanded * post,
+        alpha_i = 15 + rnorm(n_states, 0, 2)[state_id],
+        lambda_t = -0.5 * (year - 2010),
+        # Trend violation: states likely to expand already had steeper declines
+        trend_violation = (-0.8 * X1 + 0.5 * X2 - 0.2 * (X3 - 12)) * (year - 2010),
+        epsilon = rnorm(n(), 0, 1.5),
+        y0 = alpha_i + lambda_t + trend_violation + epsilon,
+        y1 = y0 + true_att,
+        uninsured_rate = if_else(treat_active == 1, y1, y0)
+    )
+```
+
+Using all non-expanding states as controls produces biased estimates because these states were on different trajectories *even before* the policy.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-naive-trends
+#| fig-cap: "Without adjustment, treated and control states show diverging pre-trends, violating the parallel trends assumption."
+
+# Calculate naive (unweighted) trends
+plot_data_naive <- panel_data |>
+    group_by(year, is_expanded) |>
+    summarize(mean_y = mean(uninsured_rate), .groups = 'drop') |>
+    mutate(Group = if_else(is_expanded == 1, "Treated (Expanded ACA)", "Control (Did Not Expand)"))
+
+ggplot(plot_data_naive, aes(x = year, y = mean_y, color = Group, linetype = Group)) +
+    geom_line(linewidth = 1.2) +
+    geom_point(size = 2) +
+    geom_vline(xintercept = 2013.5, linetype = "dotted", color = "gray40") +
+    annotate("text", x = 2013.3, y = max(plot_data_naive$mean_y), 
+             label = "Policy\nBegins", hjust = 1, size = 3.5) +
+    scale_color_manual(values = c("Control (Did Not Expand)" = "#E69F00", 
+                                   "Treated (Expanded ACA)" = "#0072B2")) +
+    labs(
+        title = "Naive Comparison: Expansion vs. All Non-Expansion States",
+        subtitle = "Pre-trends are clearly not parallel",
+        x = "Year",
+        y = "Mean Uninsured Rate (%)",
+        color = NULL,
+        linetype = NULL
+    ) +
+    theme_minimal(base_size = 13) +
+    theme(legend.position = "bottom")
+```
+
+The figure shows that even *before* the ACA expansion in 2014,
+treated states had steeper downward trends in uninsured rates.
+This pre-existing difference would be incorrectly attributed to the policy in a naive DiD analysis.
+
+### Propensity Score Weighting: The Intuition
+
+The solution is to find control units that are *similar* to treated units.
+If we could compare only states that were "on the verge" of expanding but didn't,
+we would have a much better counterfactual.
+
+**Propensity score methods** formalize this intuition.
+The idea is:
+
+1. Estimate each unit's probability of being treated based on observable characteristics
+2. Give more weight to control units that "look like" they should have been treated
+3. Use these weights in the DiD regression
+
+Control units with high propensity scores (high predicted probability of treatment) but who weren't actually treated become our primary comparison group.
+They're similar to treated units on observables,
+making parallel trends more plausible.
+
+### The IPW-DiD Algorithm
+
+**Inverse Propensity Score Weighted DiD (IPW-DiD)** proceeds in three steps:
+
+**Step 1: Estimate the Propensity Score**
+
+We estimate a logistic regression predicting treatment status from pre-treatment characteristics:
+
+$$
+P(D_i = 1 | X) = G(\beta_0 + \beta_1 X_1 + \beta_2 X_2 + ... + \beta_k X_k)
+$$
+
+where $G()$ is the logistic function and the $X$ variables are characteristics that predict treatment.
+
+For the ACA example,
+we might include political leaning (Democratic vote share),
+region,
+and baseline poverty rates.
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# Aggregate to state level for propensity score estimation
+state_data <- panel_data |>
+    filter(post == 0) |>  # Use only pre-treatment data
+    group_by(state_id, is_expanded) |>
+    summarize(
+        dem_share = mean(X1),
+        region = mean(X2),
+        poverty = mean(X3),
+        .groups = 'drop'
+    )
+
+# Estimate propensity scores with logistic regression
+ps_model <- glm(is_expanded ~ dem_share + region + poverty,
+                data = state_data,
+                family = binomial("logit"))
+
+# Get predicted probabilities
+state_data <- state_data |>
+    mutate(ps_score = predict(ps_model, type = "response"))
+```
+
+**Step 2: Calculate IPW Weights**
+
+The inverse propensity weights are:
+
+$$
+IPW_i = D_i + (1 - D_i) \times \frac{\hat{P}_i}{1 - \hat{P}_i}
+$$
+
+- For treated units ($D_i = 1$): weight = 1
+- For control units ($D_i = 0$): weight = $\frac{\hat{P}_i}{1 - \hat{P}_i}$
+
+Control units with high propensity scores get large weights;
+those with low propensity scores get small weights.
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# Calculate IPW weights
+state_data <- state_data |>
+    mutate(
+        ipw = case_when(
+            is_expanded == 1 ~ 1,
+            is_expanded == 0 ~ ps_score / (1 - ps_score)
+        )
+    )
+
+# Show example weights
+state_data |>
+    select(state_id, is_expanded, ps_score, ipw) |>
+    arrange(desc(ipw)) |>
+    head(8) |>
+    knitr::kable(digits = 2, caption = "Example IPW Weights")
+```
+
+**Step 3: Estimate Weighted TWFE**
+
+Finally,
+we estimate the standard TWFE DiD regression but using the IPW weights:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# Merge weights into panel data
+panel_weighted <- panel_data |>
+    left_join(select(state_data, state_id, ipw), by = "state_id")
+
+# Naive (unweighted) DiD
+did_naive <- feols(uninsured_rate ~ treat_active | state_id + year,
+                   vcov = "HC1",
+                   data = panel_data)
+
+# IPW-weighted DiD
+did_ipw <- feols(uninsured_rate ~ treat_active | state_id + year,
+                 vcov = "HC1",
+                 weights = ~ipw,
+                 data = panel_weighted)
+```
+
+### Comparing Results
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-ipw-comparison
+#| fig-cap: "IPW weighting restores parallel pre-trends by up-weighting control units similar to treated units."
+
+# Calculate IPW-weighted trends
+plot_data_ipw <- panel_weighted |>
+    group_by(year, is_expanded) |>
+    summarize(mean_y = weighted.mean(uninsured_rate, w = ipw), .groups = 'drop') |>
+    mutate(Group = if_else(is_expanded == 1, "Treated (Expanded ACA)", "Control (IPW-Weighted)"))
+
+ggplot(plot_data_ipw, aes(x = year, y = mean_y, color = Group, linetype = Group)) +
+    geom_line(linewidth = 1.2) +
+    geom_point(size = 2) +
+    geom_vline(xintercept = 2013.5, linetype = "dotted", color = "gray40") +
+    annotate("text", x = 2013.3, y = max(plot_data_ipw$mean_y), 
+             label = "Policy\nBegins", hjust = 1, size = 3.5) +
+    scale_color_manual(values = c("Control (IPW-Weighted)" = "#E69F00", 
+                                   "Treated (Expanded ACA)" = "#0072B2")) +
+    labs(
+        title = "IPW-Weighted Comparison",
+        subtitle = "Pre-trends are now much more parallel",
+        x = "Year",
+        y = "Mean Uninsured Rate (%)",
+        color = NULL,
+        linetype = NULL
+    ) +
+    theme_minimal(base_size = 13) +
+    theme(legend.position = "bottom")
+```
+
+The IPW-weighted trends are much more parallel in the pre-period!
+This gives us greater confidence in the parallel trends assumption.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+# Create comparison table
+tibble(
+    Method = c("Naive DiD (all controls equal weight)", "IPW-Weighted DiD"),
+    Estimate = c(coef(did_naive)["treat_active"], coef(did_ipw)["treat_active"]),
+    `True Effect` = c(-5, -5)
+) |>
+    knitr::kable(digits = 2, caption = "Comparing Naive and IPW-DiD Estimates (True effect = -5)")
+```
+
+The naive estimate is substantially biased (too negative) because it attributes pre-existing trends to the policy.
+The IPW-weighted estimate is much closer to the true effect of -5 percentage points.
+
+::: {.callout-important}
+## Key Insight
+IPW-DiD works by reweighting the control group so that it looks more like the treatment group on observable characteristics.
+This makes parallel trends more plausible---but the method is only as good as your propensity score model.
+If important confounders are omitted,
+bias remains.
+:::
+
+
+## Dynamic DiD and Event Studies
+
+### Why Treatment Effects May Change Over Time
+
+The basic DiD model estimates a single treatment effect that applies to all post-treatment periods.
+But many policies have effects that **evolve over time**:
+
+- A job training program might have small initial effects that grow as workers gain experience
+- A minimum wage increase might have immediate disemployment effects that fade as firms adjust
+- An environmental regulation might have growing effects as compliance increases
+
+**Dynamic DiD** allows us to estimate separate treatment effects for each time period,
+capturing how the policy impact unfolds.
+
+### Relative Time
+
+Dynamic DiD models use **relative time**---the number of periods since treatment occurred---rather than calendar time.
+If treatment occurs in 2015:
+
+| Calendar Year | Relative Time |
+|:-------------:|:-------------:|
+| 2012 | -3 |
+| 2013 | -2 |
+| 2014 | -1 |
+| 2015 (treatment) | 0 |
+| 2016 | +1 |
+| 2017 | +2 |
+
+This framing lets us estimate effects at each distance from treatment and,
+crucially,
+test whether pre-treatment "effects" are zero (as they should be if parallel trends holds).
+
+### The Dynamic DiD Model
+
+The dynamic DiD model includes dummy variables for each relative time period:
+
+$$
+y_{it} = \sum_{k \neq -1} \beta_k D_{it}^k + \alpha_i + \tau_t + \mu_{it}
+$$
+
+where $D_{it}^k = 1$ if unit $i$ is treated and period $t$ is $k$ periods from treatment.
+
+We **omit** $k = -1$ (the period just before treatment) as the reference category.
+All coefficients are interpreted relative to this baseline.
+
+### Example: Environmental Policy and Manufacturing Employment
+
+Suppose we want to estimate how an environmental regulation affects manufacturing employment in cities.
+We have data on 50 cities observed from 1995 to 2010,
+with 25 cities adopting the policy in 2005.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+# Simulate dynamic DiD data
+set.seed(456)
+n_cities <- 50
+years <- 1995:2010
+TREATMENT_YEAR <- 2005
+
+# Create panel
+panel_env <- expand.grid(city_id = 1:n_cities, year = years) |>
+    as_tibble()
+
+# Assign treatment (25 treated, 25 control)
+control_cities <- sample(1:n_cities, 25)
+city_lookup <- tibble(city_id = 1:n_cities) |>
+    mutate(
+        treated_group = ifelse(city_id %in% control_cities, 0, 1),
+        adoption_year = ifelse(treated_group == 1, TREATMENT_YEAR, Inf)
+    )
+
+# True effect function (grows then levels off)
+get_true_effect <- function(rel_year) {
+    case_when(
+        rel_year < 0 ~ 0,
+        rel_year == 0 ~ -100,
+        rel_year == 1 ~ -300,
+        rel_year == 2 ~ -450,
+        rel_year >= 3 ~ -500
+    )
+}
+
+# Generate fixed effects
+city_fes <- rnorm(n_cities, 1000, 150)
+year_fes <- rnorm(length(years), 50, 20)
+
+# Build dataset
+env_data <- panel_env |>
+    left_join(city_lookup, by = "city_id") |>
+    mutate(
+        city_fe = city_fes[city_id],
+        year_fe = year_fes[year - min(years) + 1],
+        rel_year = year - adoption_year,
+        true_effect = get_true_effect(rel_year),
+        manufacturing_emp = city_fe + year_fe + true_effect + rnorm(n(), 0, 50)
+    )
+
+# Create relative time treatment dummies
+env_data <- env_data |>
+    mutate(
+        rel_t = year - TREATMENT_YEAR,
+        rel_t_treat = case_when(treated_group == 1 ~ rel_t, TRUE ~ 0)
+    )
+
+env_data <- dummy_cols(env_data, select_columns = "rel_t_treat", 
+                        remove_selected_columns = TRUE)
+
+env_data <- env_data |>
+    mutate(rel_t_treat_0 = rel_t_treat_0 * treated_group)
+```
+
+Let's visualize the raw trends first:
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-env-trends
+#| fig-cap: "Treatment and control cities show parallel pre-trends, then diverge after the policy in 2005."
+
+env_trends <- env_data |>
+    group_by(year, treated_group) |>
+    summarize(mean_emp = mean(manufacturing_emp), .groups = 'drop') |>
+    mutate(Group = if_else(treated_group == 1, "Treated Cities", "Control Cities"))
+
+ggplot(env_trends, aes(x = year, y = mean_emp, color = Group)) +
+    geom_line(linewidth = 1.2) +
+    geom_point(size = 2) +
+    geom_vline(xintercept = 2004.5, linetype = "dashed", color = "gray40") +
+    annotate("text", x = 2004.3, y = 1150, label = "Policy\nAdopted", hjust = 1, size = 3.5) +
+    scale_color_manual(values = c("Control Cities" = "#E69F00", "Treated Cities" = "#0072B2")) +
+    labs(
+        title = "Manufacturing Employment: Treated vs. Control Cities",
+        x = "Year",
+        y = "Mean Manufacturing Employment",
+        color = NULL
+    ) +
+    theme_minimal(base_size = 13) +
+    theme(legend.position = "bottom")
+```
+
+The trends are parallel before 2005,
+then the treated cities experience a growing decline in manufacturing employment.
+
+### Estimating the Dynamic Model
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# Estimate dynamic DiD (note: rel_t_treat_-1 is omitted as reference)
+dyn_did <- feols(
+    manufacturing_emp ~ `rel_t_treat_-10` + `rel_t_treat_-9` + `rel_t_treat_-8` + 
+        `rel_t_treat_-7` + `rel_t_treat_-6` + `rel_t_treat_-5` + `rel_t_treat_-4` + 
+        `rel_t_treat_-3` + `rel_t_treat_-2` + `rel_t_treat_0` + `rel_t_treat_1` + 
+        `rel_t_treat_2` + `rel_t_treat_3` + `rel_t_treat_4` + `rel_t_treat_5` |
+        city_id + year,
+    vcov = "HC1",
+    data = env_data
+)
+```
+
+### The Event Study Plot
+
+The best way to present dynamic DiD results is an **event study plot**.
+We plot each coefficient with its 95% confidence interval,
+with the x-axis showing relative time and a vertical line at the treatment date.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-event-study
+#| fig-cap: "Event study plot showing treatment effects over time. Pre-treatment coefficients near zero support parallel trends; post-treatment coefficients show the growing negative effect."
+
+# Extract coefficients and confidence intervals
+est_tab <- tibble(
+    coefname = names(coef(dyn_did)),
+    est = coef(dyn_did),
+    ci95_l = confint(dyn_did)[,1],
+    ci95_u = confint(dyn_did)[,2],
+    rel_t = c(-10:-2, 0:5)
+)
+
+# Add the omitted reference period
+omitted_lvl <- tibble(coefname = "ref", rel_t = -1, est = 0, ci95_l = 0, ci95_u = 0)
+est_tab <- bind_rows(est_tab, omitted_lvl) |> arrange(rel_t)
+
+# Create the event study plot
+ggplot(est_tab, aes(x = rel_t, y = est)) +
+    geom_hline(yintercept = 0, linetype = "solid", color = "gray60") +
+    geom_vline(xintercept = -0.5, linetype = "dashed", color = "gray40") +
+    geom_errorbar(aes(ymin = ci95_l, ymax = ci95_u), width = 0.2, 
+                  color = "#0072B2", linewidth = 0.8) +
+    geom_point(size = 3, color = "#0072B2") +
+    geom_line(color = "#0072B2", linewidth = 0.8) +
+    annotate("text", x = -5, y = 150, label = "Pre-treatment\n(should be ≈ 0)", 
+             color = "gray40", size = 3.5) +
+    annotate("text", x = 3, y = -200, label = "Post-treatment\n(causal effects)", 
+             color = "gray40", size = 3.5) +
+    scale_x_continuous(breaks = seq(-10, 5, 2)) +
+    coord_cartesian(ylim = c(-700, 300)) +
+    labs(
+        title = "Event Study: Effect of Environmental Policy on Manufacturing Employment",
+        subtitle = "Reference period: k = -1 (year before treatment)",
+        x = "Years Relative to Policy Adoption",
+        y = "Estimated Effect on Employment"
+    ) +
+    theme_minimal(base_size = 13)
+```
+
+### Interpreting the Event Study
+
+The event study plot reveals several important patterns:
+
+1. **Pre-treatment coefficients (k < -1):** These cluster around zero with confidence intervals that include zero. This is strong evidence for parallel trends---before the policy,
+treated and control cities were on similar trajectories.
+
+2. **Reference period (k = -1):** This is normalized to zero by construction.
+
+3. **Post-treatment coefficients (k ≥ 0):** These show the causal effect of the policy. The effect starts at about -100 in the adoption year and grows to about -500 by year 3,
+where it levels off.
+
+::: {.callout-note}
+## Why Pre-Trends Matter
+The pre-treatment coefficients serve as a **placebo test**.
+If we found large,
+significant "effects" before the policy was implemented,
+that would suggest our control group is invalid---the groups were already diverging for reasons unrelated to the treatment.
+:::
+
+
+## Cluster-Robust Standard Errors
+
+### The Problem: Non-Independent Observations
+
+Standard OLS assumes observations are independent.
+But in panel data,
+observations from the same unit across time are often correlated.
+Students in the same classroom share a teacher;
+workers in the same firm share management;
+residents of the same state share policies.
+
+When errors are **correlated within clusters**,
+standard errors from regular OLS are too small.
+This leads to:
+
+- T-statistics that are too large
+- P-values that are too small
+- Confidence intervals that are too narrow
+- **Too many false positives** (Type I errors)
+
+### Visualizing the Problem
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-cluster-visual
+#| fig-cap: "With clustered data, observations within groups are correlated. Regular standard errors don't account for this, leading to overconfidence."
+
+# Create illustration data
+set.seed(123)
+n_clusters <- 6
+obs_per_cluster <- 15
+
+cluster_data <- tibble(
+    cluster = rep(1:n_clusters, each = obs_per_cluster),
+    cluster_effect = rep(rnorm(n_clusters, 0, 2), each = obs_per_cluster),
+    individual_effect = rnorm(n_clusters * obs_per_cluster, 0, 0.5),
+    y = 5 + cluster_effect + individual_effect,
+    x = runif(n_clusters * obs_per_cluster, 0, 10)
+)
+
+ggplot(cluster_data, aes(x = x, y = y, color = factor(cluster))) +
+    geom_point(size = 2.5, alpha = 0.7) +
+    geom_hline(data = cluster_data |> group_by(cluster) |> summarize(mean_y = mean(y)),
+               aes(yintercept = mean_y, color = factor(cluster)),
+               linetype = "dashed", alpha = 0.5) +
+    scale_color_brewer(palette = "Set2") +
+    labs(
+        title = "Clustered Data: Observations Within Groups Are Correlated",
+        subtitle = "Dashed lines show cluster means; observations cluster around their group mean",
+        x = "X Variable",
+        y = "Y Variable",
+        color = "Cluster"
+    ) +
+    theme_minimal(base_size = 13) +
+    theme(legend.position = "right")
+```
+
+### Simulation: The Dangers of Ignoring Clustering
+
+Let's simulate what happens when we ignore clustering.
+We'll generate data where the **true treatment effect is zero**,
+so any "significant" result is a false positive.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+# Simulation parameters
+set.seed(12345980)
+NUM_SIMS <- 500
+NUM_CLUSTERS <- 50
+OBS_PER_CLUSTER <- 30
+ICC <- 0.5  # Intra-cluster correlation
+TRUE_EFFECT <- 0  # No true effect
+
+# Function to generate clustered data
+generate_clustered_data <- function() {
+    total_var <- 1
+    cluster_var <- ICC * total_var
+    indiv_var <- (1 - ICC) * total_var
+    
+    cluster_error <- rnorm(NUM_CLUSTERS, 0, sqrt(cluster_var))
+    treatment <- rbinom(NUM_CLUSTERS, 1, 0.5)
+    
+    clusters <- tibble(
+        cluster_id = 1:NUM_CLUSTERS,
+        cluster_error = cluster_error,
+        treatment = treatment
+    )
+    
+    df <- clusters[rep(1:NUM_CLUSTERS, each = OBS_PER_CLUSTER), ] |>
+        mutate(
+            individual_error = rnorm(n(), 0, sqrt(indiv_var)),
+            y = 5 + TRUE_EFFECT * treatment + cluster_error + individual_error
+        )
+    
+    return(df)
+}
+
+# Run simulation
+results <- map_dfr(1:NUM_SIMS, function(i) {
+    sim_data <- generate_clustered_data()
+    model <- feols(y ~ treatment, data = sim_data)
+    
+    # Naive p-value
+    naive_p <- summary(model, se = "iid")$coeftable["treatment", "Pr(>|t|)"]
+    
+    # Cluster-robust p-value
+    cluster_p <- summary(model, cluster = ~cluster_id)$coeftable["treatment", "Pr(>|t|)"]
+    
+    tibble(naive_p = naive_p, cluster_p = cluster_p)
+})
+
+# Calculate rejection rates
+naive_reject <- mean(results$naive_p < 0.05)
+cluster_reject <- mean(results$cluster_p < 0.05)
+```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-cluster-sim
+#| fig-cap: "Distribution of p-values from 500 simulations where the true effect is zero. Naive standard errors (left) produce too many small p-values; cluster-robust standard errors (right) are properly calibrated."
+
+results_long <- results |>
+    pivot_longer(everything(), names_to = "method", values_to = "pvalue") |>
+    mutate(method = if_else(method == "naive_p", 
+                            "Naive (OLS) Standard Errors", 
+                            "Cluster-Robust Standard Errors"))
+
+ggplot(results_long, aes(x = pvalue, fill = method)) +
+    geom_histogram(bins = 20, alpha = 0.7, color = "white") +
+    geom_vline(xintercept = 0.05, linetype = "dashed", color = "red") +
+    facet_wrap(~method) +
+    annotate("text", x = 0.15, y = 80, label = "α = 0.05", color = "red", size = 3.5) +
+    scale_fill_manual(values = c("Naive (OLS) Standard Errors" = "#E69F00",
+                                  "Cluster-Robust Standard Errors" = "#0072B2")) +
+    labs(
+        title = "P-Value Distributions Under the Null (True Effect = 0)",
+        subtitle = sprintf("Naive rejection rate: %.0f%% | Cluster-robust rejection rate: %.0f%%", 
+                          naive_reject * 100, cluster_reject * 100),
+        x = "P-Value",
+        y = "Count"
+    ) +
+    theme_minimal(base_size = 12) +
+    theme(legend.position = "none")
+```
+
+The simulation shows that:
+
+- With **naive standard errors**: We reject the null `r round(naive_reject * 100)`% of the time (should be 5%)
+- With **cluster-robust standard errors**: We reject `r round(cluster_reject * 100)`% of the time (close to 5%)
+
+Ignoring clustering leads to a **massive inflation of false positives**!
+
+### Implementing Cluster-Robust Standard Errors
+
+In `fixest`,
+cluster-robust standard errors are easy to implement using the `cluster` argument:
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Standard (naive) standard errors
+model_naive <- feols(y ~ treatment | state + year,
+                     vcov = "HC1",
+                     data = my_data)
+
+# Cluster-robust standard errors (clustered at state level)
+model_cluster <- feols(y ~ treatment | state + year,
+                       cluster = "state",
+                       data = my_data)
+```
+
+::: {.callout-tip}
+## Rule of Thumb: Cluster at the Treatment Level
+Cluster your standard errors at the level where treatment is assigned.
+If policies are set at the state level,
+cluster by state.
+If a program is implemented at the school level,
+cluster by school.
+:::
+
+
+## Summary
+
+This chapter covered three important extensions to basic DiD:
+
+**Propensity Score Weighting (IPW-DiD)** improves the counterfactual by up-weighting control units that are similar to treated units.
+When treated and control groups differ systematically,
+naive DiD violates parallel trends;
+IPW helps restore balance.
+The algorithm involves estimating propensity scores,
+computing inverse probability weights,
+and using those weights in the TWFE regression.
+
+**Dynamic DiD and Event Studies** allow treatment effects to vary over time.
+By estimating separate effects for each period relative to treatment,
+we can see whether effects grow,
+shrink,
+or remain stable.
+Crucially,
+the pre-treatment coefficients serve as a placebo test:
+if they're significantly different from zero,
+parallel trends is violated.
+
+**Cluster-Robust Standard Errors** correct for correlated errors within groups.
+When observations within clusters (states, schools, firms) are correlated,
+standard OLS inference is overconfident,
+leading to inflated false positive rates.
+Clustering at the treatment level provides valid inference.
+
+These tools are essential for credible DiD analysis in practice.
+
+
+## Check Your Understanding
+
+:::: {.content-visible when-format="html"}
+
+For each question below, 
+select the best answer from the dropdown menu. 
+
+```{=html}
+<div class="question">
+<div class="answer-row">
+    <label>i. In IPW-DiD, control units with high propensity scores receive ______ weights. </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Lower</option>
+        <option value="b">Higher</option>
+        <option value="c">Equal</option>
+        <option value="d">Zero</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>ii. Why do we typically omit k = -1 (the period just before treatment) in dynamic DiD? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Because there's no data for that period</option>
+        <option value="b">Because the treatment effect is largest then</option>
+        <option value="c">To serve as the reference category for interpreting other coefficients</option>
+        <option value="d">Because parallel trends always holds at k = -1</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iii. In an event study plot, what do pre-treatment coefficients (k < -1) test? </label>
+    <select onchange="checkAnswer(this, 'a')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The parallel trends assumption</option>
+        <option value="b">The size of the treatment effect</option>
+        <option value="c">Whether the policy was implemented correctly</option>
+        <option value="d">The statistical power of the study</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iv. What happens to standard errors if we ignore clustering in panel data? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">They become too large (conservative)</option>
+        <option value="b">They become too small (overconfident)</option>
+        <option value="c">They are unbiased</option>
+        <option value="d">They become negative</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>v. At what level should you cluster standard errors when studying state-level minimum wage policies? </label>
+    <select onchange="checkAnswer(this, 'd')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Individual worker level</option>
+        <option value="b">Firm level</option>
+        <option value="c">Industry level</option>
+        <option value="d">State level</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>vi. <strong>(Challenge)</strong> If your event study shows significant negative "effects" at k = -3 and k = -2 (before treatment), what should you conclude? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The treatment has anticipation effects</option>
+        <option value="b">The treatment effect is very large</option>
+        <option value="c">The parallel trends assumption is likely violated; the control group may be invalid</option>
+        <option value="d">You need more post-treatment periods</option>
+    </select>
+</div>
+</div>
+
+```
+
+::: {.callout-tip collapse="true"}
+## Show Explanation
+
+i. Control units with high propensity scores (high predicted probability of being treated) but who weren't actually treated receive **higher** weights. The intuition is that these units are most similar to treated units on observables, making them better comparisons. The IPW formula gives them weight = P/(1-P), which increases with P.
+
+ii. We need to omit one period to avoid perfect collinearity (similar to the dummy variable trap). We choose k = -1 because it's the natural baseline: all treatment effect estimates are then interpreted as differences from the period immediately before treatment began.
+
+iii. Pre-treatment coefficients should be zero if parallel trends holds—there should be no "effect" of a treatment that hasn't happened yet. If these coefficients are significantly different from zero, it suggests treated and control groups were already diverging before the policy, violating the key identifying assumption.
+
+iv. When observations within clusters are correlated, regular standard errors treat them as independent, underestimating the true uncertainty. This makes standard errors too small, t-statistics too large, p-values too small, and confidence intervals too narrow—leading to excessive false positives.
+
+v. The rule is to cluster at the level of treatment assignment. Since minimum wage policies are set at the state level, you should cluster by state. This accounts for correlation in outcomes among all workers within the same state who share the same policy environment.
+
+vi. Significant pre-treatment effects are a red flag. They suggest the treated and control groups were on different trajectories *before* the policy—meaning any post-treatment difference could reflect these pre-existing trends rather than the causal effect of the policy. This casts serious doubt on the validity of the control group and the DiD estimate.
+
+:::
+
+::::
+
+:::: {.content-hidden when-format="html"}
+
+*Note: This section contains interactive content only available in the HTML version.*
+
+::::

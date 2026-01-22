@@ -99,6 +99,7 @@ function checkAnswer(selectElement, correctValue) {
 ::: {.callout-tip collapse="true"}
 ## **Key Questions**
 - What are the properties of the summation operator?
+- What are the key rules for logarithms, and why do economists use logs so often?
 - How do we interpret derivatives and partial derivatives?
 - How do we find the maximum or minimum of a function?
 - What is the difference between a population and a sample?
@@ -253,6 +254,216 @@ the derivative is simply the coefficient $\beta_1$---the effect of $x$ on $y$ is
 In the other cases,
 the derivative depends on the value of $x$,
 meaning the effect of $x$ on $y$ varies depending on where you start.
+
+
+### Percentages and Percent Changes
+
+Understanding percentages is essential for econometrics.
+Many economic variables are reported as percentages (unemployment rate, interest rates, inflation),
+and we frequently describe changes in percentage terms.
+Getting the language right matters---confusing "percent" with "percentage points" is a common source of errors.
+
+#### Percentages
+
+A **percentage** expresses a number as a fraction of 100.
+To convert a decimal to a percentage, multiply by 100:
+
+$$0.25 = 25\%$$
+
+To convert a percentage to a decimal, divide by 100:
+
+$$25\% = 0.25$$
+
+In econometrics, we typically work with decimals in our calculations and convert to percentages for interpretation.
+
+#### Percent Change
+
+The **percent change** (or **percentage change**) measures how much a variable changed relative to its initial value:
+
+$$\text{Percent Change} = \frac{\text{New Value} - \text{Old Value}}{\text{Old Value}} \times 100\%$$
+
+Or more compactly:
+
+$$\%\Delta Y = \frac{Y_2 - Y_1}{Y_1} \times 100\%$$
+
+**Example:** If wages increase from \$20 to \$22 per hour:
+
+$$\%\Delta wage = \frac{22 - 20}{20} \times 100\% = \frac{2}{20} \times 100\% = 10\%$$
+
+Wages increased by **10 percent**.
+
+::: {.callout-warning}
+## Percent Change vs. Percentage Point Change
+
+These are **not** the same thing! This distinction trips up many students.
+
+- **Percent change:** The change relative to the starting value
+- **Percentage point change:** The arithmetic difference between two percentages
+
+**Example:** If the unemployment rate rises from 4% to 5%:
+
+- The **percentage point change** is: $5\% - 4\% = 1$ percentage point
+- The **percent change** is: $\frac{5 - 4}{4} \times 100\% = 25\%$
+
+Both statements are correct:
+
+- "Unemployment rose by 1 percentage point"
+- "Unemployment rose by 25 percent"
+
+They mean very different things! In news and policy discussions, this distinction matters enormously.
+:::
+
+#### When to Use Which
+
+Use **percentage points** when:
+
+- Describing changes in variables already measured as percentages (interest rates, unemployment rates, test scores out of 100)
+- You want to describe the absolute change in the percentage
+
+Use **percent change** when:
+
+- Describing changes in levels (wages, prices, GDP, population)
+- You want to describe the relative or proportional change
+
+**Example:** An interest rate cut from 5% to 4% is:
+
+- A 1 percentage point decrease ✓
+- A 20% decrease ✓ (both are correct, but mean different things)
+- ~~A 1% decrease~~ ✗ (this is ambiguous and often wrong)
+
+#### Calculating Values After Percent Changes
+
+If $Y$ increases by $p\%$, the new value is:
+
+$$Y_{new} = Y_{old} \times (1 + p/100)$$
+
+If $Y$ decreases by $p\%$, the new value is:
+
+$$Y_{new} = Y_{old} \times (1 - p/100)$$
+
+**Example:** If a \$50 item increases in price by 20%:
+
+$$Price_{new} = 50 \times (1 + 0.20) = 50 \times 1.20 = \$60$$
+
+#### Compounding Percent Changes
+
+Percent changes don't add---they compound.
+If wages increase by 10% and then by another 10%, the total increase is **not** 20%.
+
+$$\text{Final} = \text{Initial} \times 1.10 \times 1.10 = \text{Initial} \times 1.21$$
+
+The total increase is **21%**, not 20%.
+
+This is why we use logarithms: log changes **do** add up, making them convenient for analyzing growth over time.
+
+
+### Logarithms
+
+Logarithms appear constantly in econometrics.
+We use them to model percentage changes,
+interpret coefficients as elasticities,
+and transform skewed variables like income and wages.
+Understanding log rules is essential for working with regression models.
+
+#### What is a Logarithm?
+
+The natural logarithm,
+denoted $\ln(x)$,
+is the inverse of the exponential function $e^x$.
+If $y = \ln(x)$,
+then $e^y = x$.
+
+Some key values to remember:
+
+- $\ln(1) = 0$ because $e^0 = 1$
+- $\ln(e) = 1$ because $e^1 = e$
+- $\ln(x)$ is only defined for $x > 0$
+
+#### Essential Log Rules
+
+Three rules form the foundation for working with logarithms:
+
+**Rule 1: Product Rule.**
+The log of a product is the sum of the logs:
+$$\ln(ab) = \ln(a) + \ln(b)$$
+
+**Rule 2: Quotient Rule.**
+The log of a ratio is the difference of the logs:
+$$\ln\left(\frac{a}{b}\right) = \ln(a) - \ln(b)$$
+
+**Rule 3: Power Rule.**
+The log of a power brings the exponent down:
+$$\ln(a^k) = k \ln(a)$$
+
+These rules are used constantly when manipulating regression equations and interpreting coefficients.
+
+#### Logs and Percentage Changes
+
+Here is the most important property of logs for econometrics:
+
+::: {.callout-important}
+## The Key Insight
+For small changes, the **difference in logs approximately equals the percentage change**:
+$$\ln(Y_2) - \ln(Y_1) \approx \frac{Y_2 - Y_1}{Y_1}$$
+
+In other words: **$\Delta ln(Y) \approx \%$ change in Y**
+:::
+
+This approximation works well for changes up to about 20%.
+It follows from the quotient rule:
+$$\ln(Y_2) - \ln(Y_1) = \ln\left(\frac{Y_2}{Y_1}\right)$$
+
+When $Y_2$ is close to $Y_1$,
+the ratio $Y_2/Y_1$ is close to 1,
+and $\ln(1 + x) \approx x$ for small $x$.
+
+**Example:** If $\ln(wage)$ increases from 2.50 to 2.58,
+the change is $0.08$.
+This means wages increased by approximately **8%**.
+
+#### Other Uses of Logs
+
+Logarithms are useful in economics for several reasons:
+
+1. **Percentage interpretation:** Coefficients in log models have natural percentage interpretations (more on this in @sec-dummy-nonlinear).
+
+2. **Elasticities:** In a log-log model like $\ln(Y) = \beta_0 + \beta_1 \ln(X)$, the coefficient $\beta_1$ is the **elasticity**---the percentage change in $Y$ for a 1% change in $X$.
+
+3. **Reducing skewness:** Variables like income, wages, and prices are often right-skewed. Taking logs makes them more symmetric and closer to normal.
+
+4. **Multiplicative relationships:** Logs transform multiplicative relationships into additive ones, which are easier to estimate with linear regression.
+
+```{r}
+#| echo: false
+#| label: fig-log-transform
+#| fig-cap: "Left: The distribution of wages is right-skewed. Right: The distribution of log wages is more symmetric."
+#| fig-width: 8
+#| fig-height: 3.5
+#| out-width: "85%"
+
+library(wooldridge)
+data(wage1)
+
+p1 <- ggplot(wage1, aes(x = wage)) +
+  geom_histogram(bins = 30, fill = "steelblue", color = "white", alpha = 0.7) +
+  labs(
+    title = "Wages (Right-Skewed)",
+    x = "Wage ($/hour)",
+    y = "Frequency"
+  ) +
+  theme_minimal()
+
+p2 <- ggplot(wage1, aes(x = log(wage))) +
+  geom_histogram(bins = 30, fill = "steelblue", color = "white", alpha = 0.7) +
+  labs(
+    title = "Log Wages (More Symmetric)",
+    x = "ln(Wage)",
+    y = "Frequency"
+  ) +
+  theme_minimal()
+
+p1 + p2
+```
 
 
 ### Partial Derivatives
@@ -772,6 +983,13 @@ which plays a central role in statistical inference.
 | Concept | Formula |
 |---------|---------|
 | Sample mean | $\bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_i$ |
+| Percent change | $\%\Delta Y = \frac{Y_2 - Y_1}{Y_1} \times 100\%$ |
+| Value after % increase | $Y_{new} = Y_{old} \times (1 + p/100)$ |
+| Log product rule | $\ln(ab) = \ln(a) + \ln(b)$ |
+| Log quotient rule | $\ln(a/b) = \ln(a) - \ln(b)$ |
+| Log power rule | $\ln(a^k) = k\ln(a)$ |
+| Logs and % changes | $\ln(Y_2) - \ln(Y_1) \approx \%\Delta Y$ |
+| Derivative of ln(x) | $\frac{d}{dx}\ln(x) = \frac{1}{x}$ |
 | Critical point (quadratic) | $x^* = -\frac{b}{2a}$ for $f(x) = ax^2 + bx + c$ |
 | Second derivative test | Max if $f''(x^*) < 0$; Min if $f''(x^*) > 0$ |
 | Expected value | $E[X] = \sum_{j=1}^{k} x_j f(x_j) = \mu$ |
@@ -891,6 +1109,51 @@ Click the "Show Explanation" toggle to see a full explanation of the answer afte
         <option value="d"> \(X / (\mu + \sigma) \)</option>
     </select>
 </div>
+
+<div class="answer-row">
+    <label>x. If wages rise from $20 to $25, the percent change is: </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">5%</option>
+        <option value="b">25%</option>
+        <option value="c">$5</option>
+        <option value="d">20%</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>xi. If the interest rate falls from 6% to 4%, this is a ______ decrease: </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">2%</option>
+        <option value="b">4%</option>
+        <option value="c">2 percentage point</option>
+        <option value="d">50%</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>xii. Simplify: \(\ln(a) + \ln(b)\) = </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">\(\ln(a + b)\)</option>
+        <option value="b">\(\ln(ab)\)</option>
+        <option value="c">\(\ln(a) \times \ln(b)\)</option>
+        <option value="d">\(\ln(a/b)\)</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>xiii. If \(\ln(wage)\) increases by 0.05, the approximate percentage change in wage is: </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">0.05%</option>
+        <option value="b">5%</option>
+        <option value="c">50%</option>
+        <option value="d">Cannot be determined</option>
+    </select>
+</div>
+
 </div>
 
 ```
@@ -915,6 +1178,15 @@ vii. Positive covariance means that when $X$ is above its mean, $Y$ tends to be 
 viii. The notation $N(\mu, \sigma^2)$ specifies the mean and **variance**. Here, $\mu = 100$ and $\sigma^2 = 25$, so $\sigma = \sqrt{25} = 5$.
 
 ix. Standardization centers the variable at zero (by subtracting $\mu$) and scales it to have unit variance (by dividing by $\sigma$). The formula is $Z = \frac{X - \mu}{\sigma}$.
+
+x. Percent change = (New - Old)/Old × 100% = (25 - 20)/20 × 100% = 5/20 × 100% = 25%. Note that $5 is the *dollar* change, not the *percent* change.
+
+xi. When a variable is already measured as a percentage (like an interest rate), we describe changes in **percentage points**. The rate fell from 6% to 4%, a difference of 2 percentage points. (Note: this is also a 33% *percent* decrease, since (6-4)/6 = 0.33, but "2 percentage points" is the clearer description.)
+
+xii. This is the **product rule** for logarithms: $\ln(a) + \ln(b) = \ln(ab)$. A common mistake is thinking $\ln(a) + \ln(b) = \ln(a+b)$, but this is incorrect!
+
+xiii. The key insight for logs: **differences in logs ≈ percentage changes**. A change of 0.05 in ln(wage) corresponds to approximately a 5% change in wage. Multiply by 100 to convert to percentage.
+
 
 :::
 

@@ -1,0 +1,1735 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>7&nbsp; Dummy Variables and Non-Linear Models – EC325 Workbook</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/heteroskedasticity.html" rel="next">
+<link href="../chapters/statistical_inference.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/dummies_nonlins.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Dummy Variables and Non-Linear Models</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">EC325 Workbook</a> 
+        <div class="sidebar-tools-main">
+    <div class="dropdown">
+      <a href="" title="Download" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label="Download"><i class="bi bi-download"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="../EC325-Workbook.pdf">
+              <i class="bi bi-file-pdf pe-1"></i>
+            Download PDF
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="../EC325-Workbook.epub">
+              <i class="bi bi-journal pe-1"></i>
+            Download ePub
+            </a>
+          </li>
+      </ul>
+    </div>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/data_practices.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Good Data Practices</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/rcts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Causality and Randomized Control Trials</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/bivariate_ols.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Bivariate Regression and Ordinary Least Squares</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/multivariate_ols.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Multivariate Regression</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/statistical_inference.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Statistical Inference</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/dummies_nonlins.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Dummy Variables and Non-Linear Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/heteroskedasticity.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Heteroskedasticity</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/binary_outcomes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Interaction Effects</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/panel_fe.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Panel Data and Fixed Effects</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/did.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/advanced_did.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Advanced Difference-in-Differences</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/instrumental_variables.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Instrumental Variables</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/installingR.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Intro to R and RStudio</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/statsreview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Statistics and Probability Review</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/r_reference.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">R Functions and Packages Reference</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#categorical-variables-in-regression" id="toc-categorical-variables-in-regression" class="nav-link active" data-scroll-target="#categorical-variables-in-regression"><span class="header-section-number">7.1</span> Categorical Variables in Regression</a>
+  <ul class="collapse">
+  <li><a href="#dummy-variables" id="toc-dummy-variables" class="nav-link" data-scroll-target="#dummy-variables"><span class="header-section-number">7.1.1</span> Dummy Variables</a></li>
+  <li><a href="#interpreting-dummy-variable-coefficients" id="toc-interpreting-dummy-variable-coefficients" class="nav-link" data-scroll-target="#interpreting-dummy-variable-coefficients"><span class="header-section-number">7.1.2</span> Interpreting Dummy Variable Coefficients</a></li>
+  <li><a href="#visualizing-what-dummy-variables-do" id="toc-visualizing-what-dummy-variables-do" class="nav-link" data-scroll-target="#visualizing-what-dummy-variables-do"><span class="header-section-number">7.1.3</span> Visualizing What Dummy Variables Do</a></li>
+  </ul></li>
+  <li><a href="#the-dummy-variable-trap" id="toc-the-dummy-variable-trap" class="nav-link" data-scroll-target="#the-dummy-variable-trap"><span class="header-section-number">7.2</span> The Dummy Variable Trap</a></li>
+  <li><a href="#multiple-categories" id="toc-multiple-categories" class="nav-link" data-scroll-target="#multiple-categories"><span class="header-section-number">7.3</span> Multiple Categories</a>
+  <ul class="collapse">
+  <li><a href="#choosing-the-baseline-category" id="toc-choosing-the-baseline-category" class="nav-link" data-scroll-target="#choosing-the-baseline-category"><span class="header-section-number">7.3.1</span> Choosing the Baseline Category</a></li>
+  </ul></li>
+  <li><a href="#factor-variables-in-r" id="toc-factor-variables-in-r" class="nav-link" data-scroll-target="#factor-variables-in-r"><span class="header-section-number">7.4</span> Factor Variables in R</a></li>
+  <li><a href="#non-linear-relationships-polynomial-models" id="toc-non-linear-relationships-polynomial-models" class="nav-link" data-scroll-target="#non-linear-relationships-polynomial-models"><span class="header-section-number">7.5</span> Non-Linear Relationships: Polynomial Models</a>
+  <ul class="collapse">
+  <li><a href="#estimating-quadratic-models" id="toc-estimating-quadratic-models" class="nav-link" data-scroll-target="#estimating-quadratic-models"><span class="header-section-number">7.5.1</span> Estimating Quadratic Models</a></li>
+  <li><a href="#interpreting-quadratic-models" id="toc-interpreting-quadratic-models" class="nav-link" data-scroll-target="#interpreting-quadratic-models"><span class="header-section-number">7.5.2</span> Interpreting Quadratic Models</a></li>
+  </ul></li>
+  <li><a href="#logarithmic-transformations" id="toc-logarithmic-transformations" class="nav-link" data-scroll-target="#logarithmic-transformations"><span class="header-section-number">7.6</span> Logarithmic Transformations</a>
+  <ul class="collapse">
+  <li><a href="#log-linear-models" id="toc-log-linear-models" class="nav-link" data-scroll-target="#log-linear-models"><span class="header-section-number">7.6.1</span> Log-Linear Models</a></li>
+  <li><a href="#linear-log-models" id="toc-linear-log-models" class="nav-link" data-scroll-target="#linear-log-models"><span class="header-section-number">7.6.2</span> Linear-Log Models</a></li>
+  <li><a href="#log-log-models-elasticities" id="toc-log-log-models-elasticities" class="nav-link" data-scroll-target="#log-log-models-elasticities"><span class="header-section-number">7.6.3</span> Log-Log Models (Elasticities)</a></li>
+  <li><a href="#summary-table" id="toc-summary-table" class="nav-link" data-scroll-target="#summary-table"><span class="header-section-number">7.6.4</span> Summary Table</a></li>
+  </ul></li>
+  <li><a href="#application-policy-evaluation-with-dummy-variables" id="toc-application-policy-evaluation-with-dummy-variables" class="nav-link" data-scroll-target="#application-policy-evaluation-with-dummy-variables"><span class="header-section-number">7.7</span> Application: Policy Evaluation with Dummy Variables</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">7.8</span> Summary</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">7.9</span> Check Your Understanding</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span id="sec-dummy-nonlinear" class="quarto-section-identifier"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Dummy Variables and Non-Linear Models</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+
+<style>
+.problem {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+.context {
+    background-color: #e8f4f8;
+    padding: 12px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border-left: 4px solid #2874a6;
+}
+.question {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #fff3cd;
+    border-radius: 5px;
+}
+.answer-row {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.answer-row label {
+    min-width: 320px;
+    font-weight: 500;
+}
+select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    min-width: 300px;
+    cursor: pointer;
+}
+select:focus {
+    border-color: #2874a6;
+    outline: none;
+}
+.correct {
+    border-color: #28a745 !important;
+    background-color: #d4edda !important;
+}
+.incorrect {
+    border-color: #dc3545 !important;
+    background-color: #f8d7da !important;
+}
+.explanation {
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #e7f3ff;
+    border-radius: 5px;
+    border-left: 4px solid #2874a6;
+}
+.note {
+    font-size: 0.85em;
+    color: #666;
+    font-style: italic;
+}
+</style>
+
+<script>
+function checkAnswer(selectElement, correctValue) {
+    if (selectElement.value === '') {
+        selectElement.classList.remove('correct', 'incorrect');
+    } else if (selectElement.value === correctValue) {
+        selectElement.classList.remove('incorrect');
+        selectElement.classList.add('correct');
+    } else {
+        selectElement.classList.remove('correct');
+        selectElement.classList.add('incorrect');
+    }
+}
+</script>
+
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<strong>Key Questions</strong>
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ul>
+<li>How do we include categorical information (like race, gender, or region) in a regression?</li>
+<li>What is a dummy variable and how do we interpret its coefficient?</li>
+<li>How do we avoid the “dummy variable trap”?</li>
+<li>How can we model non-linear relationships using polynomials?</li>
+<li>When should we use logarithmic transformations?</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<strong>Suggested Readings</strong>
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ul>
+<li><span class="citation" data-cites="wooldridge_introductory_2019">Wooldridge (<a href="references.html#ref-wooldridge_introductory_2019" role="doc-biblioref">2019</a>)</span> Ch. 7</li>
+<li><span class="citation" data-cites="bailey_real_2020">Bailey (<a href="references.html#ref-bailey_real_2020" role="doc-biblioref">2020</a>)</span>, Ch. 5</li>
+</ul>
+</div>
+</div>
+</div>
+<p>So far, we have primarily considered <strong>quantitative</strong> variables in our regression models: wages measured in dollars, years of education, birthweight in grams, and so on. But in empirical work, some of the most important variables are <strong>qualitative</strong>: race, gender, region, industry, or whether someone participated in a program. This chapter introduces techniques for incorporating categorical information into regression models and for modeling non-linear relationships.</p>
+<section id="categorical-variables-in-regression" class="level2" data-number="7.1">
+<h2 data-number="7.1" class="anchored" data-anchor-id="categorical-variables-in-regression"><span class="header-section-number">7.1</span> Categorical Variables in Regression</h2>
+<p>Regression requires numeric inputs, so we cannot simply include a variable like “region” with values “South,” “Midwest,” “Northeast,” and “West” directly in our model. We need a way to translate qualitative information into numbers.</p>
+<section id="dummy-variables" class="level3" data-number="7.1.1">
+<h3 data-number="7.1.1" class="anchored" data-anchor-id="dummy-variables"><span class="header-section-number">7.1.1</span> Dummy Variables</h3>
+<p>The most common approach is to create <strong>dummy variables</strong> (also called binary or indicator variables). A dummy variable takes only two values: 1 if the observation has a particular characteristic, and 0 otherwise.</p>
+<p>Consider this simple example from the Star Wars dataset:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>ex_data <span class="ot">&lt;-</span> starwars <span class="sc">|&gt;</span> </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">head</span>(<span class="dv">5</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(name, height, mass, species)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(ex_data, <span class="at">caption =</span> <span class="st">"Star Wars Characters"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Star Wars Characters</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">name</th>
+<th style="text-align: right;">height</th>
+<th style="text-align: right;">mass</th>
+<th style="text-align: left;">species</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Luke Skywalker</td>
+<td style="text-align: right;">172</td>
+<td style="text-align: right;">77</td>
+<td style="text-align: left;">Human</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C-3PO</td>
+<td style="text-align: right;">167</td>
+<td style="text-align: right;">75</td>
+<td style="text-align: left;">Droid</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">R2-D2</td>
+<td style="text-align: right;">96</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: left;">Droid</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Darth Vader</td>
+<td style="text-align: right;">202</td>
+<td style="text-align: right;">136</td>
+<td style="text-align: left;">Human</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Leia Organa</td>
+<td style="text-align: right;">150</td>
+<td style="text-align: right;">49</td>
+<td style="text-align: left;">Human</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The <code>species</code> variable is qualitative—we cannot use it directly in a regression. But we can create a dummy variable called <code>human</code> that equals 1 for humans and 0 for droids:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>ex_data <span class="ot">&lt;-</span> ex_data <span class="sc">|&gt;</span> </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">human =</span> <span class="fu">case_when</span>(species <span class="sc">==</span> <span class="st">"Human"</span> <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                             <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">0</span>))</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(ex_data, <span class="at">caption =</span> <span class="st">"Star Wars Characters with Dummy Variable"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Star Wars Characters with Dummy Variable</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">name</th>
+<th style="text-align: right;">height</th>
+<th style="text-align: right;">mass</th>
+<th style="text-align: left;">species</th>
+<th style="text-align: right;">human</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Luke Skywalker</td>
+<td style="text-align: right;">172</td>
+<td style="text-align: right;">77</td>
+<td style="text-align: left;">Human</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C-3PO</td>
+<td style="text-align: right;">167</td>
+<td style="text-align: right;">75</td>
+<td style="text-align: left;">Droid</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">R2-D2</td>
+<td style="text-align: right;">96</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: left;">Droid</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Darth Vader</td>
+<td style="text-align: right;">202</td>
+<td style="text-align: right;">136</td>
+<td style="text-align: left;">Human</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Leia Organa</td>
+<td style="text-align: right;">150</td>
+<td style="text-align: right;">49</td>
+<td style="text-align: left;">Human</td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Now we have a numeric variable that captures whether each character is human.</p>
+</section>
+<section id="interpreting-dummy-variable-coefficients" class="level3" data-number="7.1.2">
+<h3 data-number="7.1.2" class="anchored" data-anchor-id="interpreting-dummy-variable-coefficients"><span class="header-section-number">7.1.2</span> Interpreting Dummy Variable Coefficients</h3>
+<p>To see how dummy variables work in regression, let’s examine a practical example. Suppose we want to know whether taking calculus in high school affects performance in college economics courses. We have data on students’ economics exam scores, their high school GPA, and whether they took calculus.</p>
+<p>We estimate the model:</p>
+<p><span class="math display">\[
+score = \beta_0 + \beta_1(hsgpa) + \beta_2(calculus) + \mu
+\]</span></p>
+<p>where <code>calculus</code> equals 1 if the student took calculus and 0 otherwise.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>lm1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(score <span class="sc">~</span> hsgpa <span class="sc">+</span> calculus, <span class="at">data =</span> wooldridge<span class="sc">::</span>econmath)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = score ~ hsgpa + calculus, data = wooldridge::econmath)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-54.355  -7.457   1.148   8.699  29.825 
+
+Coefficients:
+            Estimate Std. Error t value             Pr(&gt;|t|)    
+(Intercept)  24.5276     4.0759   6.018       0.000000002624 ***
+hsgpa        13.2038     1.2257  10.772 &lt; 0.0000000000000002 ***
+calculus      5.8243     0.8992   6.477       0.000000000158 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 12.18 on 853 degrees of freedom
+Multiple R-squared:  0.1756,    Adjusted R-squared:  0.1737 
+F-statistic: 90.87 on 2 and 853 DF,  p-value: &lt; 0.00000000000000022</code></pre>
+</div>
+</div>
+<p>How do we interpret these coefficients? The coefficient on <code>hsgpa</code> (<span class="math inline">\(\hat{\beta}_1 \approx 13.2\)</span>) tells us that a one-point increase in high school GPA is associated with about a 13-point increase in economics score, holding calculus status constant.</p>
+<p>The coefficient on <code>calculus</code> (<span class="math inline">\(\hat{\beta}_2 \approx 5.8\)</span>) tells us that students who took calculus score about 5.8 points higher on average than students who did not, holding GPA constant. This is the <strong>difference in intercepts</strong> between the two groups.</p>
+</section>
+<section id="visualizing-what-dummy-variables-do" class="level3" data-number="7.1.3">
+<h3 data-number="7.1.3" class="anchored" data-anchor-id="visualizing-what-dummy-variables-do"><span class="header-section-number">7.1.3</span> Visualizing What Dummy Variables Do</h3>
+<p>To understand what’s happening geometrically, think about the regression line for each group.</p>
+<p>For students who did <strong>not</strong> take calculus (<code>calculus = 0</code>): <span class="math display">\[
+\widehat{score} = \hat{\beta}_0 + \hat{\beta}_1(hsgpa) + \hat{\beta}_2(0) = \hat{\beta}_0 + \hat{\beta}_1(hsgpa)
+\]</span></p>
+<p>For students who <strong>did</strong> take calculus (<code>calculus = 1</code>): <span class="math display">\[
+\widehat{score} = \hat{\beta}_0 + \hat{\beta}_1(hsgpa) + \hat{\beta}_2(1) = (\hat{\beta}_0 + \hat{\beta}_2) + \hat{\beta}_1(hsgpa)
+\]</span></p>
+<p>Both groups have the <strong>same slope</strong> (<span class="math inline">\(\hat{\beta}_1\)</span>), but the calculus group has a higher intercept by exactly <span class="math inline">\(\hat{\beta}_2\)</span>. The dummy variable shifts the regression line up or down:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-dummy-shift" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-dummy-shift-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7.1: Dummy variables shift the intercept while keeping the slope constant.
+</figcaption>
+<div aria-describedby="fig-dummy-shift-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="dummies_nonlins_files/figure-html/fig-dummy-shift-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Key Insight
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A dummy variable coefficient represents the <strong>difference in intercepts</strong> between groups. Both groups share the same slope—the effect of increasing <span class="math inline">\(x\)</span> by one unit is the same regardless of group membership.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="the-dummy-variable-trap" class="level2" data-number="7.2">
+<h2 data-number="7.2" class="anchored" data-anchor-id="the-dummy-variable-trap"><span class="header-section-number">7.2</span> The Dummy Variable Trap</h2>
+<p>You might wonder: why not include dummy variables for <em>both</em> calculus-takers and non-calculus-takers? In other words, why not estimate:</p>
+<p><span class="math display">\[
+score = \beta_0 + \beta_1(hsgpa) + \beta_2(calculus) + \beta_3(no\_calculus) + \mu
+\]</span></p>
+<p>The problem is that this creates <strong>perfect multicollinearity</strong>. For every student in the dataset: <span class="math display">\[
+calculus + no\_calculus = 1
+\]</span></p>
+<p>This means <span class="math inline">\(no\_calculus = 1 - calculus\)</span>, so one variable is a perfect linear function of the other. OLS cannot separately identify the effects of perfectly collinear variables.</p>
+<p>This is called the <strong>dummy variable trap</strong>. To avoid it, we always omit one category. The omitted category becomes our <strong>baseline</strong> or <strong>reference group</strong>, and all coefficients are interpreted relative to this baseline.</p>
+<p>In our example, non-calculus-takers are the baseline. The coefficient <span class="math inline">\(\hat{\beta}_2 = 5.8\)</span> means calculus-takers score 5.8 points higher <em>than non-calculus-takers</em>.</p>
+</section>
+<section id="multiple-categories" class="level2" data-number="7.3">
+<h2 data-number="7.3" class="anchored" data-anchor-id="multiple-categories"><span class="header-section-number">7.3</span> Multiple Categories</h2>
+<p>What if our categorical variable has more than two values? Consider the Palmer Penguins data, where species can be Adelie, Chinstrap, or Gentoo.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">12487345</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>ex_data <span class="ot">&lt;-</span> penguins <span class="sc">|&gt;</span> </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sample_n</span>(<span class="dv">5</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(body_mass_g, flipper_length_mm, sex, species)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(ex_data, <span class="at">caption =</span> <span class="st">"Palmer Penguins Sample"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Palmer Penguins Sample</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">body_mass_g</th>
+<th style="text-align: right;">flipper_length_mm</th>
+<th style="text-align: left;">sex</th>
+<th style="text-align: left;">species</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">3450</td>
+<td style="text-align: right;">193</td>
+<td style="text-align: left;">female</td>
+<td style="text-align: left;">Adelie</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3475</td>
+<td style="text-align: right;">187</td>
+<td style="text-align: left;">male</td>
+<td style="text-align: left;">Adelie</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4650</td>
+<td style="text-align: right;">184</td>
+<td style="text-align: left;">male</td>
+<td style="text-align: left;">Adelie</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3650</td>
+<td style="text-align: right;">187</td>
+<td style="text-align: left;">female</td>
+<td style="text-align: left;">Chinstrap</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4600</td>
+<td style="text-align: right;">209</td>
+<td style="text-align: left;">female</td>
+<td style="text-align: left;">Gentoo</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>To include species in a regression, we create <strong><span class="math inline">\(g - 1\)</span> dummy variables</strong> where <span class="math inline">\(g\)</span> is the number of categories. With three species, we need two dummy variables:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>ex_data <span class="ot">&lt;-</span> ex_data <span class="sc">|&gt;</span> </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">species_Chinstrap =</span> <span class="fu">case_when</span>(species <span class="sc">==</span> <span class="st">"Chinstrap"</span> <span class="sc">~</span> <span class="dv">1</span>, <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">0</span>),</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">species_Gentoo =</span> <span class="fu">case_when</span>(species <span class="sc">==</span> <span class="st">"Gentoo"</span> <span class="sc">~</span> <span class="dv">1</span>, <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">0</span>))</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(ex_data, <span class="at">caption =</span> <span class="st">"Penguins with Dummy Variables"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Penguins with Dummy Variables</caption>
+<colgroup>
+<col style="width: 15%">
+<col style="width: 22%">
+<col style="width: 8%">
+<col style="width: 12%">
+<col style="width: 22%">
+<col style="width: 18%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">body_mass_g</th>
+<th style="text-align: right;">flipper_length_mm</th>
+<th style="text-align: left;">sex</th>
+<th style="text-align: left;">species</th>
+<th style="text-align: right;">species_Chinstrap</th>
+<th style="text-align: right;">species_Gentoo</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">3450</td>
+<td style="text-align: right;">193</td>
+<td style="text-align: left;">female</td>
+<td style="text-align: left;">Adelie</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3475</td>
+<td style="text-align: right;">187</td>
+<td style="text-align: left;">male</td>
+<td style="text-align: left;">Adelie</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4650</td>
+<td style="text-align: right;">184</td>
+<td style="text-align: left;">male</td>
+<td style="text-align: left;">Adelie</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3650</td>
+<td style="text-align: right;">187</td>
+<td style="text-align: left;">female</td>
+<td style="text-align: left;">Chinstrap</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4600</td>
+<td style="text-align: right;">209</td>
+<td style="text-align: left;">female</td>
+<td style="text-align: left;">Gentoo</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Notice that Adelie penguins have 0 for both dummies—they are the omitted baseline category.</p>
+<p>Now we can estimate the effect of body mass on flipper length, controlling for species:</p>
+<p><span class="math display">\[
+flipper\_length = \beta_0 + \beta_1(body\_mass) + \beta_2(Chinstrap) + \beta_3(Gentoo) + \mu
+\]</span></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>penguin_data <span class="ot">&lt;-</span> penguins <span class="sc">|&gt;</span> </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">species_Chinstrap =</span> <span class="fu">case_when</span>(species <span class="sc">==</span> <span class="st">"Chinstrap"</span> <span class="sc">~</span> <span class="dv">1</span>, <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">0</span>),</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">species_Gentoo =</span> <span class="fu">case_when</span>(species <span class="sc">==</span> <span class="st">"Gentoo"</span> <span class="sc">~</span> <span class="dv">1</span>, <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">0</span>))</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>lm_penguin <span class="ot">&lt;-</span> <span class="fu">lm</span>(flipper_length_mm <span class="sc">~</span> body_mass_g <span class="sc">+</span> species_Chinstrap <span class="sc">+</span> species_Gentoo, </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">data =</span> penguin_data)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm_penguin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = flipper_length_mm ~ body_mass_g + species_Chinstrap + 
+    species_Gentoo, data = penguin_data)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-14.5455  -3.1845   0.1307   3.3533  17.5313 
+
+Coefficients:
+                     Estimate  Std. Error t value             Pr(&gt;|t|)    
+(Intercept)       158.8602606   2.3865767  66.564 &lt; 0.0000000000000002 ***
+body_mass_g         0.0084021   0.0006339  13.255 &lt; 0.0000000000000002 ***
+species_Chinstrap   5.5974403   0.7882166   7.101     0.00000000000733 ***
+species_Gentoo     15.6774699   1.0906591  14.374 &lt; 0.0000000000000002 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 5.395 on 338 degrees of freedom
+  (2 observations deleted due to missingness)
+Multiple R-squared:  0.8541,    Adjusted R-squared:  0.8528 
+F-statistic: 659.4 on 3 and 338 DF,  p-value: &lt; 0.00000000000000022</code></pre>
+</div>
+</div>
+<p>Interpretation:</p>
+<ul>
+<li><span class="math inline">\(\hat{\beta}_1 \approx 0.008\)</span>: A 1-gram increase in body mass is associated with a 0.008 mm increase in flipper length, holding species constant.</li>
+<li><span class="math inline">\(\hat{\beta}_2 \approx 5.6\)</span>: Chinstrap penguins have flippers about 5.6 mm longer than Adelie penguins of the same body mass.</li>
+<li><span class="math inline">\(\hat{\beta}_3 \approx 15.7\)</span>: Gentoo penguins have flippers about 15.7 mm longer than Adelie penguins of the same body mass.</li>
+</ul>
+<section id="choosing-the-baseline-category" class="level3" data-number="7.3.1">
+<h3 data-number="7.3.1" class="anchored" data-anchor-id="choosing-the-baseline-category"><span class="header-section-number">7.3.1</span> Choosing the Baseline Category</h3>
+<p>How should we choose which category to omit? It depends on our research question.</p>
+<p>If we only care about controlling for the categorical variable (not interpreting its coefficients), then the choice doesn’t matter—the coefficient on our main variable of interest won’t change.</p>
+<p>If we do care about interpreting the dummy coefficients, choose a baseline that makes interpretation natural. For studying the gender wage gap, making “male” the baseline means the female coefficient directly measures the wage gap relative to men.</p>
+<p>Let’s verify that changing the baseline doesn’t affect other coefficients:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Switching baseline to Gentoo</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>penguin_data <span class="ot">&lt;-</span> penguin_data <span class="sc">|&gt;</span> </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">species_Adelie =</span> <span class="fu">case_when</span>(species <span class="sc">==</span> <span class="st">"Adelie"</span> <span class="sc">~</span> <span class="dv">1</span>, <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">0</span>))</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>lm_penguin2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(flipper_length_mm <span class="sc">~</span> body_mass_g <span class="sc">+</span> species_Chinstrap <span class="sc">+</span> species_Adelie, </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data =</span> penguin_data)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare body mass coefficients</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Body mass coefficient (Adelie baseline):"</span>, <span class="fu">round</span>(<span class="fu">coef</span>(lm_penguin)[<span class="st">"body_mass_g"</span>], <span class="dv">5</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Body mass coefficient (Adelie baseline): 0.0084 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Body mass coefficient (Gentoo baseline):"</span>, <span class="fu">round</span>(<span class="fu">coef</span>(lm_penguin2)[<span class="st">"body_mass_g"</span>], <span class="dv">5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Body mass coefficient (Gentoo baseline): 0.0084</code></pre>
+</div>
+</div>
+<p>The coefficient on body mass is identical regardless of which species is the baseline.</p>
+</section>
+</section>
+<section id="factor-variables-in-r" class="level2" data-number="7.4">
+<h2 data-number="7.4" class="anchored" data-anchor-id="factor-variables-in-r"><span class="header-section-number">7.4</span> Factor Variables in R</h2>
+<p>Creating dummy variables manually is tedious, especially when categories are numerous. R’s <strong>factor</strong> variables automate this process.</p>
+<p>When you include a factor variable in a regression, R automatically creates the necessary dummy variables and omits one category:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert species to factor</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>penguin_data <span class="ot">&lt;-</span> penguins <span class="sc">|&gt;</span> </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">species_f =</span> <span class="fu">factor</span>(species))</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co"># R handles dummy creation automatically</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>lm_factor <span class="ot">&lt;-</span> <span class="fu">lm</span>(flipper_length_mm <span class="sc">~</span> body_mass_g <span class="sc">+</span> species_f, <span class="at">data =</span> penguin_data)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm_factor)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = flipper_length_mm ~ body_mass_g + species_f, data = penguin_data)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-14.5455  -3.1845   0.1307   3.3533  17.5313 
+
+Coefficients:
+                      Estimate  Std. Error t value             Pr(&gt;|t|)    
+(Intercept)        158.8602606   2.3865767  66.564 &lt; 0.0000000000000002 ***
+body_mass_g          0.0084021   0.0006339  13.255 &lt; 0.0000000000000002 ***
+species_fChinstrap   5.5974403   0.7882166   7.101     0.00000000000733 ***
+species_fGentoo     15.6774699   1.0906591  14.374 &lt; 0.0000000000000002 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 5.395 on 338 degrees of freedom
+  (2 observations deleted due to missingness)
+Multiple R-squared:  0.8541,    Adjusted R-squared:  0.8528 
+F-statistic: 659.4 on 3 and 338 DF,  p-value: &lt; 0.00000000000000022</code></pre>
+</div>
+</div>
+<p>Notice the coefficients are identical to our manual approach. R chose “Adelie” as the baseline because it comes first alphabetically.</p>
+<p>To change the baseline category, use the <code>relevel()</code> function:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Make Gentoo the baseline</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>penguin_data <span class="ot">&lt;-</span> penguin_data <span class="sc">|&gt;</span> </span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">species_f =</span> <span class="fu">relevel</span>(species_f, <span class="at">ref =</span> <span class="st">"Gentoo"</span>))</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>lm_factor2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(flipper_length_mm <span class="sc">~</span> body_mass_g <span class="sc">+</span> species_f, <span class="at">data =</span> penguin_data)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm_factor2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = flipper_length_mm ~ body_mass_g + species_f, data = penguin_data)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-14.5455  -3.1845   0.1307   3.3533  17.5313 
+
+Coefficients:
+                      Estimate  Std. Error t value             Pr(&gt;|t|)    
+(Intercept)        174.5377305   3.2542422  53.634 &lt; 0.0000000000000002 ***
+body_mass_g          0.0084021   0.0006339  13.255 &lt; 0.0000000000000002 ***
+species_fAdelie    -15.6774699   1.0906591 -14.374 &lt; 0.0000000000000002 ***
+species_fChinstrap -10.0800297   1.1787380  -8.552 0.000000000000000428 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 5.395 on 338 degrees of freedom
+  (2 observations deleted due to missingness)
+Multiple R-squared:  0.8541,    Adjusted R-squared:  0.8528 
+F-statistic: 659.4 on 3 and 338 DF,  p-value: &lt; 0.00000000000000022</code></pre>
+</div>
+</div>
+<p>Now coefficients are relative to Gentoo penguins.</p>
+</section>
+<section id="non-linear-relationships-polynomial-models" class="level2" data-number="7.5">
+<h2 data-number="7.5" class="anchored" data-anchor-id="non-linear-relationships-polynomial-models"><span class="header-section-number">7.5</span> Non-Linear Relationships: Polynomial Models</h2>
+<p>So far we’ve assumed linear relationships between variables. But many economic relationships are non-linear. Consider the effect of work experience on wages: at low experience levels, additional experience substantially increases productivity and wages; but at very high experience levels, workers may become less productive as they age.</p>
+<p>This suggests a <strong>quadratic</strong> relationship—wages increase with experience at first, then eventually decrease:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-quadratic" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-quadratic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7.2: A quadratic model (orange) often fits experience-wage data better than a linear model (blue).
+</figcaption>
+<div aria-describedby="fig-quadratic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="dummies_nonlins_files/figure-html/fig-quadratic-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<section id="estimating-quadratic-models" class="level3" data-number="7.5.1">
+<h3 data-number="7.5.1" class="anchored" data-anchor-id="estimating-quadratic-models"><span class="header-section-number">7.5.1</span> Estimating Quadratic Models</h3>
+<p>To estimate a quadratic model, we simply include both the variable and its square:</p>
+<p><span class="math display">\[
+log(wage) = \beta_0 + \beta_1(exper) + \beta_2(exper^2) + \mu
+\]</span></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>wage_data <span class="ot">&lt;-</span> wooldridge<span class="sc">::</span>wage1 <span class="sc">|&gt;</span> </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">exper2 =</span> exper<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>lm_quad <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(wage) <span class="sc">~</span> exper <span class="sc">+</span> exper2, <span class="at">data =</span> wage_data)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm_quad)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = log(wage) ~ exper + exper2, data = wage_data)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-2.05828 -0.33126 -0.05044  0.31806  1.47493 
+
+Coefficients:
+              Estimate Std. Error t value             Pr(&gt;|t|)    
+(Intercept)  1.2952908  0.0494812  26.177 &lt; 0.0000000000000002 ***
+exper        0.0455341  0.0058595   7.771   0.0000000000000415 ***
+exper2      -0.0009439  0.0001291  -7.312   0.0000000000009933 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.5041 on 523 degrees of freedom
+Multiple R-squared:  0.104, Adjusted R-squared:  0.1006 
+F-statistic: 30.35 on 2 and 523 DF,  p-value: 0.0000000000003377</code></pre>
+</div>
+</div>
+</section>
+<section id="interpreting-quadratic-models" class="level3" data-number="7.5.2">
+<h3 data-number="7.5.2" class="anchored" data-anchor-id="interpreting-quadratic-models"><span class="header-section-number">7.5.2</span> Interpreting Quadratic Models</h3>
+<p>With a quadratic term, the marginal effect of <span class="math inline">\(x\)</span> on <span class="math inline">\(y\)</span> is no longer constant. Taking the derivative:</p>
+<p><span class="math display">\[
+\frac{\partial y}{\partial x} = \beta_1 + 2\beta_2 x
+\]</span></p>
+<p>The effect of experience <strong>depends on your current level of experience</strong>.</p>
+<p>With our estimates (<span class="math inline">\(\hat{\beta}_1 \approx 0.046\)</span>, <span class="math inline">\(\hat{\beta}_2 \approx -0.0009\)</span>):</p>
+<p>For a worker with <strong>10 years</strong> of experience: <span class="math display">\[
+0.046 + 2(-0.0009)(10) = 0.028 \approx 2.8\%
+\]</span></p>
+<p>An additional year of experience increases wages by about 2.8%.</p>
+<p>For a worker with <strong>45 years</strong> of experience: <span class="math display">\[
+0.046 + 2(-0.0009)(45) = -0.035 \approx -3.5\%
+\]</span></p>
+<p>An additional year actually <em>decreases</em> wages—the worker is past the peak of the experience-wage relationship.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Finding the Peak
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The experience level where wages are maximized occurs where the marginal effect equals zero: <span class="math display">\[
+\beta_1 + 2\beta_2 x^* = 0 \implies x^* = -\frac{\beta_1}{2\beta_2}
+\]</span></p>
+<p>With our estimates: <span class="math inline">\(x^* = -\frac{0.046}{2(-0.0009)} \approx 25.6\)</span> years.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="logarithmic-transformations" class="level2" data-number="7.6">
+<h2 data-number="7.6" class="anchored" data-anchor-id="logarithmic-transformations"><span class="header-section-number">7.6</span> Logarithmic Transformations</h2>
+<p>We’ve already seen that taking the log of the dependent variable changes how we interpret coefficients. Let’s review the different cases systematically.</p>
+<section id="log-linear-models" class="level3" data-number="7.6.1">
+<h3 data-number="7.6.1" class="anchored" data-anchor-id="log-linear-models"><span class="header-section-number">7.6.1</span> Log-Linear Models</h3>
+<p>When the dependent variable is logged but independent variables are not: <span class="math display">\[
+\ln(Y) = \beta_0 + \beta_1 X + \mu
+\]</span></p>
+<p>Interpretation: A <strong>one-unit</strong> increase in <span class="math inline">\(X\)</span> is associated with a <strong><span class="math inline">\(100 \times \beta_1\)</span> percent</strong> change in <span class="math inline">\(Y\)</span>.</p>
+<p>This works because <span class="math inline">\(\ln(Y_1) - \ln(Y_0) = \ln(Y_1/Y_0) \approx (Y_1 - Y_0)/Y_0\)</span> for small changes.</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Approximation Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The “multiply by 100” interpretation is an approximation that works well when <span class="math inline">\(\beta_1\)</span> is small (less than about 0.2 in absolute value). For larger coefficients, use the exact formula: percent change = <span class="math inline">\(100 \times (e^{\beta_1} - 1)\)</span>.</p>
+</div>
+</div>
+</section>
+<section id="linear-log-models" class="level3" data-number="7.6.2">
+<h3 data-number="7.6.2" class="anchored" data-anchor-id="linear-log-models"><span class="header-section-number">7.6.2</span> Linear-Log Models</h3>
+<p>When independent variables are logged but the dependent variable is not: <span class="math display">\[
+Y = \beta_0 + \beta_1 \ln(X) + \mu
+\]</span></p>
+<p>Interpretation: A <strong>1 percent</strong> increase in <span class="math inline">\(X\)</span> is associated with a <strong><span class="math inline">\(\beta_1/100\)</span> unit</strong> change in <span class="math inline">\(Y\)</span>.</p>
+</section>
+<section id="log-log-models-elasticities" class="level3" data-number="7.6.3">
+<h3 data-number="7.6.3" class="anchored" data-anchor-id="log-log-models-elasticities"><span class="header-section-number">7.6.3</span> Log-Log Models (Elasticities)</h3>
+<p>When both sides are logged: <span class="math display">\[
+\ln(Y) = \beta_0 + \beta_1 \ln(X) + \mu
+\]</span></p>
+<p>Interpretation: A <strong>1 percent</strong> increase in <span class="math inline">\(X\)</span> is associated with a <strong><span class="math inline">\(\beta_1\)</span> percent</strong> change in <span class="math inline">\(Y\)</span>.</p>
+<p>This is the <strong>elasticity</strong> of <span class="math inline">\(Y\)</span> with respect to <span class="math inline">\(X\)</span>—a unit-free measure of responsiveness.</p>
+</section>
+<section id="summary-table" class="level3" data-number="7.6.4">
+<h3 data-number="7.6.4" class="anchored" data-anchor-id="summary-table"><span class="header-section-number">7.6.4</span> Summary Table</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 21%">
+<col style="width: 63%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Model</th>
+<th style="text-align: left;">Equation</th>
+<th style="text-align: left;">Interpretation of <span class="math inline">\(\beta_1\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>Linear-Linear</strong></td>
+<td style="text-align: left;"><span class="math inline">\(Y = \beta_0 + \beta_1 X\)</span></td>
+<td style="text-align: left;">1-unit ↑ in <span class="math inline">\(X\)</span> → <span class="math inline">\(\beta_1\)</span>-unit change in <span class="math inline">\(Y\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Log-Linear</strong></td>
+<td style="text-align: left;"><span class="math inline">\(\ln(Y) = \beta_0 + \beta_1 X\)</span></td>
+<td style="text-align: left;">1-unit ↑ in <span class="math inline">\(X\)</span> → <span class="math inline">\((100 \times \beta_1)\%\)</span> change in <span class="math inline">\(Y\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Linear-Log</strong></td>
+<td style="text-align: left;"><span class="math inline">\(Y = \beta_0 + \beta_1 \ln(X)\)</span></td>
+<td style="text-align: left;">1% ↑ in <span class="math inline">\(X\)</span> → <span class="math inline">\(\beta_1/100\)</span> unit change in <span class="math inline">\(Y\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Log-Log</strong></td>
+<td style="text-align: left;"><span class="math inline">\(\ln(Y) = \beta_0 + \beta_1 \ln(X)\)</span></td>
+<td style="text-align: left;">1% ↑ in <span class="math inline">\(X\)</span> → <span class="math inline">\(\beta_1\%\)</span> change in <span class="math inline">\(Y\)</span> (elasticity)</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="application-policy-evaluation-with-dummy-variables" class="level2" data-number="7.7">
+<h2 data-number="7.7" class="anchored" data-anchor-id="application-policy-evaluation-with-dummy-variables"><span class="header-section-number">7.7</span> Application: Policy Evaluation with Dummy Variables</h2>
+<p>Dummy variables are essential for evaluating policies and programs. Suppose we want to estimate the effect of a job training program on wages:</p>
+<p><span class="math display">\[
+\ln(wage) = \beta_0 + \beta_1(training) + \beta_2(educ) + \beta_3(exper) + \mu
+\]</span></p>
+<p>where <code>training</code> equals 1 if the person participated in the program and 0 otherwise.</p>
+<p>The coefficient <span class="math inline">\(\beta_1\)</span> measures the <strong>treatment effect</strong>—the percentage difference in wages between program participants and non-participants, controlling for education and experience.</p>
+<p>This is essentially a regression-based version of comparing treatment and control groups, where the control variables help us account for differences between those who did and didn’t participate.</p>
+</section>
+<section id="summary" class="level2" data-number="7.8">
+<h2 data-number="7.8" class="anchored" data-anchor-id="summary"><span class="header-section-number">7.8</span> Summary</h2>
+<p>This chapter introduced two powerful extensions to basic regression: categorical variables and non-linear functional forms.</p>
+<p><strong>Dummy variables</strong> allow us to include qualitative information in regression models. The coefficient on a dummy variable represents the difference in intercepts between groups—the effect of having a particular characteristic relative to the baseline category. When a categorical variable has <span class="math inline">\(g\)</span> categories, we include <span class="math inline">\(g - 1\)</span> dummy variables to avoid perfect multicollinearity (the dummy variable trap).</p>
+<p><strong>Polynomial models</strong> capture non-linear relationships by including squared or higher-order terms. With quadratic models, the marginal effect of <span class="math inline">\(x\)</span> on <span class="math inline">\(y\)</span> depends on the current level of <span class="math inline">\(x\)</span>, allowing us to model relationships that increase and then decrease (or vice versa).</p>
+<p><strong>Logarithmic transformations</strong> change the interpretation of coefficients: log-linear models give percentage changes, linear-log models give the effect of percentage changes, and log-log models give elasticities. These transformations are especially useful when dealing with variables like wages or prices that are right-skewed and where percentage changes are more meaningful than absolute changes.</p>
+</section>
+<section id="check-your-understanding" class="level2" data-number="7.9">
+<h2 data-number="7.9" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">7.9</span> Check Your Understanding</h2>
+<p>For each question below, select the best answer from the dropdown menu. The dropdown will turn green if correct and red if incorrect.</p>
+<div class="question">
+<div class="answer-row">
+    <label>i. In a regression with a dummy variable for "female" (1 = female, 0 = male), the coefficient on female is -0.15 when the dependent variable is log(wage). How do we interpret this? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Women earn $0.15 less per hour than men</option>
+        <option value="b">Women earn about 15% less than men, holding other variables constant</option>
+        <option value="c">Women earn 15% more than men</option>
+        <option value="d">For every additional woman in the sample, wages fall by 15%</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>ii. Why do we include only g-1 dummy variables when a categorical variable has g categories? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">To save computation time</option>
+        <option value="b">Because one category is always unimportant</option>
+        <option value="c">To avoid perfect multicollinearity (the dummy variable trap)</option>
+        <option value="d">Because R cannot handle more than g-1 variables</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iii. In the model log(wage) = β₀ + β₁(exper) + β₂(exper²), what does a negative β₂ imply? </label>
+    <select onchange="checkAnswer(this, 'a')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The wage-experience relationship is concave (wages increase at a decreasing rate, then may decline)</option>
+        <option value="b">Experience has no effect on wages</option>
+        <option value="c">More experience always leads to lower wages</option>
+        <option value="d">The model is incorrectly specified</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iv. In a log-log model ln(Y) = β₀ + β₁ln(X), β₁ = 0.5. How do we interpret this? </label>
+    <select onchange="checkAnswer(this, 'd')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">A 1-unit increase in X leads to a 0.5-unit increase in Y</option>
+        <option value="b">A 1-unit increase in X leads to a 50% increase in Y</option>
+        <option value="c">A 1% increase in X leads to a 0.5-unit increase in Y</option>
+        <option value="d">A 1% increase in X leads to a 0.5% increase in Y</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>v. If we change the baseline category for a set of dummy variables, what happens to the coefficient on our main variable of interest? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">It changes sign</option>
+        <option value="b">It stays the same</option>
+        <option value="c">It becomes statistically insignificant</option>
+        <option value="d">It doubles in magnitude</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>vi. <strong>(Challenge)</strong> In the quadratic model log(wage) = 1.2 + 0.04(exper) - 0.0008(exper²), at what experience level are wages maximized? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">10 years</option>
+        <option value="b">20 years</option>
+        <option value="c">25 years</option>
+        <option value="d">50 years</option>
+    </select>
+</div>
+</div>
+
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Show Explanation
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="i">
+<li><p>With a log-linear model (log on the left side only), we multiply the coefficient by 100 to get the percentage interpretation. A coefficient of -0.15 means women earn approximately 15% less than men (the baseline category), holding other variables constant.</p></li>
+<li><p>If we include dummy variables for all g categories plus an intercept, the dummy variables will sum to 1 for every observation, creating perfect collinearity with the intercept. This is the “dummy variable trap.” Omitting one category solves this problem.</p></li>
+<li><p>A negative coefficient on the squared term means the parabola opens downward. Combined with a positive coefficient on the linear term, this creates an inverted-U shape: wages increase with experience initially, but at a decreasing rate, and eventually begin to decline.</p></li>
+<li><p>In a log-log model, both variables are in logs, so the coefficient is an elasticity. It tells us the percentage change in Y for a 1% change in X. Here, a 1% increase in X is associated with a 0.5% increase in Y.</p></li>
+<li><p>Changing the baseline category changes how the dummy coefficients are interpreted (they become relative to a different group), but it doesn’t affect coefficients on other variables in the model. The model’s predictions and fit remain identical.</p></li>
+<li><p>The experience level that maximizes wages is found by setting the derivative equal to zero: 0.04 + 2(-0.0008)(exper) = 0. Solving: exper = 0.04/(2 × 0.0008) = 0.04/0.0016 = 25 years.</p></li>
+</ol>
+</div>
+</div>
+</div>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-bailey_real_2020" class="csl-entry" role="listitem">
+Bailey, Michael A. 2020. <em>Real Econometrics: The Right Tools to Answer Important Questions</em>. Oxford University Press.
+</div>
+<div id="ref-wooldridge_introductory_2019" class="csl-entry" role="listitem">
+Wooldridge, Jeffrey M. 2019. <em>Introductory Econometrics: A Modern Approach</em>. 7th ed. Cengage Learning.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/statistical_inference.html" class="pagination-link" aria-label="Statistical Inference">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Statistical Inference</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/heteroskedasticity.html" class="pagination-link" aria-label="Heteroskedasticity">
+        <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Heteroskedasticity</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p><span class="faux-block"> © 2025 Raymond Caraher. All rights reserved. </span></p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

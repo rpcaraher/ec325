@@ -1,0 +1,630 @@
+# Panel Data and Fixed Effects {#sec-panel-fe}
+
+```{r}
+#| echo: false
+#| output: false
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(wooldridge)
+library(modelsummary)
+
+options(scipen = 999)
+
+```
+
+```{=html}
+
+<style>
+.problem {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+.context {
+    background-color: #e8f4f8;
+    padding: 12px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border-left: 4px solid #2874a6;
+}
+.question {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #fff3cd;
+    border-radius: 5px;
+}
+.answer-row {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.answer-row label {
+    min-width: 320px;
+    font-weight: 500;
+}
+select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    min-width: 300px;
+    cursor: pointer;
+}
+select:focus {
+    border-color: #2874a6;
+    outline: none;
+}
+.correct {
+    border-color: #28a745 !important;
+    background-color: #d4edda !important;
+}
+.incorrect {
+    border-color: #dc3545 !important;
+    background-color: #f8d7da !important;
+}
+.explanation {
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #e7f3ff;
+    border-radius: 5px;
+    border-left: 4px solid #2874a6;
+}
+.note {
+    font-size: 0.85em;
+    color: #666;
+    font-style: italic;
+}
+</style>
+
+<script>
+function checkAnswer(selectElement, correctValue) {
+    if (selectElement.value === '') {
+        selectElement.classList.remove('correct', 'incorrect');
+    } else if (selectElement.value === correctValue) {
+        selectElement.classList.remove('incorrect');
+        selectElement.classList.add('correct');
+    } else {
+        selectElement.classList.remove('correct');
+        selectElement.classList.add('incorrect');
+    }
+}
+</script>
+
+```
+
+
+::: {.callout-tip collapse="true"}
+## **Key Questions**
+- What distinguishes panel data from cross-sectional data?
+- How can observing units over time help us address omitted variable bias?
+- What is a fixed effect and what does it control for?
+- How do we estimate fixed effects models in practice?
+- What types of confounders can fixed effects eliminate, and what can they not?
+:::
+
+::: {.callout-note collapse="true"}
+## **Suggested Readings**
+- @wooldridge_introductory_2019, Ch. 13-14
+:::
+
+
+Throughout this course,
+we have emphasized that omitted variable bias poses the central threat to causal inference.
+We can add control variables,
+but we can only control for what we can measure.
+What about unobserved factors like natural ability,
+motivation,
+local culture,
+or a city's history?
+
+**Panel data**---observing the same units over multiple time periods---offers a powerful solution.
+By tracking how outcomes change within the same unit over time,
+we can control for all characteristics of that unit that remain constant,
+even if we cannot observe or measure them directly.
+This chapter introduces panel data methods,
+with a focus on **fixed effects** estimation.
+
+
+## Cross-Sectional vs. Panel Data
+
+### Cross-Sectional Data
+
+Most datasets we have examined so far are **cross-sectional**:
+each unit (person, firm, city) is observed at a single point in time.
+Examples include housing prices in Ames, Iowa in 2010;
+penguin measurements from a single expedition;
+or wage data from one year of the Current Population Survey.
+
+With cross-sectional data,
+we can describe populations,
+identify correlations,
+and use multivariate regression to control for observable confounders.
+But we face a fundamental limitation:
+we cannot control for unobserved characteristics that differ across units.
+
+### Panel Data
+
+**Panel data** (also called longitudinal data) tracks the same units across multiple time periods.
+Examples include:
+
+- NBA players observed across multiple seasons
+- Employment and wages in states tracked quarterly over several years
+- Crime rates in cities measured annually for a decade
+- Stock prices for companies tracked daily
+
+The key feature is that we observe the **same unit** at **different times**,
+allowing us to see how that unit changes when circumstances change.
+
+
+## Why Panel Data Helps: The Intuition
+
+Consider estimating the effect of unemployment on crime.
+With cross-sectional data from a single year,
+we might compare cities with high unemployment to cities with low unemployment.
+But cities differ in countless ways:
+geography,
+demographics,
+policing strategies,
+local culture,
+economic history.
+Many of these factors affect both unemployment and crime,
+creating omitted variable bias.
+
+Now imagine we observe the **same cities** over two years.
+Some cities experience rising unemployment;
+others see it fall.
+We can ask:
+when unemployment rises *within a city*,
+does crime also rise?
+
+This **within-unit comparison** automatically controls for everything about that city that stays constant over time---its geography,
+its historical legacy,
+its baseline demographics.
+We don't need to measure these factors;
+we just need them to be stable across the time periods we observe.
+
+::: {.callout-important}
+## The Key Insight
+Panel data allows us to control for **all time-invariant characteristics** of each unit,
+whether observed or unobserved.
+The variation we use for identification comes from changes *within* units over time,
+not comparisons *across* different units.
+:::
+
+
+## The Fixed Effects Model
+
+### Setting Up the Model
+
+Let's formalize this intuition.
+Suppose we observe units $i = 1, 2, ..., N$ over time periods $t = 1, 2, ..., T$.
+Our outcome is $y_{it}$ and our variable of interest is $x_{it}$.
+
+The panel data model is:
+
+$$
+y_{it} = \beta_0 + \beta_1 x_{it} + a_i + \tau_t + \mu_{it}
+$$ {#eq-panel-model}
+
+where:
+
+- $y_{it}$ is the outcome for unit $i$ at time $t$
+- $x_{it}$ is the explanatory variable (which varies across units and time)
+- $a_i$ is the **unit fixed effect**---capturing all time-invariant characteristics of unit $i$
+- $\tau_t$ is the **time fixed effect**---capturing shocks that affect all units equally in period $t$
+- $\mu_{it}$ is the idiosyncratic error term
+
+The unit fixed effect $a_i$ is the crucial element.
+It absorbs everything about unit $i$ that doesn't change over time:
+genetics,
+geography,
+institutional history,
+baseline culture.
+In our crime example,
+$a_i$ captures each city's fixed characteristics that affect crime rates.
+
+### What Does This Solve?
+
+Recall that omitted variable bias occurs when an unobserved factor is correlated with both $x$ and $y$.
+In the standard cross-sectional regression:
+
+$$
+y_i = \beta_0 + \beta_1 x_i + \mu_i
+$$
+
+any time-invariant unobserved factor correlated with $x$ gets absorbed into the error term,
+biasing our estimate of $\beta_1$.
+
+With fixed effects,
+those time-invariant factors are captured by $a_i$ and explicitly controlled for.
+As long as the confounders don't change over time,
+they cannot bias our estimate.
+
+
+## Estimating Fixed Effects: The Within Transformation
+
+How do we actually estimate @eq-panel-model when we don't observe $a_i$?
+
+One approach is the **within transformation** (also called the "demeaning" approach).
+For each unit $i$,
+we compute the average of each variable over time:
+
+$$
+\bar{y}_i = \beta_0 + \beta_1 \bar{x}_i + a_i + \bar{\tau} + \bar{\mu}_i
+$$
+
+where $\bar{y}_i = \frac{1}{T}\sum_{t=1}^{T} y_{it}$ is unit $i$'s average outcome across all time periods.
+
+Now subtract this time-averaged equation from the original:
+
+$$
+y_{it} - \bar{y}_i = \beta_1(x_{it} - \bar{x}_i) + (\tau_t - \bar{\tau}) + (\mu_{it} - \bar{\mu}_i)
+$$
+
+Notice what happened:
+the $a_i$ term **completely disappears**!
+Since $a_i$ is constant over time,
+$a_i - a_i = 0$.
+
+We can write this more compactly as:
+
+$$
+\ddot{y}_{it} = \beta_1 \ddot{x}_{it} + \ddot{\tau}_t + \ddot{\mu}_{it}
+$$
+
+where the double-dots indicate "time-demeaned" variables (deviations from unit means).
+
+::: {.callout-note}
+## Why "Within" Transformation?
+This estimator is called the "within" transformation because the variation used to identify $\beta_1$ comes entirely from variation *within* each unit over time.
+Cross-sectional differences between units are eliminated by the demeaning process.
+:::
+
+### Example: Unemployment and Crime
+
+Let's see this in action.
+We have data on crime rates and unemployment for 46 cities observed in two years (1982 and 1987).
+
+First,
+let's see what happens with simple cross-sectional regression using just 1987 data:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+crime_data <- wooldridge::crime2
+
+# Cross-sectional regression using only 1987
+reg_cross <- lm(crmrte ~ unem, data = filter(crime_data, year == 87))
+summary(reg_cross)
+```
+
+The coefficient on unemployment is **negative** (-4.16),
+suggesting higher unemployment is associated with *lower* crime.
+This counterintuitive result likely reflects omitted variable bias:
+cities with low unemployment might also have other characteristics (wealth, strong institutions) that lead to lower crime.
+
+Now let's use both years and apply the within transformation:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# Create city identifier
+crime_data <- crime_data |> 
+    mutate(city_id = rep(1:46, each = 2))
+
+# Compute city-level means
+city_means <- crime_data |> 
+    group_by(city_id) |> 
+    summarize(
+        mean_crmrte = mean(crmrte),
+        mean_unem = mean(unem),
+        mean_d87 = mean(d87)
+    )
+
+# Merge and demean
+crime_data <- crime_data |> 
+    left_join(city_means, by = "city_id") |> 
+    mutate(
+        crmrte_demean = crmrte - mean_crmrte,
+        unem_demean = unem - mean_unem,
+        time_demean = d87 - mean_d87
+    )
+
+# Estimate on demeaned data
+reg_within <- lm(crmrte_demean ~ unem_demean + time_demean, data = crime_data)
+summary(reg_within)
+```
+
+Now the coefficient on unemployment is **positive** (2.22)!
+After controlling for all time-invariant city characteristics,
+we find that when unemployment rises within a city,
+crime rises too.
+This makes much more intuitive sense.
+
+The within transformation eliminated the bias from unobserved city characteristics that were driving the negative cross-sectional correlation.
+
+
+## Estimating Fixed Effects: The Dummy Variable Approach
+
+In practice,
+we rarely compute the within transformation manually.
+Instead,
+we use an equivalent approach:
+including **dummy variables** for each unit.
+
+We estimate:
+
+$$
+y_{it} = \beta_0 + \beta_1 x_{it} + \sum_{j=2}^{N} \gamma_j D_j + \sum_{s=2}^{T} \delta_s T_s + \mu_{it}
+$$
+
+where $D_j$ is a dummy variable equal to 1 if the observation is from unit $j$,
+and $T_s$ is a dummy equal to 1 if the observation is from time period $s$.
+We omit one unit and one time period to avoid the dummy variable trap.
+
+This approach is mathematically equivalent to the within transformation but more flexible:
+it's easier to add control variables,
+and we can see the estimated fixed effects if desired.
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# Create factor variable for city and dummy for 1987
+crime_data <- crime_data |> 
+    mutate(
+        city_f = factor(city_id),
+        year_87 = ifelse(year == 87, 1, 0)
+    )
+
+# Estimate with dummy variables
+reg_fe <- lm(crmrte ~ unem + year_87 + city_f, data = crime_data)
+
+# Show just the key coefficients (not all 46 city dummies)
+summary(reg_fe)$coefficients[1:4, ]
+```
+
+The coefficient on `unem` (2.22) is identical to our within transformation estimate!
+
+The dummy variable coefficients themselves are usually not of primary interest,
+but they can provide useful information.
+For instance,
+we can see which cities have unusually high or low crime rates after accounting for unemployment.
+
+
+## What Fixed Effects Control For (and What They Don't)
+
+Fixed effects are powerful,
+but they're not magic.
+It's crucial to understand exactly what they do and don't control for.
+
+### What Unit Fixed Effects Control For
+
+Unit fixed effects ($a_i$) absorb all characteristics of unit $i$ that are **constant over time**:
+
+- Geography and location
+- Historical legacy and founding conditions
+- Stable institutional features
+- Baseline demographics (to the extent they don't change much)
+- Measurement differences (e.g., how crime is recorded)
+- "Culture" and other hard-to-measure factors
+
+### What Time Fixed Effects Control For
+
+Time fixed effects ($\tau_t$) absorb all factors that **affect all units equally** in a given period:
+
+- Macroeconomic conditions (recessions, booms)
+- National policy changes
+- Seasonal patterns
+- Technological changes affecting everyone
+
+### What Fixed Effects Do NOT Control For
+
+Fixed effects cannot eliminate bias from factors that vary **both across units and over time** in ways correlated with the treatment:
+
+- Time-varying confounders specific to certain units
+- Differential trends (some units changing faster than others)
+- Reverse causality (if $y$ affects $x$ within a period)
+
+::: {.callout-warning}
+## Fixed Effects ≠ No OVB
+Fixed effects dramatically reduce omitted variable bias by controlling for time-invariant confounders.
+But they don't eliminate all possible bias.
+Unit-specific, time-varying confounders can still cause problems.
+Always think carefully about what might be changing differently across your units over time.
+:::
+
+For example,
+in our crime analysis,
+fixed effects control for each city's baseline characteristics.
+But if some cities increased their police budgets while others cut them,
+and these budget changes are correlated with unemployment changes,
+we would still have omitted variable bias.
+We could address this by adding police spending as an explicit control variable.
+
+
+## Adding Control Variables
+
+We can include additional time-varying control variables in fixed effects models:
+
+$$
+y_{it} = \beta_1 x_{it} + \gamma z_{it} + a_i + \tau_t + \mu_{it}
+$$
+
+where $z_{it}$ is a control variable that changes over time within units.
+
+This helps address the remaining source of potential bias:
+unit-specific, time-varying confounders.
+Of course,
+we can only control for variables we observe and measure.
+
+
+## Practical Considerations
+
+### When to Use Fixed Effects
+
+Fixed effects are most valuable when:
+
+1. You have genuine panel data (same units observed multiple times)
+2. There is meaningful variation in $x$ within units over time
+3. Time-invariant confounders are a major concern
+4. The treatment effect is expected to be relatively immediate
+
+### When Fixed Effects May Not Work Well
+
+Fixed effects may be less useful when:
+
+1. Little within-unit variation exists (everyone's $x$ is stable over time)
+2. The treatment effect takes a long time to materialize
+3. Time-varying confounders are the main concern
+4. You have very few time periods (less precise estimates)
+
+### Standard Errors
+
+With panel data,
+observations within the same unit are often correlated over time.
+Standard OLS standard errors assume independence and can be too small.
+In practice,
+researchers typically use **clustered standard errors** at the unit level to account for this correlation.
+We'll discuss this more in later chapters.
+
+
+## Summary
+
+Panel data---observing the same units over time---offers a powerful tool for causal inference.
+By tracking how outcomes change within units when circumstances change,
+we can control for all time-invariant characteristics of each unit,
+whether observed or not.
+
+The **fixed effects estimator** implements this idea.
+It can be computed via the within transformation (demeaning the data) or equivalently by including dummy variables for each unit.
+The coefficient of interest is identified purely from within-unit variation over time.
+
+Fixed effects control for:
+
+- All time-invariant unit characteristics (observed and unobserved)
+- All time-specific shocks affecting all units equally (when time fixed effects are included)
+
+Fixed effects do NOT control for:
+
+- Unit-specific, time-varying confounders
+- Differential trends across units
+- Reverse causality
+
+Panel methods are not a complete solution to omitted variable bias,
+but they represent a major improvement over cross-sectional analysis when time-invariant confounders are a primary concern.
+
+
+## Check Your Understanding
+
+:::: {.content-visible when-format="html"}
+
+For each question below, 
+select the best answer from the dropdown menu. 
+
+```{=html}
+<div class="question">
+<div class="answer-row">
+    <label>i. What distinguishes panel data from cross-sectional data? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Panel data has more observations</option>
+        <option value="b">Panel data tracks the same units over multiple time periods</option>
+        <option value="c">Panel data includes more variables</option>
+        <option value="d">Panel data is collected by governments</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>ii. In the model y<sub>it</sub> = &beta;<sub>0</sub> + &beta;<sub>1</sub>x<sub>it</sub> + a<sub>i</sub> + &mu;<sub>it</sub>, what does a<sub>i</sub> represent? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The effect of x on y</option>
+        <option value="b">Random measurement error</option>
+        <option value="c">All time-invariant characteristics of unit i</option>
+        <option value="d">The average value of y across all units</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iii. Why does the within transformation eliminate the unit fixed effect a<sub>i</sub>? </label>
+    <select onchange="checkAnswer(this, 'a')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Because a<sub>i</sub> is constant over time, so a<sub>i</sub> - a<sub>i</sub> = 0 when we demean</option>
+        <option value="b">Because a<sub>i</sub> is uncorrelated with x</option>
+        <option value="c">Because we assume a<sub>i</sub> = 0</option>
+        <option value="d">Because we have enough control variables</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iv. In the unemployment-crime example, why did the coefficient change from negative (cross-sectional) to positive (fixed effects)? </label>
+    <select onchange="checkAnswer(this, 'd')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The fixed effects model has more observations</option>
+        <option value="b">The cross-sectional model had a coding error</option>
+        <option value="c">Fixed effects models always produce positive coefficients</option>
+        <option value="d">Fixed effects removed bias from time-invariant city characteristics correlated with both unemployment and crime</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>v. Which of the following would unit fixed effects NOT control for? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">A city's geographic location</option>
+        <option value="b">A city's historical founding conditions</option>
+        <option value="c">Changes in a city's police budget over time</option>
+        <option value="d">A city's baseline demographics</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>vi. <strong>(Challenge)</strong> The dummy variable approach and the within transformation produce identical estimates of &beta;<sub>1</sub>. Why might we prefer the dummy variable approach in practice? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">It runs faster computationally</option>
+        <option value="b">It's easier to add time-varying control variables and we can examine the fixed effect estimates if desired</option>
+        <option value="c">It produces smaller standard errors</option>
+        <option value="d">It doesn't require panel data</option>
+    </select>
+</div>
+</div>
+
+```
+
+::: {.callout-tip collapse="true"}
+## Show Explanation
+
+i. Panel data's defining feature is that it follows the **same units** (people, firms, cities, etc.) across **multiple time periods**. This allows us to observe how each unit changes over time, rather than just comparing different units at one point in time.
+
+ii. The term $a_i$ is the unit fixed effect. It captures everything about unit $i$ that is constant over time—observed characteristics like location, but also unobserved factors like institutional history, culture, or baseline conditions. This is what makes fixed effects so powerful for addressing omitted variable bias.
+
+iii. The within transformation subtracts each unit's time-average from its observations. Since $a_i$ doesn't vary over time, its average equals itself: $\bar{a}_i = a_i$. So when we compute $a_i - \bar{a}_i = a_i - a_i = 0$, the fixed effect is eliminated.
+
+iv. The cross-sectional estimate was biased because unobserved city characteristics (wealth, institutions, etc.) were correlated with both unemployment and crime. Cities with "good" characteristics had both low unemployment AND low crime, creating a spurious negative correlation. Fixed effects removed these time-invariant confounders, revealing the true positive effect of unemployment on crime.
+
+v. Unit fixed effects only control for characteristics that are **constant over time**. A city's police budget changes from year to year, so it's a time-varying factor that fixed effects won't automatically control for. We would need to include it as an explicit control variable.
+
+vi. While mathematically equivalent for estimating $\beta_1$, the dummy variable approach is more practical. It's straightforward to add additional control variables, it works naturally with standard regression software, and we can examine the estimated fixed effects if they're of substantive interest. The within transformation requires manual computation of demeaned variables.
+
+:::
+
+::::
+
+:::: {.content-hidden when-format="html"}
+
+*Note: This section contains interactive content only available in the HTML version.*
+
+::::

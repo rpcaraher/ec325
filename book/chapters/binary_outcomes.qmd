@@ -1,0 +1,552 @@
+# Interaction Effects {#sec-interactions}
+
+```{r}
+#| echo: false
+#| output: false
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(wooldridge)
+library(modelsummary)
+
+options(scipen = 999)
+
+```
+
+```{=html}
+
+<style>
+.problem {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+.context {
+    background-color: #e8f4f8;
+    padding: 12px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border-left: 4px solid #2874a6;
+}
+.question {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #fff3cd;
+    border-radius: 5px;
+}
+.answer-row {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.answer-row label {
+    min-width: 320px;
+    font-weight: 500;
+}
+select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    min-width: 300px;
+    cursor: pointer;
+}
+select:focus {
+    border-color: #2874a6;
+    outline: none;
+}
+.correct {
+    border-color: #28a745 !important;
+    background-color: #d4edda !important;
+}
+.incorrect {
+    border-color: #dc3545 !important;
+    background-color: #f8d7da !important;
+}
+.explanation {
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #e7f3ff;
+    border-radius: 5px;
+    border-left: 4px solid #2874a6;
+}
+.note {
+    font-size: 0.85em;
+    color: #666;
+    font-style: italic;
+}
+</style>
+
+<script>
+function checkAnswer(selectElement, correctValue) {
+    if (selectElement.value === '') {
+        selectElement.classList.remove('correct', 'incorrect');
+    } else if (selectElement.value === correctValue) {
+        selectElement.classList.remove('incorrect');
+        selectElement.classList.add('correct');
+    } else {
+        selectElement.classList.remove('correct');
+        selectElement.classList.add('incorrect');
+    }
+}
+</script>
+
+```
+
+
+::: {.callout-tip collapse="true"}
+## **Key Questions**
+- What happens when the effect of one variable depends on the value of another?
+- How do we include and interpret interaction terms in regression?
+- What's the difference between interacting two dummy variables versus a dummy and a continuous variable?
+- How do interactions allow for different slopes across groups?
+:::
+
+::: {.callout-note collapse="true"}
+## **Suggested Readings**
+- @wooldridge_introductory_2019, Ch. 7.4
+- @bailey_real_2020, Ch. 5.4
+:::
+
+
+In the previous chapter,
+we saw how dummy variables allow different groups to have different intercepts---the regression lines for different groups are parallel but shifted up or down.
+But what if the *effect* of a variable differs across groups?
+What if the returns to education are higher for men than for women,
+or the effect of experience on wages depends on whether someone has a college degree?
+
+**Interaction terms** allow us to model these situations.
+When we include an interaction between two variables,
+we allow the effect of one variable to depend on the value of another.
+
+
+## Why Interactions Matter
+
+Consider the gender wage gap.
+We might estimate:
+
+$$
+\ln(wage) = \beta_0 + \beta_1(female) + \beta_2(educ) + \mu
+$$
+
+This model assumes that the effect of education on wages ($\beta_2$) is the same for men and women.
+The only difference is the intercept---women's wage line is shifted down by $\beta_1$.
+
+But what if education has different effects for men and women?
+Perhaps discrimination means women receive lower returns to their education,
+or perhaps women are overrepresented in fields where education is particularly valuable.
+To test this,
+we need to allow the *slope* on education to differ by gender.
+
+This is exactly what interaction terms do.
+
+
+## Interactions Between Two Dummy Variables
+
+Let's start with the simplest case:
+interacting two dummy variables.
+Suppose we want to understand how being female and being married jointly affect wages.
+
+We create an **interaction term** by multiplying the two dummy variables:
+
+$$
+\ln(wage) = \beta_0 + \beta_1(female) + \beta_2(married) + \beta_3(female \times married) + \mu
+$$
+
+The interaction term $female \times married$ equals 1 only for married women and 0 for everyone else.
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+wage_data <- wooldridge::wage1 |> 
+    mutate(female_married = female * married)
+
+lm1 <- lm(log(wage) ~ female + married + female_married, data = wage_data)
+summary(lm1)
+```
+
+### Interpreting the Interaction
+
+To understand what each coefficient means,
+let's work through the predicted wages for each group:
+
+| Group | female | married | female × married | Predicted ln(wage) |
+|:------|:------:|:-------:|:----------------:|:-------------------|
+| Unmarried men | 0 | 0 | 0 | $\beta_0$ |
+| Unmarried women | 1 | 0 | 0 | $\beta_0 + \beta_1$ |
+| Married men | 0 | 1 | 0 | $\beta_0 + \beta_2$ |
+| Married women | 1 | 1 | 1 | $\beta_0 + \beta_1 + \beta_2 + \beta_3$ |
+
+From our estimates:
+
+- **Unmarried men** (baseline): $\ln(wage) = 1.57$
+- **Unmarried women**: The coefficient on `female` ($\hat{\beta}_1 \approx -0.13$) tells us unmarried women earn about 13% less than unmarried men.
+- **Married men**: The coefficient on `married` ($\hat{\beta}_2 \approx 0.42$) tells us married men earn about 42% more than unmarried men---a large "marriage premium."
+- **Married women**: We need to add all applicable coefficients: $-0.13 + 0.42 + (-0.38) = -0.09$, so married women earn about 9% less than unmarried men.
+
+::: {.callout-important}
+## The Interaction Effect
+The coefficient on the interaction term ($\hat{\beta}_3 \approx -0.38$) tells us that the marriage premium is **different** for women than for men.
+While married men earn 42% more than unmarried men,
+the marriage "premium" for women is only $0.42 + (-0.38) = 0.04$,
+or about 4%---much smaller.
+
+Equivalently,
+the gender wage gap is larger for married workers than for unmarried workers.
+:::
+
+
+## Interactions Between Dummies and Continuous Variables
+
+Perhaps more powerful is interacting a dummy variable with a continuous variable.
+This allows the **slope**---not just the intercept---to differ across groups.
+
+Suppose we want to test whether men and women have different returns to education:
+
+$$
+\ln(wage) = \beta_0 + \beta_1(female) + \beta_2(educ) + \beta_3(female \times educ) + \mu
+$$
+
+The interaction term $female \times educ$ equals 0 for all men (since $female = 0$) and equals the education level for women.
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+wage_data <- wooldridge::wage1 |> 
+    mutate(female_educ = female * educ)
+
+lm2 <- lm(log(wage) ~ female + educ + female_educ, data = wage_data)
+summary(lm2)
+```
+
+### Different Slopes for Different Groups
+
+Let's write out the predicted wage equations for each group:
+
+**For men** ($female = 0$):
+$$
+\ln(wage) = \beta_0 + \beta_2(educ) = 0.389 + 0.082(educ)
+$$
+
+**For women** ($female = 1$):
+$$
+\ln(wage) = (\beta_0 + \beta_1) + (\beta_2 + \beta_3)(educ) = (0.389 - 0.227) + (0.082 + 0.006)(educ)
+$$
+$$
+= 0.162 + 0.088(educ)
+$$
+
+Now we can see:
+
+- **Men** start with a higher intercept (0.389 vs 0.162)
+- **Women** have a slightly higher return to education (8.8% vs 8.2% per year)
+
+The interaction coefficient ($\hat{\beta}_3 \approx 0.006$) is not statistically significant here,
+suggesting we cannot reject that men and women have the same returns to education.
+But the approach illustrates how interactions allow different slopes.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-interaction-slopes
+#| fig-cap: "With an interaction term, men and women can have different slopes (returns to education), not just different intercepts."
+
+# Calculate predictions
+wage_data <- wage_data |> 
+    mutate(pred_men = 0.389 + 0.082 * educ,
+           pred_women = 0.162 + 0.088 * educ)
+
+# Reshape to long format
+wage_data_long <- wage_data |>
+    select(educ, pred_men, pred_women) |> 
+    pivot_longer(
+        cols = c(pred_men, pred_women),
+        names_to = "gender",
+        values_to = "predicted_wage"
+    )
+
+# Create the plot
+ggplot(wage_data_long, aes(x = educ, y = predicted_wage, color = gender)) +
+    geom_line(linewidth = 1) +
+    labs(
+        title = "Effect of Education on Log Wages by Gender",
+        x = "Years of Education",
+        y = "Predicted Log Wage",
+        color = "Gender"
+    ) +
+    scale_color_manual(
+        labels = c("Men", "Women"),
+        values = c("pred_men" = "#0072B2", "pred_women" = "#D55E00")
+    ) +
+    theme_minimal() +
+    theme(legend.position = "bottom")
+```
+
+::: {.callout-note}
+## Dummy Variables vs. Interactions: A Summary
+- **Dummy variable alone**: Different intercepts, same slopes (parallel lines)
+- **Interaction with continuous variable**: Different intercepts AND different slopes
+:::
+
+
+## Computing Effects with Interactions
+
+When interactions are present,
+computing the effect of a variable requires care.
+The effect of one variable depends on the value of the other variable in the interaction.
+
+From our model:
+$$
+\ln(wage) = \beta_0 + \beta_1(female) + \beta_2(educ) + \beta_3(female \times educ)
+$$
+
+The effect of education on wages is:
+$$
+\frac{\partial \ln(wage)}{\partial educ} = \beta_2 + \beta_3(female)
+$$
+
+- For men ($female = 0$): Effect = $\beta_2 = 0.082$ (8.2% per year)
+- For women ($female = 1$): Effect = $\beta_2 + \beta_3 = 0.082 + 0.006 = 0.088$ (8.8% per year)
+
+Similarly,
+the effect of being female depends on education level:
+$$
+\frac{\partial \ln(wage)}{\partial female} = \beta_1 + \beta_3(educ)
+$$
+
+At 12 years of education: Effect = $-0.227 + 0.006(12) = -0.155$ (-15.5%)
+
+At 16 years of education: Effect = $-0.227 + 0.006(16) = -0.131$ (-13.1%)
+
+The gender wage gap **narrows** as education increases (though the interaction isn't statistically significant in this example).
+
+
+## Interactions Between Two Continuous Variables
+
+We can also interact two continuous variables.
+For example,
+perhaps the effect of experience on wages depends on education level---more educated workers might have steeper experience-wage profiles because they're in careers with more room for advancement.
+
+$$
+\ln(wage) = \beta_0 + \beta_1(educ) + \beta_2(exper) + \beta_3(educ \times exper) + \mu
+$$
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+wage_data <- wooldridge::wage1 |> 
+    mutate(educ_exper = educ * exper)
+
+lm3 <- lm(log(wage) ~ educ + exper + educ_exper, data = wage_data)
+summary(lm3)
+```
+
+The interaction coefficient ($\hat{\beta}_3 \approx 0.0003$) is small but positive and marginally significant.
+This suggests that the returns to experience are slightly higher for more educated workers.
+
+The effect of experience is:
+$$
+\frac{\partial \ln(wage)}{\partial exper} = \beta_2 + \beta_3(educ)
+$$
+
+For someone with 12 years of education: $0.019 + 0.0003(12) = 0.023$ (2.3% per year)
+
+For someone with 16 years of education: $0.019 + 0.0003(16) = 0.024$ (2.4% per year)
+
+
+## Application: Decomposing the Gender Wage Gap
+
+Economists have long sought to understand why women earn less than men on average.
+A classic approach uses regression with interactions to **decompose** the wage gap into:
+
+1. **Explained differences**: Gaps due to differences in education, experience, occupation, etc.
+2. **Unexplained differences**: Gaps that remain after controlling for observable characteristics (potentially reflecting discrimination)
+
+Consider a comprehensive model:
+
+$$
+\ln(wage) = \beta_0 + \beta_1(female) + \sum_{j} \beta_j(HumanCapital_j) + \sum_{k} \beta_k(Occupation_k) + \mu
+$$
+
+- The human capital variables (education, experience) capture differences in worker productivity
+- The occupation dummies capture sorting into different types of jobs
+- The coefficient $\beta_1$ on `female` represents the **unexplained** gap---the wage difference that remains after accounting for these factors
+
+Research by Blau and Kahn (2017) uses this approach with rich panel data.
+They find that while the raw gender wage gap has narrowed considerably since 1980,
+a substantial unexplained gap remains.
+Human capital differences explain less of the gap over time (as women have caught up in education and experience),
+but occupational and industry segregation continues to be important.
+
+
+## Best Practices for Using Interactions
+
+### Always Include Main Effects
+
+When including an interaction term,
+always include the main effects too:
+
+**Correct:**
+$$
+y = \beta_0 + \beta_1(A) + \beta_2(B) + \beta_3(A \times B)
+$$
+
+**Incorrect:**
+$$
+y = \beta_0 + \beta_3(A \times B)
+$$
+
+Omitting main effects forces the interaction to capture both the main effects and the interaction,
+leading to misleading coefficients.
+
+### Center Continuous Variables
+
+When interacting continuous variables,
+centering them (subtracting the mean) can make coefficients more interpretable.
+After centering,
+the main effect coefficient gives the effect at the mean of the other variable,
+rather than at zero.
+
+### Test Whether Interactions Are Needed
+
+Not every model needs interactions.
+Test whether the interaction coefficient is statistically significant before interpreting it substantively.
+You can also use F-tests to jointly test multiple interaction terms.
+
+
+## Summary
+
+Interaction terms extend the flexibility of regression models by allowing the effect of one variable to depend on another.
+
+**Interactions between dummy variables** allow us to estimate separate effects for groups defined by multiple categories.
+The interaction coefficient captures the additional effect of belonging to both categories beyond what we'd expect from adding the individual effects.
+
+**Interactions between dummies and continuous variables** allow different slopes for different groups.
+Without interactions,
+a dummy variable only shifts the intercept (parallel lines).
+With interactions,
+each group can have its own slope.
+
+**Interactions between continuous variables** allow the marginal effect of one variable to vary with the level of another.
+This is useful when economic theory suggests complementarities or diminishing returns.
+
+When interactions are present,
+interpreting coefficients requires care.
+The effect of a variable involved in an interaction depends on the value of the other variable(s) in the interaction.
+Always compute effects at meaningful values (like means or specific policy-relevant points).
+
+
+## Check Your Understanding
+
+:::: {.content-visible when-format="html"}
+
+For each question below, 
+select the best answer from the dropdown menu. 
+
+```{=html}
+<div class="question">
+<div class="answer-row">
+    <label>i. In the model ln(wage) = β₀ + β₁(female) + β₂(educ) + β₃(female × educ), what does β₃ represent? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The effect of education on wages</option>
+        <option value="b">The effect of being female on wages</option>
+        <option value="c">How much the effect of education differs for women compared to men</option>
+        <option value="d">The average wage of women with no education</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>ii. In the same model, what is the effect of education on wages for women? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">β₂</option>
+        <option value="b">β₂ + β₃</option>
+        <option value="c">β₁ + β₃</option>
+        <option value="d">β₃</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iii. We estimate: ln(wage) = 1.5 + (-0.20)(female) + (0.30)(married) + (-0.25)(female × married). What are predicted log wages for married women? </label>
+    <select onchange="checkAnswer(this, 'd')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">1.5</option>
+        <option value="b">1.30</option>
+        <option value="c">1.55</option>
+        <option value="d">1.35</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iv. In that same model, what is the "marriage premium" (effect of being married) for women? </label>
+    <select onchange="checkAnswer(this, 'a')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">0.05 (about 5%)</option>
+        <option value="b">0.30 (about 30%)</option>
+        <option value="c">-0.25 (about -25%)</option>
+        <option value="d">-0.20 (about -20%)</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>v. Why should we always include main effects when we include an interaction term? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">R will give an error otherwise</option>
+        <option value="b">It increases the R-squared</option>
+        <option value="c">Omitting them forces the interaction to capture both main effects and interaction, leading to misleading coefficients</option>
+        <option value="d">Main effects are always statistically significant</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>vi. <strong>(Challenge)</strong> In the model y = β₀ + β₁x₁ + β₂x₂ + β₃(x₁ × x₂), what is ∂y/∂x₁? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">β₁</option>
+        <option value="b">β₁ + β₃x₂</option>
+        <option value="c">β₁ + β₂ + β₃</option>
+        <option value="d">β₃</option>
+    </select>
+</div>
+</div>
+
+```
+
+::: {.callout-tip collapse="true"}
+## Show Explanation
+
+i. The interaction coefficient β₃ captures how the effect of education *differs* between groups. It tells us how much more (or less) each year of education affects wages for women compared to men.
+
+ii. For women (female = 1), the effect of education is the derivative with respect to educ: β₂ + β₃(female) = β₂ + β₃(1) = β₂ + β₃. The interaction term adds to (or subtracts from) the baseline effect.
+
+iii. For married women, female = 1, married = 1, and female × married = 1. The predicted log wage is: 1.5 + (-0.20)(1) + (0.30)(1) + (-0.25)(1) = 1.5 - 0.20 + 0.30 - 0.25 = 1.35.
+
+iv. The marriage premium for women is β₂ + β₃ = 0.30 + (-0.25) = 0.05. The interaction term reduces the marriage premium for women compared to men (who have a premium of just β₂ = 0.30).
+
+v. When we include an interaction A × B without the main effects A and B, the interaction term is forced to capture all variation associated with both A and B, not just their interaction. This leads to coefficients that are difficult to interpret and often misleading.
+
+vi. Taking the partial derivative of y with respect to x₁, treating x₂ as constant: ∂y/∂x₁ = β₁ + β₃x₂. The effect of x₁ depends on the level of x₂---this is the defining feature of an interaction.
+
+:::
+
+::::
+
+:::: {.content-hidden when-format="html"}
+
+*Note: This section contains interactive content only available in the HTML version.*
+
+::::

@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>10&nbsp; Panel Data and Fixed Effects – EC325 Workbook</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/did.html" rel="next">
+<link href="../chapters/binary_outcomes.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/panel_fe.html"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Panel Data and Fixed Effects</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">EC325 Workbook</a> 
+        <div class="sidebar-tools-main">
+    <div class="dropdown">
+      <a href="" title="Download" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label="Download"><i class="bi bi-download"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="../EC325-Workbook.pdf">
+              <i class="bi bi-file-pdf pe-1"></i>
+            Download PDF
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="../EC325-Workbook.epub">
+              <i class="bi bi-journal pe-1"></i>
+            Download ePub
+            </a>
+          </li>
+      </ul>
+    </div>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/data_practices.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Good Data Practices</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/rcts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Causality and Randomized Control Trials</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/bivariate_ols.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Bivariate Regression and Ordinary Least Squares</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/multivariate_ols.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Multivariate Regression</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/statistical_inference.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Statistical Inference</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/dummies_nonlins.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Dummy Variables and Non-Linear Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/heteroskedasticity.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Heteroskedasticity</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/binary_outcomes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Interaction Effects</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/panel_fe.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Panel Data and Fixed Effects</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/did.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/advanced_did.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Advanced Difference-in-Differences</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/instrumental_variables.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Instrumental Variables</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/installingR.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Intro to R and RStudio</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/statsreview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Statistics and Probability Review</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/r_reference.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">R Functions and Packages Reference</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#cross-sectional-vs.-panel-data" id="toc-cross-sectional-vs.-panel-data" class="nav-link active" data-scroll-target="#cross-sectional-vs.-panel-data"><span class="header-section-number">10.1</span> Cross-Sectional vs.&nbsp;Panel Data</a>
+  <ul class="collapse">
+  <li><a href="#cross-sectional-data" id="toc-cross-sectional-data" class="nav-link" data-scroll-target="#cross-sectional-data"><span class="header-section-number">10.1.1</span> Cross-Sectional Data</a></li>
+  <li><a href="#panel-data" id="toc-panel-data" class="nav-link" data-scroll-target="#panel-data"><span class="header-section-number">10.1.2</span> Panel Data</a></li>
+  </ul></li>
+  <li><a href="#why-panel-data-helps-the-intuition" id="toc-why-panel-data-helps-the-intuition" class="nav-link" data-scroll-target="#why-panel-data-helps-the-intuition"><span class="header-section-number">10.2</span> Why Panel Data Helps: The Intuition</a></li>
+  <li><a href="#the-fixed-effects-model" id="toc-the-fixed-effects-model" class="nav-link" data-scroll-target="#the-fixed-effects-model"><span class="header-section-number">10.3</span> The Fixed Effects Model</a>
+  <ul class="collapse">
+  <li><a href="#setting-up-the-model" id="toc-setting-up-the-model" class="nav-link" data-scroll-target="#setting-up-the-model"><span class="header-section-number">10.3.1</span> Setting Up the Model</a></li>
+  <li><a href="#what-does-this-solve" id="toc-what-does-this-solve" class="nav-link" data-scroll-target="#what-does-this-solve"><span class="header-section-number">10.3.2</span> What Does This Solve?</a></li>
+  </ul></li>
+  <li><a href="#estimating-fixed-effects-the-within-transformation" id="toc-estimating-fixed-effects-the-within-transformation" class="nav-link" data-scroll-target="#estimating-fixed-effects-the-within-transformation"><span class="header-section-number">10.4</span> Estimating Fixed Effects: The Within Transformation</a>
+  <ul class="collapse">
+  <li><a href="#example-unemployment-and-crime" id="toc-example-unemployment-and-crime" class="nav-link" data-scroll-target="#example-unemployment-and-crime"><span class="header-section-number">10.4.1</span> Example: Unemployment and Crime</a></li>
+  </ul></li>
+  <li><a href="#estimating-fixed-effects-the-dummy-variable-approach" id="toc-estimating-fixed-effects-the-dummy-variable-approach" class="nav-link" data-scroll-target="#estimating-fixed-effects-the-dummy-variable-approach"><span class="header-section-number">10.5</span> Estimating Fixed Effects: The Dummy Variable Approach</a></li>
+  <li><a href="#what-fixed-effects-control-for-and-what-they-dont" id="toc-what-fixed-effects-control-for-and-what-they-dont" class="nav-link" data-scroll-target="#what-fixed-effects-control-for-and-what-they-dont"><span class="header-section-number">10.6</span> What Fixed Effects Control For (and What They Don’t)</a>
+  <ul class="collapse">
+  <li><a href="#what-unit-fixed-effects-control-for" id="toc-what-unit-fixed-effects-control-for" class="nav-link" data-scroll-target="#what-unit-fixed-effects-control-for"><span class="header-section-number">10.6.1</span> What Unit Fixed Effects Control For</a></li>
+  <li><a href="#what-time-fixed-effects-control-for" id="toc-what-time-fixed-effects-control-for" class="nav-link" data-scroll-target="#what-time-fixed-effects-control-for"><span class="header-section-number">10.6.2</span> What Time Fixed Effects Control For</a></li>
+  <li><a href="#what-fixed-effects-do-not-control-for" id="toc-what-fixed-effects-do-not-control-for" class="nav-link" data-scroll-target="#what-fixed-effects-do-not-control-for"><span class="header-section-number">10.6.3</span> What Fixed Effects Do NOT Control For</a></li>
+  </ul></li>
+  <li><a href="#adding-control-variables" id="toc-adding-control-variables" class="nav-link" data-scroll-target="#adding-control-variables"><span class="header-section-number">10.7</span> Adding Control Variables</a></li>
+  <li><a href="#practical-considerations" id="toc-practical-considerations" class="nav-link" data-scroll-target="#practical-considerations"><span class="header-section-number">10.8</span> Practical Considerations</a>
+  <ul class="collapse">
+  <li><a href="#when-to-use-fixed-effects" id="toc-when-to-use-fixed-effects" class="nav-link" data-scroll-target="#when-to-use-fixed-effects"><span class="header-section-number">10.8.1</span> When to Use Fixed Effects</a></li>
+  <li><a href="#when-fixed-effects-may-not-work-well" id="toc-when-fixed-effects-may-not-work-well" class="nav-link" data-scroll-target="#when-fixed-effects-may-not-work-well"><span class="header-section-number">10.8.2</span> When Fixed Effects May Not Work Well</a></li>
+  <li><a href="#standard-errors" id="toc-standard-errors" class="nav-link" data-scroll-target="#standard-errors"><span class="header-section-number">10.8.3</span> Standard Errors</a></li>
+  </ul></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">10.9</span> Summary</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">10.10</span> Check Your Understanding</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span id="sec-panel-fe" class="quarto-section-identifier"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Panel Data and Fixed Effects</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+
+<style>
+.problem {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+.context {
+    background-color: #e8f4f8;
+    padding: 12px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border-left: 4px solid #2874a6;
+}
+.question {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #fff3cd;
+    border-radius: 5px;
+}
+.answer-row {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.answer-row label {
+    min-width: 320px;
+    font-weight: 500;
+}
+select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    min-width: 300px;
+    cursor: pointer;
+}
+select:focus {
+    border-color: #2874a6;
+    outline: none;
+}
+.correct {
+    border-color: #28a745 !important;
+    background-color: #d4edda !important;
+}
+.incorrect {
+    border-color: #dc3545 !important;
+    background-color: #f8d7da !important;
+}
+.explanation {
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #e7f3ff;
+    border-radius: 5px;
+    border-left: 4px solid #2874a6;
+}
+.note {
+    font-size: 0.85em;
+    color: #666;
+    font-style: italic;
+}
+</style>
+
+<script>
+function checkAnswer(selectElement, correctValue) {
+    if (selectElement.value === '') {
+        selectElement.classList.remove('correct', 'incorrect');
+    } else if (selectElement.value === correctValue) {
+        selectElement.classList.remove('incorrect');
+        selectElement.classList.add('correct');
+    } else {
+        selectElement.classList.remove('correct');
+        selectElement.classList.add('incorrect');
+    }
+}
+</script>
+
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<strong>Key Questions</strong>
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ul>
+<li>What distinguishes panel data from cross-sectional data?</li>
+<li>How can observing units over time help us address omitted variable bias?</li>
+<li>What is a fixed effect and what does it control for?</li>
+<li>How do we estimate fixed effects models in practice?</li>
+<li>What types of confounders can fixed effects eliminate, and what can they not?</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<strong>Suggested Readings</strong>
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ul>
+<li><span class="citation" data-cites="wooldridge_introductory_2019">Wooldridge (<a href="references.html#ref-wooldridge_introductory_2019" role="doc-biblioref">2019</a>)</span>, Ch. 13-14</li>
+</ul>
+</div>
+</div>
+</div>
+<p>Throughout this course, we have emphasized that omitted variable bias poses the central threat to causal inference. We can add control variables, but we can only control for what we can measure. What about unobserved factors like natural ability, motivation, local culture, or a city’s history?</p>
+<p><strong>Panel data</strong>—observing the same units over multiple time periods—offers a powerful solution. By tracking how outcomes change within the same unit over time, we can control for all characteristics of that unit that remain constant, even if we cannot observe or measure them directly. This chapter introduces panel data methods, with a focus on <strong>fixed effects</strong> estimation.</p>
+<section id="cross-sectional-vs.-panel-data" class="level2" data-number="10.1">
+<h2 data-number="10.1" class="anchored" data-anchor-id="cross-sectional-vs.-panel-data"><span class="header-section-number">10.1</span> Cross-Sectional vs.&nbsp;Panel Data</h2>
+<section id="cross-sectional-data" class="level3" data-number="10.1.1">
+<h3 data-number="10.1.1" class="anchored" data-anchor-id="cross-sectional-data"><span class="header-section-number">10.1.1</span> Cross-Sectional Data</h3>
+<p>Most datasets we have examined so far are <strong>cross-sectional</strong>: each unit (person, firm, city) is observed at a single point in time. Examples include housing prices in Ames, Iowa in 2010; penguin measurements from a single expedition; or wage data from one year of the Current Population Survey.</p>
+<p>With cross-sectional data, we can describe populations, identify correlations, and use multivariate regression to control for observable confounders. But we face a fundamental limitation: we cannot control for unobserved characteristics that differ across units.</p>
+</section>
+<section id="panel-data" class="level3" data-number="10.1.2">
+<h3 data-number="10.1.2" class="anchored" data-anchor-id="panel-data"><span class="header-section-number">10.1.2</span> Panel Data</h3>
+<p><strong>Panel data</strong> (also called longitudinal data) tracks the same units across multiple time periods. Examples include:</p>
+<ul>
+<li>NBA players observed across multiple seasons</li>
+<li>Employment and wages in states tracked quarterly over several years</li>
+<li>Crime rates in cities measured annually for a decade</li>
+<li>Stock prices for companies tracked daily</li>
+</ul>
+<p>The key feature is that we observe the <strong>same unit</strong> at <strong>different times</strong>, allowing us to see how that unit changes when circumstances change.</p>
+</section>
+</section>
+<section id="why-panel-data-helps-the-intuition" class="level2" data-number="10.2">
+<h2 data-number="10.2" class="anchored" data-anchor-id="why-panel-data-helps-the-intuition"><span class="header-section-number">10.2</span> Why Panel Data Helps: The Intuition</h2>
+<p>Consider estimating the effect of unemployment on crime. With cross-sectional data from a single year, we might compare cities with high unemployment to cities with low unemployment. But cities differ in countless ways: geography, demographics, policing strategies, local culture, economic history. Many of these factors affect both unemployment and crime, creating omitted variable bias.</p>
+<p>Now imagine we observe the <strong>same cities</strong> over two years. Some cities experience rising unemployment; others see it fall. We can ask: when unemployment rises <em>within a city</em>, does crime also rise?</p>
+<p>This <strong>within-unit comparison</strong> automatically controls for everything about that city that stays constant over time—its geography, its historical legacy, its baseline demographics. We don’t need to measure these factors; we just need them to be stable across the time periods we observe.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The Key Insight
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Panel data allows us to control for <strong>all time-invariant characteristics</strong> of each unit, whether observed or unobserved. The variation we use for identification comes from changes <em>within</em> units over time, not comparisons <em>across</em> different units.</p>
+</div>
+</div>
+</section>
+<section id="the-fixed-effects-model" class="level2" data-number="10.3">
+<h2 data-number="10.3" class="anchored" data-anchor-id="the-fixed-effects-model"><span class="header-section-number">10.3</span> The Fixed Effects Model</h2>
+<section id="setting-up-the-model" class="level3" data-number="10.3.1">
+<h3 data-number="10.3.1" class="anchored" data-anchor-id="setting-up-the-model"><span class="header-section-number">10.3.1</span> Setting Up the Model</h3>
+<p>Let’s formalize this intuition. Suppose we observe units <span class="math inline">\(i = 1, 2, ..., N\)</span> over time periods <span class="math inline">\(t = 1, 2, ..., T\)</span>. Our outcome is <span class="math inline">\(y_{it}\)</span> and our variable of interest is <span class="math inline">\(x_{it}\)</span>.</p>
+<p>The panel data model is:</p>
+<p><span id="eq-panel-model"><span class="math display">\[
+y_{it} = \beta_0 + \beta_1 x_{it} + a_i + \tau_t + \mu_{it}
+\tag{10.1}\]</span></span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(y_{it}\)</span> is the outcome for unit <span class="math inline">\(i\)</span> at time <span class="math inline">\(t\)</span></li>
+<li><span class="math inline">\(x_{it}\)</span> is the explanatory variable (which varies across units and time)</li>
+<li><span class="math inline">\(a_i\)</span> is the <strong>unit fixed effect</strong>—capturing all time-invariant characteristics of unit <span class="math inline">\(i\)</span></li>
+<li><span class="math inline">\(\tau_t\)</span> is the <strong>time fixed effect</strong>—capturing shocks that affect all units equally in period <span class="math inline">\(t\)</span></li>
+<li><span class="math inline">\(\mu_{it}\)</span> is the idiosyncratic error term</li>
+</ul>
+<p>The unit fixed effect <span class="math inline">\(a_i\)</span> is the crucial element. It absorbs everything about unit <span class="math inline">\(i\)</span> that doesn’t change over time: genetics, geography, institutional history, baseline culture. In our crime example, <span class="math inline">\(a_i\)</span> captures each city’s fixed characteristics that affect crime rates.</p>
+</section>
+<section id="what-does-this-solve" class="level3" data-number="10.3.2">
+<h3 data-number="10.3.2" class="anchored" data-anchor-id="what-does-this-solve"><span class="header-section-number">10.3.2</span> What Does This Solve?</h3>
+<p>Recall that omitted variable bias occurs when an unobserved factor is correlated with both <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>. In the standard cross-sectional regression:</p>
+<p><span class="math display">\[
+y_i = \beta_0 + \beta_1 x_i + \mu_i
+\]</span></p>
+<p>any time-invariant unobserved factor correlated with <span class="math inline">\(x\)</span> gets absorbed into the error term, biasing our estimate of <span class="math inline">\(\beta_1\)</span>.</p>
+<p>With fixed effects, those time-invariant factors are captured by <span class="math inline">\(a_i\)</span> and explicitly controlled for. As long as the confounders don’t change over time, they cannot bias our estimate.</p>
+</section>
+</section>
+<section id="estimating-fixed-effects-the-within-transformation" class="level2" data-number="10.4">
+<h2 data-number="10.4" class="anchored" data-anchor-id="estimating-fixed-effects-the-within-transformation"><span class="header-section-number">10.4</span> Estimating Fixed Effects: The Within Transformation</h2>
+<p>How do we actually estimate <a href="#eq-panel-model" class="quarto-xref">Equation&nbsp;<span>10.1</span></a> when we don’t observe <span class="math inline">\(a_i\)</span>?</p>
+<p>One approach is the <strong>within transformation</strong> (also called the “demeaning” approach). For each unit <span class="math inline">\(i\)</span>, we compute the average of each variable over time:</p>
+<p><span class="math display">\[
+\bar{y}_i = \beta_0 + \beta_1 \bar{x}_i + a_i + \bar{\tau} + \bar{\mu}_i
+\]</span></p>
+<p>where <span class="math inline">\(\bar{y}_i = \frac{1}{T}\sum_{t=1}^{T} y_{it}\)</span> is unit <span class="math inline">\(i\)</span>’s average outcome across all time periods.</p>
+<p>Now subtract this time-averaged equation from the original:</p>
+<p><span class="math display">\[
+y_{it} - \bar{y}_i = \beta_1(x_{it} - \bar{x}_i) + (\tau_t - \bar{\tau}) + (\mu_{it} - \bar{\mu}_i)
+\]</span></p>
+<p>Notice what happened: the <span class="math inline">\(a_i\)</span> term <strong>completely disappears</strong>! Since <span class="math inline">\(a_i\)</span> is constant over time, <span class="math inline">\(a_i - a_i = 0\)</span>.</p>
+<p>We can write this more compactly as:</p>
+<p><span class="math display">\[
+\ddot{y}_{it} = \beta_1 \ddot{x}_{it} + \ddot{\tau}_t + \ddot{\mu}_{it}
+\]</span></p>
+<p>where the double-dots indicate “time-demeaned” variables (deviations from unit means).</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Why “Within” Transformation?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This estimator is called the “within” transformation because the variation used to identify <span class="math inline">\(\beta_1\)</span> comes entirely from variation <em>within</em> each unit over time. Cross-sectional differences between units are eliminated by the demeaning process.</p>
+</div>
+</div>
+<section id="example-unemployment-and-crime" class="level3" data-number="10.4.1">
+<h3 data-number="10.4.1" class="anchored" data-anchor-id="example-unemployment-and-crime"><span class="header-section-number">10.4.1</span> Example: Unemployment and Crime</h3>
+<p>Let’s see this in action. We have data on crime rates and unemployment for 46 cities observed in two years (1982 and 1987).</p>
+<p>First, let’s see what happens with simple cross-sectional regression using just 1987 data:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>crime_data <span class="ot">&lt;-</span> wooldridge<span class="sc">::</span>crime2</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Cross-sectional regression using only 1987</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>reg_cross <span class="ot">&lt;-</span> <span class="fu">lm</span>(crmrte <span class="sc">~</span> unem, <span class="at">data =</span> <span class="fu">filter</span>(crime_data, year <span class="sc">==</span> <span class="dv">87</span>))</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(reg_cross)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = crmrte ~ unem, data = filter(crime_data, year == 
+    87))
+
+Residuals:
+   Min     1Q Median     3Q    Max 
+-57.55 -27.01 -10.56  18.01  79.75 
+
+Coefficients:
+            Estimate Std. Error t value   Pr(&gt;|t|)    
+(Intercept)  128.378     20.757   6.185 0.00000018 ***
+unem          -4.161      3.416  -1.218       0.23    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 34.6 on 44 degrees of freedom
+Multiple R-squared:  0.03262,   Adjusted R-squared:  0.01063 
+F-statistic: 1.483 on 1 and 44 DF,  p-value: 0.2297</code></pre>
+</div>
+</div>
+<p>The coefficient on unemployment is <strong>negative</strong> (-4.16), suggesting higher unemployment is associated with <em>lower</em> crime. This counterintuitive result likely reflects omitted variable bias: cities with low unemployment might also have other characteristics (wealth, strong institutions) that lead to lower crime.</p>
+<p>Now let’s use both years and apply the within transformation:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create city identifier</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>crime_data <span class="ot">&lt;-</span> crime_data <span class="sc">|&gt;</span> </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">city_id =</span> <span class="fu">rep</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">46</span>, <span class="at">each =</span> <span class="dv">2</span>))</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute city-level means</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>city_means <span class="ot">&lt;-</span> crime_data <span class="sc">|&gt;</span> </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(city_id) <span class="sc">|&gt;</span> </span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">mean_crmrte =</span> <span class="fu">mean</span>(crmrte),</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">mean_unem =</span> <span class="fu">mean</span>(unem),</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">mean_d87 =</span> <span class="fu">mean</span>(d87)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge and demean</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>crime_data <span class="ot">&lt;-</span> crime_data <span class="sc">|&gt;</span> </span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(city_means, <span class="at">by =</span> <span class="st">"city_id"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>        <span class="at">crmrte_demean =</span> crmrte <span class="sc">-</span> mean_crmrte,</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>        <span class="at">unem_demean =</span> unem <span class="sc">-</span> mean_unem,</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>        <span class="at">time_demean =</span> d87 <span class="sc">-</span> mean_d87</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimate on demeaned data</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>reg_within <span class="ot">&lt;-</span> <span class="fu">lm</span>(crmrte_demean <span class="sc">~</span> unem_demean <span class="sc">+</span> time_demean, <span class="at">data =</span> crime_data)</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(reg_within)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = crmrte_demean ~ unem_demean + time_demean, data = crime_data)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-26.458  -6.384   0.000   6.384  26.458 
+
+Coefficients:
+                         Estimate            Std. Error t value  Pr(&gt;|t|)    
+(Intercept) -0.000000000000000027  1.039332417007331477   0.000  1.000000    
+unem_demean  2.217999508245958484  0.617247710094903312   3.593  0.000535 ***
+time_demean 15.402203621534523492  3.306166769286675411   4.659 0.0000111 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 9.969 on 89 degrees of freedom
+Multiple R-squared:  0.1961,    Adjusted R-squared:  0.178 
+F-statistic: 10.85 on 2 and 89 DF,  p-value: 0.00006059</code></pre>
+</div>
+</div>
+<p>Now the coefficient on unemployment is <strong>positive</strong> (2.22)! After controlling for all time-invariant city characteristics, we find that when unemployment rises within a city, crime rises too. This makes much more intuitive sense.</p>
+<p>The within transformation eliminated the bias from unobserved city characteristics that were driving the negative cross-sectional correlation.</p>
+</section>
+</section>
+<section id="estimating-fixed-effects-the-dummy-variable-approach" class="level2" data-number="10.5">
+<h2 data-number="10.5" class="anchored" data-anchor-id="estimating-fixed-effects-the-dummy-variable-approach"><span class="header-section-number">10.5</span> Estimating Fixed Effects: The Dummy Variable Approach</h2>
+<p>In practice, we rarely compute the within transformation manually. Instead, we use an equivalent approach: including <strong>dummy variables</strong> for each unit.</p>
+<p>We estimate:</p>
+<p><span class="math display">\[
+y_{it} = \beta_0 + \beta_1 x_{it} + \sum_{j=2}^{N} \gamma_j D_j + \sum_{s=2}^{T} \delta_s T_s + \mu_{it}
+\]</span></p>
+<p>where <span class="math inline">\(D_j\)</span> is a dummy variable equal to 1 if the observation is from unit <span class="math inline">\(j\)</span>, and <span class="math inline">\(T_s\)</span> is a dummy equal to 1 if the observation is from time period <span class="math inline">\(s\)</span>. We omit one unit and one time period to avoid the dummy variable trap.</p>
+<p>This approach is mathematically equivalent to the within transformation but more flexible: it’s easier to add control variables, and we can see the estimated fixed effects if desired.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create factor variable for city and dummy for 1987</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>crime_data <span class="ot">&lt;-</span> crime_data <span class="sc">|&gt;</span> </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">city_f =</span> <span class="fu">factor</span>(city_id),</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">year_87 =</span> <span class="fu">ifelse</span>(year <span class="sc">==</span> <span class="dv">87</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimate with dummy variables</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>reg_fe <span class="ot">&lt;-</span> <span class="fu">lm</span>(crmrte <span class="sc">~</span> unem <span class="sc">+</span> year_87 <span class="sc">+</span> city_f, <span class="at">data =</span> crime_data)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Show just the key coefficients (not all 46 city dummies)</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(reg_fe)<span class="sc">$</span>coefficients[<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>, ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            Estimate Std. Error  t value     Pr(&gt;|t|)
+(Intercept) 51.48923 12.3457756 4.170595 0.0001404348
+unem         2.21800  0.8778658 2.526581 0.0151893177
+year_87     15.40220  4.7021169 3.275589 0.0020604685
+city_f2     17.29171 14.1954509 1.218116 0.2296714584</code></pre>
+</div>
+</div>
+<p>The coefficient on <code>unem</code> (2.22) is identical to our within transformation estimate!</p>
+<p>The dummy variable coefficients themselves are usually not of primary interest, but they can provide useful information. For instance, we can see which cities have unusually high or low crime rates after accounting for unemployment.</p>
+</section>
+<section id="what-fixed-effects-control-for-and-what-they-dont" class="level2" data-number="10.6">
+<h2 data-number="10.6" class="anchored" data-anchor-id="what-fixed-effects-control-for-and-what-they-dont"><span class="header-section-number">10.6</span> What Fixed Effects Control For (and What They Don’t)</h2>
+<p>Fixed effects are powerful, but they’re not magic. It’s crucial to understand exactly what they do and don’t control for.</p>
+<section id="what-unit-fixed-effects-control-for" class="level3" data-number="10.6.1">
+<h3 data-number="10.6.1" class="anchored" data-anchor-id="what-unit-fixed-effects-control-for"><span class="header-section-number">10.6.1</span> What Unit Fixed Effects Control For</h3>
+<p>Unit fixed effects (<span class="math inline">\(a_i\)</span>) absorb all characteristics of unit <span class="math inline">\(i\)</span> that are <strong>constant over time</strong>:</p>
+<ul>
+<li>Geography and location</li>
+<li>Historical legacy and founding conditions</li>
+<li>Stable institutional features</li>
+<li>Baseline demographics (to the extent they don’t change much)</li>
+<li>Measurement differences (e.g., how crime is recorded)</li>
+<li>“Culture” and other hard-to-measure factors</li>
+</ul>
+</section>
+<section id="what-time-fixed-effects-control-for" class="level3" data-number="10.6.2">
+<h3 data-number="10.6.2" class="anchored" data-anchor-id="what-time-fixed-effects-control-for"><span class="header-section-number">10.6.2</span> What Time Fixed Effects Control For</h3>
+<p>Time fixed effects (<span class="math inline">\(\tau_t\)</span>) absorb all factors that <strong>affect all units equally</strong> in a given period:</p>
+<ul>
+<li>Macroeconomic conditions (recessions, booms)</li>
+<li>National policy changes</li>
+<li>Seasonal patterns</li>
+<li>Technological changes affecting everyone</li>
+</ul>
+</section>
+<section id="what-fixed-effects-do-not-control-for" class="level3" data-number="10.6.3">
+<h3 data-number="10.6.3" class="anchored" data-anchor-id="what-fixed-effects-do-not-control-for"><span class="header-section-number">10.6.3</span> What Fixed Effects Do NOT Control For</h3>
+<p>Fixed effects cannot eliminate bias from factors that vary <strong>both across units and over time</strong> in ways correlated with the treatment:</p>
+<ul>
+<li>Time-varying confounders specific to certain units</li>
+<li>Differential trends (some units changing faster than others)</li>
+<li>Reverse causality (if <span class="math inline">\(y\)</span> affects <span class="math inline">\(x\)</span> within a period)</li>
+</ul>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Fixed Effects ≠ No OVB
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Fixed effects dramatically reduce omitted variable bias by controlling for time-invariant confounders. But they don’t eliminate all possible bias. Unit-specific, time-varying confounders can still cause problems. Always think carefully about what might be changing differently across your units over time.</p>
+</div>
+</div>
+<p>For example, in our crime analysis, fixed effects control for each city’s baseline characteristics. But if some cities increased their police budgets while others cut them, and these budget changes are correlated with unemployment changes, we would still have omitted variable bias. We could address this by adding police spending as an explicit control variable.</p>
+</section>
+</section>
+<section id="adding-control-variables" class="level2" data-number="10.7">
+<h2 data-number="10.7" class="anchored" data-anchor-id="adding-control-variables"><span class="header-section-number">10.7</span> Adding Control Variables</h2>
+<p>We can include additional time-varying control variables in fixed effects models:</p>
+<p><span class="math display">\[
+y_{it} = \beta_1 x_{it} + \gamma z_{it} + a_i + \tau_t + \mu_{it}
+\]</span></p>
+<p>where <span class="math inline">\(z_{it}\)</span> is a control variable that changes over time within units.</p>
+<p>This helps address the remaining source of potential bias: unit-specific, time-varying confounders. Of course, we can only control for variables we observe and measure.</p>
+</section>
+<section id="practical-considerations" class="level2" data-number="10.8">
+<h2 data-number="10.8" class="anchored" data-anchor-id="practical-considerations"><span class="header-section-number">10.8</span> Practical Considerations</h2>
+<section id="when-to-use-fixed-effects" class="level3" data-number="10.8.1">
+<h3 data-number="10.8.1" class="anchored" data-anchor-id="when-to-use-fixed-effects"><span class="header-section-number">10.8.1</span> When to Use Fixed Effects</h3>
+<p>Fixed effects are most valuable when:</p>
+<ol type="1">
+<li>You have genuine panel data (same units observed multiple times)</li>
+<li>There is meaningful variation in <span class="math inline">\(x\)</span> within units over time</li>
+<li>Time-invariant confounders are a major concern</li>
+<li>The treatment effect is expected to be relatively immediate</li>
+</ol>
+</section>
+<section id="when-fixed-effects-may-not-work-well" class="level3" data-number="10.8.2">
+<h3 data-number="10.8.2" class="anchored" data-anchor-id="when-fixed-effects-may-not-work-well"><span class="header-section-number">10.8.2</span> When Fixed Effects May Not Work Well</h3>
+<p>Fixed effects may be less useful when:</p>
+<ol type="1">
+<li>Little within-unit variation exists (everyone’s <span class="math inline">\(x\)</span> is stable over time)</li>
+<li>The treatment effect takes a long time to materialize</li>
+<li>Time-varying confounders are the main concern</li>
+<li>You have very few time periods (less precise estimates)</li>
+</ol>
+</section>
+<section id="standard-errors" class="level3" data-number="10.8.3">
+<h3 data-number="10.8.3" class="anchored" data-anchor-id="standard-errors"><span class="header-section-number">10.8.3</span> Standard Errors</h3>
+<p>With panel data, observations within the same unit are often correlated over time. Standard OLS standard errors assume independence and can be too small. In practice, researchers typically use <strong>clustered standard errors</strong> at the unit level to account for this correlation. We’ll discuss this more in later chapters.</p>
+</section>
+</section>
+<section id="summary" class="level2" data-number="10.9">
+<h2 data-number="10.9" class="anchored" data-anchor-id="summary"><span class="header-section-number">10.9</span> Summary</h2>
+<p>Panel data—observing the same units over time—offers a powerful tool for causal inference. By tracking how outcomes change within units when circumstances change, we can control for all time-invariant characteristics of each unit, whether observed or not.</p>
+<p>The <strong>fixed effects estimator</strong> implements this idea. It can be computed via the within transformation (demeaning the data) or equivalently by including dummy variables for each unit. The coefficient of interest is identified purely from within-unit variation over time.</p>
+<p>Fixed effects control for:</p>
+<ul>
+<li>All time-invariant unit characteristics (observed and unobserved)</li>
+<li>All time-specific shocks affecting all units equally (when time fixed effects are included)</li>
+</ul>
+<p>Fixed effects do NOT control for:</p>
+<ul>
+<li>Unit-specific, time-varying confounders</li>
+<li>Differential trends across units</li>
+<li>Reverse causality</li>
+</ul>
+<p>Panel methods are not a complete solution to omitted variable bias, but they represent a major improvement over cross-sectional analysis when time-invariant confounders are a primary concern.</p>
+</section>
+<section id="check-your-understanding" class="level2" data-number="10.10">
+<h2 data-number="10.10" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">10.10</span> Check Your Understanding</h2>
+<p>For each question below, select the best answer from the dropdown menu.</p>
+<div class="question">
+<div class="answer-row">
+    <label>i. What distinguishes panel data from cross-sectional data? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Panel data has more observations</option>
+        <option value="b">Panel data tracks the same units over multiple time periods</option>
+        <option value="c">Panel data includes more variables</option>
+        <option value="d">Panel data is collected by governments</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>ii. In the model y<sub>it</sub> = β<sub>0</sub> + β<sub>1</sub>x<sub>it</sub> + a<sub>i</sub> + μ<sub>it</sub>, what does a<sub>i</sub> represent? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The effect of x on y</option>
+        <option value="b">Random measurement error</option>
+        <option value="c">All time-invariant characteristics of unit i</option>
+        <option value="d">The average value of y across all units</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iii. Why does the within transformation eliminate the unit fixed effect a<sub>i</sub>? </label>
+    <select onchange="checkAnswer(this, 'a')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Because ai is constant over time, so ai - ai = 0 when we demean</option>
+        <option value="b">Because ai is uncorrelated with x</option>
+        <option value="c">Because we assume ai = 0</option>
+        <option value="d">Because we have enough control variables</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iv. In the unemployment-crime example, why did the coefficient change from negative (cross-sectional) to positive (fixed effects)? </label>
+    <select onchange="checkAnswer(this, 'd')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The fixed effects model has more observations</option>
+        <option value="b">The cross-sectional model had a coding error</option>
+        <option value="c">Fixed effects models always produce positive coefficients</option>
+        <option value="d">Fixed effects removed bias from time-invariant city characteristics correlated with both unemployment and crime</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>v. Which of the following would unit fixed effects NOT control for? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">A city's geographic location</option>
+        <option value="b">A city's historical founding conditions</option>
+        <option value="c">Changes in a city's police budget over time</option>
+        <option value="d">A city's baseline demographics</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>vi. <strong>(Challenge)</strong> The dummy variable approach and the within transformation produce identical estimates of β<sub>1</sub>. Why might we prefer the dummy variable approach in practice? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">It runs faster computationally</option>
+        <option value="b">It's easier to add time-varying control variables and we can examine the fixed effect estimates if desired</option>
+        <option value="c">It produces smaller standard errors</option>
+        <option value="d">It doesn't require panel data</option>
+    </select>
+</div>
+</div>
+
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Show Explanation
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="i">
+<li><p>Panel data’s defining feature is that it follows the <strong>same units</strong> (people, firms, cities, etc.) across <strong>multiple time periods</strong>. This allows us to observe how each unit changes over time, rather than just comparing different units at one point in time.</p></li>
+<li><p>The term <span class="math inline">\(a_i\)</span> is the unit fixed effect. It captures everything about unit <span class="math inline">\(i\)</span> that is constant over time—observed characteristics like location, but also unobserved factors like institutional history, culture, or baseline conditions. This is what makes fixed effects so powerful for addressing omitted variable bias.</p></li>
+<li><p>The within transformation subtracts each unit’s time-average from its observations. Since <span class="math inline">\(a_i\)</span> doesn’t vary over time, its average equals itself: <span class="math inline">\(\bar{a}_i = a_i\)</span>. So when we compute <span class="math inline">\(a_i - \bar{a}_i = a_i - a_i = 0\)</span>, the fixed effect is eliminated.</p></li>
+<li><p>The cross-sectional estimate was biased because unobserved city characteristics (wealth, institutions, etc.) were correlated with both unemployment and crime. Cities with “good” characteristics had both low unemployment AND low crime, creating a spurious negative correlation. Fixed effects removed these time-invariant confounders, revealing the true positive effect of unemployment on crime.</p></li>
+<li><p>Unit fixed effects only control for characteristics that are <strong>constant over time</strong>. A city’s police budget changes from year to year, so it’s a time-varying factor that fixed effects won’t automatically control for. We would need to include it as an explicit control variable.</p></li>
+<li><p>While mathematically equivalent for estimating <span class="math inline">\(\beta_1\)</span>, the dummy variable approach is more practical. It’s straightforward to add additional control variables, it works naturally with standard regression software, and we can examine the estimated fixed effects if they’re of substantive interest. The within transformation requires manual computation of demeaned variables.</p></li>
+</ol>
+</div>
+</div>
+</div>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-wooldridge_introductory_2019" class="csl-entry" role="listitem">
+Wooldridge, Jeffrey M. 2019. <em>Introductory Econometrics: A Modern Approach</em>. 7th ed. Cengage Learning.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/binary_outcomes.html" class="pagination-link" aria-label="Interaction Effects">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Interaction Effects</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/did.html" class="pagination-link" aria-label="Difference-in-Differences">
+        <span class="nav-page-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p><span class="faux-block"> © 2025 Raymond Caraher. All rights reserved. </span></p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

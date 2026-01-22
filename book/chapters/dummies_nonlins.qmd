@@ -1,0 +1,746 @@
+# Dummy Variables and Non-Linear Models {#sec-dummy-nonlinear}
+
+```{r}
+#| echo: false
+#| output: false
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(wooldridge)
+library(modelsummary)
+library(palmerpenguins)
+
+options(scipen = 999)
+
+```
+
+```{=html}
+
+<style>
+.problem {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+.context {
+    background-color: #e8f4f8;
+    padding: 12px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border-left: 4px solid #2874a6;
+}
+.question {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #fff3cd;
+    border-radius: 5px;
+}
+.answer-row {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.answer-row label {
+    min-width: 320px;
+    font-weight: 500;
+}
+select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    min-width: 300px;
+    cursor: pointer;
+}
+select:focus {
+    border-color: #2874a6;
+    outline: none;
+}
+.correct {
+    border-color: #28a745 !important;
+    background-color: #d4edda !important;
+}
+.incorrect {
+    border-color: #dc3545 !important;
+    background-color: #f8d7da !important;
+}
+.explanation {
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #e7f3ff;
+    border-radius: 5px;
+    border-left: 4px solid #2874a6;
+}
+.note {
+    font-size: 0.85em;
+    color: #666;
+    font-style: italic;
+}
+</style>
+
+<script>
+function checkAnswer(selectElement, correctValue) {
+    if (selectElement.value === '') {
+        selectElement.classList.remove('correct', 'incorrect');
+    } else if (selectElement.value === correctValue) {
+        selectElement.classList.remove('incorrect');
+        selectElement.classList.add('correct');
+    } else {
+        selectElement.classList.remove('correct');
+        selectElement.classList.add('incorrect');
+    }
+}
+</script>
+
+```
+
+
+::: {.callout-tip collapse="true"}
+## **Key Questions**
+- How do we include categorical information (like race, gender, or region) in a regression?
+- What is a dummy variable and how do we interpret its coefficient?
+- How do we avoid the "dummy variable trap"?
+- How can we model non-linear relationships using polynomials?
+- When should we use logarithmic transformations?
+:::
+
+::: {.callout-note collapse="true"}
+## **Suggested Readings**
+- @wooldridge_introductory_2019 Ch. 7
+- @bailey_real_2020, Ch. 5
+:::
+
+
+So far,
+we have primarily considered **quantitative** variables in our regression models:
+wages measured in dollars,
+years of education,
+birthweight in grams,
+and so on.
+But in empirical work,
+some of the most important variables are **qualitative**:
+race,
+gender,
+region,
+industry,
+or whether someone participated in a program.
+This chapter introduces techniques for incorporating categorical information into regression models and for modeling non-linear relationships.
+
+
+## Categorical Variables in Regression
+
+Regression requires numeric inputs,
+so we cannot simply include a variable like "region" with values "South," "Midwest," "Northeast," and "West" directly in our model.
+We need a way to translate qualitative information into numbers.
+
+### Dummy Variables
+
+The most common approach is to create **dummy variables** (also called binary or indicator variables).
+A dummy variable takes only two values: 1 if the observation has a particular characteristic,
+and 0 otherwise.
+
+Consider this simple example from the Star Wars dataset:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+ex_data <- starwars |> 
+    head(5) |> 
+    select(name, height, mass, species)
+
+knitr::kable(ex_data, caption = "Star Wars Characters")
+```
+
+The `species` variable is qualitative---we cannot use it directly in a regression.
+But we can create a dummy variable called `human` that equals 1 for humans and 0 for droids:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+ex_data <- ex_data |> 
+    mutate(human = case_when(species == "Human" ~ 1,
+                             TRUE ~ 0))
+
+knitr::kable(ex_data, caption = "Star Wars Characters with Dummy Variable")
+```
+
+Now we have a numeric variable that captures whether each character is human.
+
+### Interpreting Dummy Variable Coefficients
+
+To see how dummy variables work in regression,
+let's examine a practical example.
+Suppose we want to know whether taking calculus in high school affects performance in college economics courses.
+We have data on students' economics exam scores,
+their high school GPA,
+and whether they took calculus.
+
+We estimate the model:
+
+$$
+score = \beta_0 + \beta_1(hsgpa) + \beta_2(calculus) + \mu
+$$
+
+where `calculus` equals 1 if the student took calculus and 0 otherwise.
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+lm1 <- lm(score ~ hsgpa + calculus, data = wooldridge::econmath)
+summary(lm1)
+```
+
+How do we interpret these coefficients?
+The coefficient on `hsgpa` ($\hat{\beta}_1 \approx 13.2$) tells us that a one-point increase in high school GPA is associated with about a 13-point increase in economics score,
+holding calculus status constant.
+
+The coefficient on `calculus` ($\hat{\beta}_2 \approx 5.8$) tells us that students who took calculus score about 5.8 points higher on average than students who did not,
+holding GPA constant.
+This is the **difference in intercepts** between the two groups.
+
+### Visualizing What Dummy Variables Do
+
+To understand what's happening geometrically,
+think about the regression line for each group.
+
+For students who did **not** take calculus (`calculus = 0`):
+$$
+\widehat{score} = \hat{\beta}_0 + \hat{\beta}_1(hsgpa) + \hat{\beta}_2(0) = \hat{\beta}_0 + \hat{\beta}_1(hsgpa)
+$$
+
+For students who **did** take calculus (`calculus = 1`):
+$$
+\widehat{score} = \hat{\beta}_0 + \hat{\beta}_1(hsgpa) + \hat{\beta}_2(1) = (\hat{\beta}_0 + \hat{\beta}_2) + \hat{\beta}_1(hsgpa)
+$$
+
+Both groups have the **same slope** ($\hat{\beta}_1$),
+but the calculus group has a higher intercept by exactly $\hat{\beta}_2$.
+The dummy variable shifts the regression line up or down:
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-dummy-shift
+#| fig-cap: "Dummy variables shift the intercept while keeping the slope constant."
+
+# Prepare the data
+exp_tab <- wooldridge::econmath |>
+    mutate(score_pred_noncalc = 24.5276 + 13.2038 * hsgpa,
+           score_pred_calc = 24.5276 + 5.8243 + 13.2038 * hsgpa)
+
+# Reshape to long format
+exp_tab_long <- exp_tab |>
+  pivot_longer(
+    cols = c(score_pred_noncalc, score_pred_calc),
+    names_to = "calculus_status",
+    values_to = "predicted_score"
+  )
+
+# Create the plot
+ggplot(exp_tab_long, aes(x = hsgpa, y = predicted_score, color = calculus_status)) +
+  geom_line(linewidth = 1) +
+  coord_cartesian(xlim = c(2.5, 4.5), ylim = c(50, 90)) +
+  labs(
+    title = "Predicted Economics Score vs. High School GPA",
+    x = "High School GPA",
+    y = "Predicted Score",
+    color = "Calculus Status"
+  ) +
+  scale_color_manual(
+    labels = c("Took Calculus", "No Calculus"),
+    values = c("score_pred_calc" = "#0072B2", "score_pred_noncalc" = "#D55E00")
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+::: {.callout-important}
+## Key Insight
+A dummy variable coefficient represents the **difference in intercepts** between groups.
+Both groups share the same slope---the effect of increasing $x$ by one unit is the same regardless of group membership.
+:::
+
+
+## The Dummy Variable Trap
+
+You might wonder:
+why not include dummy variables for *both* calculus-takers and non-calculus-takers?
+In other words,
+why not estimate:
+
+$$
+score = \beta_0 + \beta_1(hsgpa) + \beta_2(calculus) + \beta_3(no\_calculus) + \mu
+$$
+
+The problem is that this creates **perfect multicollinearity**.
+For every student in the dataset:
+$$
+calculus + no\_calculus = 1
+$$
+
+This means $no\_calculus = 1 - calculus$,
+so one variable is a perfect linear function of the other.
+OLS cannot separately identify the effects of perfectly collinear variables.
+
+This is called the **dummy variable trap**.
+To avoid it,
+we always omit one category.
+The omitted category becomes our **baseline** or **reference group**,
+and all coefficients are interpreted relative to this baseline.
+
+In our example,
+non-calculus-takers are the baseline.
+The coefficient $\hat{\beta}_2 = 5.8$ means calculus-takers score 5.8 points higher *than non-calculus-takers*.
+
+
+## Multiple Categories
+
+What if our categorical variable has more than two values?
+Consider the Palmer Penguins data,
+where species can be Adelie,
+Chinstrap,
+or Gentoo.
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+set.seed(12487345)
+
+ex_data <- penguins |> 
+    sample_n(5) |> 
+    select(body_mass_g, flipper_length_mm, sex, species)
+
+knitr::kable(ex_data, caption = "Palmer Penguins Sample")
+```
+
+To include species in a regression,
+we create **$g - 1$ dummy variables** where $g$ is the number of categories.
+With three species,
+we need two dummy variables:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+ex_data <- ex_data |> 
+    mutate(species_Chinstrap = case_when(species == "Chinstrap" ~ 1, TRUE ~ 0),
+           species_Gentoo = case_when(species == "Gentoo" ~ 1, TRUE ~ 0))
+
+knitr::kable(ex_data, caption = "Penguins with Dummy Variables")
+```
+
+Notice that Adelie penguins have 0 for both dummies---they are the omitted baseline category.
+
+Now we can estimate the effect of body mass on flipper length,
+controlling for species:
+
+$$
+flipper\_length = \beta_0 + \beta_1(body\_mass) + \beta_2(Chinstrap) + \beta_3(Gentoo) + \mu
+$$
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+penguin_data <- penguins |> 
+    mutate(species_Chinstrap = case_when(species == "Chinstrap" ~ 1, TRUE ~ 0),
+           species_Gentoo = case_when(species == "Gentoo" ~ 1, TRUE ~ 0))
+
+lm_penguin <- lm(flipper_length_mm ~ body_mass_g + species_Chinstrap + species_Gentoo, 
+                 data = penguin_data)
+summary(lm_penguin)
+```
+
+Interpretation:
+
+- $\hat{\beta}_1 \approx 0.008$: A 1-gram increase in body mass is associated with a 0.008 mm increase in flipper length, holding species constant.
+- $\hat{\beta}_2 \approx 5.6$: Chinstrap penguins have flippers about 5.6 mm longer than Adelie penguins of the same body mass.
+- $\hat{\beta}_3 \approx 15.7$: Gentoo penguins have flippers about 15.7 mm longer than Adelie penguins of the same body mass.
+
+### Choosing the Baseline Category
+
+How should we choose which category to omit?
+It depends on our research question.
+
+If we only care about controlling for the categorical variable (not interpreting its coefficients),
+then the choice doesn't matter---the coefficient on our main variable of interest won't change.
+
+If we do care about interpreting the dummy coefficients,
+choose a baseline that makes interpretation natural.
+For studying the gender wage gap,
+making "male" the baseline means the female coefficient directly measures the wage gap relative to men.
+
+Let's verify that changing the baseline doesn't affect other coefficients:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# Switching baseline to Gentoo
+penguin_data <- penguin_data |> 
+    mutate(species_Adelie = case_when(species == "Adelie" ~ 1, TRUE ~ 0))
+
+lm_penguin2 <- lm(flipper_length_mm ~ body_mass_g + species_Chinstrap + species_Adelie, 
+                  data = penguin_data)
+
+# Compare body mass coefficients
+cat("Body mass coefficient (Adelie baseline):", round(coef(lm_penguin)["body_mass_g"], 5), "\n")
+cat("Body mass coefficient (Gentoo baseline):", round(coef(lm_penguin2)["body_mass_g"], 5))
+```
+
+The coefficient on body mass is identical regardless of which species is the baseline.
+
+
+## Factor Variables in R
+
+Creating dummy variables manually is tedious,
+especially when categories are numerous.
+R's **factor** variables automate this process.
+
+When you include a factor variable in a regression,
+R automatically creates the necessary dummy variables and omits one category:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# Convert species to factor
+penguin_data <- penguins |> 
+    mutate(species_f = factor(species))
+
+# R handles dummy creation automatically
+lm_factor <- lm(flipper_length_mm ~ body_mass_g + species_f, data = penguin_data)
+summary(lm_factor)
+```
+
+Notice the coefficients are identical to our manual approach.
+R chose "Adelie" as the baseline because it comes first alphabetically.
+
+To change the baseline category,
+use the `relevel()` function:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# Make Gentoo the baseline
+penguin_data <- penguin_data |> 
+    mutate(species_f = relevel(species_f, ref = "Gentoo"))
+
+lm_factor2 <- lm(flipper_length_mm ~ body_mass_g + species_f, data = penguin_data)
+summary(lm_factor2)
+```
+
+Now coefficients are relative to Gentoo penguins.
+
+
+## Non-Linear Relationships: Polynomial Models
+
+So far we've assumed linear relationships between variables.
+But many economic relationships are non-linear.
+Consider the effect of work experience on wages:
+at low experience levels,
+additional experience substantially increases productivity and wages;
+but at very high experience levels,
+workers may become less productive as they age.
+
+This suggests a **quadratic** relationship---wages increase with experience at first,
+then eventually decrease:
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-quadratic
+#| fig-cap: "A quadratic model (orange) often fits experience-wage data better than a linear model (blue)."
+
+ggplot(wooldridge::wage1, aes(x = exper, y = wage)) +
+  geom_point(alpha = 0.4, color = "gray50") +
+  geom_smooth(method = "lm", formula = y ~ x, aes(color = "Linear"), se = FALSE) +
+  geom_smooth(method = "lm", formula = y ~ x + I(x^2), aes(color = "Quadratic"), se = FALSE) +
+  labs(
+    x = "Experience (years)",
+    y = "Hourly Wage ($)",
+    title = "Relationship Between Wage and Experience",
+    color = "Model"
+  ) +
+  scale_color_manual(values = c("Linear" = "#0072B2", "Quadratic" = "#D55E00")) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+### Estimating Quadratic Models
+
+To estimate a quadratic model,
+we simply include both the variable and its square:
+
+$$
+log(wage) = \beta_0 + \beta_1(exper) + \beta_2(exper^2) + \mu
+$$
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+wage_data <- wooldridge::wage1 |> 
+    mutate(exper2 = exper^2)
+
+lm_quad <- lm(log(wage) ~ exper + exper2, data = wage_data)
+summary(lm_quad)
+```
+
+### Interpreting Quadratic Models
+
+With a quadratic term,
+the marginal effect of $x$ on $y$ is no longer constant.
+Taking the derivative:
+
+$$
+\frac{\partial y}{\partial x} = \beta_1 + 2\beta_2 x
+$$
+
+The effect of experience **depends on your current level of experience**.
+
+With our estimates ($\hat{\beta}_1 \approx 0.046$, $\hat{\beta}_2 \approx -0.0009$):
+
+For a worker with **10 years** of experience:
+$$
+0.046 + 2(-0.0009)(10) = 0.028 \approx 2.8\%
+$$
+
+An additional year of experience increases wages by about 2.8%.
+
+For a worker with **45 years** of experience:
+$$
+0.046 + 2(-0.0009)(45) = -0.035 \approx -3.5\%
+$$
+
+An additional year actually *decreases* wages---the worker is past the peak of the experience-wage relationship.
+
+::: {.callout-note}
+## Finding the Peak
+The experience level where wages are maximized occurs where the marginal effect equals zero:
+$$
+\beta_1 + 2\beta_2 x^* = 0 \implies x^* = -\frac{\beta_1}{2\beta_2}
+$$
+
+With our estimates: $x^* = -\frac{0.046}{2(-0.0009)} \approx 25.6$ years.
+:::
+
+
+## Logarithmic Transformations
+
+We've already seen that taking the log of the dependent variable changes how we interpret coefficients.
+Let's review the different cases systematically.
+
+### Log-Linear Models
+
+When the dependent variable is logged but independent variables are not:
+$$
+\ln(Y) = \beta_0 + \beta_1 X + \mu
+$$
+
+Interpretation: A **one-unit** increase in $X$ is associated with a **$100 \times \beta_1$ percent** change in $Y$.
+
+This works because $\ln(Y_1) - \ln(Y_0) = \ln(Y_1/Y_0) \approx (Y_1 - Y_0)/Y_0$ for small changes.
+
+::: {.callout-warning}
+## Approximation Warning
+The "multiply by 100" interpretation is an approximation that works well when $\beta_1$ is small (less than about 0.2 in absolute value).
+For larger coefficients,
+use the exact formula: percent change = $100 \times (e^{\beta_1} - 1)$.
+:::
+
+### Linear-Log Models
+
+When independent variables are logged but the dependent variable is not:
+$$
+Y = \beta_0 + \beta_1 \ln(X) + \mu
+$$
+
+Interpretation: A **1 percent** increase in $X$ is associated with a **$\beta_1/100$ unit** change in $Y$.
+
+### Log-Log Models (Elasticities)
+
+When both sides are logged:
+$$
+\ln(Y) = \beta_0 + \beta_1 \ln(X) + \mu
+$$
+
+Interpretation: A **1 percent** increase in $X$ is associated with a **$\beta_1$ percent** change in $Y$.
+
+This is the **elasticity** of $Y$ with respect to $X$---a unit-free measure of responsiveness.
+
+### Summary Table
+
+| Model | Equation | Interpretation of $\beta_1$ |
+|:------|:---------|:----------------------------|
+| **Linear-Linear** | $Y = \beta_0 + \beta_1 X$ | 1-unit ↑ in $X$ → $\beta_1$-unit change in $Y$ |
+| **Log-Linear** | $\ln(Y) = \beta_0 + \beta_1 X$ | 1-unit ↑ in $X$ → $(100 \times \beta_1)\%$ change in $Y$ |
+| **Linear-Log** | $Y = \beta_0 + \beta_1 \ln(X)$ | 1% ↑ in $X$ → $\beta_1/100$ unit change in $Y$ |
+| **Log-Log** | $\ln(Y) = \beta_0 + \beta_1 \ln(X)$ | 1% ↑ in $X$ → $\beta_1\%$ change in $Y$ (elasticity) |
+
+
+## Application: Policy Evaluation with Dummy Variables
+
+Dummy variables are essential for evaluating policies and programs.
+Suppose we want to estimate the effect of a job training program on wages:
+
+$$
+\ln(wage) = \beta_0 + \beta_1(training) + \beta_2(educ) + \beta_3(exper) + \mu
+$$
+
+where `training` equals 1 if the person participated in the program and 0 otherwise.
+
+The coefficient $\beta_1$ measures the **treatment effect**---the percentage difference in wages between program participants and non-participants,
+controlling for education and experience.
+
+This is essentially a regression-based version of comparing treatment and control groups,
+where the control variables help us account for differences between those who did and didn't participate.
+
+
+## Summary
+
+This chapter introduced two powerful extensions to basic regression:
+categorical variables and non-linear functional forms.
+
+**Dummy variables** allow us to include qualitative information in regression models.
+The coefficient on a dummy variable represents the difference in intercepts between groups---the effect of having a particular characteristic relative to the baseline category.
+When a categorical variable has $g$ categories,
+we include $g - 1$ dummy variables to avoid perfect multicollinearity (the dummy variable trap).
+
+**Polynomial models** capture non-linear relationships by including squared or higher-order terms.
+With quadratic models,
+the marginal effect of $x$ on $y$ depends on the current level of $x$,
+allowing us to model relationships that increase and then decrease (or vice versa).
+
+**Logarithmic transformations** change the interpretation of coefficients:
+log-linear models give percentage changes,
+linear-log models give the effect of percentage changes,
+and log-log models give elasticities.
+These transformations are especially useful when dealing with variables like wages or prices that are right-skewed and where percentage changes are more meaningful than absolute changes.
+
+
+## Check Your Understanding
+
+:::: {.content-visible when-format="html"}
+
+For each question below, 
+select the best answer from the dropdown menu. 
+The dropdown will turn green if correct and red if incorrect. 
+
+```{=html}
+<div class="question">
+<div class="answer-row">
+    <label>i. In a regression with a dummy variable for "female" (1 = female, 0 = male), the coefficient on female is -0.15 when the dependent variable is log(wage). How do we interpret this? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Women earn $0.15 less per hour than men</option>
+        <option value="b">Women earn about 15% less than men, holding other variables constant</option>
+        <option value="c">Women earn 15% more than men</option>
+        <option value="d">For every additional woman in the sample, wages fall by 15%</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>ii. Why do we include only g-1 dummy variables when a categorical variable has g categories? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">To save computation time</option>
+        <option value="b">Because one category is always unimportant</option>
+        <option value="c">To avoid perfect multicollinearity (the dummy variable trap)</option>
+        <option value="d">Because R cannot handle more than g-1 variables</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iii. In the model log(wage) = β₀ + β₁(exper) + β₂(exper²), what does a negative β₂ imply? </label>
+    <select onchange="checkAnswer(this, 'a')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The wage-experience relationship is concave (wages increase at a decreasing rate, then may decline)</option>
+        <option value="b">Experience has no effect on wages</option>
+        <option value="c">More experience always leads to lower wages</option>
+        <option value="d">The model is incorrectly specified</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iv. In a log-log model ln(Y) = β₀ + β₁ln(X), β₁ = 0.5. How do we interpret this? </label>
+    <select onchange="checkAnswer(this, 'd')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">A 1-unit increase in X leads to a 0.5-unit increase in Y</option>
+        <option value="b">A 1-unit increase in X leads to a 50% increase in Y</option>
+        <option value="c">A 1% increase in X leads to a 0.5-unit increase in Y</option>
+        <option value="d">A 1% increase in X leads to a 0.5% increase in Y</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>v. If we change the baseline category for a set of dummy variables, what happens to the coefficient on our main variable of interest? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">It changes sign</option>
+        <option value="b">It stays the same</option>
+        <option value="c">It becomes statistically insignificant</option>
+        <option value="d">It doubles in magnitude</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>vi. <strong>(Challenge)</strong> In the quadratic model log(wage) = 1.2 + 0.04(exper) - 0.0008(exper²), at what experience level are wages maximized? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">10 years</option>
+        <option value="b">20 years</option>
+        <option value="c">25 years</option>
+        <option value="d">50 years</option>
+    </select>
+</div>
+</div>
+
+```
+
+::: {.callout-tip collapse="true"}
+## Show Explanation
+
+i. With a log-linear model (log on the left side only), we multiply the coefficient by 100 to get the percentage interpretation. A coefficient of -0.15 means women earn approximately 15% less than men (the baseline category), holding other variables constant.
+
+ii. If we include dummy variables for all g categories plus an intercept, the dummy variables will sum to 1 for every observation, creating perfect collinearity with the intercept. This is the "dummy variable trap." Omitting one category solves this problem.
+
+iii. A negative coefficient on the squared term means the parabola opens downward. Combined with a positive coefficient on the linear term, this creates an inverted-U shape: wages increase with experience initially, but at a decreasing rate, and eventually begin to decline.
+
+iv. In a log-log model, both variables are in logs, so the coefficient is an elasticity. It tells us the percentage change in Y for a 1% change in X. Here, a 1% increase in X is associated with a 0.5% increase in Y.
+
+v. Changing the baseline category changes how the dummy coefficients are interpreted (they become relative to a different group), but it doesn't affect coefficients on other variables in the model. The model's predictions and fit remain identical.
+
+vi. The experience level that maximizes wages is found by setting the derivative equal to zero: 0.04 + 2(-0.0008)(exper) = 0. Solving: exper = 0.04/(2 × 0.0008) = 0.04/0.0016 = 25 years.
+
+:::
+
+::::
+
+:::: {.content-hidden when-format="html"}
+
+*Note: This section contains interactive content only available in the HTML version.*
+
+::::

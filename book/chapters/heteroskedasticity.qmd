@@ -1,0 +1,873 @@
+# Heteroskedasticity {#sec-heteroskedasticity}
+
+```{r}
+#| echo: false
+#| output: false
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(wooldridge)
+library(modelsummary)
+library(lmtest)
+library(sandwich)
+library(fixest)
+
+options(scipen = 999)
+
+theme_set(theme_minimal(base_size = 12) +
+          theme(plot.title = element_text(face = "bold", size = 14),
+                plot.subtitle = element_text(size = 11, color = "gray40"),
+                panel.grid.minor = element_blank()))
+
+```
+
+```{=html}
+
+<style>
+.problem {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+.context {
+    background-color: #e8f4f8;
+    padding: 12px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border-left: 4px solid #2874a6;
+}
+.question {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #fff3cd;
+    border-radius: 5px;
+}
+.answer-row {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.answer-row label {
+    min-width: 320px;
+    font-weight: 500;
+}
+select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    min-width: 300px;
+    cursor: pointer;
+}
+select:focus {
+    border-color: #2874a6;
+    outline: none;
+}
+.correct {
+    border-color: #28a745 !important;
+    background-color: #d4edda !important;
+}
+.incorrect {
+    border-color: #dc3545 !important;
+    background-color: #f8d7da !important;
+}
+.explanation {
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #e7f3ff;
+    border-radius: 5px;
+    border-left: 4px solid #2874a6;
+}
+.note {
+    font-size: 0.85em;
+    color: #666;
+    font-style: italic;
+}
+</style>
+
+<script>
+function checkAnswer(selectElement, correctValue) {
+    if (selectElement.value === '') {
+        selectElement.classList.remove('correct', 'incorrect');
+    } else if (selectElement.value === correctValue) {
+        selectElement.classList.remove('incorrect');
+        selectElement.classList.add('correct');
+    } else {
+        selectElement.classList.remove('correct');
+        selectElement.classList.add('incorrect');
+    }
+}
+</script>
+
+```
+
+
+::: {.callout-tip collapse="true"}
+## **Key Questions**
+- What is homoskedasticity and why is it a Gauss-Markov assumption?
+- What happens to OLS estimates when heteroskedasticity is present?
+- How does heteroskedasticity affect our hypothesis tests?
+- What are heteroskedasticity-robust standard errors and when should we use them?
+- How can we detect heteroskedasticity in our data?
+:::
+
+::: {.callout-note collapse="true"}
+## **Suggested Readings**
+- @wooldridge_introductory_2019, Ch. 8
+:::
+
+
+One of the key assumptions underlying OLS is that the variance of the error term is constant across all values of the explanatory variables.
+When this assumption fails,
+we have **heteroskedasticity**---and while our coefficient estimates remain unbiased,
+our standard errors become unreliable.
+This chapter explores what heteroskedasticity is,
+why it matters,
+and how to fix it.
+
+
+## The Homoskedasticity Assumption
+
+### Gauss-Markov Assumption 5
+
+Recall the Gauss-Markov assumptions that make OLS the Best Linear Unbiased Estimator (BLUE).
+The fifth assumption is **homoskedasticity**:
+
+::: {.callout-note}
+## Homoskedasticity
+The error term $\mu$ has the **same variance** given any value of the explanatory variables:
+$$Var(\mu | x_1, x_2, ..., x_k) = \sigma^2$$
+The variance is constant---it doesn't depend on $x$.
+:::
+
+This assumption is crucial because it allows us to derive the correct formula for the variance of $\hat{\beta}$,
+which in turn gives us valid standard errors,
+t-statistics,
+and p-values.
+
+### What Does Homoskedasticity Look Like?
+
+In a homoskedastic regression,
+the spread of observations around the regression line is **constant** across all values of $x$.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-homoskedastic
+#| fig-cap: "Homoskedastic data: the spread of points around the regression line is constant across all values of x."
+
+set.seed(123)
+n <- 200
+
+# Generate homoskedastic data
+homo_data <- tibble(
+    x = runif(n, 0, 100),
+    error = rnorm(n, 0, 15),  # Constant variance
+    y = 10 + 0.5 * x + error
+)
+
+ggplot(homo_data, aes(x = x, y = y)) +
+    geom_point(alpha = 0.6, color = "steelblue") +
+    geom_smooth(method = "lm", se = FALSE, color = "darkred", linewidth = 1.2) +
+    # Add bands to show constant variance
+    geom_ribbon(
+        data = tibble(x = seq(0, 100, length.out = 100)) |>
+            mutate(yhat = 10 + 0.5 * x),
+        aes(x = x, ymin = yhat - 30, ymax = yhat + 30),
+        alpha = 0.15, fill = "darkred",
+        inherit.aes = FALSE
+    ) +
+    labs(
+        title = "Homoskedastic Data",
+        subtitle = "The spread (variance) of errors is constant across all x values",
+        x = "X",
+        y = "Y"
+    ) +
+    annotate("text", x = 80, y = 15, label = "Constant\nspread", 
+             color = "darkred", size = 4, fontface = "bold")
+```
+
+Notice how the "cone" of data points has roughly the same width whether $x$ is small or large.
+This is homoskedasticity in action.
+
+
+## Heteroskedasticity: When Variance Changes
+
+### What Is Heteroskedasticity?
+
+**Heteroskedasticity** occurs when the variance of the error term changes with the level of the explanatory variable:
+$$Var(\mu_i | x_i) = \sigma_i^2$$
+
+The subscript $i$ indicates that variance depends on observation $i$'s value of $x$.
+
+### What Does Heteroskedasticity Look Like?
+
+The classic pattern is a "fan" or "cone" shape,
+where the spread of data increases (or decreases) as $x$ changes:
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-heteroskedastic
+#| fig-cap: "Heteroskedastic data: the spread of points around the regression line increases with x, creating a 'fan' or 'cone' pattern."
+
+set.seed(123)
+
+# Generate heteroskedastic data (variance increases with x)
+hetero_data <- tibble(
+    x = runif(n, 0, 100),
+    # Variance increases with x
+    error = rnorm(n, 0, 0.3 * x),
+    y = 10 + 0.5 * x + error
+)
+
+ggplot(hetero_data, aes(x = x, y = y)) +
+    geom_point(alpha = 0.6, color = "steelblue") +
+    geom_smooth(method = "lm", se = FALSE, color = "darkred", linewidth = 1.2) +
+    # Add expanding bands to show increasing variance
+    geom_ribbon(
+        data = tibble(x = seq(0, 100, length.out = 100)) |>
+            mutate(yhat = 10 + 0.5 * x, spread = 0.6 * x),
+        aes(x = x, ymin = yhat - spread, ymax = yhat + spread),
+        alpha = 0.15, fill = "darkred",
+        inherit.aes = FALSE
+    ) +
+    labs(
+        title = "Heteroskedastic Data",
+        subtitle = "The spread (variance) of errors increases with x",
+        x = "X",
+        y = "Y"
+    ) +
+    annotate("text", x = 85, y = 20, label = "Spread\nincreases", 
+             color = "darkred", size = 4, fontface = "bold")
+```
+
+This pattern is extremely common in economic data.
+For example:
+
+- **Income and consumption:** Higher-income households have more variable consumption patterns
+- **Firm size and profits:** Larger firms have more variable profit margins
+- **Experience and wages:** More experienced workers have more variable wages
+
+### Side-by-Side Comparison
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-comparison
+#| fig-cap: "Comparing homoskedastic (left) and heteroskedastic (right) data. The key difference is whether the spread of points changes with x."
+#| fig-width: 10
+#| fig-height: 4
+
+# Combine data for faceted plot
+combined_data <- bind_rows(
+    homo_data |> mutate(type = "Homoskedastic"),
+    hetero_data |> mutate(type = "Heteroskedastic")
+)
+
+ggplot(combined_data, aes(x = x, y = y)) +
+    geom_point(alpha = 0.5, color = "steelblue") +
+    geom_smooth(method = "lm", se = FALSE, color = "darkred", linewidth = 1.2) +
+    facet_wrap(~type, scales = "free_y") +
+    labs(
+        title = "Homoskedastic vs. Heteroskedastic Data",
+        x = "X",
+        y = "Y"
+    )
+```
+
+
+## Why Does Heteroskedasticity Matter?
+
+### The Good News: Coefficients Are Still Unbiased
+
+Here's the crucial point:
+**heteroskedasticity does NOT bias our coefficient estimates**.
+The unbiasedness of OLS depends only on Gauss-Markov assumptions 1-4,
+not on homoskedasticity.
+
+So $E[\hat{\beta}] = \beta$ still holds.
+Our estimates are centered on the truth.
+
+### The Bad News: Standard Errors Are Wrong
+
+However,
+the standard error formulas we've been using assume homoskedasticity.
+When this assumption is violated:
+
+- The formula $SE(\hat{\beta}_1) = \frac{\hat{\sigma}}{\sqrt{SST_x}}$ is **invalid**
+- Our computed standard errors will typically be **too small**
+- This means t-statistics are **too large**
+- And p-values are **too small**
+
+The result?
+**We reject the null hypothesis too often**,
+even when it's true.
+
+### Type I Error: A Quick Review
+
+::: {.callout-important}
+## Type I Error
+A **Type I error** (false positive) occurs when we reject a true null hypothesis.
+
+When we set $\alpha = 0.05$,
+we're accepting a 5% probability of making this error.
+If our test is working correctly,
+we should reject true null hypotheses exactly 5% of the time.
+:::
+
+With heteroskedasticity and standard OLS standard errors,
+the actual Type I error rate can be much higher than 5%---sometimes 10%, 15%, or even higher.
+
+
+## Simulation: Seeing the Problem
+
+### Setup: Simulating Hypothesis Tests
+
+Let's run a simulation to see exactly what goes wrong.
+We'll generate data where the **true effect is zero** ($\beta_1 = 0$),
+then see how often we incorrectly reject this true null hypothesis.
+
+First,
+let's see what happens under **homoskedasticity** (where everything works correctly):
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| cache: true
+
+# Simulation parameters
+n_sims <- 2000       # Number of simulations
+n_obs <- 250         # Observations per sample
+beta0_true <- 5      # True intercept
+beta1_true <- 0      # True slope (NULL HYPOTHESIS IS TRUE!)
+
+set.seed(42)
+
+# Function for ONE simulation trial under HOMOSKEDASTICITY
+run_homo_trial <- function(i) {
+    x <- runif(n_obs, 1, 50)
+    error <- rnorm(n_obs, mean = 0, sd = 10)  # Constant variance
+    y <- beta0_true + beta1_true * x + error
+    
+    model <- lm(y ~ x)
+    
+    # Get OLS p-value
+    pval_ols <- summary(model)$coefficients["x", "Pr(>|t|)"]
+    
+    return(data.frame(pval_ols = pval_ols))
+}
+
+# Run simulations
+homo_results <- map_dfr(1:n_sims, run_homo_trial)
+
+# Calculate rejection rate (Type I error rate)
+homo_reject_rate <- mean(homo_results$pval_ols < 0.05)
+```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-homo-pvals
+#| fig-cap: "Under homoskedasticity, p-values are uniformly distributed when the null is true, and the rejection rate matches our significance level."
+
+ggplot(homo_results, aes(x = pval_ols)) +
+    geom_histogram(aes(y = after_stat(density)), bins = 20, 
+                   fill = "steelblue", alpha = 0.7, color = "white") +
+    geom_hline(yintercept = 1, linetype = "dashed", color = "darkgreen", linewidth = 1) +
+    geom_vline(xintercept = 0.05, linetype = "dashed", color = "red", linewidth = 1) +
+    annotate("text", x = 0.12, y = 1.3, label = paste0("Rejection rate: ", 
+             scales::percent(homo_reject_rate, accuracy = 0.1)),
+             color = "red", fontface = "bold", size = 4) +
+    annotate("text", x = 0.7, y = 1.15, label = "Uniform distribution\n(expected under null)",
+             color = "darkgreen", size = 3.5) +
+    labs(
+        title = "P-Value Distribution Under Homoskedasticity",
+        subtitle = "True effect = 0; p-values should be uniform; rejection rate ≈ 5%",
+        x = "P-Value",
+        y = "Density"
+    ) +
+    scale_x_continuous(breaks = seq(0, 1, 0.2))
+```
+
+Under homoskedasticity,
+the Type I error rate is `r scales::percent(homo_reject_rate, accuracy = 0.1)`---almost exactly 5%,
+as expected.
+
+### Now With Heteroskedasticity
+
+Now let's see what happens when we have heteroskedasticity but use standard OLS standard errors:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| cache: true
+
+# Function for ONE simulation trial under HETEROSKEDASTICITY
+run_hetero_trial <- function(i) {
+    x <- runif(n_obs, 1, 50)
+    # Variance INCREASES with x (heteroskedasticity!)
+    error <- rnorm(n_obs, mean = 0, sd = sqrt(0.2 * x^3))
+    y <- beta0_true + beta1_true * x + error
+    
+    model <- lm(y ~ x)
+    
+    # Get both OLS and robust p-values
+    res_ols <- coeftest(model)
+    res_robust <- coeftest(model, vcov. = vcovHC(model, type = "HC1"))
+    
+    return(data.frame(
+        pval_ols = res_ols["x", "Pr(>|t|)"],
+        pval_robust = res_robust["x", "Pr(>|t|)"]
+    ))
+}
+
+# Run simulations
+hetero_results <- map_dfr(1:n_sims, run_hetero_trial)
+
+# Calculate rejection rates
+ols_reject_rate <- mean(hetero_results$pval_ols < 0.05)
+robust_reject_rate <- mean(hetero_results$pval_robust < 0.05)
+```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-hetero-pvals
+#| fig-cap: "Under heteroskedasticity, standard OLS p-values pile up near zero, causing excessive rejections. Robust standard errors fix this problem."
+#| fig-width: 10
+#| fig-height: 4
+
+# Reshape for faceting
+hetero_long <- hetero_results |>
+    pivot_longer(everything(), names_to = "method", values_to = "pval") |>
+    mutate(method = case_when(
+        method == "pval_ols" ~ paste0("Standard OLS SE (Rejection rate: ", 
+                                       scales::percent(ols_reject_rate, accuracy = 0.1), ")"),
+        method == "pval_robust" ~ paste0("Robust SE (Rejection rate: ", 
+                                          scales::percent(robust_reject_rate, accuracy = 0.1), ")")
+    ))
+
+ggplot(hetero_long, aes(x = pval)) +
+    geom_histogram(aes(y = after_stat(density)), bins = 20, 
+                   fill = "steelblue", alpha = 0.7, color = "white") +
+    geom_hline(yintercept = 1, linetype = "dashed", color = "darkgreen", linewidth = 1) +
+    geom_vline(xintercept = 0.05, linetype = "dashed", color = "red", linewidth = 1) +
+    facet_wrap(~method) +
+    labs(
+        title = "P-Value Distributions Under Heteroskedasticity",
+        subtitle = "True effect = 0; left panel shows the problem, right panel shows the fix",
+        x = "P-Value",
+        y = "Density"
+    ) +
+    scale_x_continuous(breaks = seq(0, 1, 0.2))
+```
+
+The difference is stark!
+With standard OLS standard errors (left panel),
+we reject the true null hypothesis `r scales::percent(ols_reject_rate, accuracy = 0.1)` of the time---more than **twice** our intended 5% rate.
+This is a serious problem:
+we're finding "significant" effects that don't exist.
+
+With heteroskedasticity-robust standard errors (right panel),
+the rejection rate returns to approximately 5%.
+
+
+## Heteroskedasticity-Robust Standard Errors
+
+### The Solution
+
+The fix is remarkably simple:
+use a different formula for the standard errors that accounts for heteroskedasticity.
+These are called **heteroskedasticity-robust standard errors** (also known as White standard errors or Huber-White standard errors).
+
+The standard OLS variance formula is:
+$$Var(\hat{\beta}_1) = \frac{\sum_{i=1}^{n}\hat{u}_i^2 / (n-2)}{SST_x^2}$$
+
+The heteroskedasticity-robust formula is:
+$$Var(\hat{\beta}_1) = \frac{\sum_{i=1}^{n}(x_i - \bar{x})^2\hat{u}_i^2}{SST_x^2}$$
+
+The key difference is that robust standard errors **weight each squared residual by how far its $x_i$ is from the mean**.
+This accounts for the fact that residuals may have different variances at different values of $x$.
+
+### Visualizing the Sampling Distributions
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| cache: true
+
+# Run more detailed simulation to get coefficient estimates
+set.seed(999)
+
+detailed_hetero_trial <- function(i) {
+    x <- runif(n_obs, 1, 50)
+    error <- rnorm(n_obs, mean = 0, sd = sqrt(0.2 * x^3))
+    y <- beta0_true + beta1_true * x + error
+    
+    model <- lm(y ~ x)
+    
+    res_ols <- coeftest(model)
+    res_robust <- coeftest(model, vcov. = vcovHC(model, type = "HC1"))
+    
+    return(data.frame(
+        beta1_hat = coef(model)["x"],
+        se_ols = res_ols["x", "Std. Error"],
+        se_robust = res_robust["x", "Std. Error"]
+    ))
+}
+
+detailed_results <- map_dfr(1:n_sims, detailed_hetero_trial)
+
+# Calculate average SEs
+avg_se_ols <- mean(detailed_results$se_ols)
+avg_se_robust <- mean(detailed_results$se_robust)
+true_se <- sd(detailed_results$beta1_hat)
+```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-sampling-dist
+#| fig-cap: "The actual sampling distribution (blue) compared to what standard OLS SEs predict (red dashed) vs. robust SEs (green). OLS SEs are too narrow; robust SEs match reality."
+
+ggplot(detailed_results, aes(x = beta1_hat)) +
+    geom_density(fill = "steelblue", alpha = 0.5, color = "steelblue", linewidth = 1) +
+    stat_function(
+        fun = dnorm,
+        args = list(mean = 0, sd = avg_se_ols),
+        color = "red",
+        linewidth = 1.2,
+        linetype = "dashed"
+    ) +
+    stat_function(
+        fun = dnorm,
+        args = list(mean = 0, sd = avg_se_robust),
+        color = "darkgreen",
+        linewidth = 1.2
+    ) +
+    geom_vline(xintercept = 0, linetype = "dotted", linewidth = 1) +
+    labs(
+        title = "Sampling Distribution of β̂₁ Under Heteroskedasticity",
+        subtitle = "Blue = actual distribution | Red dashed = OLS SE prediction | Green = Robust SE prediction",
+        x = expression(hat(beta)[1]),
+        y = "Density"
+    ) +
+    annotate("text", x = 1.5, y = 0.35, label = "OLS SE\n(too narrow)", 
+             color = "red", size = 3.5, fontface = "bold") +
+    annotate("text", x = -2, y = 0.25, label = "Robust SE\n(correct)", 
+             color = "darkgreen", size = 3.5, fontface = "bold")
+```
+
+The figure shows that:
+
+- The **actual** sampling distribution (blue) has heavier tails than OLS standard errors predict
+- Standard OLS SEs (red dashed) assume a narrower distribution than reality
+- Robust SEs (green) correctly capture the true variability
+
+### Comparing Type I Error Rates
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-type1-comparison
+#| fig-cap: "Type I error rates across different scenarios. Robust standard errors maintain the correct 5% rate even with heteroskedasticity."
+
+type1_data <- tibble(
+    Scenario = c("Homoskedastic\n(OLS SE)", 
+                 "Heteroskedastic\n(OLS SE)", 
+                 "Heteroskedastic\n(Robust SE)"),
+    Rate = c(homo_reject_rate, ols_reject_rate, robust_reject_rate),
+    Status = c("Correct", "Inflated!", "Correct")
+)
+
+type1_data$Scenario <- factor(type1_data$Scenario, levels = type1_data$Scenario)
+
+ggplot(type1_data, aes(x = Scenario, y = Rate, fill = Status)) +
+    geom_col(width = 0.6) +
+    geom_hline(yintercept = 0.05, linetype = "dashed", color = "black", linewidth = 1) +
+    geom_text(aes(label = scales::percent(Rate, accuracy = 0.1)), 
+              vjust = -0.5, size = 5, fontface = "bold") +
+    scale_fill_manual(values = c("Correct" = "steelblue", "Inflated!" = "coral")) +
+    scale_y_continuous(labels = scales::percent, limits = c(0, 0.15)) +
+    labs(
+        title = "Type I Error Rates: The Heteroskedasticity Problem",
+        subtitle = "Dashed line shows the target 5% rate",
+        x = "",
+        y = "Type I Error Rate (False Positive Rate)"
+    ) +
+    theme(legend.position = "none") +
+    annotate("text", x = 2, y = 0.13, label = "Over-rejection!", 
+             color = "coral", fontface = "bold", size = 4)
+```
+
+
+## Implementing Robust Standard Errors in R
+
+### Using `fixest`
+
+The easiest way to get robust standard errors is with the `fixest` package,
+which we'll use throughout this course:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# Generate some heteroskedastic data
+set.seed(123)
+example_data <- tibble(
+    x = runif(200, 1, 50),
+    y = 5 + 0.5 * x + rnorm(200, 0, sqrt(0.1 * x^2))
+)
+
+# Standard OLS (wrong SEs with heteroskedasticity)
+model_ols <- feols(y ~ x, data = example_data)
+
+# With heteroskedasticity-robust SEs
+model_robust <- feols(y ~ x, vcov = "HC1", data = example_data)
+```
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# Compare the results
+modelsummary(
+    list("Standard SE" = model_ols, "Robust SE" = model_robust),
+    stars = TRUE,
+    gof_map = c("nobs", "r.squared")
+)
+```
+
+Notice that:
+
+- The **coefficients are identical** (unbiasedness is not affected)
+- The **standard errors differ** (robust SEs are typically larger)
+- This affects **t-statistics and p-values**
+
+### Best Practice: Always Use Robust Standard Errors
+
+::: {.callout-tip}
+## Best Practice
+**Always report heteroskedasticity-robust standard errors.**
+
+Why? Because:
+
+1. If heteroskedasticity is present, robust SEs are correct and standard SEs are wrong
+2. If homoskedasticity holds, robust SEs are still valid (just slightly less efficient)
+
+You can't lose by using robust SEs,
+but you can lose badly by not using them.
+:::
+
+
+## Detecting Heteroskedasticity
+
+### Residual Plots
+
+The best way to detect heteroskedasticity is to **look at your residuals**.
+Plot the residuals against the fitted values (or against each explanatory variable) and look for patterns:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# Fit model to heteroskedastic data
+model <- lm(y ~ x, data = example_data)
+
+# Add residuals and fitted values to data
+example_data <- example_data |>
+    mutate(
+        fitted = fitted(model),
+        resid = residuals(model)
+    )
+```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-residual-plot
+#| fig-cap: "Residual plot showing the 'fan' pattern characteristic of heteroskedasticity. The spread of residuals increases with fitted values."
+
+ggplot(example_data, aes(x = fitted, y = resid)) +
+    geom_point(alpha = 0.6, color = "steelblue") +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "darkred", linewidth = 1) +
+    geom_smooth(method = "loess", se = FALSE, color = "coral", linewidth = 1) +
+    labs(
+        title = "Residual Plot: Detecting Heteroskedasticity",
+        subtitle = "The 'fan' pattern indicates variance increases with fitted values",
+        x = "Fitted Values",
+        y = "Residuals"
+    ) +
+    annotate("text", x = 28, y = 15, label = "Spread increases\n= heteroskedasticity", 
+             color = "coral", fontface = "bold", size = 4)
+```
+
+### What to Look For
+
+**Homoskedasticity:** Residuals form a random cloud with constant spread
+
+**Heteroskedasticity:** Look for:
+
+- Fan/cone shapes (spread increases or decreases)
+- Patterns in the spread related to fitted values
+- Different variability for different groups
+
+### Formal Tests
+
+While visual inspection is usually sufficient,
+you can also use formal tests like the **Breusch-Pagan test**:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# Breusch-Pagan test
+bptest(model)
+```
+
+A small p-value (< 0.05) suggests heteroskedasticity is present.
+However,
+**don't rely solely on formal tests**---always look at your residual plots too.
+
+
+## Summary
+
+Heteroskedasticity is a common issue in economic data where the variance of errors changes with the explanatory variables.
+
+**Key Points:**
+
+1. **Heteroskedasticity does NOT bias coefficients** - $E[\hat{\beta}] = \beta$ still holds
+2. **Heteroskedasticity DOES invalidate standard errors** - leading to incorrect inference
+3. **The main symptom is inflated Type I error rates** - we reject true nulls too often
+4. **The solution is simple: use robust standard errors** - specify `vcov = "HC1"` in `feols()`
+5. **Detect heteroskedasticity with residual plots** - look for fan/cone patterns
+
+**Best Practice:**
+Always use heteroskedasticity-robust standard errors.
+They're valid whether or not heteroskedasticity is present,
+so there's no downside to using them.
+
+
+## Check Your Understanding
+
+:::: {.content-visible when-format="html"}
+
+For each question below, 
+select the best answer from the dropdown menu. 
+
+```{=html}
+<div class="question">
+<div class="answer-row">
+    <label>i. What is heteroskedasticity? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">When the error term is correlated with x</option>
+        <option value="b">When the variance of the error term changes with x</option>
+        <option value="c">When the mean of the error term is not zero</option>
+        <option value="d">When observations are not independent</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>ii. Does heteroskedasticity bias OLS coefficient estimates? </label>
+    <select onchange="checkAnswer(this, 'a')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">No, coefficients remain unbiased</option>
+        <option value="b">Yes, coefficients become biased upward</option>
+        <option value="c">Yes, coefficients become biased downward</option>
+        <option value="d">It depends on the form of heteroskedasticity</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iii. What goes wrong when we have heteroskedasticity but use standard OLS standard errors? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Coefficients become inconsistent</option>
+        <option value="b">R² becomes meaningless</option>
+        <option value="c">Standard errors are typically too small, leading to too many false positives</option>
+        <option value="d">The regression line no longer minimizes squared residuals</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iv. In a residual plot, what pattern suggests heteroskedasticity? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Residuals forming a horizontal line at zero</option>
+        <option value="b">Residuals forming a fan or cone shape</option>
+        <option value="c">Residuals forming a U-shape</option>
+        <option value="d">Residuals clustering in the center</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>v. Why is it considered best practice to always use robust standard errors? </label>
+    <select onchange="checkAnswer(this, 'd')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">They make coefficients larger</option>
+        <option value="b">They increase R²</option>
+        <option value="c">They are required by academic journals</option>
+        <option value="d">They are valid whether or not heteroskedasticity is present</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>vi. <strong>(Challenge)</strong> If standard OLS standard errors are 0.05 and robust standard errors are 0.08 for the same coefficient, what does this suggest? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The coefficient is biased</option>
+        <option value="b">The model has omitted variable bias</option>
+        <option value="c">Heteroskedasticity is likely present, and OLS SEs are underestimating uncertainty</option>
+        <option value="d">The sample size is too small</option>
+    </select>
+</div>
+</div>
+
+```
+
+::: {.callout-tip collapse="true"}
+## Show Explanation
+
+i. Heteroskedasticity means the variance of the error term is not constant—it changes depending on the value of x. For example, variance might increase with x, creating a "fan" pattern in the data.
+
+ii. No, heteroskedasticity does NOT cause bias in coefficient estimates. Unbiasedness depends only on Gauss-Markov assumptions 1-4 (linearity, random sampling, no perfect collinearity, zero conditional mean). The homoskedasticity assumption (GM5) affects efficiency and inference, not unbiasedness.
+
+iii. When heteroskedasticity is present but ignored, the standard error formula is wrong. Typically, standard errors are underestimated, making t-statistics too large and p-values too small. This leads to rejecting true null hypotheses too often (inflated Type I error rate).
+
+iv. The classic sign of heteroskedasticity is a "fan" or "cone" shape in the residual plot, where the spread of residuals increases (or decreases) as the fitted values change. Constant spread would indicate homoskedasticity.
+
+v. Robust standard errors are valid whether or not heteroskedasticity exists. If there's no heteroskedasticity, they're slightly less efficient but still correct. If there IS heteroskedasticity, they're correct while standard SEs are wrong. There's no downside to using them.
+
+vi. When robust SEs are larger than standard OLS SEs, it typically indicates heteroskedasticity is present. The standard OLS formula is underestimating the true variability in β̂, while the robust formula correctly accounts for the non-constant variance. This is a common pattern and exactly why robust SEs are recommended.
+
+:::
+
+::::
+
+:::: {.content-hidden when-format="html"}
+
+*Note: This section contains interactive content only available in the HTML version.*
+
+::::

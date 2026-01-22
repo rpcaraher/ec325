@@ -1,0 +1,638 @@
+# Difference-in-Differences {#sec-did}
+
+```{r}
+#| echo: false
+#| output: false
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(fixest)
+library(wooldridge)
+library(modelsummary)
+
+options(scipen = 999)
+
+```
+
+```{=html}
+
+<style>
+.problem {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+.context {
+    background-color: #e8f4f8;
+    padding: 12px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border-left: 4px solid #2874a6;
+}
+.question {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #fff3cd;
+    border-radius: 5px;
+}
+.answer-row {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.answer-row label {
+    min-width: 320px;
+    font-weight: 500;
+}
+select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    min-width: 300px;
+    cursor: pointer;
+}
+select:focus {
+    border-color: #2874a6;
+    outline: none;
+}
+.correct {
+    border-color: #28a745 !important;
+    background-color: #d4edda !important;
+}
+.incorrect {
+    border-color: #dc3545 !important;
+    background-color: #f8d7da !important;
+}
+.explanation {
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #e7f3ff;
+    border-radius: 5px;
+    border-left: 4px solid #2874a6;
+}
+.note {
+    font-size: 0.85em;
+    color: #666;
+    font-style: italic;
+}
+</style>
+
+<script>
+function checkAnswer(selectElement, correctValue) {
+    if (selectElement.value === '') {
+        selectElement.classList.remove('correct', 'incorrect');
+    } else if (selectElement.value === correctValue) {
+        selectElement.classList.remove('incorrect');
+        selectElement.classList.add('correct');
+    } else {
+        selectElement.classList.remove('correct');
+        selectElement.classList.add('incorrect');
+    }
+}
+</script>
+
+```
+
+
+::: {.callout-tip collapse="true"}
+## **Key Questions**
+- What is a natural experiment and how does it help with causal inference?
+- What is the parallel trends assumption and why is it crucial for DiD?
+- How do we estimate the average treatment effect on the treated (ATT) using DiD?
+- What is two-way fixed effects and how does it relate to DiD?
+- How do we choose good control units for a DiD design?
+:::
+
+::: {.callout-note collapse="true"}
+## **Suggested Readings**
+- TBD
+:::
+
+
+We have built up an increasingly powerful toolkit for causal inference.
+Randomized controlled trials remain the gold standard,
+but are often infeasible.
+Multivariate OLS allows us to control for observable confounders,
+and fixed effects extend this to control for unobserved time-invariant factors.
+But what if even fixed effects aren't enough?
+
+This chapter introduces **difference-in-differences (DiD)**,
+a method that combines the logic of experiments with the practicality of observational data.
+Instead of relying solely on control *variables*,
+DiD uses control *units*---a comparison group that shows us what would have happened to the treated group in the absence of treatment.
+
+
+## Natural Experiments
+
+### The Problem with Observational Data
+
+Suppose we want to estimate the effect of immigration on native workers' wages.
+A naive approach might compare wages in cities with high immigration to wages in cities with low immigration.
+But this comparison is confounded:
+immigrants tend to move to cities with strong economies,
+creating a spurious positive correlation between immigration and wages.
+
+Even with control variables,
+we may miss important unobserved factors like a city's economic trajectory or its attractiveness to both immigrants and high-wage employers.
+Fixed effects help with time-invariant confounders,
+but cannot address factors that change differently across cities over time.
+
+### Natural Experiments as a Solution
+
+A **natural experiment** occurs when some external force---nature, policy, or historical accident---assigns units to treatment and control groups in a way that resembles random assignment.
+
+::: {.callout-note}
+## Natural Experiments
+A **natural experiment** is a study based on observational data where "treatment" is assigned by forces outside the researcher's control,
+such as policy changes,
+geographic boundaries,
+or historical events.
+Natural experiments create conditions that *resemble* random assignment,
+allowing us to make causal inferences without actually randomizing.
+:::
+
+The key insight is that if treatment assignment is "as good as random,"
+then comparing treated and control units can identify causal effects---just like in an RCT.
+
+
+## The Mariel Boatlift: A Classic Natural Experiment
+
+One of the most famous natural experiments in economics involves the Mariel Boatlift.
+In 1980,
+Cuba experienced severe economic turmoil,
+and Fidel Castro announced that anyone who wished to leave could do so.
+Between April and October,
+approximately 125,000 Cubans departed from Mariel Harbor and arrived in Miami.
+
+This mass migration had nothing to do with labor market conditions in Miami.
+It was driven entirely by Cuban politics and Miami's geographic proximity to Cuba.
+In other words,
+the "treatment" of a sudden large increase in labor supply was essentially randomly assigned to Miami.
+
+David Card's seminal 1990 study used this natural experiment to estimate the effect of immigration on native wages.
+But how exactly do we use such an event to identify causal effects?
+
+
+## The Difference-in-Differences Approach
+
+### Why Simple Before-After Comparisons Fail
+
+Card first compared wages in Miami before the boatlift (1979) to wages after (1980-1985):
+
+| City | Pre (1979) | Post (1980-1985) | Difference |
+|:----:|:----------:|:----------------:|:----------:|
+| Miami | 1.85 | 1.83 | -0.02 |
+
+Wages fell slightly.
+Can we interpret this as the causal effect of immigration?
+
+**No.**
+Wages might have fallen everywhere during this period due to recession or other macroeconomic factors.
+Looking only at the treated unit's change over time confuses the treatment effect with broader trends.
+
+### The Need for Control Units
+
+To isolate the treatment effect,
+we need to know what *would have happened* to Miami's wages if the boatlift had never occurred.
+This **counterfactual** is inherently unobservable---we cannot see the parallel universe where Cuba didn't open its borders.
+
+But we can approximate it using **control units**:
+cities similar to Miami that were not affected by the boatlift.
+Card chose Atlanta, Los Angeles, Houston, and Tampa-St. Petersburg as controls,
+arguing they had similar demographics and economic trajectories to Miami.
+
+| City | Pre (1979) | Post (1980-1985) | Difference |
+|:----:|:----------:|:----------------:|:----------:|
+| Miami | 1.85 | 1.83 | -0.02 |
+| Controls | 1.93 | 1.91 | -0.02 |
+| **Difference** | | | **0.00** |
+
+The control cities experienced the *same* wage decline as Miami.
+This suggests the wage drop in Miami was not caused by the boatlift but by broader economic trends affecting all cities.
+
+The **difference-in-differences** estimate is the change in Miami minus the change in controls:
+$$
+(-0.02) - (-0.02) = 0.00
+$$
+
+Card concluded that the Mariel Boatlift had essentially no effect on native wages---a surprising and influential finding.
+
+
+## The Parallel Trends Assumption
+
+### The Core Identifying Assumption
+
+The DiD approach rests on one critical assumption:
+
+::: {.callout-important}
+## Parallel Trends Assumption
+In the absence of treatment,
+the average outcome for the treated group would have followed the **same trend** as the average outcome for the control group.
+:::
+
+Mathematically:
+$$
+E[Y_{i,post} - Y_{i,pre} | Treated] = E[Y_{i,post} - Y_{i,pre} | Control]
+$$
+
+in the counterfactual world where treatment never occurred.
+
+This assumption is **not testable** directly because we never observe the treated group's counterfactual trend.
+However,
+we can assess its plausibility by examining whether treated and control groups followed similar trends *before* treatment began.
+If pre-treatment trends are parallel,
+it's more credible that they would have remained parallel absent treatment.
+
+### Visualizing DiD
+
+The logic of DiD is best understood graphically:
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-did-visual
+#| fig-cap: "The DiD estimate is the gap between the observed treatment outcome and the counterfactual (dashed line) based on the control group's trend."
+
+did_data <- tibble(
+  time = rep(c(1, 2, 3, 4), 2),
+  group = rep(c("Control", "Treatment"), each = 4),
+  outcome = case_when(
+    group == "Control"   & time == 1 ~ 10,
+    group == "Control"   & time == 2 ~ 11,
+    group == "Control"   & time == 3 ~ 12,
+    group == "Control"   & time == 4 ~ 13,
+    group == "Treatment" & time == 1 ~ 15,
+    group == "Treatment" & time == 2 ~ 16,
+    group == "Treatment" & time == 3 ~ 20,
+    group == "Treatment" & time == 4 ~ 21
+  )
+)
+
+counterfactual_line <- tibble(
+  time = c(2, 3, 4),
+  outcome = c(16, 17, 18)
+)
+
+ggplot(data = did_data, aes(x = time, y = outcome, color = group)) +
+  geom_line(aes(group = group), linewidth = 1.2) +
+  geom_point(size = 3) +
+  geom_line(
+    data = counterfactual_line, 
+    aes(x = time, y = outcome), 
+    color = "#0072B2",
+    linetype = "dashed", 
+    linewidth = 1.2
+  ) +
+  geom_vline(xintercept = 2.5, linetype = "dotted", linewidth = 1) +
+  annotate("text", x = 2.55, y = 22, label = "Treatment Starts", hjust = 0, size = 4) +
+  annotate("text", x = 3.5, y = 18.5, label = "Counterfactual\n(Parallel Trend)", 
+           color = "#0072B2", hjust = 0.5, size = 4) +
+  annotate("segment", x = 4, xend = 4, y = 18.2, yend = 20.8,
+           arrow = arrow(type = "closed", length = unit(0.2, "cm"), ends = "both")) +
+  annotate("text", x = 4.1, y = 19.5, label = "ATT", hjust = 0, size = 4.5) +
+  labs(x = "Time Period", y = "Average Outcome", color = "Group") +
+  scale_x_continuous(breaks = 1:4) +
+  scale_color_manual(values = c("Control" = "grey50", "Treatment" = "#0072B2")) +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom")
+```
+
+The **Average Treatment Effect on the Treated (ATT)** is the vertical distance between:
+
+1. The observed outcome for the treated group after treatment
+2. The counterfactual: where the treated group *would have been* if it had followed the control group's trend
+
+The dashed line represents this counterfactual---the treated group's hypothetical trajectory without treatment.
+
+
+## The DiD Regression
+
+### Setting Up the Model
+
+We typically estimate DiD using regression.
+For the simple 2×2 case (two groups, two time periods),
+the model is:
+
+$$
+y_{it} = \beta_0 + \beta_1 D_i + \beta_2 P_t + \delta(D_i \times P_t) + \mu_{it}
+$$ {#eq-did-reg}
+
+where:
+
+- $D_i$ is a **treatment group indicator** (1 if treated, 0 if control)
+- $P_t$ is a **post-period indicator** (1 if post-treatment, 0 if pre-treatment)
+- $D_i \times P_t$ is the interaction term (1 only for treated units in the post period)
+- $\delta$ is the **DiD estimate**---our estimate of the ATT
+
+### How It Works
+
+To see why $\delta$ captures the DiD effect,
+consider the predicted outcomes for each group-period combination:
+
+| Group | Period | Predicted Outcome |
+|:-----:|:------:|:-----------------:|
+| Control | Pre | &beta;<sub>0</sub> |
+| Control | Post | &beta;<sub>0</sub> + &beta;<sub>2</sub> |
+| Treated | Pre | &beta;<sub>0</sub> + &beta;<sub>1</sub> |
+| Treated | Post | &beta;<sub>0</sub> + &beta;<sub>1</sub> + &beta;<sub>2</sub> + &delta; |
+
+Now compute the differences:
+
+**Change for treated group:** (&beta;<sub>0</sub> + &beta;<sub>1</sub> + &beta;<sub>2</sub> + &delta;) − (&beta;<sub>0</sub> + &beta;<sub>1</sub>) = &beta;<sub>2</sub> + &delta;
+
+**Change for control group:** (&beta;<sub>0</sub> + &beta;<sub>2</sub>) − &beta;<sub>0</sub> = &beta;<sub>2</sub>
+
+**DiD estimate:** (&beta;<sub>2</sub> + &delta;) − &beta;<sub>2</sub> = **&delta;**
+
+The coefficient on the interaction term exactly equals the difference-in-differences!
+
+### Example: Estimating the Mariel Boatlift Effect
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# Create the Card (1990) data
+miami_wages <- tibble(
+    city = "miami",
+    year = 1979:1985,
+    wages = c(1.85, 1.83, 1.85, 1.82, 1.82, 1.82, 1.82)
+)
+
+control_wages <- tibble(
+    city = "control",
+    year = 1979:1985,
+    wages = c(1.93, 1.90, 1.91, 1.91, 1.90, 1.91, 1.92)
+)
+
+boatlift_data <- bind_rows(miami_wages, control_wages) |>
+    mutate(
+        post = ifelse(year >= 1980, 1, 0),
+        treated = ifelse(city == "miami", 1, 0),
+        post_treat = post * treated
+    )
+
+# Estimate DiD regression
+did_reg <- feols(wages ~ treated + post + post_treat,
+                 vcov = "HC1",
+                 data = boatlift_data)
+
+summary(did_reg)
+```
+
+The coefficient on `post_treat` (approximately 0.01) is our DiD estimate.
+It suggests the Mariel Boatlift had essentially no effect on wages---consistent with Card's original findings.
+
+
+## Two-Way Fixed Effects
+
+### Extending to Multiple Units and Time Periods
+
+The simple 2×2 DiD works well for clean natural experiments with one treated unit and one control unit observed before and after.
+But what if we have many treated units,
+many control units,
+and many time periods?
+
+The **Two-Way Fixed Effects (TWFE)** model extends DiD to these more complex settings:
+
+$$
+y_{it} = \delta D_{it} + \alpha_i + \tau_t + \mu_{it}
+$$ {#eq-twfe}
+
+where:
+
+- $D_{it}$ equals 1 if unit $i$ is treated at time $t$, and 0 otherwise
+- $\alpha_i$ are **unit fixed effects** (one for each unit)
+- $\tau_t$ are **time fixed effects** (one for each time period)
+- $\delta$ is the treatment effect
+
+This model subsumes the simple DiD:
+unit fixed effects capture permanent differences between groups (like $\beta_1 D_i$),
+and time fixed effects capture common shocks to all units (like $\beta_2 P_t$).
+
+### Estimating TWFE in R
+
+The `fixest` package makes TWFE estimation straightforward.
+The syntax `| unit + time` specifies the fixed effects:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# TWFE estimation
+twfe_reg <- feols(wages ~ post_treat | city + year,
+                  vcov = "HC1",
+                  data = boatlift_data)
+
+summary(twfe_reg)
+```
+
+The coefficient on `post_treat` is identical to our simple DiD regression---as expected,
+since TWFE and the 2×2 DiD model are equivalent in this simple case.
+
+
+## Research Design: Choosing Good Controls
+
+### The Art of Causal Inference
+
+Your DiD estimate is only as good as your research design.
+The goal is to find control units that make the parallel trends assumption credible.
+
+**Good Controls → Good Counterfactual → Credible DiD Estimate**
+
+**Bad Controls → Bad Counterfactual → Misleading DiD Estimate**
+
+### Example: Minimum Wages and Employment
+
+Consider estimating the effect of minimum wage increases on employment.
+One approach might compare all states that raised their minimum wage to all states that didn't.
+
+But states that raise minimum wages are systematically different:
+they tend to be more politically liberal,
+have stronger labor markets,
+different industries,
+and many other characteristics that affect employment.
+These differences violate parallel trends---minimum-wage states may have been on different employment trajectories regardless of the policy.
+
+Card and Krueger (1994) proposed a more compelling research design.
+When New Jersey raised its minimum wage in 1992 and neighboring Pennsylvania did not,
+they compared fast-food restaurants in counties *right next to each other* on opposite sides of the NJ-PA border.
+
+The identifying assumption:
+restaurants separated only by a state border are similar in all relevant ways except the minimum wage policy.
+Geographic proximity makes parallel trends much more plausible than comparing NJ to distant states with very different economies.
+
+### Intuition-Driven vs. Data-Driven Selection
+
+There are two broad approaches to choosing control units:
+
+**Intuition-driven selection** relies on substantive knowledge to identify appropriate comparisons.
+Card's choice of control cities for Miami was based on demographic and economic similarities.
+Card and Krueger's border design was based on geographic proximity.
+The advantage is transparency and interpretability.
+
+**Data-driven selection** uses algorithms to find control units that match the treated unit on pre-treatment outcomes.
+Methods like synthetic control construct a weighted average of potential controls that best reproduces the treated unit's pre-treatment trajectory.
+The advantage is objectivity;
+the disadvantage is complexity and potential overfitting.
+
+In practice,
+the best research designs often combine both approaches:
+use substantive knowledge to identify a reasonable set of potential controls,
+then verify that pre-treatment trends are indeed parallel.
+
+
+## What Can Go Wrong
+
+### Violations of Parallel Trends
+
+The most serious threat to DiD is violation of the parallel trends assumption.
+This can happen when:
+
+1. **Differential trends:** Treated and control units were already on different trajectories before treatment
+2. **Anticipation effects:** Units change behavior before treatment actually begins
+3. **Spillovers:** Treatment affects control units (e.g., workers move from treated to control areas)
+4. **Composition changes:** The mix of units changes over time in ways correlated with treatment
+
+### Assessing Parallel Trends
+
+While we cannot test parallel trends directly,
+we can assess plausibility by:
+
+1. **Examining pre-treatment trends:** Do treated and control groups move together before treatment? Diverging pre-trends are a red flag.
+2. **Placebo tests:** Estimate "effects" at times when no treatment occurred. Significant placebo effects suggest the design is flawed.
+3. **Event studies:** Estimate treatment effects for each time period separately to visualize the dynamic pattern.
+
+If pre-treatment trends are not parallel,
+the DiD estimate will be biased.
+The direction of bias depends on whether the treated group was trending upward or downward relative to controls.
+
+
+## Summary
+
+Difference-in-differences is one of the most widely used methods for causal inference in economics and social science.
+It combines the intuition of experimental design with the practicality of observational data.
+
+The key elements are:
+
+1. **Natural experiments** provide plausibly exogenous variation in treatment assignment
+2. **Control units** approximate what would have happened to treated units absent treatment
+3. **The parallel trends assumption** requires that treated and control groups would have followed the same trajectory without treatment
+4. **The DiD estimator** subtracts the control group's change from the treated group's change to isolate the treatment effect
+5. **TWFE** extends DiD to multiple units and time periods using unit and time fixed effects
+
+The credibility of any DiD analysis rests entirely on the parallel trends assumption.
+Careful research design---choosing appropriate control units and verifying parallel pre-trends---is essential for producing convincing causal estimates.
+
+
+## Check Your Understanding
+
+:::: {.content-visible when-format="html"}
+
+For each question below, 
+select the best answer from the dropdown menu. 
+
+```{=html}
+<div class="question">
+<div class="answer-row">
+    <label>i. What is a natural experiment? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">An experiment conducted outdoors</option>
+        <option value="b">A randomized controlled trial with natural products</option>
+        <option value="c">A situation where external forces create treatment assignment that resembles randomization</option>
+        <option value="d">Any observational study with a large sample size</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>ii. Why can't we simply compare Miami's wages before and after the Mariel Boatlift to estimate the causal effect? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Miami's data is unreliable</option>
+        <option value="b">Other factors (like recession) might have changed wages regardless of the boatlift</option>
+        <option value="c">The boatlift didn't actually affect Miami</option>
+        <option value="d">We need at least 10 years of data</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iii. What does the parallel trends assumption require? </label>
+    <select onchange="checkAnswer(this, 'd')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Treated and control groups have the same average outcome</option>
+        <option value="b">Treatment is randomly assigned</option>
+        <option value="c">There are no confounding variables</option>
+        <option value="d">Absent treatment, treated and control groups would have followed the same trend</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iv. In the DiD regression y<sub>it</sub> = &beta;<sub>0</sub> + &beta;<sub>1</sub>D<sub>i</sub> + &beta;<sub>2</sub>P<sub>t</sub> + &delta;(D<sub>i</sub>&times;P<sub>t</sub>) + &mu;<sub>it</sub>, which coefficient is the DiD estimate (the ATT)? </label>
+    <select onchange="checkAnswer(this, 'd')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">&beta;<sub>0</sub></option>
+        <option value="b">&beta;<sub>1</sub></option>
+        <option value="c">&beta;<sub>2</sub></option>
+        <option value="d">&delta;</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>v. Why did Card and Krueger compare restaurants on opposite sides of the NJ-PA border rather than comparing NJ to all other states? </label>
+    <select onchange="checkAnswer(this, 'a')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Geographically close units are more similar, making parallel trends more credible</option>
+        <option value="b">They could only afford to survey restaurants near the border</option>
+        <option value="c">Other states didn't have fast-food restaurants</option>
+        <option value="d">Federal law required border comparisons</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>vi. <strong>(Challenge)</strong> If pre-treatment trends show the treated group's outcome was rising faster than the control group's, what does this imply for the DiD estimate? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The DiD estimate will be unbiased</option>
+        <option value="b">The DiD estimate will understate the true effect</option>
+        <option value="c">The DiD estimate will overstate the true effect (or show a positive effect when there is none)</option>
+        <option value="d">We cannot determine the direction of bias</option>
+    </select>
+</div>
+</div>
+
+```
+
+::: {.callout-tip collapse="true"}
+## Show Explanation
+
+i. A natural experiment occurs when external forces—policy changes, geographic features, historical events—assign units to treatment in a way that resembles random assignment. This allows researchers to make causal inferences without actually conducting an experiment.
+
+ii. A simple before-after comparison for Miami alone would confound the boatlift's effect with any other changes happening at the same time (macroeconomic conditions, national trends, etc.). We need a control group to show what would have happened to Miami *without* the boatlift.
+
+iii. Parallel trends is the core assumption of DiD. It requires that, in the hypothetical world where treatment never occurred, the treated group's outcome would have changed by the same amount as the control group's. This allows us to use the control group's actual change as the counterfactual for the treated group.
+
+iv. In the DiD regression, δ (delta) is the coefficient on the interaction term D<sub>i</sub>×P<sub>t</sub>. This interaction equals 1 only for treated units in the post-period, so its coefficient captures the additional change for treated units beyond what control units experienced—exactly the DiD estimate.
+
+v. States that raise minimum wages differ systematically from states that don't in many ways (politics, industries, labor markets). These differences make parallel trends implausible. Restaurants right next to each other across a state border share local economic conditions and differ mainly in which state's minimum wage applies—a much more credible comparison.
+
+vi. If the treated group was already trending upward faster than controls before treatment, the DiD will attribute that pre-existing differential trend to the treatment. The estimate will be **biased upward**—showing a more positive effect than the true causal impact (or showing a positive effect when the true effect is zero or negative).
+
+:::
+
+::::
+
+:::: {.content-hidden when-format="html"}
+
+*Note: This section contains interactive content only available in the HTML version.*
+
+::::

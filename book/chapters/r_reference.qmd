@@ -1,0 +1,1231 @@
+# R Functions and Packages Reference {#sec-r-reference}
+
+```{r}
+#| echo: false
+#| output: false
+#| message: false
+#| warning: false
+
+library(tidyverse)
+```
+
+This appendix provides a quick reference for all the R functions and packages used throughout this book.
+Use this as a handy guide when you need to remember the syntax or arguments for a particular function.
+
+
+## Packages Used in This Book
+
+### tidyverse
+
+The `tidyverse` is a collection of R packages designed for data science.
+When you load `tidyverse`, it automatically loads several packages including `ggplot2`, `dplyr`, `tidyr`, `readr`, and others.
+
+**What it's used for:**
+
+- Data manipulation and transformation (`dplyr`)
+- Data visualization (`ggplot2`)
+- Reshaping data (`tidyr`)
+- Reading data files (`readr`)
+
+**Loading:**
+```{r}
+#| eval: false
+library(tidyverse)
+```
+
+---
+
+### modelsummary
+
+The `modelsummary` package creates publication-quality tables for regression results and descriptive statistics.
+
+**What it's used for:**
+
+- Creating formatted regression tables comparing multiple models
+- Generating descriptive statistics tables
+- Exporting tables to Word, LaTeX, or HTML
+
+**Loading:**
+```{r}
+#| eval: false
+library(modelsummary)
+```
+
+---
+
+### palmerpenguins
+
+A dataset package containing measurements of penguins from Palmer Station, Antarctica.
+Great for learning data visualization and exploration.
+
+**What it's used for:**
+
+- Practice dataset for learning R
+- Data visualization examples
+- Regression examples
+
+**Loading:**
+```{r}
+#| eval: false
+library(palmerpenguins)
+data(penguins)
+```
+
+---
+
+### wooldridge
+
+Contains all datasets from Wooldridge's *Introductory Econometrics* textbook.
+
+**What it's used for:**
+
+- Real-world econometric datasets
+- Regression examples (wages, crime, etc.)
+
+**Loading:**
+```{r}
+#| eval: false
+library(wooldridge)
+data(wage1)  # Example: load the wage1 dataset
+```
+
+---
+
+### fixest
+
+A fast and powerful package for fixed effects and panel data regression.
+
+**What it's used for:**
+
+- Panel data regression with fixed effects
+- Clustered standard errors
+- Very large datasets (faster than `lm()`)
+
+**Loading:**
+```{r}
+#| eval: false
+library(fixest)
+```
+
+---
+
+### lmtest
+
+Provides diagnostic tests for linear regression models.
+
+**What it's used for:**
+
+- Breusch-Pagan test for heteroskedasticity
+- Other specification tests
+
+**Loading:**
+```{r}
+#| eval: false
+library(lmtest)
+```
+
+---
+
+### sandwich
+
+Provides robust covariance matrix estimators (heteroskedasticity-consistent standard errors).
+
+**What it's used for:**
+
+- Robust standard errors
+- Heteroskedasticity-consistent (HC) standard errors
+
+**Loading:**
+```{r}
+#| eval: false
+library(sandwich)
+```
+
+---
+
+### patchwork
+
+Easily combine multiple ggplot2 plots into a single figure.
+
+**What it's used for:**
+
+- Arranging multiple plots side by side
+- Creating multi-panel figures
+
+**Loading:**
+```{r}
+#| eval: false
+library(patchwork)
+```
+
+---
+
+
+## Data Inspection Functions
+
+### `head()`
+
+Display the first few rows of a data frame.
+
+**Arguments:**
+
+- `x`: A data frame or vector
+- `n`: Number of rows to display (default: 6)
+
+**Example:**
+```{r}
+head(mtcars, n = 3)
+```
+
+---
+
+### `glimpse()`
+
+Get a compact overview of a data frame's structure and column types.
+
+**Arguments:**
+
+- `x`: A data frame
+
+**Example:**
+```{r}
+glimpse(mtcars)
+```
+
+---
+
+### `summary()`
+
+Generate summary statistics for each variable.
+
+**Arguments:**
+
+- `object`: A data frame, vector, or model object
+
+**Example:**
+```{r}
+summary(mtcars$mpg)
+```
+
+---
+
+### `nrow()` and `ncol()`
+
+Return the number of rows or columns in a data frame.
+
+**Arguments:**
+
+- `x`: A data frame or matrix
+
+**Example:**
+```{r}
+nrow(mtcars)
+ncol(mtcars)
+```
+
+---
+
+### `colnames()`
+
+Return or set the column names of a data frame.
+
+**Arguments:**
+
+- `x`: A data frame or matrix
+
+**Example:**
+```{r}
+colnames(mtcars)
+```
+
+---
+
+### `class()` and `typeof()`
+
+Return the class or underlying type of an object.
+
+**Arguments:**
+
+- `x`: Any R object
+
+**Example:**
+```{r}
+class(mtcars$mpg)
+typeof(mtcars$mpg)
+```
+
+---
+
+
+## Descriptive Statistics Functions
+
+### `mean()`
+
+Calculate the arithmetic mean.
+
+**Arguments:**
+
+- `x`: A numeric vector
+- `na.rm`: Remove missing values? (default: `FALSE`)
+
+**Example:**
+```{r}
+x <- c(10, 20, 30, NA, 50)
+mean(x, na.rm = TRUE)
+```
+
+---
+
+### `sd()`
+
+Calculate the standard deviation.
+
+**Arguments:**
+
+- `x`: A numeric vector
+- `na.rm`: Remove missing values? (default: `FALSE`)
+
+**Example:**
+```{r}
+sd(mtcars$mpg)
+```
+
+---
+
+### `median()`
+
+Calculate the median (middle value).
+
+**Arguments:**
+
+- `x`: A numeric vector
+- `na.rm`: Remove missing values? (default: `FALSE`)
+
+**Example:**
+```{r}
+median(mtcars$mpg)
+```
+
+---
+
+### `min()` and `max()`
+
+Find the minimum or maximum value.
+
+**Arguments:**
+
+- `...`: Numeric vectors
+- `na.rm`: Remove missing values? (default: `FALSE`)
+
+**Example:**
+```{r}
+min(mtcars$mpg)
+max(mtcars$mpg)
+```
+
+---
+
+### `sum()`
+
+Calculate the sum of all values.
+
+**Arguments:**
+
+- `...`: Numeric vectors
+- `na.rm`: Remove missing values? (default: `FALSE`)
+
+**Example:**
+```{r}
+sum(mtcars$mpg)
+```
+
+---
+
+### `var()`
+
+Calculate the variance.
+
+**Arguments:**
+
+- `x`: A numeric vector
+- `na.rm`: Remove missing values? (default: `FALSE`)
+
+**Example:**
+```{r}
+var(mtcars$mpg)
+```
+
+---
+
+### `cor()`
+
+Calculate the correlation between two variables.
+
+**Arguments:**
+
+- `x`, `y`: Numeric vectors
+- `use`: How to handle missing values (e.g., `"complete.obs"`)
+
+**Example:**
+```{r}
+cor(mtcars$mpg, mtcars$hp)
+```
+
+---
+
+
+## Data Manipulation Functions (dplyr)
+
+### `select()`
+
+Choose which columns to keep.
+
+**Arguments:**
+
+- `.data`: A data frame
+- `...`: Column names or selection helpers
+
+**Example:**
+```{r}
+mtcars |>
+  select(mpg, cyl, hp) |>
+  head(3)
+```
+
+---
+
+### `filter()`
+
+Keep rows that meet a condition.
+
+**Arguments:**
+
+- `.data`: A data frame
+- `...`: Logical conditions
+
+**Example:**
+```{r}
+mtcars |>
+  filter(mpg > 25) |>
+  head(3)
+```
+
+---
+
+### `mutate()`
+
+Create new variables or modify existing ones.
+
+**Arguments:**
+
+- `.data`: A data frame
+- `...`: Name-value pairs of expressions
+
+**Example:**
+```{r}
+mtcars |>
+  mutate(kpl = mpg * 0.425) |>  # Convert to km per liter
+  select(mpg, kpl) |>
+  head(3)
+```
+
+---
+
+### `group_by()`
+
+Group data by one or more variables (usually followed by `summarize()`).
+
+**Arguments:**
+
+- `.data`: A data frame
+- `...`: Variables to group by
+
+**Example:**
+```{r}
+mtcars |>
+  group_by(cyl) |>
+  summarize(avg_mpg = mean(mpg))
+```
+
+---
+
+### `summarize()` / `summarise()`
+
+Calculate summary statistics for each group.
+
+**Arguments:**
+
+- `.data`: A data frame (usually grouped)
+- `...`: Name-value pairs of summary functions
+
+**Example:**
+```{r}
+mtcars |>
+  group_by(cyl) |>
+  summarize(
+    avg_mpg = mean(mpg),
+    sd_mpg = sd(mpg),
+    n = n()
+  )
+```
+
+---
+
+### `count()`
+
+Count observations by group.
+
+**Arguments:**
+
+- `x`: A data frame
+- `...`: Variables to count by
+- `sort`: Sort by count? (default: `FALSE`)
+
+**Example:**
+```{r}
+mtcars |>
+  count(cyl)
+```
+
+---
+
+### `arrange()`
+
+Sort rows by one or more variables.
+
+**Arguments:**
+
+- `.data`: A data frame
+- `...`: Variables to sort by (use `desc()` for descending)
+
+**Example:**
+```{r}
+mtcars |>
+  arrange(desc(mpg)) |>
+  head(3)
+```
+
+---
+
+### `case_when()`
+
+Vectorized if-else for creating categorical variables.
+
+**Arguments:**
+
+- `...`: A sequence of two-sided formulas: `condition ~ value`
+
+**Example:**
+```{r}
+mtcars |>
+  mutate(
+    mpg_category = case_when(
+      mpg < 15 ~ "Low",
+      mpg < 25 ~ "Medium",
+      TRUE ~ "High"
+    )
+  ) |>
+  count(mpg_category)
+```
+
+---
+
+### `ifelse()`
+
+Simple conditional: if condition is TRUE, return one value; otherwise, another.
+
+**Arguments:**
+
+- `test`: A logical condition
+- `yes`: Value if TRUE
+- `no`: Value if FALSE
+
+**Example:**
+```{r}
+mtcars |>
+  mutate(efficient = ifelse(mpg > 20, 1, 0)) |>
+  count(efficient)
+```
+
+---
+
+### `n()`
+
+Count the number of observations in the current group (used inside `summarize()`).
+
+**Arguments:** None
+
+**Example:**
+```{r}
+mtcars |>
+  group_by(cyl) |>
+  summarize(count = n())
+```
+
+---
+
+
+## Regression Functions
+
+### `lm()`
+
+Fit a linear model using Ordinary Least Squares (OLS).
+
+**Arguments:**
+
+- `formula`: A formula like `y ~ x1 + x2`
+- `data`: A data frame
+
+**Example:**
+```{r}
+reg <- lm(mpg ~ hp + wt, data = mtcars)
+summary(reg)
+```
+
+---
+
+### `summary()` (for regression)
+
+Display detailed regression results including coefficients, standard errors, t-statistics, and p-values.
+
+**Arguments:**
+
+- `object`: A fitted model object
+
+**Example:**
+```{r}
+#| eval: false
+reg <- lm(mpg ~ hp, data = mtcars)
+summary(reg)
+```
+
+---
+
+### `coef()`
+
+Extract the estimated coefficients from a model.
+
+**Arguments:**
+
+- `object`: A fitted model object
+
+**Example:**
+```{r}
+reg <- lm(mpg ~ hp, data = mtcars)
+coef(reg)
+```
+
+---
+
+### `confint()`
+
+Calculate confidence intervals for model coefficients.
+
+**Arguments:**
+
+- `object`: A fitted model object
+- `level`: Confidence level (default: 0.95)
+
+**Example:**
+```{r}
+reg <- lm(mpg ~ hp, data = mtcars)
+confint(reg, level = 0.95)
+```
+
+---
+
+### `predict()`
+
+Generate predicted values from a fitted model.
+
+**Arguments:**
+
+- `object`: A fitted model object
+- `newdata`: Optional data frame with new predictor values
+
+**Example:**
+```{r}
+reg <- lm(mpg ~ hp, data = mtcars)
+# Predict for existing data
+head(predict(reg))
+
+# Predict for new data
+predict(reg, newdata = data.frame(hp = c(100, 150, 200)))
+```
+
+---
+
+### `residuals()`
+
+Extract residuals (prediction errors) from a fitted model.
+
+**Arguments:**
+
+- `object`: A fitted model object
+
+**Example:**
+```{r}
+reg <- lm(mpg ~ hp, data = mtcars)
+head(residuals(reg))
+```
+
+---
+
+### `feols()` (fixest package)
+
+Fit linear models with fixed effects and robust standard errors.
+
+**Arguments:**
+
+- `fml`: A formula (use `|` for fixed effects)
+- `data`: A data frame
+- `vcov`: Type of standard errors (e.g., `"HC1"` for robust)
+
+**Example:**
+```{r}
+#| eval: false
+library(fixest)
+reg <- feols(mpg ~ hp + wt, data = mtcars, vcov = "HC1")
+summary(reg)
+```
+
+---
+
+### `modelsummary()` (modelsummary package)
+
+Create publication-quality regression tables.
+
+**Arguments:**
+
+- `models`: A model or list of models
+- `stars`: Show significance stars?
+- `gof_map`: Which goodness-of-fit statistics to show
+
+**Example:**
+```{r}
+#| eval: false
+library(modelsummary)
+reg1 <- lm(mpg ~ hp, data = mtcars)
+reg2 <- lm(mpg ~ hp + wt, data = mtcars)
+modelsummary(list(reg1, reg2), stars = TRUE)
+```
+
+---
+
+
+## Visualization Functions (ggplot2)
+
+### `ggplot()`
+
+Initialize a ggplot object.
+
+**Arguments:**
+
+- `data`: A data frame
+- `mapping`: Aesthetic mappings created by `aes()`
+
+**Example:**
+```{r}
+#| fig-height: 3
+ggplot(mtcars, aes(x = hp, y = mpg)) +
+  geom_point()
+```
+
+---
+
+### `aes()`
+
+Define aesthetic mappings (which variables map to x, y, color, etc.).
+
+**Arguments:**
+
+- `x`, `y`: Variables for axes
+- `color`, `fill`: Variables for color
+- `size`, `shape`: Variables for size and shape
+
+**Example:**
+```{r}
+#| fig-height: 3
+ggplot(mtcars, aes(x = hp, y = mpg, color = factor(cyl))) +
+  geom_point()
+```
+
+---
+
+### `geom_point()`
+
+Add points to a plot (scatterplot).
+
+**Arguments:**
+
+- `size`: Point size
+- `color`: Point color
+- `alpha`: Transparency (0 to 1)
+
+**Example:**
+```{r}
+#| fig-height: 3
+ggplot(mtcars, aes(x = hp, y = mpg)) +
+  geom_point(size = 3, color = "steelblue", alpha = 0.7)
+```
+
+---
+
+### `geom_line()`
+
+Add lines connecting points.
+
+**Arguments:**
+
+- `linewidth`: Line thickness
+- `color`: Line color
+- `linetype`: Line type (e.g., "dashed")
+
+**Example:**
+```{r}
+#| fig-height: 3
+# Line plot (useful for time series)
+df <- data.frame(x = 1:10, y = cumsum(rnorm(10)))
+ggplot(df, aes(x = x, y = y)) +
+  geom_line(color = "steelblue", linewidth = 1)
+```
+
+---
+
+### `geom_histogram()`
+
+Create a histogram.
+
+**Arguments:**
+
+- `binwidth`: Width of each bin
+- `bins`: Number of bins
+- `fill`: Bar fill color
+- `color`: Bar outline color
+
+**Example:**
+```{r}
+#| fig-height: 3
+ggplot(mtcars, aes(x = mpg)) +
+  geom_histogram(binwidth = 3, fill = "steelblue", color = "white")
+```
+
+---
+
+### `geom_boxplot()`
+
+Create a boxplot.
+
+**Arguments:**
+
+- `fill`: Box fill color
+- `outlier.color`: Color of outlier points
+
+**Example:**
+```{r}
+#| fig-height: 3
+ggplot(mtcars, aes(x = factor(cyl), y = mpg)) +
+  geom_boxplot(fill = "lightblue")
+```
+
+---
+
+### `geom_bar()` and `geom_col()`
+
+Create bar charts. `geom_bar()` counts observations; `geom_col()` uses values directly.
+
+**Arguments:**
+
+- `fill`: Bar fill color
+- `stat`: For `geom_bar()`, use `"identity"` to plot values directly
+
+**Example:**
+```{r}
+#| fig-height: 3
+# geom_bar counts automatically
+ggplot(mtcars, aes(x = factor(cyl))) +
+  geom_bar(fill = "steelblue")
+```
+
+---
+
+### `geom_smooth()`
+
+Add a smoothed conditional mean (often a regression line).
+
+**Arguments:**
+
+- `method`: Smoothing method (e.g., `"lm"` for linear)
+- `se`: Show confidence interval? (default: `TRUE`)
+- `color`: Line color
+
+**Example:**
+```{r}
+#| fig-height: 3
+ggplot(mtcars, aes(x = hp, y = mpg)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE, color = "red")
+```
+
+---
+
+### `geom_hline()` and `geom_vline()`
+
+Add horizontal or vertical reference lines.
+
+**Arguments:**
+
+- `yintercept` / `xintercept`: Where to draw the line
+- `linetype`: Line type (e.g., `"dashed"`)
+- `color`: Line color
+
+**Example:**
+```{r}
+#| fig-height: 3
+ggplot(mtcars, aes(x = hp, y = mpg)) +
+  geom_point() +
+  geom_hline(yintercept = mean(mtcars$mpg), linetype = "dashed", color = "red")
+```
+
+---
+
+### `labs()`
+
+Add labels to the plot (title, axis labels, etc.).
+
+**Arguments:**
+
+- `title`: Plot title
+- `x`, `y`: Axis labels
+- `color`, `fill`: Legend titles
+
+**Example:**
+```{r}
+#| fig-height: 3
+ggplot(mtcars, aes(x = hp, y = mpg)) +
+  geom_point() +
+  labs(
+    title = "Fuel Efficiency vs. Horsepower",
+    x = "Horsepower",
+    y = "Miles per Gallon"
+  )
+```
+
+---
+
+### `facet_wrap()`
+
+Create small multiples (separate panels for each level of a variable).
+
+**Arguments:**
+
+- `facets`: A formula like `~ variable`
+- `nrow`, `ncol`: Number of rows or columns
+- `scales`: Should scales be fixed or free?
+
+**Example:**
+```{r}
+#| fig-height: 3
+ggplot(mtcars, aes(x = hp, y = mpg)) +
+  geom_point() +
+  facet_wrap(~ cyl, nrow = 1)
+```
+
+---
+
+### `theme_minimal()`
+
+Apply a clean, minimal theme to the plot.
+
+**Arguments:** None (or see `theme()` for customization)
+
+**Example:**
+```{r}
+#| fig-height: 3
+ggplot(mtcars, aes(x = hp, y = mpg)) +
+  geom_point() +
+  theme_minimal()
+```
+
+---
+
+
+## Utility Functions
+
+### `c()`
+
+Combine values into a vector.
+
+**Arguments:**
+
+- `...`: Values to combine
+
+**Example:**
+```{r}
+x <- c(1, 2, 3, 4, 5)
+x
+```
+
+---
+
+### `seq()`
+
+Generate a sequence of numbers.
+
+**Arguments:**
+
+- `from`: Starting value
+- `to`: Ending value
+- `by`: Increment
+- `length.out`: Desired length of sequence
+
+**Example:**
+```{r}
+seq(from = 0, to = 10, by = 2)
+seq(from = 0, to = 1, length.out = 5)
+```
+
+---
+
+### `rep()`
+
+Repeat values.
+
+**Arguments:**
+
+- `x`: Value(s) to repeat
+- `times`: Number of times to repeat
+
+**Example:**
+```{r}
+rep(c("A", "B"), times = 3)
+```
+
+---
+
+### `sample()`
+
+Take a random sample.
+
+**Arguments:**
+
+- `x`: Vector to sample from
+- `size`: Number of items to sample
+- `replace`: Sample with replacement?
+
+**Example:**
+```{r}
+set.seed(123)
+sample(1:10, size = 5, replace = FALSE)
+```
+
+---
+
+### `set.seed()`
+
+Set the random number seed for reproducibility.
+
+**Arguments:**
+
+- `seed`: An integer
+
+**Example:**
+```{r}
+set.seed(42)
+rnorm(3)  # Will always produce the same values
+```
+
+---
+
+### `rnorm()`
+
+Generate random numbers from a normal distribution.
+
+**Arguments:**
+
+- `n`: Number of values to generate
+- `mean`: Mean of the distribution (default: 0)
+- `sd`: Standard deviation (default: 1)
+
+**Example:**
+```{r}
+set.seed(123)
+rnorm(5, mean = 100, sd = 15)
+```
+
+---
+
+### `factor()`
+
+Create a factor (categorical variable).
+
+**Arguments:**
+
+- `x`: A vector
+- `levels`: The allowed levels (in order)
+- `labels`: Labels for the levels
+
+**Example:**
+```{r}
+education <- c("HS", "College", "HS", "Graduate")
+factor(education, levels = c("HS", "College", "Graduate"))
+```
+
+---
+
+### `as.factor()`, `as.numeric()`, `as.character()`
+
+Convert objects to a different type.
+
+**Arguments:**
+
+- `x`: Object to convert
+
+**Example:**
+```{r}
+x <- c("1", "2", "3")
+as.numeric(x)
+```
+
+---
+
+### `is.na()`
+
+Check for missing values.
+
+**Arguments:**
+
+- `x`: A vector or data frame
+
+**Example:**
+```{r}
+x <- c(1, 2, NA, 4)
+is.na(x)
+sum(is.na(x))  # Count missing values
+```
+
+---
+
+### `library()`
+
+Load an installed package.
+
+**Arguments:**
+
+- `package`: Name of the package (unquoted)
+
+**Example:**
+```{r}
+#| eval: false
+library(tidyverse)
+```
+
+---
+
+### `install.packages()`
+
+Install a package from CRAN (run once, not in scripts).
+
+**Arguments:**
+
+- `pkgs`: Package name (quoted)
+
+**Example:**
+```{r}
+#| eval: false
+install.packages("tidyverse")
+```
+
+---
+
+
+## The Pipe Operator: `|>`
+
+The pipe operator takes the output from the left side and passes it as the first argument to the function on the right.
+This allows you to chain operations together in a readable way.
+
+**Example without pipe:**
+```{r}
+#| eval: false
+# Nested functions are hard to read
+summary(select(filter(mtcars, mpg > 20), mpg, hp))
+```
+
+**Example with pipe:**
+```{r}
+# Piped version is much clearer
+mtcars |>
+  filter(mpg > 20) |>
+  select(mpg, hp) |>
+  summary()
+```
+
+::: {.callout-tip}
+## Keyboard Shortcut
+In RStudio, type **Cmd/Ctrl + Shift + M** to insert the pipe operator.
+:::
+
+---
+
+
+## Quick Reference Tables
+
+### Descriptive Statistics Functions
+
+| Function | Purpose | Key Argument |
+|----------|---------|--------------|
+| `mean()` | Average | `na.rm = TRUE` |
+| `sd()` | Standard deviation | `na.rm = TRUE` |
+| `median()` | Middle value | `na.rm = TRUE` |
+| `min()`, `max()` | Extremes | `na.rm = TRUE` |
+| `sum()` | Total | `na.rm = TRUE` |
+| `var()` | Variance | `na.rm = TRUE` |
+| `cor()` | Correlation | `use = "complete.obs"` |
+| `summary()` | Multiple stats | — |
+
+: Descriptive statistics functions {#tbl-desc-stats-ref}
+
+### Data Manipulation Functions (dplyr)
+
+| Function | Purpose | Example |
+|----------|---------|---------|
+| `select()` | Choose columns | `select(data, col1, col2)` |
+| `filter()` | Choose rows | `filter(data, x > 5)` |
+| `mutate()` | Create/modify variables | `mutate(data, new = x * 2)` |
+| `group_by()` | Group data | `group_by(data, category)` |
+| `summarize()` | Aggregate | `summarize(data, avg = mean(x))` |
+| `count()` | Count rows | `count(data, category)` |
+| `arrange()` | Sort rows | `arrange(data, desc(x))` |
+
+: Data manipulation functions {#tbl-dplyr-ref}
+
+### Regression Functions
+
+| Function | Purpose | Package |
+|----------|---------|---------|
+| `lm()` | OLS regression | base R |
+| `summary()` | Model results | base R |
+| `coef()` | Coefficients | base R |
+| `confint()` | Confidence intervals | base R |
+| `predict()` | Fitted values | base R |
+| `residuals()` | Residuals | base R |
+| `feols()` | Fixed effects + robust SE | fixest |
+| `modelsummary()` | Formatted tables | modelsummary |
+
+: Regression functions {#tbl-reg-ref}
+
+### ggplot2 Geometries
+
+| Function | Plot Type |
+|----------|-----------|
+| `geom_point()` | Scatterplot |
+| `geom_line()` | Line plot |
+| `geom_histogram()` | Histogram |
+| `geom_boxplot()` | Boxplot |
+| `geom_bar()` | Bar chart (counts) |
+| `geom_col()` | Bar chart (values) |
+| `geom_smooth()` | Smoothed line/regression |
+| `geom_hline()` | Horizontal line |
+| `geom_vline()` | Vertical line |
+
+: ggplot2 geometries {#tbl-ggplot-ref}

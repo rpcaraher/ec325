@@ -252,6 +252,48 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../chapters/unit6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Dummy Variables and Non-Linear Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/unit7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Interaction Effects</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/heteroskedasticity.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Heteroskedasticity</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/panel_fe.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Panel Data and Fixed Effects</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/did.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/advanced_did.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Advanced Difference-in-Differences</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/instrumental_variables.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Instrumental Variables</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../chapters/references.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">References</span></a>
   </div>
@@ -301,7 +343,7 @@ window.Quarto = {
   <li><a href="#getting-started-the-palmer-penguins" id="toc-getting-started-the-palmer-penguins" class="nav-link" data-scroll-target="#getting-started-the-palmer-penguins"><span class="header-section-number">2.3.2</span> Getting Started: The Palmer Penguins</a></li>
   <li><a href="#building-a-plot-step-by-step" id="toc-building-a-plot-step-by-step" class="nav-link" data-scroll-target="#building-a-plot-step-by-step"><span class="header-section-number">2.3.3</span> Building a Plot: Step by Step</a></li>
   <li><a href="#adding-more-information-color-and-shape" id="toc-adding-more-information-color-and-shape" class="nav-link" data-scroll-target="#adding-more-information-color-and-shape"><span class="header-section-number">2.3.4</span> Adding More Information: Color and Shape</a></li>
-  <li><a href="#adding-a-regression-line" id="toc-adding-a-regression-line" class="nav-link" data-scroll-target="#adding-a-regression-line"><span class="header-section-number">2.3.5</span> Adding a Regression Line</a></li>
+  <li><a href="#adding-a-line-of-best-fit" id="toc-adding-a-line-of-best-fit" class="nav-link" data-scroll-target="#adding-a-line-of-best-fit"><span class="header-section-number">2.3.5</span> Adding a Line-of-Best Fit</a></li>
   <li><a href="#proper-labeling" id="toc-proper-labeling" class="nav-link" data-scroll-target="#proper-labeling"><span class="header-section-number">2.3.6</span> Proper Labeling</a></li>
   <li><a href="#histograms-for-distributions" id="toc-histograms-for-distributions" class="nav-link" data-scroll-target="#histograms-for-distributions"><span class="header-section-number">2.3.7</span> Histograms for Distributions</a></li>
   <li><a href="#a-simple-example-with-our-wage-data" id="toc-a-simple-example-with-our-wage-data" class="nav-link" data-scroll-target="#a-simple-example-with-our-wage-data"><span class="header-section-number">2.3.8</span> A Simple Example with Our Wage Data</a></li>
@@ -955,7 +997,7 @@ Figure&nbsp;2.2: A basic scatterplot showing flipper length versus body mass.
 </section>
 <section id="adding-more-information-color-and-shape" class="level3" data-number="2.3.4">
 <h3 data-number="2.3.4" class="anchored" data-anchor-id="adding-more-information-color-and-shape"><span class="header-section-number">2.3.4</span> Adding More Information: Color and Shape</h3>
-<p>But wait—could this relationship be driven by different penguin species? Maybe larger species have both longer flippers and greater body mass. We can encode species information using color:</p>
+<p>But wait—could this relationship be driven by different penguin species? Maybe larger species have both longer flippers and greater body mass. We can <em>encode</em> species information using color:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> penguins) <span class="sc">+</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g, <span class="at">color =</span> species))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -972,11 +1014,16 @@ Figure&nbsp;2.3: Scatterplot with species indicated by color. The positive relat
 </div>
 </div>
 </div>
-<p>Now we can see that: - Gentoo penguins (blue) are generally larger - The positive relationship between flipper length and body mass exists <strong>within each species</strong> - This suggests the relationship isn’t just due to species differences</p>
+<p>Now we can see that:</p>
+<ul>
+<li>Gentoo penguins (blue) are generally larger</li>
+<li>The positive relationship between flipper length and body mass exists <strong>within each species</strong></li>
+<li>This suggests the relationship isn’t just due to species differences</li>
+</ul>
 </section>
-<section id="adding-a-regression-line" class="level3" data-number="2.3.5">
-<h3 data-number="2.3.5" class="anchored" data-anchor-id="adding-a-regression-line"><span class="header-section-number">2.3.5</span> Adding a Regression Line</h3>
-<p>Let’s add the regression line to visualize the overall trend. This requires a new <strong>layer</strong> (not a new aesthetic):</p>
+<section id="adding-a-line-of-best-fit" class="level3" data-number="2.3.5">
+<h3 data-number="2.3.5" class="anchored" data-anchor-id="adding-a-line-of-best-fit"><span class="header-section-number">2.3.5</span> Adding a Line-of-Best Fit</h3>
+<p>Let’s add a line-of-best fit (i.e., a regression line) to visualize the overall trend. This requires a new <strong>layer</strong> (not a new aesthetic):</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> penguins) <span class="sc">+</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g, <span class="at">color =</span> species)) <span class="sc">+</span></span>
@@ -1025,7 +1072,13 @@ Figure&nbsp;2.5: A properly labeled scatterplot with clear titles and axis label
 </div>
 </div>
 </div>
-<p>Notice how much clearer this is! The plot now includes: - A descriptive title - Proper axis labels with units - A data source in the subtitle - Readable legend labels</p>
+<p>Notice how much clearer this is! The plot now includes:</p>
+<ul>
+<li>A descriptive title</li>
+<li>Proper axis labels with units</li>
+<li>A data source in the subtitle</li>
+<li>Readable legend labels</li>
+</ul>
 </section>
 <section id="histograms-for-distributions" class="level3" data-number="2.3.7">
 <h3 data-number="2.3.7" class="anchored" data-anchor-id="histograms-for-distributions"><span class="header-section-number">2.3.7</span> Histograms for Distributions</h3>

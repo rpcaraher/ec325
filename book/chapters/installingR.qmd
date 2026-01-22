@@ -358,13 +358,141 @@ For example,
 :::
 
 
+## Data Types in R
+
+Every piece of data in R has a **type** that determines how it can be used.
+Understanding data types is essential because certain operations only work with certain types,
+and R will sometimes convert between types automatically in ways that can cause unexpected results.
+
+### Numeric Types
+
+R has two main numeric types:
+
+**Integer** (`int`): Whole numbers without decimal places. Created by adding `L` after a number:
+
+```{r}
+my_integer <- 5L
+typeof(my_integer)
+```
+
+**Double** (`dbl`): Numbers with decimal places (also called "floating point"). This is the default for most numbers:
+
+```{r}
+my_double <- 5.7
+typeof(my_double)
+```
+
+In practice, the distinction between integers and doubles rarely matters for econometric analysis---R handles conversions automatically. When you see `<int>` or `<dbl>` in your data, both are simply "numbers."
+
+### Character Strings
+
+**Character** (`chr`): Text data, always enclosed in quotes:
+
+```{r}
+my_name <- "Economics"
+typeof(my_name)
+```
+
+Character strings are used for labels, names, and categorical data that hasn't been converted to a factor.
+
+### Logical Values
+
+**Logical** (`lgl`): TRUE or FALSE values (can be abbreviated as `T` and `F`):
+
+```{r}
+is_enrolled <- TRUE
+typeof(is_enrolled)
+```
+
+Logical values are often created by comparisons:
+
+```{r}
+5 > 3
+10 == 10  # Note: == tests equality, = is for assignment
+```
+
+Logical values are essential for filtering data (e.g., "keep only observations where income > 50000").
+
+### Factors
+
+**Factor** (`fct`): Categorical variables with a fixed set of possible values (called "levels").
+Factors are crucial in regression because R treats them differently from numeric variables:
+
+```{r}
+# Create a factor for education level
+edu_level <- factor(c("High School", "College", "Graduate", "College", "High School"))
+edu_level
+```
+
+Notice how R shows the "Levels"---the complete set of possible categories.
+Factors are especially important for dummy variables in regression.
+
+::: {.callout-important}
+## Why Factors Matter
+When you include a factor in a regression, R automatically creates dummy variables for each level.
+If you include a character variable, R may treat it as text rather than a categorical variable,
+leading to errors or unexpected results.
+We will talk more about this in section @sec-dummy-nonlinear.
+:::
+
+### Checking and Converting Types
+
+You can check an object's type with `typeof()` or `class()`:
+
+```{r}
+class(edu_level)
+```
+
+Convert between types using `as.numeric()`, `as.character()`, `as.factor()`, etc.:
+
+```{r}
+# Convert character to factor
+major <- c("Economics", "Math", "Economics", "Physics")
+major_factor <- as.factor(major)
+major_factor
+
+# Convert numeric to character
+numbers <- c(1, 2, 3)
+as.character(numbers)
+```
+
+### The `glimpse()` Function
+
+The `glimpse()` function from the tidyverse shows you the type of every column in a data frame:
+
+```{r}
+#| message: false
+library(tidyverse)
+glimpse(mtcars)
+```
+
+Each variable is shown with its type abbreviation (`<dbl>` for double, `<int>` for integer, etc.).
+This is one of the first things you should run when loading a new dataset.
+
+### Common Type Abbreviations
+
+When working with data frames, you'll frequently see these abbreviations:
+
+| Abbreviation | Type | Description |
+|--------------|------|-------------|
+| `<dbl>` | Double | Numbers with decimals |
+| `<int>` | Integer | Whole numbers |
+| `<chr>` | Character | Text strings |
+| `<fct>` | Factor | Categorical variable |
+| `<lgl>` | Logical | TRUE/FALSE |
+| `<date>` | Date | Calendar dates |
+| `<dttm>` | Datetime | Date and time |
+
+: Common data type abbreviations in R {#tbl-type-abbrev}
+
+
 ### Data Frames
 
-Data frames are the primary way that structured, 
+Data frames are the primary way that structured,
 tabular data is stored in R.
 A data frame is essentially a table where each column is a vector and each row is an observation.
-R comes with several built-in data frames for practice, 
-including `mtcars`, 
+R comes with several built-in data frames for practice,
+including `mtcars`,
 which contains data on various car models.
 
 Use `head()` to view the first few rows of a data frame:
