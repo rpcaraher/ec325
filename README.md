@@ -2,6 +2,30 @@
 
 Course materials for EC 325 at Colby College.
 
+Keep in mind that only reference materials,
+data, and ungraded in-class assignments are here.
+Graded assignments,
+including concept checks and problem sets,
+will only be posted on Moodle.
+Don't forget you also have to submit your work to Moodle.
+
+## What is Git and GitHub?
+
+**Git** is a version control system—software that tracks changes to files over time. Think of it like "Track Changes" in Word, but much more powerful. Git lets you:
+
+- Keep a complete history of every change made to a project
+- Revert to previous versions if something breaks
+- See exactly what changed, when, and by whom
+
+**GitHub** is a website that hosts Git repositories (projects) online. It makes it easy to share code and collaborate. For this class, I use GitHub to distribute course materials to you—when I update slides or add new datasets, you can download those changes with a single click.
+
+You don't need to become a Git expert for this class. You only need to know how to:
+
+1. **Clone** — download the repository to your computer (you'll do this once)
+2. **Pull** — download updates when I announce them
+
+That's it! The instructions below will walk you through both.
+
 ## Getting Started
 
 ### Step 1: Create a GitHub Account
@@ -44,38 +68,45 @@ That's it! Your materials are now up to date.
 
 ```
 ec325/
-├── book/              # Raw book chapters (.qmd files)
+├── slides/            # The slides and code used to generate them
+├── book/              # Raw code for generating book chapters
 ├── data/              # Datasets for labs and problem sets
 ├── labs/              # In-class lab exercises
-├── problem-sets/      # Problem set instructions
 ├── student-work/      # YOUR work goes here (not tracked by Git!)
-└── docs/              # Rendered book (also viewable online)
+└── docs/              # Rendered book (also viewable online at link below)
 ```
+
+
+## Viewing the Lecture Notes Book
+
+**Online:** [https://www.raymondcaraher.com/ec325/](https://www.raymondcaraher.com/ec325/)
+
+**Locally:** Open `docs/index.html` in your web browser.
 
 ## Where to Save Your Work
 
 **Always save your scripts and work in the `student-work/` folder.**
 
 This folder is ignored by Git, so:
+
 - Your work won't be overwritten when you pull updates
 - You won't see annoying "untracked files" warnings
-
-## Viewing the Book
-
-**Online:** [Site goes here](https://yoursite.com/ec325-materials/)
-
-**Locally:** Open `docs/index.html` in your browser, or run `quarto preview` in the terminal.
+- You can create all sorts of sub-directories in here to keep your work through the semester organized (e.g., `problem-set-1`, `project-data`, etc.)
 
 ## Troubleshooting
 
 ### "I'm getting merge conflicts"
 
-This usually means you edited a course file directly. To fix:
+This usually means you edited the course files I make directly. To fix:
+
 1. Save any work you want to keep somewhere else
 2. In the Terminal tab, run: `git checkout .`
 3. Pull again
 
 To avoid this, always work in the `student-work/` folder.
+You are more than welcome to mess around with the files I use to generate course content,
+but I recommend you do so by copy-pasting the content from this directory to some other
+directory not associated with Git.
 
 ### "Pull isn't working"
 
@@ -83,8 +114,15 @@ Make sure you're connected to the internet and try again. If you see an error me
 
 ### "I accidentally deleted something"
 
-No problem—just pull again and the original files will be restored.
+First, try to restore it from your Trash folder.
+If you can't find it, as long its one of the files I made, then it's no problem—just pull again and the original files will be restored.
+But if it is one of the files you made in the `student-work/` folder,
+then it may be gone for good.
+Email me and we can try to track it down.
+In any case,
+it is good practice to back-up the repository every once a while to some other location on your computer.
+
 
 ## Questions?
 
-If you run into issues, come to office hours or post in the course Slack/discussion board.
+If you run into issues, come to office hours or send me an email at [rcaraher@colby.edu](mailto:rcaraher@colby.edu)
