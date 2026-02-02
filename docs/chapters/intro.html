@@ -553,150 +553,108 @@ Table&nbsp;1.1: Relationship between training and wages for 10 workers
 <div class="cell-output-display">
 <!-- preamble start -->
 
-    <script>
+    <script src="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.js"></script>
 
-      function styleCell_ncnx0um5p1qg67qyj0kr(i, j, css_id) {
-          var table = document.getElementById("tinytable_ncnx0um5p1qg67qyj0kr");
-          var cell = table.rows[i]?.cells[j];  // Safe navigation to avoid errors
-          if (cell) {
-              console.log(`Styling cell at (${i}, ${j}) with class ${css_id}`);
-              cell.classList.add(css_id);
-          } else {
-              console.warn(`Cell at (${i}, ${j}) not found.`);
-          }
-      }
-      function insertSpanRow(i, colspan, content) {
-        var table = document.getElementById('tinytable_ncnx0um5p1qg67qyj0kr');
-        var newRow = table.insertRow(i);
-        var newCell = newRow.insertCell(0);
-        newCell.setAttribute("colspan", colspan);
-        // newCell.innerText = content;
-        // this may be unsafe, but innerText does not interpret <br>
-        newCell.innerHTML = content;
-      }
-      function spanCell_ncnx0um5p1qg67qyj0kr(i, j, rowspan, colspan) {
-        var table = document.getElementById("tinytable_ncnx0um5p1qg67qyj0kr");
-        const targetRow = table.rows[i];
-        const targetCell = targetRow.cells[j];
-        for (let r = 0; r < rowspan; r++) {
-          // Only start deleting cells to the right for the first row (r == 0)
-          if (r === 0) {
-            // Delete cells to the right of the target cell in the first row
-            for (let c = colspan - 1; c > 0; c--) {
-              if (table.rows[i + r].cells[j + c]) {
-                table.rows[i + r].deleteCell(j + c);
-              }
-            }
-          }
-          // For rows below the first, delete starting from the target column
-          if (r > 0) {
-            for (let c = colspan - 1; c >= 0; c--) {
-              if (table.rows[i + r] && table.rows[i + r].cells[j]) {
-                table.rows[i + r].deleteCell(j);
-              }
-            }
-          }
-        }
-        // Set rowspan and colspan of the target cell
-        targetCell.rowSpan = rowspan;
-        targetCell.colSpan = colspan;
-      }
+    <script>
+      // Create table-specific functions using external factory
+      const tableFns_vxh2mpg767md7evkkh5k = TinyTable.createTableFunctions("tinytable_vxh2mpg767md7evkkh5k");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: 2, j: 0 }, { i: 4, j: 0 }, { i: 1, j: 0 }, { i: 6, j: 0 }, { i: 8, j: 0 }, { i: 5, j: 0 }, { i: 1, j: 2 }, { i: 3, j: 0 }, { i: 1, j: 1 }, { i: 2, j: 1 }, { i: 3, j: 1 }, { i: 4, j: 1 }, { i: 5, j: 1 }, { i: 6, j: 1 }, { i: 7, j: 1 }, { i: 8, j: 1 }, { i: 7, j: 0 }, { i: 1, j: 3 }, { i: 9, j: 0 }, { i: 3, j: 3 }, { i: 2, j: 2 }, { i: 3, j: 2 }, { i: 4, j: 2 }, { i: 5, j: 2 }, { i: 6, j: 2 }, { i: 7, j: 2 }, { i: 8, j: 2 }, { i: 9, j: 2 }, { i: 7, j: 3 }, { i: 9, j: 1 }, { i: 5, j: 3 }, { i: 2, j: 3 }, { i: 4, j: 3 }, { i: 9, j: 3 }, { i: 6, j: 3 }, { i: 8, j: 3 },  ], css_id: 'tinytable_css_e3srppu7afv10k7nqtfd',}, 
-          { positions: [ { i: 10, j: 2 }, { i: 10, j: 0 }, { i: 10, j: 1 }, { i: 10, j: 3 },  ], css_id: 'tinytable_css_60w9m69r8eamj22nbj9e',}, 
-          { positions: [ { i: 0, j: 0 }, { i: 0, j: 2 }, { i: 0, j: 3 }, { i: 0, j: 1 },  ], css_id: 'tinytable_css_515pa6jmppjpuxn6phn0',}, 
+          { positions: [ { i: '10', j: 1 }, { i: '10', j: 2 }, { i: '10', j: 3 }, { i: '10', j: 4 } ], css_id: 'tinytable_css_aej1iwu2g6rqyo3dsqer',}, 
+          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '4', j: 1 }, { i: '5', j: 1 }, { i: '6', j: 1 }, { i: '7', j: 1 }, { i: '8', j: 1 }, { i: '9', j: 1 }, { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '4', j: 2 }, { i: '5', j: 2 }, { i: '6', j: 2 }, { i: '7', j: 2 }, { i: '8', j: 2 }, { i: '9', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '3', j: 3 }, { i: '4', j: 3 }, { i: '5', j: 3 }, { i: '6', j: 3 }, { i: '7', j: 3 }, { i: '8', j: 3 }, { i: '9', j: 3 }, { i: '1', j: 4 }, { i: '2', j: 4 }, { i: '3', j: 4 }, { i: '4', j: 4 }, { i: '5', j: 4 }, { i: '6', j: 4 }, { i: '7', j: 4 }, { i: '8', j: 4 }, { i: '9', j: 4 } ], css_id: 'tinytable_css_hcqds8vh1ljm3qawwjun',}, 
+          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 } ], css_id: 'tinytable_css_hbwuwbiehfkykc6g20i0',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  styleCell_ncnx0um5p1qg67qyj0kr(cell.i, cell.j, group.css_id);
+                  tableFns_vxh2mpg767md7evkkh5k.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
     </script>
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
-      /* tinytable css entries after */
-      .table td.tinytable_css_e3srppu7afv10k7nqtfd, .table th.tinytable_css_e3srppu7afv10k7nqtfd { text-align: left; }
-      .table td.tinytable_css_60w9m69r8eamj22nbj9e, .table th.tinytable_css_60w9m69r8eamj22nbj9e { text-align: left; border-bottom: solid #d3d8dc 0.1em; }
-      .table td.tinytable_css_515pa6jmppjpuxn6phn0, .table th.tinytable_css_515pa6jmppjpuxn6phn0 { text-align: left; border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
+    /* tinytable css entries after */
+    #tinytable_vxh2mpg767md7evkkh5k td.tinytable_css_aej1iwu2g6rqyo3dsqer, #tinytable_vxh2mpg767md7evkkh5k th.tinytable_css_aej1iwu2g6rqyo3dsqer {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_vxh2mpg767md7evkkh5k td.tinytable_css_hcqds8vh1ljm3qawwjun, #tinytable_vxh2mpg767md7evkkh5k th.tinytable_css_hcqds8vh1ljm3qawwjun { text-align: left }
+    #tinytable_vxh2mpg767md7evkkh5k td.tinytable_css_hbwuwbiehfkykc6g20i0, #tinytable_vxh2mpg767md7evkkh5k th.tinytable_css_hbwuwbiehfkykc6g20i0 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
     </style>
     <div class="container">
-      <table class="table table-borderless" id="tinytable_ncnx0um5p1qg67qyj0kr" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
-        <thead>
+      <table class="tinytable" id="tinytable_vxh2mpg767md7evkkh5k" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         
+        <thead>
               <tr>
-                <th scope="col">person_name</th>
-                <th scope="col">person_id</th>
-                <th scope="col">wage</th>
-                <th scope="col">yrs_training</th>
+                <th scope="col" data-row="0" data-col="1">person_name</th>
+                <th scope="col" data-row="0" data-col="2">person_id</th>
+                <th scope="col" data-row="0" data-col="3">wage</th>
+                <th scope="col" data-row="0" data-col="4">yrs_training</th>
               </tr>
         </thead>
         
         <tbody>
                 <tr>
-                  <td>Paul</td>
-                  <td>1</td>
-                  <td>18.50</td>
-                  <td>1.00</td>
+                  <td data-row="1" data-col="1">Paul</td>
+                  <td data-row="1" data-col="2">1</td>
+                  <td data-row="1" data-col="3">18.50</td>
+                  <td data-row="1" data-col="4">1.00</td>
                 </tr>
                 <tr>
-                  <td>Ringo</td>
-                  <td>2</td>
-                  <td>22.00</td>
-                  <td>3.00</td>
+                  <td data-row="2" data-col="1">Ringo</td>
+                  <td data-row="2" data-col="2">2</td>
+                  <td data-row="2" data-col="3">22.00</td>
+                  <td data-row="2" data-col="4">3.00</td>
                 </tr>
                 <tr>
-                  <td>George</td>
-                  <td>3</td>
-                  <td>17.65</td>
-                  <td>2.50</td>
+                  <td data-row="3" data-col="1">George</td>
+                  <td data-row="3" data-col="2">3</td>
+                  <td data-row="3" data-col="3">17.65</td>
+                  <td data-row="3" data-col="4">2.50</td>
                 </tr>
                 <tr>
-                  <td>John</td>
-                  <td>4</td>
-                  <td>27.95</td>
-                  <td>8.20</td>
+                  <td data-row="4" data-col="1">John</td>
+                  <td data-row="4" data-col="2">4</td>
+                  <td data-row="4" data-col="3">27.95</td>
+                  <td data-row="4" data-col="4">8.20</td>
                 </tr>
                 <tr>
-                  <td>Linda</td>
-                  <td>5</td>
-                  <td>19.20</td>
-                  <td>0.50</td>
+                  <td data-row="5" data-col="1">Linda</td>
+                  <td data-row="5" data-col="2">5</td>
+                  <td data-row="5" data-col="3">19.20</td>
+                  <td data-row="5" data-col="4">0.50</td>
                 </tr>
                 <tr>
-                  <td>Yoko</td>
-                  <td>6</td>
-                  <td>24.80</td>
-                  <td>6.80</td>
+                  <td data-row="6" data-col="1">Yoko</td>
+                  <td data-row="6" data-col="2">6</td>
+                  <td data-row="6" data-col="3">24.80</td>
+                  <td data-row="6" data-col="4">6.80</td>
                 </tr>
                 <tr>
-                  <td>Pattie</td>
-                  <td>7</td>
-                  <td>20.50</td>
-                  <td>5.50</td>
+                  <td data-row="7" data-col="1">Pattie</td>
+                  <td data-row="7" data-col="2">7</td>
+                  <td data-row="7" data-col="3">20.50</td>
+                  <td data-row="7" data-col="4">5.50</td>
                 </tr>
                 <tr>
-                  <td>Maureen</td>
-                  <td>8</td>
-                  <td>23.75</td>
-                  <td>4.20</td>
+                  <td data-row="8" data-col="1">Maureen</td>
+                  <td data-row="8" data-col="2">8</td>
+                  <td data-row="8" data-col="3">23.75</td>
+                  <td data-row="8" data-col="4">4.20</td>
                 </tr>
                 <tr>
-                  <td>Cynthia</td>
-                  <td>9</td>
-                  <td>16.40</td>
-                  <td>0.80</td>
+                  <td data-row="9" data-col="1">Cynthia</td>
+                  <td data-row="9" data-col="2">9</td>
+                  <td data-row="9" data-col="3">16.40</td>
+                  <td data-row="9" data-col="4">0.80</td>
                 </tr>
                 <tr>
-                  <td>Barbara</td>
-                  <td>10</td>
-                  <td>28.50</td>
-                  <td>9.10</td>
+                  <td data-row="10" data-col="1">Barbara</td>
+                  <td data-row="10" data-col="2">10</td>
+                  <td data-row="10" data-col="3">28.50</td>
+                  <td data-row="10" data-col="4">9.10</td>
                 </tr>
         </tbody>
       </table>

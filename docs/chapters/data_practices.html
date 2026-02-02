@@ -123,35 +123,6 @@ div.csl-indent {
   }
 }</script>
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 </head>
 
@@ -514,16 +485,16 @@ function checkAnswer(selectElement, correctValue) {
 <h2 data-number="2.1" class="anchored" data-anchor-id="when-good-economists-use-bad-data"><span class="header-section-number">2.1</span> When Good Economists Use Bad Data</h2>
 <p>In 2010, economists Carmen Reinhart and Kenneth Rogoff published influential research on government debt and economic growth. Their analysis covered many annual observations from countries around the world, and their key finding was striking: when a country’s government debt exceeded 90% of GDP, economic growth dropped dramatically.</p>
 <p>The policy implications seemed clear. Governments should be cautious about using deficit spending to fight unemployment. This finding influenced policy debates across the world during a period when many countries were considering how aggressively to respond to the Great Recession. There was one problem with this analysis, however: the data didn’t quite say what Reinhart and Rogoff thought it did.</p>
-<p>In 2014, a graduate student named Thomas Herndon was trying to replicate their results for a homework assignment. He couldn’t get the numbers to match. After obtaining the original Excel spreadsheet from Reinhart and Rogoff, Herndon and his advisors discovered three issues: some observations had been mistakenly excluded from key calculations, observations were weighed strangely, and—most embarrassingly—some cells in the Excel spreadsheet had simply not been included in the formula calculating the average.</p>
+<p>In 2014, a graduate student named Thomas Herndon was trying to replicate their results for a homework assignment. He couldn’t get the numbers to match. After obtaining the original Excel spreadsheet from Reinhart and Rogoff, Herndon and his advisors discovered three issues: some observations had been mistakenly excluded from key calculations, observations were weighed strangely, and some cells in the Excel spreadsheet had simply not been included in the formula calculating the average.</p>
 <p>When the data were corrected, the dramatic “cliff” in economic growth disappeared. While growth did decline somewhat as debt increased, the relationship was much more gradual than originally reported. There was no “cliff” that was so central to the original analysis. The corrected analysis told a very different policy story.</p>
-<p>Reinhart and Rogoff’s experience teaches us that data management and descriptive statistics is not just tedious housekeeping—it’s fundamental to credible research. No amount of sophisticated econometric technique can compensate for errors and misunderstandings in the underlying data. This chapter introduces practices that help us avoid such problems.</p>
+<p>This experience teaches us that good data practices are one of the most fundamental tenants of credible research. No amount of sophisticated econometric technique can compensate for errors and misunderstandings in the underlying data. This chapter introduces practices that help us avoid such problems, and will be useful throughout your career as an econometrician.</p>
 </section>
 <section id="know-your-data" class="level2" data-number="2.2">
 <h2 data-number="2.2" class="anchored" data-anchor-id="know-your-data"><span class="header-section-number">2.2</span> Know Your Data</h2>
 <p>The first rule of data analysis is simple: <strong>know your data</strong>. This means examining it carefully before conducting any formal analysis. We want to understand what we’re working with, detect potential errors, and develop intuition about the relationships we might find.</p>
 <section id="descriptive-statistics" class="level3" data-number="2.2.1">
 <h3 data-number="2.2.1" class="anchored" data-anchor-id="descriptive-statistics"><span class="header-section-number">2.2.1</span> Descriptive Statistics</h3>
-<p>For every variable in our dataset, we should know several key statistics: the number of observations, the mean, the standard deviation, and the minimum and maximum values. These statistics give us a feel for the data and help us spot problems.</p>
+<p>For every variable in our dataset, we should know several key statistics: the number of observations, the mean, the standard deviation, and the minimum and maximum values (refer to <a href="statsreview.html" class="quarto-xref"><span>Appendix B</span></a> for a review of what exactly these calculations mean). These statistics give us a feel for the data and help us spot problems.</p>
 <p>Let’s look at a simple example. Suppose we’re studying the relationship between education and wages. Here’s simulated data for 100 individuals:</p>
 <div class="cell">
 <details class="code-fold">
@@ -560,124 +531,82 @@ function checkAnswer(selectElement, correctValue) {
 <div class="cell-output-display">
 <!-- preamble start -->
 
-    <script>
+    <script src="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.js"></script>
 
-      function styleCell_7um9aqmwle397uryj7v2(i, j, css_id) {
-          var table = document.getElementById("tinytable_7um9aqmwle397uryj7v2");
-          var cell = table.rows[i]?.cells[j];  // Safe navigation to avoid errors
-          if (cell) {
-              console.log(`Styling cell at (${i}, ${j}) with class ${css_id}`);
-              cell.classList.add(css_id);
-          } else {
-              console.warn(`Cell at (${i}, ${j}) not found.`);
-          }
-      }
-      function insertSpanRow(i, colspan, content) {
-        var table = document.getElementById('tinytable_7um9aqmwle397uryj7v2');
-        var newRow = table.insertRow(i);
-        var newCell = newRow.insertCell(0);
-        newCell.setAttribute("colspan", colspan);
-        // newCell.innerText = content;
-        // this may be unsafe, but innerText does not interpret <br>
-        newCell.innerHTML = content;
-      }
-      function spanCell_7um9aqmwle397uryj7v2(i, j, rowspan, colspan) {
-        var table = document.getElementById("tinytable_7um9aqmwle397uryj7v2");
-        const targetRow = table.rows[i];
-        const targetCell = targetRow.cells[j];
-        for (let r = 0; r < rowspan; r++) {
-          // Only start deleting cells to the right for the first row (r == 0)
-          if (r === 0) {
-            // Delete cells to the right of the target cell in the first row
-            for (let c = colspan - 1; c > 0; c--) {
-              if (table.rows[i + r].cells[j + c]) {
-                table.rows[i + r].deleteCell(j + c);
-              }
-            }
-          }
-          // For rows below the first, delete starting from the target column
-          if (r > 0) {
-            for (let c = colspan - 1; c >= 0; c--) {
-              if (table.rows[i + r] && table.rows[i + r].cells[j]) {
-                table.rows[i + r].deleteCell(j);
-              }
-            }
-          }
-        }
-        // Set rowspan and colspan of the target cell
-        targetCell.rowSpan = rowspan;
-        targetCell.colSpan = colspan;
-      }
+    <script>
+      // Create table-specific functions using external factory
+      const tableFns_styxkpw5mhkwad1yrff7 = TinyTable.createTableFunctions("tinytable_styxkpw5mhkwad1yrff7");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: 3, j: 0 }, { i: 3, j: 1 }, { i: 3, j: 2 }, { i: 3, j: 3 }, { i: 3, j: 4 }, { i: 3, j: 5 }, { i: 3, j: 6 }, { i: 3, j: 7 },  ], css_id: 'tinytable_css_wkx4b2h07tjxkihnsxl3',}, 
-          { positions: [ { i: 0, j: 0 }, { i: 0, j: 1 }, { i: 0, j: 2 }, { i: 0, j: 3 }, { i: 0, j: 4 }, { i: 0, j: 5 }, { i: 0, j: 6 }, { i: 0, j: 7 },  ], css_id: 'tinytable_css_achk4ujh27i9ebyvx0c6',}, 
-          { positions: [ { i: 1, j: 0 }, { i: 2, j: 0 }, { i: 1, j: 1 }, { i: 2, j: 1 }, { i: 1, j: 2 }, { i: 2, j: 2 }, { i: 1, j: 3 }, { i: 2, j: 3 }, { i: 1, j: 4 }, { i: 2, j: 4 }, { i: 1, j: 5 }, { i: 2, j: 5 }, { i: 1, j: 6 }, { i: 2, j: 6 }, { i: 1, j: 7 }, { i: 2, j: 7 },  ], css_id: 'tinytable_css_aacxedprhgxbtyjpo7jr',}, 
+          { positions: [ { i: '3', j: 1 }, { i: '3', j: 2 }, { i: '3', j: 3 }, { i: '3', j: 4 }, { i: '3', j: 5 }, { i: '3', j: 6 }, { i: '3', j: 7 }, { i: '3', j: 8 } ], css_id: 'tinytable_css_aacxedprhgxbtyjpo7jr',}, 
+          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '1', j: 4 }, { i: '2', j: 4 }, { i: '1', j: 5 }, { i: '2', j: 5 }, { i: '1', j: 6 }, { i: '2', j: 6 }, { i: '1', j: 7 }, { i: '2', j: 7 }, { i: '1', j: 8 }, { i: '2', j: 8 } ], css_id: 'tinytable_css_achk4ujh27i9ebyvx0c6',}, 
+          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 }, { i: '0', j: 6 }, { i: '0', j: 7 }, { i: '0', j: 8 } ], css_id: 'tinytable_css_7um9aqmwle397uryj7v2',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  styleCell_7um9aqmwle397uryj7v2(cell.i, cell.j, group.css_id);
+                  tableFns_styxkpw5mhkwad1yrff7.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
     </script>
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
-      /* tinytable css entries after */
-      .table td.tinytable_css_wkx4b2h07tjxkihnsxl3, .table th.tinytable_css_wkx4b2h07tjxkihnsxl3 { text-align: left; border-bottom: solid #d3d8dc 0.1em; }
-      .table td.tinytable_css_achk4ujh27i9ebyvx0c6, .table th.tinytable_css_achk4ujh27i9ebyvx0c6 { text-align: left; border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
-      .table td.tinytable_css_aacxedprhgxbtyjpo7jr, .table th.tinytable_css_aacxedprhgxbtyjpo7jr { text-align: left; }
+    /* tinytable css entries after */
+    #tinytable_styxkpw5mhkwad1yrff7 td.tinytable_css_aacxedprhgxbtyjpo7jr, #tinytable_styxkpw5mhkwad1yrff7 th.tinytable_css_aacxedprhgxbtyjpo7jr {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_styxkpw5mhkwad1yrff7 td.tinytable_css_achk4ujh27i9ebyvx0c6, #tinytable_styxkpw5mhkwad1yrff7 th.tinytable_css_achk4ujh27i9ebyvx0c6 { text-align: left }
+    #tinytable_styxkpw5mhkwad1yrff7 td.tinytable_css_7um9aqmwle397uryj7v2, #tinytable_styxkpw5mhkwad1yrff7 th.tinytable_css_7um9aqmwle397uryj7v2 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
     </style>
     <div class="container">
-      <table class="table table-borderless" id="tinytable_7um9aqmwle397uryj7v2" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
-        <thead>
+      <table class="tinytable" id="tinytable_styxkpw5mhkwad1yrff7" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         
+        <thead>
               <tr>
-                <th scope="col"> </th>
-                <th scope="col">Unique</th>
-                <th scope="col">Missing Pct.</th>
-                <th scope="col">Mean</th>
-                <th scope="col">SD</th>
-                <th scope="col">Min</th>
-                <th scope="col">Median</th>
-                <th scope="col">Max</th>
+                <th scope="col" data-row="0" data-col="1"> </th>
+                <th scope="col" data-row="0" data-col="2">Unique</th>
+                <th scope="col" data-row="0" data-col="3">Missing Pct.</th>
+                <th scope="col" data-row="0" data-col="4">Mean</th>
+                <th scope="col" data-row="0" data-col="5">SD</th>
+                <th scope="col" data-row="0" data-col="6">Min</th>
+                <th scope="col" data-row="0" data-col="7">Median</th>
+                <th scope="col" data-row="0" data-col="8">Max</th>
               </tr>
         </thead>
         
         <tbody>
                 <tr>
-                  <td>education</td>
-                  <td>12</td>
-                  <td>0</td>
-                  <td>14.1</td>
-                  <td>2.6</td>
-                  <td>8.0</td>
-                  <td>14.0</td>
-                  <td>20.0</td>
+                  <td data-row="1" data-col="1">education</td>
+                  <td data-row="1" data-col="2">12</td>
+                  <td data-row="1" data-col="3">0</td>
+                  <td data-row="1" data-col="4">14.1</td>
+                  <td data-row="1" data-col="5">2.6</td>
+                  <td data-row="1" data-col="6">8.0</td>
+                  <td data-row="1" data-col="7">14.0</td>
+                  <td data-row="1" data-col="8">20.0</td>
                 </tr>
                 <tr>
-                  <td>wage</td>
-                  <td>100</td>
-                  <td>0</td>
-                  <td>44.9</td>
-                  <td>7.9</td>
-                  <td>23.2</td>
-                  <td>45.6</td>
-                  <td>60.8</td>
+                  <td data-row="2" data-col="1">wage</td>
+                  <td data-row="2" data-col="2">100</td>
+                  <td data-row="2" data-col="3">0</td>
+                  <td data-row="2" data-col="4">44.9</td>
+                  <td data-row="2" data-col="5">7.9</td>
+                  <td data-row="2" data-col="6">23.2</td>
+                  <td data-row="2" data-col="7">45.6</td>
+                  <td data-row="2" data-col="8">60.8</td>
                 </tr>
                 <tr>
-                  <td>age</td>
-                  <td>33</td>
-                  <td>0</td>
-                  <td>35.3</td>
-                  <td>9.4</td>
-                  <td>22.0</td>
-                  <td>35.0</td>
-                  <td>60.0</td>
+                  <td data-row="3" data-col="1">age</td>
+                  <td data-row="3" data-col="2">33</td>
+                  <td data-row="3" data-col="3">0</td>
+                  <td data-row="3" data-col="4">35.3</td>
+                  <td data-row="3" data-col="5">9.4</td>
+                  <td data-row="3" data-col="6">22.0</td>
+                  <td data-row="3" data-col="7">35.0</td>
+                  <td data-row="3" data-col="8">60.0</td>
                 </tr>
         </tbody>
       </table>
@@ -691,124 +620,82 @@ function checkAnswer(selectElement, correctValue) {
 <div class="cell-output-display">
 <!-- preamble start -->
 
-    <script>
+    <script src="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.js"></script>
 
-      function styleCell_htlpjut7oy0t3rw5jd8r(i, j, css_id) {
-          var table = document.getElementById("tinytable_htlpjut7oy0t3rw5jd8r");
-          var cell = table.rows[i]?.cells[j];  // Safe navigation to avoid errors
-          if (cell) {
-              console.log(`Styling cell at (${i}, ${j}) with class ${css_id}`);
-              cell.classList.add(css_id);
-          } else {
-              console.warn(`Cell at (${i}, ${j}) not found.`);
-          }
-      }
-      function insertSpanRow(i, colspan, content) {
-        var table = document.getElementById('tinytable_htlpjut7oy0t3rw5jd8r');
-        var newRow = table.insertRow(i);
-        var newCell = newRow.insertCell(0);
-        newCell.setAttribute("colspan", colspan);
-        // newCell.innerText = content;
-        // this may be unsafe, but innerText does not interpret <br>
-        newCell.innerHTML = content;
-      }
-      function spanCell_htlpjut7oy0t3rw5jd8r(i, j, rowspan, colspan) {
-        var table = document.getElementById("tinytable_htlpjut7oy0t3rw5jd8r");
-        const targetRow = table.rows[i];
-        const targetCell = targetRow.cells[j];
-        for (let r = 0; r < rowspan; r++) {
-          // Only start deleting cells to the right for the first row (r == 0)
-          if (r === 0) {
-            // Delete cells to the right of the target cell in the first row
-            for (let c = colspan - 1; c > 0; c--) {
-              if (table.rows[i + r].cells[j + c]) {
-                table.rows[i + r].deleteCell(j + c);
-              }
-            }
-          }
-          // For rows below the first, delete starting from the target column
-          if (r > 0) {
-            for (let c = colspan - 1; c >= 0; c--) {
-              if (table.rows[i + r] && table.rows[i + r].cells[j]) {
-                table.rows[i + r].deleteCell(j);
-              }
-            }
-          }
-        }
-        // Set rowspan and colspan of the target cell
-        targetCell.rowSpan = rowspan;
-        targetCell.colSpan = colspan;
-      }
+    <script>
+      // Create table-specific functions using external factory
+      const tableFns_mgj8ikgx630rgzxqspky = TinyTable.createTableFunctions("tinytable_mgj8ikgx630rgzxqspky");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: 1, j: 0 }, { i: 2, j: 0 }, { i: 1, j: 1 }, { i: 2, j: 1 }, { i: 1, j: 2 }, { i: 2, j: 2 }, { i: 1, j: 3 }, { i: 2, j: 3 }, { i: 1, j: 4 }, { i: 2, j: 4 }, { i: 1, j: 5 }, { i: 2, j: 5 }, { i: 1, j: 6 }, { i: 2, j: 6 }, { i: 1, j: 7 }, { i: 2, j: 7 },  ], css_id: 'tinytable_css_y64n4ky28qsqgxjpbnnt',}, 
-          { positions: [ { i: 0, j: 0 }, { i: 0, j: 1 }, { i: 0, j: 2 }, { i: 0, j: 3 }, { i: 0, j: 4 }, { i: 0, j: 5 }, { i: 0, j: 6 }, { i: 0, j: 7 },  ], css_id: 'tinytable_css_un5la8hiwawx0th3e6d9',}, 
-          { positions: [ { i: 3, j: 0 }, { i: 3, j: 1 }, { i: 3, j: 2 }, { i: 3, j: 3 }, { i: 3, j: 4 }, { i: 3, j: 5 }, { i: 3, j: 6 }, { i: 3, j: 7 },  ], css_id: 'tinytable_css_lt9w6on1z7dggfvo2d88',}, 
+          { positions: [ { i: '3', j: 1 }, { i: '3', j: 2 }, { i: '3', j: 3 }, { i: '3', j: 4 }, { i: '3', j: 5 }, { i: '3', j: 6 }, { i: '3', j: 7 }, { i: '3', j: 8 } ], css_id: 'tinytable_css_un5la8hiwawx0th3e6d9',}, 
+          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '1', j: 4 }, { i: '2', j: 4 }, { i: '1', j: 5 }, { i: '2', j: 5 }, { i: '1', j: 6 }, { i: '2', j: 6 }, { i: '1', j: 7 }, { i: '2', j: 7 }, { i: '1', j: 8 }, { i: '2', j: 8 } ], css_id: 'tinytable_css_htlpjut7oy0t3rw5jd8r',}, 
+          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 }, { i: '0', j: 6 }, { i: '0', j: 7 }, { i: '0', j: 8 } ], css_id: 'tinytable_css_cxzr9vqw0dvrvtxynxnr',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  styleCell_htlpjut7oy0t3rw5jd8r(cell.i, cell.j, group.css_id);
+                  tableFns_mgj8ikgx630rgzxqspky.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
     </script>
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
-      /* tinytable css entries after */
-      .table td.tinytable_css_y64n4ky28qsqgxjpbnnt, .table th.tinytable_css_y64n4ky28qsqgxjpbnnt { text-align: left; }
-      .table td.tinytable_css_un5la8hiwawx0th3e6d9, .table th.tinytable_css_un5la8hiwawx0th3e6d9 { text-align: left; border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
-      .table td.tinytable_css_lt9w6on1z7dggfvo2d88, .table th.tinytable_css_lt9w6on1z7dggfvo2d88 { text-align: left; border-bottom: solid #d3d8dc 0.1em; }
+    /* tinytable css entries after */
+    #tinytable_mgj8ikgx630rgzxqspky td.tinytable_css_un5la8hiwawx0th3e6d9, #tinytable_mgj8ikgx630rgzxqspky th.tinytable_css_un5la8hiwawx0th3e6d9 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_mgj8ikgx630rgzxqspky td.tinytable_css_htlpjut7oy0t3rw5jd8r, #tinytable_mgj8ikgx630rgzxqspky th.tinytable_css_htlpjut7oy0t3rw5jd8r { text-align: left }
+    #tinytable_mgj8ikgx630rgzxqspky td.tinytable_css_cxzr9vqw0dvrvtxynxnr, #tinytable_mgj8ikgx630rgzxqspky th.tinytable_css_cxzr9vqw0dvrvtxynxnr {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
     </style>
     <div class="container">
-      <table class="table table-borderless" id="tinytable_htlpjut7oy0t3rw5jd8r" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
-        <thead>
+      <table class="tinytable" id="tinytable_mgj8ikgx630rgzxqspky" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         
+        <thead>
               <tr>
-                <th scope="col"> </th>
-                <th scope="col">Unique</th>
-                <th scope="col">Missing Pct.</th>
-                <th scope="col">Mean</th>
-                <th scope="col">SD</th>
-                <th scope="col">Min</th>
-                <th scope="col">Median</th>
-                <th scope="col">Max</th>
+                <th scope="col" data-row="0" data-col="1"> </th>
+                <th scope="col" data-row="0" data-col="2">Unique</th>
+                <th scope="col" data-row="0" data-col="3">Missing Pct.</th>
+                <th scope="col" data-row="0" data-col="4">Mean</th>
+                <th scope="col" data-row="0" data-col="5">SD</th>
+                <th scope="col" data-row="0" data-col="6">Min</th>
+                <th scope="col" data-row="0" data-col="7">Median</th>
+                <th scope="col" data-row="0" data-col="8">Max</th>
               </tr>
         </thead>
         
         <tbody>
                 <tr>
-                  <td>education</td>
-                  <td>13</td>
-                  <td>0</td>
-                  <td>13.9</td>
-                  <td>3.2</td>
-                  <td>-5.0</td>
-                  <td>14.0</td>
-                  <td>20.0</td>
+                  <td data-row="1" data-col="1">education</td>
+                  <td data-row="1" data-col="2">13</td>
+                  <td data-row="1" data-col="3">0</td>
+                  <td data-row="1" data-col="4">13.9</td>
+                  <td data-row="1" data-col="5">3.2</td>
+                  <td data-row="1" data-col="6">-5.0</td>
+                  <td data-row="1" data-col="7">14.0</td>
+                  <td data-row="1" data-col="8">20.0</td>
                 </tr>
                 <tr>
-                  <td>wage</td>
-                  <td>100</td>
-                  <td>0</td>
-                  <td>52.8</td>
-                  <td>80.9</td>
-                  <td>23.2</td>
-                  <td>45.6</td>
-                  <td>850.0</td>
+                  <td data-row="2" data-col="1">wage</td>
+                  <td data-row="2" data-col="2">100</td>
+                  <td data-row="2" data-col="3">0</td>
+                  <td data-row="2" data-col="4">52.8</td>
+                  <td data-row="2" data-col="5">80.9</td>
+                  <td data-row="2" data-col="6">23.2</td>
+                  <td data-row="2" data-col="7">45.6</td>
+                  <td data-row="2" data-col="8">850.0</td>
                 </tr>
                 <tr>
-                  <td>age</td>
-                  <td>34</td>
-                  <td>0</td>
-                  <td>37.0</td>
-                  <td>19.0</td>
-                  <td>22.0</td>
-                  <td>35.0</td>
-                  <td>200.0</td>
+                  <td data-row="3" data-col="1">age</td>
+                  <td data-row="3" data-col="2">34</td>
+                  <td data-row="3" data-col="3">0</td>
+                  <td data-row="3" data-col="4">37.0</td>
+                  <td data-row="3" data-col="5">19.0</td>
+                  <td data-row="3" data-col="6">22.0</td>
+                  <td data-row="3" data-col="7">35.0</td>
+                  <td data-row="3" data-col="8">200.0</td>
                 </tr>
         </tbody>
       </table>
@@ -817,21 +704,6 @@ function checkAnswer(selectElement, correctValue) {
 </div>
 </div>
 <p>Now we have a problem! The maximum wage of $850 per hour seems suspicious—is this real or a data entry error? The minimum education value of -5 years is impossible. And an age of 200 is clearly wrong. These obvious errors suggest we need to investigate our data more carefully.</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-The Standard Deviation
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>The <strong>standard deviation</strong> measures how dispersed the values of a variable are around the mean. A larger standard deviation indicates more spread-out values. For a variable <span class="math inline">\(X\)</span> with mean <span class="math inline">\(\bar{X}\)</span>, the standard deviation is: <span class="math display">\[
-SD(X) = \sqrt{\frac{1}{N}\sum_{i=1}^{N}(X_i - \bar{X})^2}
-\]</span></p>
-</div>
-</div>
 </section>
 <section id="computing-descriptive-statistics-in-r" class="level3" data-number="2.2.2">
 <h3 data-number="2.2.2" class="anchored" data-anchor-id="computing-descriptive-statistics-in-r"><span class="header-section-number">2.2.2</span> Computing Descriptive Statistics in R</h3>
@@ -1535,124 +1407,82 @@ The Replication Standard
 <div class="cell-output-display">
 <!-- preamble start -->
 
-    <script>
+    <script src="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.js"></script>
 
-      function styleCell_1cn2h1bc5fyzqqym2u1m(i, j, css_id) {
-          var table = document.getElementById("tinytable_1cn2h1bc5fyzqqym2u1m");
-          var cell = table.rows[i]?.cells[j];  // Safe navigation to avoid errors
-          if (cell) {
-              console.log(`Styling cell at (${i}, ${j}) with class ${css_id}`);
-              cell.classList.add(css_id);
-          } else {
-              console.warn(`Cell at (${i}, ${j}) not found.`);
-          }
-      }
-      function insertSpanRow(i, colspan, content) {
-        var table = document.getElementById('tinytable_1cn2h1bc5fyzqqym2u1m');
-        var newRow = table.insertRow(i);
-        var newCell = newRow.insertCell(0);
-        newCell.setAttribute("colspan", colspan);
-        // newCell.innerText = content;
-        // this may be unsafe, but innerText does not interpret <br>
-        newCell.innerHTML = content;
-      }
-      function spanCell_1cn2h1bc5fyzqqym2u1m(i, j, rowspan, colspan) {
-        var table = document.getElementById("tinytable_1cn2h1bc5fyzqqym2u1m");
-        const targetRow = table.rows[i];
-        const targetCell = targetRow.cells[j];
-        for (let r = 0; r < rowspan; r++) {
-          // Only start deleting cells to the right for the first row (r == 0)
-          if (r === 0) {
-            // Delete cells to the right of the target cell in the first row
-            for (let c = colspan - 1; c > 0; c--) {
-              if (table.rows[i + r].cells[j + c]) {
-                table.rows[i + r].deleteCell(j + c);
-              }
-            }
-          }
-          // For rows below the first, delete starting from the target column
-          if (r > 0) {
-            for (let c = colspan - 1; c >= 0; c--) {
-              if (table.rows[i + r] && table.rows[i + r].cells[j]) {
-                table.rows[i + r].deleteCell(j);
-              }
-            }
-          }
-        }
-        // Set rowspan and colspan of the target cell
-        targetCell.rowSpan = rowspan;
-        targetCell.colSpan = colspan;
-      }
+    <script>
+      // Create table-specific functions using external factory
+      const tableFns_9w4o7okhu56gr6jhsgw1 = TinyTable.createTableFunctions("tinytable_9w4o7okhu56gr6jhsgw1");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: 1, j: 0 }, { i: 2, j: 0 }, { i: 1, j: 1 }, { i: 2, j: 1 }, { i: 1, j: 2 }, { i: 2, j: 2 }, { i: 1, j: 3 }, { i: 2, j: 3 }, { i: 1, j: 4 }, { i: 2, j: 4 }, { i: 1, j: 5 }, { i: 2, j: 5 }, { i: 1, j: 6 }, { i: 2, j: 6 }, { i: 1, j: 7 }, { i: 2, j: 7 },  ], css_id: 'tinytable_css_to2hvgvpcjjsjt79gha1',}, 
-          { positions: [ { i: 3, j: 0 }, { i: 3, j: 1 }, { i: 3, j: 2 }, { i: 3, j: 3 }, { i: 3, j: 4 }, { i: 3, j: 5 }, { i: 3, j: 6 }, { i: 3, j: 7 },  ], css_id: 'tinytable_css_iccutlt9f4zwfrbr1b5f',}, 
-          { positions: [ { i: 0, j: 0 }, { i: 0, j: 1 }, { i: 0, j: 2 }, { i: 0, j: 3 }, { i: 0, j: 4 }, { i: 0, j: 5 }, { i: 0, j: 6 }, { i: 0, j: 7 },  ], css_id: 'tinytable_css_28tut8zxlrswibxkgbty',}, 
+          { positions: [ { i: '3', j: 1 }, { i: '3', j: 2 }, { i: '3', j: 3 }, { i: '3', j: 4 }, { i: '3', j: 5 }, { i: '3', j: 6 }, { i: '3', j: 7 }, { i: '3', j: 8 } ], css_id: 'tinytable_css_to2hvgvpcjjsjt79gha1',}, 
+          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '1', j: 4 }, { i: '2', j: 4 }, { i: '1', j: 5 }, { i: '2', j: 5 }, { i: '1', j: 6 }, { i: '2', j: 6 }, { i: '1', j: 7 }, { i: '2', j: 7 }, { i: '1', j: 8 }, { i: '2', j: 8 } ], css_id: 'tinytable_css_28tut8zxlrswibxkgbty',}, 
+          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 }, { i: '0', j: 6 }, { i: '0', j: 7 }, { i: '0', j: 8 } ], css_id: 'tinytable_css_1cn2h1bc5fyzqqym2u1m',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  styleCell_1cn2h1bc5fyzqqym2u1m(cell.i, cell.j, group.css_id);
+                  tableFns_9w4o7okhu56gr6jhsgw1.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
     </script>
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
-      /* tinytable css entries after */
-      .table td.tinytable_css_to2hvgvpcjjsjt79gha1, .table th.tinytable_css_to2hvgvpcjjsjt79gha1 { text-align: left; }
-      .table td.tinytable_css_iccutlt9f4zwfrbr1b5f, .table th.tinytable_css_iccutlt9f4zwfrbr1b5f { text-align: left; border-bottom: solid #d3d8dc 0.1em; }
-      .table td.tinytable_css_28tut8zxlrswibxkgbty, .table th.tinytable_css_28tut8zxlrswibxkgbty { text-align: left; border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
+    /* tinytable css entries after */
+    #tinytable_9w4o7okhu56gr6jhsgw1 td.tinytable_css_to2hvgvpcjjsjt79gha1, #tinytable_9w4o7okhu56gr6jhsgw1 th.tinytable_css_to2hvgvpcjjsjt79gha1 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_9w4o7okhu56gr6jhsgw1 td.tinytable_css_28tut8zxlrswibxkgbty, #tinytable_9w4o7okhu56gr6jhsgw1 th.tinytable_css_28tut8zxlrswibxkgbty { text-align: left }
+    #tinytable_9w4o7okhu56gr6jhsgw1 td.tinytable_css_1cn2h1bc5fyzqqym2u1m, #tinytable_9w4o7okhu56gr6jhsgw1 th.tinytable_css_1cn2h1bc5fyzqqym2u1m {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
     </style>
     <div class="container">
-      <table class="table table-borderless" id="tinytable_1cn2h1bc5fyzqqym2u1m" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
-        <thead>
+      <table class="tinytable" id="tinytable_9w4o7okhu56gr6jhsgw1" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         
+        <thead>
               <tr>
-                <th scope="col"> </th>
-                <th scope="col">Unique</th>
-                <th scope="col">Missing Pct.</th>
-                <th scope="col">Mean</th>
-                <th scope="col">SD</th>
-                <th scope="col">Min</th>
-                <th scope="col">Median</th>
-                <th scope="col">Max</th>
+                <th scope="col" data-row="0" data-col="1"> </th>
+                <th scope="col" data-row="0" data-col="2">Unique</th>
+                <th scope="col" data-row="0" data-col="3">Missing Pct.</th>
+                <th scope="col" data-row="0" data-col="4">Mean</th>
+                <th scope="col" data-row="0" data-col="5">SD</th>
+                <th scope="col" data-row="0" data-col="6">Min</th>
+                <th scope="col" data-row="0" data-col="7">Median</th>
+                <th scope="col" data-row="0" data-col="8">Max</th>
               </tr>
         </thead>
         
         <tbody>
                 <tr>
-                  <td>violent_crime</td>
-                  <td>50</td>
-                  <td>0</td>
-                  <td>405.2</td>
-                  <td>138.9</td>
-                  <td>105.0</td>
-                  <td>389.1</td>
-                  <td>725.3</td>
+                  <td data-row="1" data-col="1">violent_crime</td>
+                  <td data-row="1" data-col="2">50</td>
+                  <td data-row="1" data-col="3">0</td>
+                  <td data-row="1" data-col="4">405.2</td>
+                  <td data-row="1" data-col="5">138.9</td>
+                  <td data-row="1" data-col="6">105.0</td>
+                  <td data-row="1" data-col="7">389.1</td>
+                  <td data-row="1" data-col="8">725.3</td>
                 </tr>
                 <tr>
-                  <td>percent_urban</td>
-                  <td>49</td>
-                  <td>0</td>
-                  <td>72.1</td>
-                  <td>13.4</td>
-                  <td>35.4</td>
-                  <td>72.3</td>
-                  <td>100.0</td>
+                  <td data-row="2" data-col="1">percent_urban</td>
+                  <td data-row="2" data-col="2">49</td>
+                  <td data-row="2" data-col="3">0</td>
+                  <td data-row="2" data-col="4">72.1</td>
+                  <td data-row="2" data-col="5">13.4</td>
+                  <td data-row="2" data-col="6">35.4</td>
+                  <td data-row="2" data-col="7">72.3</td>
+                  <td data-row="2" data-col="8">100.0</td>
                 </tr>
                 <tr>
-                  <td>percent_poverty</td>
-                  <td>50</td>
-                  <td>0</td>
-                  <td>13.2</td>
-                  <td>3.0</td>
-                  <td>8.0</td>
-                  <td>13.1</td>
-                  <td>20.3</td>
+                  <td data-row="3" data-col="1">percent_poverty</td>
+                  <td data-row="3" data-col="2">50</td>
+                  <td data-row="3" data-col="3">0</td>
+                  <td data-row="3" data-col="4">13.2</td>
+                  <td data-row="3" data-col="5">3.0</td>
+                  <td data-row="3" data-col="6">8.0</td>
+                  <td data-row="3" data-col="7">13.1</td>
+                  <td data-row="3" data-col="8">20.3</td>
                 </tr>
         </tbody>
       </table>
@@ -1769,7 +1599,7 @@ Figure&nbsp;2.8: Relationship between urbanization and violent crime rates acros
 </div>
 
 <div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1778,7 +1608,7 @@ Show Explanation
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="i">
 <li><p>This is an obvious data error—no test scored 0-100 should have values over 1,500. We need to investigate whether this is a typo, a unit conversion issue, or another problem. Simply ignoring it or deleting the data without investigation would be irresponsible.</p></li>

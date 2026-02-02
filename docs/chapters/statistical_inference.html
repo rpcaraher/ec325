@@ -1345,6 +1345,13 @@ lot_area 0.5298262 2.57581</code></pre>
 <span id="cb26-56"><a href="#cb26-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
 <span id="cb26-57"><a href="#cb26-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: `geom_errorbarh()` was deprecated in ggplot2 4.0.0.
+ℹ Please use the `orientation` argument of `geom_errorbar()` instead.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`height` was translated to `width`.</code></pre>
+</div>
 <div class="cell-output-display">
 <div id="fig-ci-simulation" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -1403,8 +1410,8 @@ Figure&nbsp;6.10: Twenty 95% confidence intervals from different samples. The tr
 <h3 data-number="6.9.1" class="anchored" data-anchor-id="from-r-output-to-publication-format"><span class="header-section-number">6.9.1</span> From R Output to Publication Format</h3>
 <p>When you run <code>summary()</code> on a regression in R, you get detailed but messy output. Academic papers present this information in a standardized, clean format using tables.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Standard R output</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(reg_housing)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Standard R output</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(reg_housing)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
@@ -1442,159 +1449,117 @@ Table&nbsp;6.1: The Effect of Lot Area on Home Sale Price
 <div class="cell-output-display">
 <!-- preamble start -->
 
-    <script>
+    <script src="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.js"></script>
 
-      function styleCell_2rus5x3fndxjpfy1fcrg(i, j, css_id) {
-          var table = document.getElementById("tinytable_2rus5x3fndxjpfy1fcrg");
-          var cell = table.rows[i]?.cells[j];  // Safe navigation to avoid errors
-          if (cell) {
-              console.log(`Styling cell at (${i}, ${j}) with class ${css_id}`);
-              cell.classList.add(css_id);
-          } else {
-              console.warn(`Cell at (${i}, ${j}) not found.`);
-          }
-      }
-      function insertSpanRow(i, colspan, content) {
-        var table = document.getElementById('tinytable_2rus5x3fndxjpfy1fcrg');
-        var newRow = table.insertRow(i);
-        var newCell = newRow.insertCell(0);
-        newCell.setAttribute("colspan", colspan);
-        // newCell.innerText = content;
-        // this may be unsafe, but innerText does not interpret <br>
-        newCell.innerHTML = content;
-      }
-      function spanCell_2rus5x3fndxjpfy1fcrg(i, j, rowspan, colspan) {
-        var table = document.getElementById("tinytable_2rus5x3fndxjpfy1fcrg");
-        const targetRow = table.rows[i];
-        const targetCell = targetRow.cells[j];
-        for (let r = 0; r < rowspan; r++) {
-          // Only start deleting cells to the right for the first row (r == 0)
-          if (r === 0) {
-            // Delete cells to the right of the target cell in the first row
-            for (let c = colspan - 1; c > 0; c--) {
-              if (table.rows[i + r].cells[j + c]) {
-                table.rows[i + r].deleteCell(j + c);
-              }
-            }
-          }
-          // For rows below the first, delete starting from the target column
-          if (r > 0) {
-            for (let c = colspan - 1; c >= 0; c--) {
-              if (table.rows[i + r] && table.rows[i + r].cells[j]) {
-                table.rows[i + r].deleteCell(j);
-              }
-            }
-          }
-        }
-        // Set rowspan and colspan of the target cell
-        targetCell.rowSpan = rowspan;
-        targetCell.colSpan = colspan;
-      }
+    <script>
+      // Create table-specific functions using external factory
+      const tableFns_globqw77wdr3qn96a9xx = TinyTable.createTableFunctions("tinytable_globqw77wdr3qn96a9xx");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: 0, j: 0 },  ], css_id: 'tinytable_css_uv4lgl5u1vkwme0970tp',}, 
-          { positions: [ { i: 15, j: 1 },  ], css_id: 'tinytable_css_sdq1vi2ciwvetmoj7puo',}, 
-          { positions: [ { i: 1, j: 1 }, { i: 2, j: 1 }, { i: 3, j: 1 }, { i: 4, j: 1 }, { i: 5, j: 1 }, { i: 6, j: 1 }, { i: 7, j: 1 }, { i: 8, j: 1 }, { i: 9, j: 1 }, { i: 10, j: 1 }, { i: 11, j: 1 }, { i: 13, j: 1 }, { i: 14, j: 1 },  ], css_id: 'tinytable_css_favn17n3fbxcsg9ht4dq',}, 
-          { positions: [ { i: 1, j: 0 }, { i: 2, j: 0 }, { i: 3, j: 0 }, { i: 4, j: 0 }, { i: 5, j: 0 }, { i: 6, j: 0 }, { i: 7, j: 0 }, { i: 8, j: 0 }, { i: 9, j: 0 }, { i: 10, j: 0 }, { i: 11, j: 0 }, { i: 13, j: 0 }, { i: 14, j: 0 },  ], css_id: 'tinytable_css_aelyxamactia4f6u7ph8',}, 
-          { positions: [ { i: 15, j: 0 },  ], css_id: 'tinytable_css_85yjcymcyircdyethf1w',}, 
-          { positions: [ { i: 12, j: 0 },  ], css_id: 'tinytable_css_720z0danlazwl38ylnrp',}, 
-          { positions: [ { i: 0, j: 1 },  ], css_id: 'tinytable_css_6yrcdet8vvmfncoz6cjc',}, 
-          { positions: [ { i: 12, j: 1 },  ], css_id: 'tinytable_css_3bdetc9zx0wiw6kcidep',}, 
+          { positions: [ { i: '15', j: 2 } ], css_id: 'tinytable_css_3bdetc9zx0wiw6kcidep',}, 
+          { positions: [ { i: '12', j: 2 } ], css_id: 'tinytable_css_favn17n3fbxcsg9ht4dq',}, 
+          { positions: [ { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '4', j: 2 }, { i: '5', j: 2 }, { i: '6', j: 2 }, { i: '7', j: 2 }, { i: '8', j: 2 }, { i: '9', j: 2 }, { i: '10', j: 2 }, { i: '11', j: 2 }, { i: '13', j: 2 }, { i: '14', j: 2 } ], css_id: 'tinytable_css_6yrcdet8vvmfncoz6cjc',}, 
+          { positions: [ { i: '0', j: 2 } ], css_id: 'tinytable_css_85yjcymcyircdyethf1w',}, 
+          { positions: [ { i: '15', j: 1 } ], css_id: 'tinytable_css_720z0danlazwl38ylnrp',}, 
+          { positions: [ { i: '12', j: 1 } ], css_id: 'tinytable_css_aelyxamactia4f6u7ph8',}, 
+          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '4', j: 1 }, { i: '5', j: 1 }, { i: '6', j: 1 }, { i: '7', j: 1 }, { i: '8', j: 1 }, { i: '9', j: 1 }, { i: '10', j: 1 }, { i: '11', j: 1 }, { i: '13', j: 1 }, { i: '14', j: 1 } ], css_id: 'tinytable_css_uv4lgl5u1vkwme0970tp',}, 
+          { positions: [ { i: '0', j: 1 } ], css_id: 'tinytable_css_2rus5x3fndxjpfy1fcrg',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  styleCell_2rus5x3fndxjpfy1fcrg(cell.i, cell.j, group.css_id);
+                  tableFns_globqw77wdr3qn96a9xx.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
     </script>
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
-      /* tinytable css entries after */
-      .table td.tinytable_css_uv4lgl5u1vkwme0970tp, .table th.tinytable_css_uv4lgl5u1vkwme0970tp { text-align: left; border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
-      .table td.tinytable_css_sdq1vi2ciwvetmoj7puo, .table th.tinytable_css_sdq1vi2ciwvetmoj7puo { text-align: center; border-bottom: solid #d3d8dc 0.1em; }
-      .table td.tinytable_css_favn17n3fbxcsg9ht4dq, .table th.tinytable_css_favn17n3fbxcsg9ht4dq { text-align: center; }
-      .table td.tinytable_css_aelyxamactia4f6u7ph8, .table th.tinytable_css_aelyxamactia4f6u7ph8 { text-align: left; }
-      .table td.tinytable_css_85yjcymcyircdyethf1w, .table th.tinytable_css_85yjcymcyircdyethf1w { text-align: left; border-bottom: solid #d3d8dc 0.1em; }
-      .table td.tinytable_css_720z0danlazwl38ylnrp, .table th.tinytable_css_720z0danlazwl38ylnrp { text-align: left; border-bottom: solid black 0.05em; }
-      .table td.tinytable_css_6yrcdet8vvmfncoz6cjc, .table th.tinytable_css_6yrcdet8vvmfncoz6cjc { text-align: center; border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
-      .table td.tinytable_css_3bdetc9zx0wiw6kcidep, .table th.tinytable_css_3bdetc9zx0wiw6kcidep { text-align: center; border-bottom: solid black 0.05em; }
+    /* tinytable css entries after */
+    #tinytable_globqw77wdr3qn96a9xx td.tinytable_css_3bdetc9zx0wiw6kcidep, #tinytable_globqw77wdr3qn96a9xx th.tinytable_css_3bdetc9zx0wiw6kcidep {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_globqw77wdr3qn96a9xx td.tinytable_css_favn17n3fbxcsg9ht4dq, #tinytable_globqw77wdr3qn96a9xx th.tinytable_css_favn17n3fbxcsg9ht4dq {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_globqw77wdr3qn96a9xx td.tinytable_css_6yrcdet8vvmfncoz6cjc, #tinytable_globqw77wdr3qn96a9xx th.tinytable_css_6yrcdet8vvmfncoz6cjc { text-align: center }
+    #tinytable_globqw77wdr3qn96a9xx td.tinytable_css_85yjcymcyircdyethf1w, #tinytable_globqw77wdr3qn96a9xx th.tinytable_css_85yjcymcyircdyethf1w {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_globqw77wdr3qn96a9xx td.tinytable_css_720z0danlazwl38ylnrp, #tinytable_globqw77wdr3qn96a9xx th.tinytable_css_720z0danlazwl38ylnrp {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_globqw77wdr3qn96a9xx td.tinytable_css_aelyxamactia4f6u7ph8, #tinytable_globqw77wdr3qn96a9xx th.tinytable_css_aelyxamactia4f6u7ph8 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_globqw77wdr3qn96a9xx td.tinytable_css_uv4lgl5u1vkwme0970tp, #tinytable_globqw77wdr3qn96a9xx th.tinytable_css_uv4lgl5u1vkwme0970tp { text-align: left }
+    #tinytable_globqw77wdr3qn96a9xx td.tinytable_css_2rus5x3fndxjpfy1fcrg, #tinytable_globqw77wdr3qn96a9xx th.tinytable_css_2rus5x3fndxjpfy1fcrg {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
     </style>
     <div class="container">
-      <table class="table table-borderless" id="tinytable_2rus5x3fndxjpfy1fcrg" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
-        <thead>
+      <table class="tinytable" id="tinytable_globqw77wdr3qn96a9xx" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         
+        <thead>
               <tr>
-                <th scope="col"> </th>
-                <th scope="col">Sale Price</th>
+                <th scope="col" data-row="0" data-col="1"> </th>
+                <th scope="col" data-row="0" data-col="2">Sale Price</th>
               </tr>
         </thead>
         <tfoot><tr><td colspan="2">* p &lt; 0.1, ** p &lt; 0.05, *** p &lt; 0.01</td></tr>
 <tr><td colspan="2">Standard errors in parentheses. * p &lt; 0.1, ** p &lt; 0.05, *** p &lt; 0.01</td></tr></tfoot>
         <tbody>
                 <tr>
-                  <td>(Intercept)</td>
-                  <td>-2369345.453***</td>
+                  <td data-row="1" data-col="1">(Intercept)</td>
+                  <td data-row="1" data-col="2">-2369345.453***</td>
                 </tr>
                 <tr>
-                  <td></td>
-                  <td>(407348.898)</td>
+                  <td data-row="2" data-col="1"></td>
+                  <td data-row="2" data-col="2">(407348.898)</td>
                 </tr>
                 <tr>
-                  <td>Lot Area (sq ft)</td>
-                  <td>1.553***</td>
+                  <td data-row="3" data-col="1">Lot Area (sq ft)</td>
+                  <td data-row="3" data-col="2">1.553***</td>
                 </tr>
                 <tr>
-                  <td></td>
-                  <td>(0.521)</td>
+                  <td data-row="4" data-col="1"></td>
+                  <td data-row="4" data-col="2">(0.521)</td>
                 </tr>
                 <tr>
-                  <td>Pool Area</td>
-                  <td>81.552***</td>
+                  <td data-row="5" data-col="1">Pool Area</td>
+                  <td data-row="5" data-col="2">81.552***</td>
                 </tr>
                 <tr>
-                  <td></td>
-                  <td>(14.698)</td>
+                  <td data-row="6" data-col="1"></td>
+                  <td data-row="6" data-col="2">(14.698)</td>
                 </tr>
                 <tr>
-                  <td>Garage Area</td>
-                  <td>167.084***</td>
+                  <td data-row="7" data-col="1">Garage Area</td>
+                  <td data-row="7" data-col="2">167.084***</td>
                 </tr>
                 <tr>
-                  <td></td>
-                  <td>(13.493)</td>
+                  <td data-row="8" data-col="1"></td>
+                  <td data-row="8" data-col="2">(13.493)</td>
                 </tr>
                 <tr>
-                  <td>Year Built</td>
-                  <td>554.285***</td>
+                  <td data-row="9" data-col="1">Year Built</td>
+                  <td data-row="9" data-col="2">554.285***</td>
                 </tr>
                 <tr>
-                  <td></td>
-                  <td>(143.828)</td>
+                  <td data-row="10" data-col="1"></td>
+                  <td data-row="10" data-col="2">(143.828)</td>
                 </tr>
                 <tr>
-                  <td>Year Remodeled</td>
-                  <td>775.747***</td>
+                  <td data-row="11" data-col="1">Year Remodeled</td>
+                  <td data-row="11" data-col="2">775.747***</td>
                 </tr>
                 <tr>
-                  <td></td>
-                  <td>(223.586)</td>
+                  <td data-row="12" data-col="1"></td>
+                  <td data-row="12" data-col="2">(223.586)</td>
                 </tr>
                 <tr>
-                  <td>Num.Obs.</td>
-                  <td>500</td>
+                  <td data-row="13" data-col="1">Num.Obs.</td>
+                  <td data-row="13" data-col="2">500</td>
                 </tr>
                 <tr>
-                  <td>R2</td>
-                  <td>0.340</td>
+                  <td data-row="14" data-col="1">R2</td>
+                  <td data-row="14" data-col="2">0.340</td>
                 </tr>
                 <tr>
-                  <td>R2 Adj.</td>
-                  <td>0.333</td>
+                  <td data-row="15" data-col="1">R2 Adj.</td>
+                  <td data-row="15" data-col="2">0.333</td>
                 </tr>
         </tbody>
       </table>
@@ -1623,11 +1588,11 @@ Table&nbsp;6.1: The Effect of Lot Area on Home Sale Price
 <h3 data-number="6.9.3" class="anchored" data-anchor-id="multiple-columns-show-robustness"><span class="header-section-number">6.9.3</span> Multiple Columns Show Robustness</h3>
 <p>Most regression tables have multiple columns, each representing a different specification. This lets readers see how estimates change as controls are added:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Three specifications with increasing controls</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>reg1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(sale_price <span class="sc">~</span> lot_area, <span class="at">data =</span> housing_data)</span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>reg2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(sale_price <span class="sc">~</span> lot_area <span class="sc">+</span> pool_area <span class="sc">+</span> garage_area, <span class="at">data =</span> housing_data)</span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>reg3 <span class="ot">&lt;-</span> <span class="fu">lm</span>(sale_price <span class="sc">~</span> lot_area <span class="sc">+</span> pool_area <span class="sc">+</span> garage_area <span class="sc">+</span> </span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>             year_built <span class="sc">+</span> year_remod, <span class="at">data =</span> housing_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Three specifications with increasing controls</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>reg1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(sale_price <span class="sc">~</span> lot_area, <span class="at">data =</span> housing_data)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>reg2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(sale_price <span class="sc">~</span> lot_area <span class="sc">+</span> pool_area <span class="sc">+</span> garage_area, <span class="at">data =</span> housing_data)</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>reg3 <span class="ot">&lt;-</span> <span class="fu">lm</span>(sale_price <span class="sc">~</span> lot_area <span class="sc">+</span> pool_area <span class="sc">+</span> garage_area <span class="sc">+</span> </span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>             year_built <span class="sc">+</span> year_remod, <span class="at">data =</span> housing_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <div id="tbl-housing-multi" class="cell quarto-float quarto-figure quarto-figure-center anchored">
@@ -1639,191 +1604,149 @@ Table&nbsp;6.2: The Effect of Lot Area on Home Sale Price: Multiple Specificatio
 <div class="cell-output-display">
 <!-- preamble start -->
 
-    <script>
+    <script src="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.js"></script>
 
-      function styleCell_7ri1dwvixcskplzyma2p(i, j, css_id) {
-          var table = document.getElementById("tinytable_7ri1dwvixcskplzyma2p");
-          var cell = table.rows[i]?.cells[j];  // Safe navigation to avoid errors
-          if (cell) {
-              console.log(`Styling cell at (${i}, ${j}) with class ${css_id}`);
-              cell.classList.add(css_id);
-          } else {
-              console.warn(`Cell at (${i}, ${j}) not found.`);
-          }
-      }
-      function insertSpanRow(i, colspan, content) {
-        var table = document.getElementById('tinytable_7ri1dwvixcskplzyma2p');
-        var newRow = table.insertRow(i);
-        var newCell = newRow.insertCell(0);
-        newCell.setAttribute("colspan", colspan);
-        // newCell.innerText = content;
-        // this may be unsafe, but innerText does not interpret <br>
-        newCell.innerHTML = content;
-      }
-      function spanCell_7ri1dwvixcskplzyma2p(i, j, rowspan, colspan) {
-        var table = document.getElementById("tinytable_7ri1dwvixcskplzyma2p");
-        const targetRow = table.rows[i];
-        const targetCell = targetRow.cells[j];
-        for (let r = 0; r < rowspan; r++) {
-          // Only start deleting cells to the right for the first row (r == 0)
-          if (r === 0) {
-            // Delete cells to the right of the target cell in the first row
-            for (let c = colspan - 1; c > 0; c--) {
-              if (table.rows[i + r].cells[j + c]) {
-                table.rows[i + r].deleteCell(j + c);
-              }
-            }
-          }
-          // For rows below the first, delete starting from the target column
-          if (r > 0) {
-            for (let c = colspan - 1; c >= 0; c--) {
-              if (table.rows[i + r] && table.rows[i + r].cells[j]) {
-                table.rows[i + r].deleteCell(j);
-              }
-            }
-          }
-        }
-        // Set rowspan and colspan of the target cell
-        targetCell.rowSpan = rowspan;
-        targetCell.colSpan = colspan;
-      }
+    <script>
+      // Create table-specific functions using external factory
+      const tableFns_2wjayhsn0v1jcwjjvhim = TinyTable.createTableFunctions("tinytable_2wjayhsn0v1jcwjjvhim");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: 1, j: 0 }, { i: 2, j: 0 }, { i: 3, j: 0 }, { i: 4, j: 0 }, { i: 5, j: 0 }, { i: 6, j: 0 }, { i: 7, j: 0 }, { i: 8, j: 0 }, { i: 9, j: 0 }, { i: 10, j: 0 }, { i: 11, j: 0 }, { i: 13, j: 0 }, { i: 14, j: 0 },  ], css_id: 'tinytable_css_sdx1orfqmbowmf6fmcg8',}, 
-          { positions: [ { i: 1, j: 1 }, { i: 4, j: 1 }, { i: 5, j: 1 }, { i: 2, j: 1 }, { i: 7, j: 1 }, { i: 8, j: 1 }, { i: 9, j: 1 }, { i: 10, j: 1 }, { i: 11, j: 1 }, { i: 9, j: 2 }, { i: 13, j: 1 }, { i: 14, j: 1 }, { i: 9, j: 3 }, { i: 3, j: 1 }, { i: 1, j: 2 }, { i: 2, j: 2 }, { i: 6, j: 1 }, { i: 4, j: 2 }, { i: 5, j: 2 }, { i: 6, j: 2 }, { i: 7, j: 2 }, { i: 8, j: 2 }, { i: 6, j: 3 }, { i: 10, j: 2 }, { i: 11, j: 2 }, { i: 3, j: 2 }, { i: 13, j: 2 }, { i: 14, j: 2 }, { i: 3, j: 3 }, { i: 4, j: 3 }, { i: 1, j: 3 }, { i: 2, j: 3 }, { i: 7, j: 3 }, { i: 8, j: 3 }, { i: 5, j: 3 }, { i: 10, j: 3 }, { i: 11, j: 3 }, { i: 13, j: 3 }, { i: 14, j: 3 },  ], css_id: 'tinytable_css_n7504jzszmsrs6jkhb4b',}, 
-          { positions: [ { i: 0, j: 1 }, { i: 0, j: 3 }, { i: 0, j: 2 },  ], css_id: 'tinytable_css_kijy6kjfmwu06r9f5thr',}, 
-          { positions: [ { i: 0, j: 0 },  ], css_id: 'tinytable_css_jlnpsgbgkganca1s1oyf',}, 
-          { positions: [ { i: 15, j: 0 },  ], css_id: 'tinytable_css_jjvl6d1l55y50qq5dcls',}, 
-          { positions: [ { i: 12, j: 0 },  ], css_id: 'tinytable_css_ami0h5w5i1066cwboorb',}, 
-          { positions: [ { i: 15, j: 2 }, { i: 15, j: 1 }, { i: 15, j: 3 },  ], css_id: 'tinytable_css_7qu9032x15s0ugacym4z',}, 
-          { positions: [ { i: 12, j: 2 }, { i: 12, j: 3 }, { i: 12, j: 1 },  ], css_id: 'tinytable_css_2hnhne0prjtlv86mk1xv',}, 
+          { positions: [ { i: '15', j: 2 }, { i: '15', j: 3 }, { i: '15', j: 4 } ], css_id: 'tinytable_css_n7504jzszmsrs6jkhb4b',}, 
+          { positions: [ { i: '12', j: 2 }, { i: '12', j: 3 }, { i: '12', j: 4 } ], css_id: 'tinytable_css_kijy6kjfmwu06r9f5thr',}, 
+          { positions: [ { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '4', j: 2 }, { i: '5', j: 2 }, { i: '6', j: 2 }, { i: '7', j: 2 }, { i: '8', j: 2 }, { i: '9', j: 2 }, { i: '10', j: 2 }, { i: '11', j: 2 }, { i: '13', j: 2 }, { i: '14', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '3', j: 3 }, { i: '4', j: 3 }, { i: '5', j: 3 }, { i: '6', j: 3 }, { i: '7', j: 3 }, { i: '8', j: 3 }, { i: '9', j: 3 }, { i: '10', j: 3 }, { i: '11', j: 3 }, { i: '13', j: 3 }, { i: '14', j: 3 }, { i: '1', j: 4 }, { i: '2', j: 4 }, { i: '3', j: 4 }, { i: '4', j: 4 }, { i: '5', j: 4 }, { i: '6', j: 4 }, { i: '7', j: 4 }, { i: '8', j: 4 }, { i: '9', j: 4 }, { i: '10', j: 4 }, { i: '11', j: 4 }, { i: '13', j: 4 }, { i: '14', j: 4 } ], css_id: 'tinytable_css_jjvl6d1l55y50qq5dcls',}, 
+          { positions: [ { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 } ], css_id: 'tinytable_css_ami0h5w5i1066cwboorb',}, 
+          { positions: [ { i: '15', j: 1 } ], css_id: 'tinytable_css_sdx1orfqmbowmf6fmcg8',}, 
+          { positions: [ { i: '12', j: 1 } ], css_id: 'tinytable_css_jlnpsgbgkganca1s1oyf',}, 
+          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '4', j: 1 }, { i: '5', j: 1 }, { i: '6', j: 1 }, { i: '7', j: 1 }, { i: '8', j: 1 }, { i: '9', j: 1 }, { i: '10', j: 1 }, { i: '11', j: 1 }, { i: '13', j: 1 }, { i: '14', j: 1 } ], css_id: 'tinytable_css_7ri1dwvixcskplzyma2p',}, 
+          { positions: [ { i: '0', j: 1 } ], css_id: 'tinytable_css_nfwfj9dk0h124jfw3ak5',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  styleCell_7ri1dwvixcskplzyma2p(cell.i, cell.j, group.css_id);
+                  tableFns_2wjayhsn0v1jcwjjvhim.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
     </script>
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
-      /* tinytable css entries after */
-      .table td.tinytable_css_sdx1orfqmbowmf6fmcg8, .table th.tinytable_css_sdx1orfqmbowmf6fmcg8 { text-align: left; }
-      .table td.tinytable_css_n7504jzszmsrs6jkhb4b, .table th.tinytable_css_n7504jzszmsrs6jkhb4b { text-align: center; }
-      .table td.tinytable_css_kijy6kjfmwu06r9f5thr, .table th.tinytable_css_kijy6kjfmwu06r9f5thr { text-align: center; border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
-      .table td.tinytable_css_jlnpsgbgkganca1s1oyf, .table th.tinytable_css_jlnpsgbgkganca1s1oyf { text-align: left; border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
-      .table td.tinytable_css_jjvl6d1l55y50qq5dcls, .table th.tinytable_css_jjvl6d1l55y50qq5dcls { text-align: left; border-bottom: solid #d3d8dc 0.1em; }
-      .table td.tinytable_css_ami0h5w5i1066cwboorb, .table th.tinytable_css_ami0h5w5i1066cwboorb { text-align: left; border-bottom: solid black 0.05em; }
-      .table td.tinytable_css_7qu9032x15s0ugacym4z, .table th.tinytable_css_7qu9032x15s0ugacym4z { text-align: center; border-bottom: solid #d3d8dc 0.1em; }
-      .table td.tinytable_css_2hnhne0prjtlv86mk1xv, .table th.tinytable_css_2hnhne0prjtlv86mk1xv { text-align: center; border-bottom: solid black 0.05em; }
+    /* tinytable css entries after */
+    #tinytable_2wjayhsn0v1jcwjjvhim td.tinytable_css_n7504jzszmsrs6jkhb4b, #tinytable_2wjayhsn0v1jcwjjvhim th.tinytable_css_n7504jzszmsrs6jkhb4b {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_2wjayhsn0v1jcwjjvhim td.tinytable_css_kijy6kjfmwu06r9f5thr, #tinytable_2wjayhsn0v1jcwjjvhim th.tinytable_css_kijy6kjfmwu06r9f5thr {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_2wjayhsn0v1jcwjjvhim td.tinytable_css_jjvl6d1l55y50qq5dcls, #tinytable_2wjayhsn0v1jcwjjvhim th.tinytable_css_jjvl6d1l55y50qq5dcls { text-align: center }
+    #tinytable_2wjayhsn0v1jcwjjvhim td.tinytable_css_ami0h5w5i1066cwboorb, #tinytable_2wjayhsn0v1jcwjjvhim th.tinytable_css_ami0h5w5i1066cwboorb {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_2wjayhsn0v1jcwjjvhim td.tinytable_css_sdx1orfqmbowmf6fmcg8, #tinytable_2wjayhsn0v1jcwjjvhim th.tinytable_css_sdx1orfqmbowmf6fmcg8 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_2wjayhsn0v1jcwjjvhim td.tinytable_css_jlnpsgbgkganca1s1oyf, #tinytable_2wjayhsn0v1jcwjjvhim th.tinytable_css_jlnpsgbgkganca1s1oyf {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_2wjayhsn0v1jcwjjvhim td.tinytable_css_7ri1dwvixcskplzyma2p, #tinytable_2wjayhsn0v1jcwjjvhim th.tinytable_css_7ri1dwvixcskplzyma2p { text-align: left }
+    #tinytable_2wjayhsn0v1jcwjjvhim td.tinytable_css_nfwfj9dk0h124jfw3ak5, #tinytable_2wjayhsn0v1jcwjjvhim th.tinytable_css_nfwfj9dk0h124jfw3ak5 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
     </style>
     <div class="container">
-      <table class="table table-borderless" id="tinytable_7ri1dwvixcskplzyma2p" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
-        <thead>
+      <table class="tinytable" id="tinytable_2wjayhsn0v1jcwjjvhim" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         
+        <thead>
               <tr>
-                <th scope="col"> </th>
-                <th scope="col">(1)</th>
-                <th scope="col">(2)</th>
-                <th scope="col">(3)</th>
+                <th scope="col" data-row="0" data-col="1"> </th>
+                <th scope="col" data-row="0" data-col="2">(1)</th>
+                <th scope="col" data-row="0" data-col="3">(2)</th>
+                <th scope="col" data-row="0" data-col="4">(3)</th>
               </tr>
         </thead>
         <tfoot><tr><td colspan="4">* p &lt; 0.1, ** p &lt; 0.05, *** p &lt; 0.01</td></tr>
 <tr><td colspan="4">Standard errors in parentheses. * p &lt; 0.1, ** p &lt; 0.05, *** p &lt; 0.01</td></tr></tfoot>
         <tbody>
                 <tr>
-                  <td>(Intercept)</td>
-                  <td>385464.906***</td>
-                  <td>288761.744***</td>
-                  <td>-2369345.453***</td>
+                  <td data-row="1" data-col="1">(Intercept)</td>
+                  <td data-row="1" data-col="2">385464.906***</td>
+                  <td data-row="1" data-col="3">288761.744***</td>
+                  <td data-row="1" data-col="4">-2369345.453***</td>
                 </tr>
                 <tr>
-                  <td></td>
-                  <td>(8462.611)</td>
-                  <td>(10454.349)</td>
-                  <td>(407348.898)</td>
+                  <td data-row="2" data-col="1"></td>
+                  <td data-row="2" data-col="2">(8462.611)</td>
+                  <td data-row="2" data-col="3">(10454.349)</td>
+                  <td data-row="2" data-col="4">(407348.898)</td>
                 </tr>
                 <tr>
-                  <td>Lot Area (sq ft)</td>
-                  <td>1.038</td>
-                  <td>1.472***</td>
-                  <td>1.553***</td>
+                  <td data-row="3" data-col="1">Lot Area (sq ft)</td>
+                  <td data-row="3" data-col="2">1.038</td>
+                  <td data-row="3" data-col="3">1.472***</td>
+                  <td data-row="3" data-col="4">1.553***</td>
                 </tr>
                 <tr>
-                  <td></td>
-                  <td>(0.635)</td>
-                  <td>(0.545)</td>
-                  <td>(0.521)</td>
+                  <td data-row="4" data-col="1"></td>
+                  <td data-row="4" data-col="2">(0.635)</td>
+                  <td data-row="4" data-col="3">(0.545)</td>
+                  <td data-row="4" data-col="4">(0.521)</td>
                 </tr>
                 <tr>
-                  <td>Pool Area</td>
-                  <td></td>
-                  <td>86.081***</td>
-                  <td>81.552***</td>
+                  <td data-row="5" data-col="1">Pool Area</td>
+                  <td data-row="5" data-col="2"></td>
+                  <td data-row="5" data-col="3">86.081***</td>
+                  <td data-row="5" data-col="4">81.552***</td>
                 </tr>
                 <tr>
-                  <td></td>
-                  <td></td>
-                  <td>(15.352)</td>
-                  <td>(14.698)</td>
+                  <td data-row="6" data-col="1"></td>
+                  <td data-row="6" data-col="2"></td>
+                  <td data-row="6" data-col="3">(15.352)</td>
+                  <td data-row="6" data-col="4">(14.698)</td>
                 </tr>
                 <tr>
-                  <td>Garage Area</td>
-                  <td></td>
-                  <td>170.687***</td>
-                  <td>167.084***</td>
+                  <td data-row="7" data-col="1">Garage Area</td>
+                  <td data-row="7" data-col="2"></td>
+                  <td data-row="7" data-col="3">170.687***</td>
+                  <td data-row="7" data-col="4">167.084***</td>
                 </tr>
                 <tr>
-                  <td></td>
-                  <td></td>
-                  <td>(14.112)</td>
-                  <td>(13.493)</td>
+                  <td data-row="8" data-col="1"></td>
+                  <td data-row="8" data-col="2"></td>
+                  <td data-row="8" data-col="3">(14.112)</td>
+                  <td data-row="8" data-col="4">(13.493)</td>
                 </tr>
                 <tr>
-                  <td>Year Built</td>
-                  <td></td>
-                  <td></td>
-                  <td>554.285***</td>
+                  <td data-row="9" data-col="1">Year Built</td>
+                  <td data-row="9" data-col="2"></td>
+                  <td data-row="9" data-col="3"></td>
+                  <td data-row="9" data-col="4">554.285***</td>
                 </tr>
                 <tr>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td>(143.828)</td>
+                  <td data-row="10" data-col="1"></td>
+                  <td data-row="10" data-col="2"></td>
+                  <td data-row="10" data-col="3"></td>
+                  <td data-row="10" data-col="4">(143.828)</td>
                 </tr>
                 <tr>
-                  <td>Year Remodeled</td>
-                  <td></td>
-                  <td></td>
-                  <td>775.747***</td>
+                  <td data-row="11" data-col="1">Year Remodeled</td>
+                  <td data-row="11" data-col="2"></td>
+                  <td data-row="11" data-col="3"></td>
+                  <td data-row="11" data-col="4">775.747***</td>
                 </tr>
                 <tr>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td>(223.586)</td>
+                  <td data-row="12" data-col="1"></td>
+                  <td data-row="12" data-col="2"></td>
+                  <td data-row="12" data-col="3"></td>
+                  <td data-row="12" data-col="4">(223.586)</td>
                 </tr>
                 <tr>
-                  <td>Num.Obs.</td>
-                  <td>500</td>
-                  <td>500</td>
-                  <td>500</td>
+                  <td data-row="13" data-col="1">Num.Obs.</td>
+                  <td data-row="13" data-col="2">500</td>
+                  <td data-row="13" data-col="3">500</td>
+                  <td data-row="13" data-col="4">500</td>
                 </tr>
                 <tr>
-                  <td>R2</td>
-                  <td>0.005</td>
-                  <td>0.274</td>
-                  <td>0.340</td>
+                  <td data-row="14" data-col="1">R2</td>
+                  <td data-row="14" data-col="2">0.005</td>
+                  <td data-row="14" data-col="3">0.274</td>
+                  <td data-row="14" data-col="4">0.340</td>
                 </tr>
                 <tr>
-                  <td>R2 Adj.</td>
-                  <td>0.003</td>
-                  <td>0.269</td>
-                  <td>0.333</td>
+                  <td data-row="15" data-col="1">R2 Adj.</td>
+                  <td data-row="15" data-col="2">0.003</td>
+                  <td data-row="15" data-col="3">0.269</td>
+                  <td data-row="15" data-col="4">0.333</td>
                 </tr>
         </tbody>
       </table>
@@ -1853,139 +1776,97 @@ Table&nbsp;6.2: The Effect of Lot Area on Home Sale Price: Multiple Specificatio
 <div class="cell-output-display">
 <!-- preamble start -->
 
-    <script>
+    <script src="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.js"></script>
 
-      function styleCell_ui797mem7l91x1et6ahu(i, j, css_id) {
-          var table = document.getElementById("tinytable_ui797mem7l91x1et6ahu");
-          var cell = table.rows[i]?.cells[j];  // Safe navigation to avoid errors
-          if (cell) {
-              console.log(`Styling cell at (${i}, ${j}) with class ${css_id}`);
-              cell.classList.add(css_id);
-          } else {
-              console.warn(`Cell at (${i}, ${j}) not found.`);
-          }
-      }
-      function insertSpanRow(i, colspan, content) {
-        var table = document.getElementById('tinytable_ui797mem7l91x1et6ahu');
-        var newRow = table.insertRow(i);
-        var newCell = newRow.insertCell(0);
-        newCell.setAttribute("colspan", colspan);
-        // newCell.innerText = content;
-        // this may be unsafe, but innerText does not interpret <br>
-        newCell.innerHTML = content;
-      }
-      function spanCell_ui797mem7l91x1et6ahu(i, j, rowspan, colspan) {
-        var table = document.getElementById("tinytable_ui797mem7l91x1et6ahu");
-        const targetRow = table.rows[i];
-        const targetCell = targetRow.cells[j];
-        for (let r = 0; r < rowspan; r++) {
-          // Only start deleting cells to the right for the first row (r == 0)
-          if (r === 0) {
-            // Delete cells to the right of the target cell in the first row
-            for (let c = colspan - 1; c > 0; c--) {
-              if (table.rows[i + r].cells[j + c]) {
-                table.rows[i + r].deleteCell(j + c);
-              }
-            }
-          }
-          // For rows below the first, delete starting from the target column
-          if (r > 0) {
-            for (let c = colspan - 1; c >= 0; c--) {
-              if (table.rows[i + r] && table.rows[i + r].cells[j]) {
-                table.rows[i + r].deleteCell(j);
-              }
-            }
-          }
-        }
-        // Set rowspan and colspan of the target cell
-        targetCell.rowSpan = rowspan;
-        targetCell.colSpan = colspan;
-      }
+    <script>
+      // Create table-specific functions using external factory
+      const tableFns_wvh5p51huzao7aqy70vx = TinyTable.createTableFunctions("tinytable_wvh5p51huzao7aqy70vx");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: 2, j: 1 }, { i: 3, j: 1 }, { i: 4, j: 1 }, { i: 1, j: 1 }, { i: 1, j: 2 }, { i: 7, j: 1 }, { i: 3, j: 2 }, { i: 5, j: 1 }, { i: 5, j: 2 }, { i: 2, j: 2 }, { i: 7, j: 2 }, { i: 4, j: 2 },  ], css_id: 'tinytable_css_qx8zcosamqbbbxgnfvii',}, 
-          { positions: [ { i: 0, j: 0 },  ], css_id: 'tinytable_css_mwek6optcxldzep4z6ce',}, 
-          { positions: [ { i: 6, j: 0 },  ], css_id: 'tinytable_css_meki01924a6gzem7vv66',}, 
-          { positions: [ { i: 0, j: 1 }, { i: 0, j: 2 },  ], css_id: 'tinytable_css_ekhl1dymx3672xsdi7k0',}, 
-          { positions: [ { i: 1, j: 0 }, { i: 2, j: 0 }, { i: 3, j: 0 }, { i: 4, j: 0 }, { i: 5, j: 0 }, { i: 7, j: 0 },  ], css_id: 'tinytable_css_b3vj1lmzmbjblsj0f9h5',}, 
-          { positions: [ { i: 8, j: 1 }, { i: 8, j: 2 },  ], css_id: 'tinytable_css_arx1lwf6ykkvvxfo9zs5',}, 
-          { positions: [ { i: 8, j: 0 },  ], css_id: 'tinytable_css_9hpul87yc0u5ekbdfg7j',}, 
-          { positions: [ { i: 6, j: 1 }, { i: 6, j: 2 },  ], css_id: 'tinytable_css_2dq2o0orsfcvw3ca9cpd',}, 
+          { positions: [ { i: '8', j: 2 }, { i: '8', j: 3 } ], css_id: 'tinytable_css_2dq2o0orsfcvw3ca9cpd',}, 
+          { positions: [ { i: '6', j: 2 }, { i: '6', j: 3 } ], css_id: 'tinytable_css_qx8zcosamqbbbxgnfvii',}, 
+          { positions: [ { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '4', j: 2 }, { i: '5', j: 2 }, { i: '7', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '3', j: 3 }, { i: '4', j: 3 }, { i: '5', j: 3 }, { i: '7', j: 3 } ], css_id: 'tinytable_css_ekhl1dymx3672xsdi7k0',}, 
+          { positions: [ { i: '0', j: 2 }, { i: '0', j: 3 } ], css_id: 'tinytable_css_9hpul87yc0u5ekbdfg7j',}, 
+          { positions: [ { i: '8', j: 1 } ], css_id: 'tinytable_css_meki01924a6gzem7vv66',}, 
+          { positions: [ { i: '6', j: 1 } ], css_id: 'tinytable_css_b3vj1lmzmbjblsj0f9h5',}, 
+          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '4', j: 1 }, { i: '5', j: 1 }, { i: '7', j: 1 } ], css_id: 'tinytable_css_mwek6optcxldzep4z6ce',}, 
+          { positions: [ { i: '0', j: 1 } ], css_id: 'tinytable_css_ui797mem7l91x1et6ahu',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  styleCell_ui797mem7l91x1et6ahu(cell.i, cell.j, group.css_id);
+                  tableFns_wvh5p51huzao7aqy70vx.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
     </script>
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
-      /* tinytable css entries after */
-      .table td.tinytable_css_qx8zcosamqbbbxgnfvii, .table th.tinytable_css_qx8zcosamqbbbxgnfvii { text-align: center; }
-      .table td.tinytable_css_mwek6optcxldzep4z6ce, .table th.tinytable_css_mwek6optcxldzep4z6ce { text-align: left; border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
-      .table td.tinytable_css_meki01924a6gzem7vv66, .table th.tinytable_css_meki01924a6gzem7vv66 { text-align: left; border-bottom: solid black 0.05em; }
-      .table td.tinytable_css_ekhl1dymx3672xsdi7k0, .table th.tinytable_css_ekhl1dymx3672xsdi7k0 { text-align: center; border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
-      .table td.tinytable_css_b3vj1lmzmbjblsj0f9h5, .table th.tinytable_css_b3vj1lmzmbjblsj0f9h5 { text-align: left; }
-      .table td.tinytable_css_arx1lwf6ykkvvxfo9zs5, .table th.tinytable_css_arx1lwf6ykkvvxfo9zs5 { text-align: center; border-bottom: solid #d3d8dc 0.1em; }
-      .table td.tinytable_css_9hpul87yc0u5ekbdfg7j, .table th.tinytable_css_9hpul87yc0u5ekbdfg7j { text-align: left; border-bottom: solid #d3d8dc 0.1em; }
-      .table td.tinytable_css_2dq2o0orsfcvw3ca9cpd, .table th.tinytable_css_2dq2o0orsfcvw3ca9cpd { text-align: center; border-bottom: solid black 0.05em; }
+    /* tinytable css entries after */
+    #tinytable_wvh5p51huzao7aqy70vx td.tinytable_css_2dq2o0orsfcvw3ca9cpd, #tinytable_wvh5p51huzao7aqy70vx th.tinytable_css_2dq2o0orsfcvw3ca9cpd {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_wvh5p51huzao7aqy70vx td.tinytable_css_qx8zcosamqbbbxgnfvii, #tinytable_wvh5p51huzao7aqy70vx th.tinytable_css_qx8zcosamqbbbxgnfvii {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_wvh5p51huzao7aqy70vx td.tinytable_css_ekhl1dymx3672xsdi7k0, #tinytable_wvh5p51huzao7aqy70vx th.tinytable_css_ekhl1dymx3672xsdi7k0 { text-align: center }
+    #tinytable_wvh5p51huzao7aqy70vx td.tinytable_css_9hpul87yc0u5ekbdfg7j, #tinytable_wvh5p51huzao7aqy70vx th.tinytable_css_9hpul87yc0u5ekbdfg7j {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_wvh5p51huzao7aqy70vx td.tinytable_css_meki01924a6gzem7vv66, #tinytable_wvh5p51huzao7aqy70vx th.tinytable_css_meki01924a6gzem7vv66 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_wvh5p51huzao7aqy70vx td.tinytable_css_b3vj1lmzmbjblsj0f9h5, #tinytable_wvh5p51huzao7aqy70vx th.tinytable_css_b3vj1lmzmbjblsj0f9h5 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_wvh5p51huzao7aqy70vx td.tinytable_css_mwek6optcxldzep4z6ce, #tinytable_wvh5p51huzao7aqy70vx th.tinytable_css_mwek6optcxldzep4z6ce { text-align: left }
+    #tinytable_wvh5p51huzao7aqy70vx td.tinytable_css_ui797mem7l91x1et6ahu, #tinytable_wvh5p51huzao7aqy70vx th.tinytable_css_ui797mem7l91x1et6ahu {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
     </style>
     <div class="container">
-      <table class="table table-borderless" id="tinytable_ui797mem7l91x1et6ahu" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="tinytable" id="tinytable_wvh5p51huzao7aqy70vx" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+        <caption>Effect of Stock Performance on CEO Salary</caption>
         <thead>
-        </thead><caption>Effect of Stock Performance on CEO Salary</caption>
-              <tbody><tr>
-                <th scope="col"> </th>
-                <th scope="col">(1)</th>
-                <th scope="col">(2)</th>
+              <tr>
+                <th scope="col" data-row="0" data-col="1"> </th>
+                <th scope="col" data-row="0" data-col="2">(1)</th>
+                <th scope="col" data-row="0" data-col="3">(2)</th>
               </tr>
-        
-        </tbody><tfoot><tr><td colspan="3">* p &lt; 0.1, ** p &lt; 0.05, *** p &lt; 0.01</td></tr></tfoot>
+        </thead>
+        <tfoot><tr><td colspan="3">* p &lt; 0.1, ** p &lt; 0.05, *** p &lt; 0.01</td></tr></tfoot>
         <tbody>
                 <tr>
-                  <td>(Intercept)</td>
-                  <td>6.806***</td>
-                  <td>4.788***</td>
+                  <td data-row="1" data-col="1">(Intercept)</td>
+                  <td data-row="1" data-col="2">6.806***</td>
+                  <td data-row="1" data-col="3">4.788***</td>
                 </tr>
                 <tr>
-                  <td></td>
-                  <td>(0.041)</td>
-                  <td>(0.234)</td>
+                  <td data-row="2" data-col="1"></td>
+                  <td data-row="2" data-col="2">(0.041)</td>
+                  <td data-row="2" data-col="3">(0.234)</td>
                 </tr>
                 <tr>
-                  <td>Return on Stock (%)</td>
-                  <td>0.001</td>
-                  <td>0.001</td>
+                  <td data-row="3" data-col="1">Return on Stock (%)</td>
+                  <td data-row="3" data-col="2">0.001</td>
+                  <td data-row="3" data-col="3">0.001</td>
                 </tr>
                 <tr>
-                  <td></td>
-                  <td>(0.001)</td>
-                  <td>(0.001)</td>
+                  <td data-row="4" data-col="1"></td>
+                  <td data-row="4" data-col="2">(0.001)</td>
+                  <td data-row="4" data-col="3">(0.001)</td>
                 </tr>
                 <tr>
-                  <td>Log(Sales)</td>
-                  <td></td>
-                  <td>0.287***</td>
+                  <td data-row="5" data-col="1">Log(Sales)</td>
+                  <td data-row="5" data-col="2"></td>
+                  <td data-row="5" data-col="3">0.287***</td>
                 </tr>
                 <tr>
-                  <td></td>
-                  <td></td>
-                  <td>(0.033)</td>
+                  <td data-row="6" data-col="1"></td>
+                  <td data-row="6" data-col="2"></td>
+                  <td data-row="6" data-col="3">(0.033)</td>
                 </tr>
                 <tr>
-                  <td>Num.Obs.</td>
-                  <td>209</td>
-                  <td>209</td>
+                  <td data-row="7" data-col="1">Num.Obs.</td>
+                  <td data-row="7" data-col="2">209</td>
+                  <td data-row="7" data-col="3">209</td>
                 </tr>
                 <tr>
-                  <td>R2 Adj.</td>
-                  <td>-0.004</td>
-                  <td>0.264</td>
+                  <td data-row="8" data-col="1">R2 Adj.</td>
+                  <td data-row="8" data-col="2">-0.004</td>
+                  <td data-row="8" data-col="3">0.264</td>
                 </tr>
         </tbody>
       </table>
@@ -2052,37 +1933,37 @@ Table&nbsp;6.2: The Effect of Lot Area on Home Sale Price: Multiple Specificatio
 <h3 data-number="6.10.4" class="anchored" data-anchor-id="f-test-example"><span class="header-section-number">6.10.4</span> F-Test Example</h3>
 <p>Let’s test whether year built and year remodeled jointly affect home prices:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Unrestricted model (full model)</span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>reg_unrestricted <span class="ot">&lt;-</span> <span class="fu">lm</span>(sale_price <span class="sc">~</span> lot_area <span class="sc">+</span> pool_area <span class="sc">+</span> garage_area <span class="sc">+</span> </span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>                         year_built <span class="sc">+</span> year_remod, </span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">data =</span> housing_data)</span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Restricted model (dropping year variables)</span></span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>reg_restricted <span class="ot">&lt;-</span> <span class="fu">lm</span>(sale_price <span class="sc">~</span> lot_area <span class="sc">+</span> pool_area <span class="sc">+</span> garage_area,</span>
-<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>                     <span class="at">data =</span> housing_data)</span>
-<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute F-statistic manually</span></span>
-<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>ssr_r <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">resid</span>(reg_restricted)<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>ssr_ur <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">resid</span>(reg_unrestricted)<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>df_ur <span class="ot">&lt;-</span> <span class="fu">df.residual</span>(reg_unrestricted)</span>
-<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>q <span class="ot">&lt;-</span> <span class="dv">2</span>  <span class="co"># number of restrictions</span></span>
-<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>f_numerator <span class="ot">&lt;-</span> (ssr_r <span class="sc">-</span> ssr_ur) <span class="sc">/</span> q</span>
-<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>f_denominator <span class="ot">&lt;-</span> ssr_ur <span class="sc">/</span> df_ur</span>
-<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>f_stat <span class="ot">&lt;-</span> f_numerator <span class="sc">/</span> f_denominator</span>
-<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Critical value at 5% significance</span></span>
-<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a>f_crit <span class="ot">&lt;-</span> <span class="fu">qf</span>(<span class="fl">0.05</span>, <span class="at">df1 =</span> q, <span class="at">df2 =</span> df_ur, <span class="at">lower.tail =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"F-statistic:"</span>, <span class="fu">round</span>(f_stat, <span class="dv">2</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Unrestricted model (full model)</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>reg_unrestricted <span class="ot">&lt;-</span> <span class="fu">lm</span>(sale_price <span class="sc">~</span> lot_area <span class="sc">+</span> pool_area <span class="sc">+</span> garage_area <span class="sc">+</span> </span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>                         year_built <span class="sc">+</span> year_remod, </span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">data =</span> housing_data)</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Restricted model (dropping year variables)</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>reg_restricted <span class="ot">&lt;-</span> <span class="fu">lm</span>(sale_price <span class="sc">~</span> lot_area <span class="sc">+</span> pool_area <span class="sc">+</span> garage_area,</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>                     <span class="at">data =</span> housing_data)</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute F-statistic manually</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>ssr_r <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">resid</span>(reg_restricted)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>ssr_ur <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">resid</span>(reg_unrestricted)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>df_ur <span class="ot">&lt;-</span> <span class="fu">df.residual</span>(reg_unrestricted)</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>q <span class="ot">&lt;-</span> <span class="dv">2</span>  <span class="co"># number of restrictions</span></span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>f_numerator <span class="ot">&lt;-</span> (ssr_r <span class="sc">-</span> ssr_ur) <span class="sc">/</span> q</span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>f_denominator <span class="ot">&lt;-</span> ssr_ur <span class="sc">/</span> df_ur</span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>f_stat <span class="ot">&lt;-</span> f_numerator <span class="sc">/</span> f_denominator</span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Critical value at 5% significance</span></span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>f_crit <span class="ot">&lt;-</span> <span class="fu">qf</span>(<span class="fl">0.05</span>, <span class="at">df1 =</span> q, <span class="at">df2 =</span> df_ur, <span class="at">lower.tail =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"F-statistic:"</span>, <span class="fu">round</span>(f_stat, <span class="dv">2</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>F-statistic: 24.69 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Critical value (5%):"</span>, <span class="fu">round</span>(f_crit, <span class="dv">2</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Critical value (5%):"</span>, <span class="fu">round</span>(f_crit, <span class="dv">2</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Critical value (5%): 3.01 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Reject H₀?"</span>, f_stat <span class="sc">&gt;</span> f_crit, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Reject H₀?"</span>, f_stat <span class="sc">&gt;</span> f_crit, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Reject H₀? TRUE </code></pre>
 </div>
@@ -2093,7 +1974,7 @@ Table&nbsp;6.2: The Effect of Lot Area on Home Sale Price: Multiple Specificatio
 <h3 data-number="6.10.5" class="anchored" data-anchor-id="using-rs-anova-function"><span class="header-section-number">6.10.5</span> Using R’s anova() Function</h3>
 <p>In practice, you’ll use R’s <code>anova()</code> function to perform F-tests:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(reg_restricted, reg_unrestricted)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(reg_restricted, reg_unrestricted)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Analysis of Variance Table
 
