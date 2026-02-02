@@ -28,11 +28,19 @@ That's it! The instructions below will walk you through both.
 
 ## Getting Started
 
-### Step 1: Create a GitHub Account
+### Step 1: Install Git
+
+Before you can use Git with RStudio, you need to install it on your computer.
+
+**Mac:** Git may already be installed. To check, open **Terminal** (search for it in Spotlight) and type `git --version`. If you see a version number, you're all set! If not, you'll be prompted to install the Xcode Command Line Tools—click **Install** and follow the prompts. Alternatively, download Git from [git-scm.com/download/mac](https://git-scm.com/download/mac).
+
+**Windows:** Download the installer from [git-scm.com/download/win](https://git-scm.com/download/win) and run it. Use the default options—just keep clicking **Next**. When asked about "Adjusting your PATH environment," select **"Git from the command line and also from 3rd-party software"** (usually the default). After installation, restart RStudio if it was open.
+
+### Step 2: Create a GitHub Account
 
 If you don't already have one, create a free account at [github.com](https://github.com).
 
-### Step 2: Clone This Repository in RStudio
+### Step 3: Clone This Repository in RStudio
 
 1. Open RStudio
 2. Go to **File → New Project → Version Control → Git**
@@ -47,7 +55,7 @@ RStudio will download all the course materials to your computer.
 
 <!-- TODO: Add screenshot of RStudio clone dialog -->
 
-### Step 3: Open the Project
+### Step 4: Open the Project
 
 After cloning, always open the course materials by double-clicking the `ec325.Rproj` file. 
 This ensures your working directory is set correctly and file paths in the code will work.
