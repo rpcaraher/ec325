@@ -553,6 +553,7 @@ For our quadratic function $f(x) = ax^2 + bx + c$:
 
 ```{r}
 #| echo: false
+#| warning: false
 #| label: fig-quadratic-optimization
 #| fig-cap: "Left: When a > 0, the parabola opens upward and the critical point is a minimum. Right: When a < 0, the parabola opens downward and the critical point is a maximum."
 #| fig-width: 8
@@ -567,9 +568,9 @@ p1 <- ggplot(data.frame(x = x, y = y_min), aes(x = x, y = y)) +
   geom_line(color = "steelblue", linewidth = 1.2) +
   geom_point(aes(x = 1, y = 0), color = "red", size = 3) +
   geom_vline(xintercept = 1, linetype = "dashed", color = "red", alpha = 0.5) +
-  annotate("text", x = 1.5, y = 0.5, label = "Minimum", color = "red", size = 4) +
+  annotate("text", x = 1.4, y = 0.75, label = "Min.", color = "red", size = 4) +
   labs(
-    title = "a > 0: Minimum",
+    title = "a > 0: Min.",
     x = "x",
     y = "f(x)"
   ) +
@@ -582,9 +583,9 @@ p2 <- ggplot(data.frame(x = x, y = y_max), aes(x = x, y = y)) +
   geom_line(color = "steelblue", linewidth = 1.2) +
   geom_point(aes(x = 1, y = 2), color = "red", size = 3) +
   geom_vline(xintercept = 1, linetype = "dashed", color = "red", alpha = 0.5) +
-  annotate("text", x = 1.5, y = 1.5, label = "Maximum", color = "red", size = 4) +
+  annotate("text", x = 1.4, y = 1.4, label = "Max.", color = "red", size = 4) +
   labs(
-    title = "a < 0: Maximum",
+    title = "a < 0: Max.",
     x = "x",
     y = "f(x)"
   ) +
