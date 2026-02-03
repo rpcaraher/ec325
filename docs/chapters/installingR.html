@@ -375,6 +375,7 @@ window.Quarto = {
   <li><a href="#installing-packages" id="toc-installing-packages" class="nav-link" data-scroll-target="#installing-packages"><span class="header-section-number">A.8.1</span> Installing Packages</a></li>
   <li><a href="#the-tidyverse" id="toc-the-tidyverse" class="nav-link" data-scroll-target="#the-tidyverse"><span class="header-section-number">A.8.2</span> The Tidyverse</a></li>
   <li><a href="#loading-packages" id="toc-loading-packages" class="nav-link" data-scroll-target="#loading-packages"><span class="header-section-number">A.8.3</span> Loading Packages</a></li>
+  <li><a href="#the-pipe-operator" id="toc-the-pipe-operator" class="nav-link" data-scroll-target="#the-pipe-operator"><span class="header-section-number">A.8.4</span> The Pipe Operator</a></li>
   </ul></li>
   <li><a href="#summary-and-conclusion" id="toc-summary-and-conclusion" class="nav-link" data-scroll-target="#summary-and-conclusion"><span class="header-section-number">A.9</span> Summary and Conclusion</a>
   <ul class="collapse">
@@ -849,11 +850,18 @@ Table&nbsp;A.1: Common data type abbreviations in R
 </figcaption>
 <div aria-describedby="tbl-type-abbrev-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 14%">
+<col style="width: 30%">
+<col style="width: 21%">
+</colgroup>
 <thead>
 <tr class="header">
 <th>Abbreviation</th>
 <th>Type</th>
 <th>Description</th>
+<th>Example</th>
 </tr>
 </thead>
 <tbody>
@@ -861,36 +869,37 @@ Table&nbsp;A.1: Common data type abbreviations in R
 <td><code>&lt;dbl&gt;</code></td>
 <td>Double</td>
 <td>Numbers with decimals</td>
+<td><code>3.14</code>, <code>2.5</code></td>
 </tr>
 <tr class="even">
 <td><code>&lt;int&gt;</code></td>
 <td>Integer</td>
 <td>Whole numbers</td>
+<td><code>1</code>, <code>42</code></td>
 </tr>
 <tr class="odd">
 <td><code>&lt;chr&gt;</code></td>
 <td>Character</td>
 <td>Text strings</td>
+<td><code>"hello"</code>, <code>"NY"</code></td>
 </tr>
 <tr class="even">
 <td><code>&lt;fct&gt;</code></td>
 <td>Factor</td>
 <td>Categorical variable</td>
+<td><code>factor("low", "med", "high")</code></td>
 </tr>
 <tr class="odd">
 <td><code>&lt;lgl&gt;</code></td>
 <td>Logical</td>
 <td>TRUE/FALSE</td>
+<td><code>TRUE</code>, <code>FALSE</code></td>
 </tr>
 <tr class="even">
 <td><code>&lt;date&gt;</code></td>
 <td>Date</td>
 <td>Calendar dates</td>
-</tr>
-<tr class="odd">
-<td><code>&lt;dttm&gt;</code></td>
-<td>Datetime</td>
-<td>Date and time</td>
+<td><code>as.Date("2024-01-15")</code></td>
 </tr>
 </tbody>
 </table>
@@ -1009,7 +1018,32 @@ Figure&nbsp;A.2: Example R script with cursor position shown. Pressing Cmd/Ctrl 
 <div class="cell">
 <div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>When you load the tidyverse, you’ll see a message listing which packages were attached. You may also see messages about “conflicts”—this just means some tidyverse functions have the same name as functions in base R, and the tidyverse versions will take precedence. This is normal and expected behavior.</p>
+<p>When you load the <code>tidyverse</code>, you’ll see a message listing which packages were attached. You may also see messages about “conflicts”—this just means some <code>tidyverse</code> functions have the same name as functions in base R, and the <code>tidyverse</code> versions will take precedence. This is normal and expected behavior.</p>
+</section>
+<section id="the-pipe-operator" class="level3" data-number="A.8.4">
+<h3 data-number="A.8.4" class="anchored" data-anchor-id="the-pipe-operator"><span class="header-section-number">A.8.4</span> The Pipe Operator</h3>
+<p>One of the most useful features of the <code>tidyverse</code> is the <strong>pipe operator</strong>: <code>|&gt;</code>. The pipe takes the result of whatever is on its left and passes it as the first argument to the function on its right.</p>
+<p>Think of the pipe like a conjunction in a sentence. Just as “and” or “then” connect actions in English, the pipe connects operations in R. Instead of saying “Take the data, then filter it, then summarize it,” you write code that reads almost the same way:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>data <span class="sc">|&gt;</span></span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2020</span>) <span class="sc">|&gt;</span></span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mean_income =</span> <span class="fu">mean</span>(income))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This code reads naturally from top to bottom: “Start with <code>data</code>, <em>then</em> filter to rows where year equals 2020, <em>then</em> summarize by calculating the mean income.”</p>
+<p>Without the pipe, you would need to either nest functions inside each other (hard to read) or create intermediate objects at each step (clutters your environment). The pipe lets you write code that mirrors how you think about the analysis.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Base R Pipe vs.&nbsp;Magrittr Pipe
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>R now has a built-in pipe (<code>|&gt;</code>) that works without loading any packages. The <code>tidyverse</code> historically used <code>%&gt;%</code> from the <code>magrittr</code> package, which you may see other people use. Both work similarly for most purposes. We’ll use the base R pipe <code>|&gt;</code> in this course.</p>
+</div>
+</div>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1112,7 +1146,7 @@ Remember the Difference
 </div>
 
 <div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1121,7 +1155,7 @@ Show Explanation
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="i">
 <li><p>RStudio is the integrated development environment (IDE) designed for working with R. It runs R in the background while providing a much more user-friendly interface with features like syntax highlighting, the environment panel, and integrated plots.</p></li>
