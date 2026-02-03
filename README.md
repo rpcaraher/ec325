@@ -2,7 +2,7 @@
 
 Course materials for EC 325 at Colby College.
 
-View the syllabus [here](./docs/ec325_syllabus.html).
+View the syllabus [here](https://www.raymondcaraher.com/ec325/ec325_syllabus.html).
 
 Keep in mind that only reference materials,
 data, and ungraded in-class assignments are here.
