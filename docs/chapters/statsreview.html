@@ -926,13 +926,31 @@ E[X] = \frac{1}{6}(1) + \frac{1}{6}(2) + \frac{1}{6}(3) + \frac{1}{6}(4) + \frac
 <p>Notice that 3.5 is not a possible outcome of any single roll, but it is the average we would expect over many rolls.</p>
 <section id="properties-of-expected-values" class="level4" data-number="B.3.4.1">
 <h4 data-number="B.3.4.1" class="anchored" data-anchor-id="properties-of-expected-values"><span class="header-section-number">B.3.4.1</span> Properties of Expected Values</h4>
-<p>The properties of expected values mirror those of the summation operator:</p>
-<p><strong>Property 1:</strong> For any constant <span class="math inline">\(c\)</span>, <span class="math inline">\(E[c] = c\)</span>.</p>
-<p><strong>Property 2:</strong> For any constants <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span>, <span class="math inline">\(E[aX + b] = aE[X] + b\)</span>.</p>
-<p><strong>Property 3:</strong> If <span class="math inline">\(\{a_1, a_2, ..., a_n\}\)</span> are constants and <span class="math inline">\(\{X_1, X_2, ..., X_n\}\)</span> are random variables, then:</p>
-<p><span class="math display">\[
-E\left[\sum_{i=1}^{n} a_i X_i\right] = \sum_{i=1}^{n} a_i E[X_i]
-\]</span></p>
+<p>The properties of expected values mirror those of the summation operator and are essential for working with regression models.</p>
+<p><strong>Property 1: Expected value of a constant.</strong> The expected value of a constant is simply that constant: <span class="math display">\[E[c] = c\]</span></p>
+<p>This makes intuitive sense: if there is no randomness, the “expected” value is just the value itself.</p>
+<p><strong>Property 2: Multiplication by a constant.</strong> Constants can be factored out of the expectation operator: <span class="math display">\[E[cX] = cE[X]\]</span></p>
+<p>If you double a random variable, its expected value doubles.</p>
+<p><strong>Property 3: Additivity (Linearity).</strong> The expectation of a sum equals the sum of expectations: <span class="math display">\[E[X + Y] = E[X] + E[Y]\]</span></p>
+<p>Importantly, this property holds <strong>regardless of whether <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are independent</strong>. This is one of the most useful properties in econometrics.</p>
+<p><strong>Property 4: Combining the above.</strong> Combining Properties 1, 2, and 3, we get the general linearity property: <span class="math display">\[E[aX + bY + c] = aE[X] + bE[Y] + c\]</span></p>
+<p>This is extremely useful for working with regression equations. If <span class="math inline">\(Y = \beta_0 + \beta_1 X + u\)</span>, we can take expectations of both sides and apply this property.</p>
+<p><strong>Property 5: Product of independent variables.</strong> If <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are <strong>independent</strong> random variables, then: <span class="math display">\[E[XY] = E[X]E[Y]\]</span></p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Independence Required!
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This property only holds when <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are independent. If they are correlated, <span class="math inline">\(E[XY] \neq E[X]E[Y]\)</span> in general. In fact, <span class="math inline">\(E[XY] - E[X]E[Y] = \text{Cov}(X,Y)\)</span>.</p>
+</div>
+</div>
+<p><strong>Property 6: Expectation of a function (Jensen’s Inequality).</strong> In general, the expectation of a function is <strong>not</strong> equal to the function of the expectation: <span class="math display">\[E[g(X)] \neq g(E[X])\]</span></p>
+<p>For example, <span class="math inline">\(E[X^2] \neq (E[X])^2\)</span>. The difference between these two quantities is related to the variance: <span class="math inline">\(E[X^2] - (E[X])^2 = \text{Var}(X)\)</span>.</p>
 </section>
 </section>
 </section>
@@ -1129,22 +1147,34 @@ Figure&nbsp;B.4: A histogram of 10,000 draws from a standard normal distribution
 <td><span class="math inline">\(E[X] = \sum_{j=1}^{k} x_j f(x_j) = \mu\)</span></td>
 </tr>
 <tr class="even">
+<td>E[constant]</td>
+<td><span class="math inline">\(E[c] = c\)</span></td>
+</tr>
+<tr class="odd">
+<td>E[linear combo]</td>
+<td><span class="math inline">\(E[aX + bY + c] = aE[X] + bE[Y] + c\)</span></td>
+</tr>
+<tr class="even">
+<td>E[product] (indep.)</td>
+<td><span class="math inline">\(E[XY] = E[X]E[Y]\)</span> (if independent)</td>
+</tr>
+<tr class="odd">
 <td>Variance</td>
 <td><span class="math inline">\(\text{Var}(X) = E[(X-\mu)^2] = \sigma^2\)</span></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Standard deviation</td>
 <td><span class="math inline">\(\text{sd}(X) = \sqrt{\text{Var}(X)} = \sigma\)</span></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Covariance</td>
 <td><span class="math inline">\(\text{Cov}(X,Y) = E[(X-\mu_X)(Y-\mu_Y)]\)</span></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Correlation</td>
 <td><span class="math inline">\(\rho_{XY} = \frac{\text{Cov}(X,Y)}{\text{sd}(X) \cdot \text{sd}(Y)}\)</span></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Standardization</td>
 <td><span class="math inline">\(Z = \frac{X - \mu}{\sigma}\)</span></td>
 </tr>
@@ -1302,7 +1332,7 @@ Figure&nbsp;B.4: A histogram of 10,000 draws from a standard normal distribution
 </div>
 
 <div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1311,7 +1341,7 @@ Show Explanation
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="i">
 <li><p>By Property 1 of summation, <span class="math inline">\(\sum_{i=1}^{n} c = nc\)</span>. Here, <span class="math inline">\(c = 3\)</span> and <span class="math inline">\(n = 5\)</span>, so the sum is <span class="math inline">\(5 \times 3 = 15\)</span>.</p></li>

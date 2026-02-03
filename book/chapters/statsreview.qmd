@@ -745,17 +745,46 @@ but it is the average we would expect over many rolls.
 
 #### Properties of Expected Values
 
-The properties of expected values mirror those of the summation operator:
+The properties of expected values mirror those of the summation operator and are essential for working with regression models.
 
-**Property 1:** For any constant $c$, $E[c] = c$.
+**Property 1: Expected value of a constant.**
+The expected value of a constant is simply that constant:
+$$E[c] = c$$
 
-**Property 2:** For any constants $a$ and $b$, $E[aX + b] = aE[X] + b$.
+This makes intuitive sense: if there is no randomness, the "expected" value is just the value itself.
 
-**Property 3:** If $\{a_1, a_2, ..., a_n\}$ are constants and $\{X_1, X_2, ..., X_n\}$ are random variables, then:
+**Property 2: Multiplication by a constant.**
+Constants can be factored out of the expectation operator:
+$$E[cX] = cE[X]$$
 
-$$
-E\left[\sum_{i=1}^{n} a_i X_i\right] = \sum_{i=1}^{n} a_i E[X_i]
-$$
+If you double a random variable, its expected value doubles.
+
+**Property 3: Additivity (Linearity).**
+The expectation of a sum equals the sum of expectations:
+$$E[X + Y] = E[X] + E[Y]$$
+
+Importantly, this property holds **regardless of whether $X$ and $Y$ are independent**. This is one of the most useful properties in econometrics.
+
+**Property 4: Combining the above.**
+Combining Properties 1, 2, and 3, we get the general linearity property:
+$$E[aX + bY + c] = aE[X] + bE[Y] + c$$
+
+This is extremely useful for working with regression equations. If $Y = \beta_0 + \beta_1 X + u$, we can take expectations of both sides and apply this property.
+
+**Property 5: Product of independent variables.**
+If $X$ and $Y$ are **independent** random variables, then:
+$$E[XY] = E[X]E[Y]$$
+
+::: {.callout-warning}
+## Independence Required!
+This property only holds when $X$ and $Y$ are independent. If they are correlated, $E[XY] \neq E[X]E[Y]$ in general. In fact, $E[XY] - E[X]E[Y] = \text{Cov}(X,Y)$.
+:::
+
+**Property 6: Expectation of a function (Jensen's Inequality).**
+In general, the expectation of a function is **not** equal to the function of the expectation:
+$$E[g(X)] \neq g(E[X])$$
+
+For example, $E[X^2] \neq (E[X])^2$. The difference between these two quantities is related to the variance: $E[X^2] - (E[X])^2 = \text{Var}(X)$.
 
 
 ## Measures of Variability
@@ -998,6 +1027,9 @@ which plays a central role in statistical inference.
 | Critical point (quadratic) | $x^* = -\frac{b}{2a}$ for $f(x) = ax^2 + bx + c$ |
 | Second derivative test | Max if $f''(x^*) < 0$; Min if $f''(x^*) > 0$ |
 | Expected value | $E[X] = \sum_{j=1}^{k} x_j f(x_j) = \mu$ |
+| E[constant] | $E[c] = c$ |
+| E[linear combo] | $E[aX + bY + c] = aE[X] + bE[Y] + c$ |
+| E[product] (indep.) | $E[XY] = E[X]E[Y]$ (if independent) |
 | Variance | $\text{Var}(X) = E[(X-\mu)^2] = \sigma^2$ |
 | Standard deviation | $\text{sd}(X) = \sqrt{\text{Var}(X)} = \sigma$ |
 | Covariance | $\text{Cov}(X,Y) = E[(X-\mu_X)(Y-\mu_Y)]$ |
