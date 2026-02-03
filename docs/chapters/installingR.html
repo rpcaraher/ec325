@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Appendix A — Intro to R and RStudio – EC325 Workbook</title>
+<title>Appendix A — Intro to R and RStudio – EC325 Lecture Notes</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -179,19 +179,19 @@ window.Quarto = {
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="../">EC325 Workbook</a> 
+      <a href="../">EC325 Lecture Notes</a> 
         <div class="sidebar-tools-main">
     <div class="dropdown">
       <a href="" title="Download" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label="Download"><i class="bi bi-download"></i></a>
       <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
           <li>
-            <a class="dropdown-item sidebar-tools-main-item" href="../EC325-Workbook.pdf">
+            <a class="dropdown-item sidebar-tools-main-item" href="../EC325-Lecture-Notes.pdf">
               <i class="bi bi-file-pdf pe-1"></i>
             Download PDF
             </a>
           </li>
           <li>
-            <a class="dropdown-item sidebar-tools-main-item" href="../EC325-Workbook.epub">
+            <a class="dropdown-item sidebar-tools-main-item" href="../EC325-Lecture-Notes.epub">
               <i class="bi bi-journal pe-1"></i>
             Download ePub
             </a>
@@ -360,10 +360,9 @@ window.Quarto = {
   <li><a href="#logical-values" id="toc-logical-values" class="nav-link" data-scroll-target="#logical-values"><span class="header-section-number">A.5.3</span> Logical Values</a></li>
   <li><a href="#factors" id="toc-factors" class="nav-link" data-scroll-target="#factors"><span class="header-section-number">A.5.4</span> Factors</a></li>
   <li><a href="#checking-and-converting-types" id="toc-checking-and-converting-types" class="nav-link" data-scroll-target="#checking-and-converting-types"><span class="header-section-number">A.5.5</span> Checking and Converting Types</a></li>
-  <li><a href="#the-glimpse-function" id="toc-the-glimpse-function" class="nav-link" data-scroll-target="#the-glimpse-function"><span class="header-section-number">A.5.6</span> The <code>glimpse()</code> Function</a></li>
-  <li><a href="#common-type-abbreviations" id="toc-common-type-abbreviations" class="nav-link" data-scroll-target="#common-type-abbreviations"><span class="header-section-number">A.5.7</span> Common Type Abbreviations</a></li>
-  <li><a href="#data-frames" id="toc-data-frames" class="nav-link" data-scroll-target="#data-frames"><span class="header-section-number">A.5.8</span> Data Frames</a></li>
-  <li><a href="#comments" id="toc-comments" class="nav-link" data-scroll-target="#comments"><span class="header-section-number">A.5.9</span> Comments</a></li>
+  <li><a href="#common-type-abbreviations" id="toc-common-type-abbreviations" class="nav-link" data-scroll-target="#common-type-abbreviations"><span class="header-section-number">A.5.6</span> Common Type Abbreviations</a></li>
+  <li><a href="#data-frames" id="toc-data-frames" class="nav-link" data-scroll-target="#data-frames"><span class="header-section-number">A.5.7</span> Data Frames</a></li>
+  <li><a href="#comments" id="toc-comments" class="nav-link" data-scroll-target="#comments"><span class="header-section-number">A.5.8</span> Comments</a></li>
   </ul></li>
   <li><a href="#working-with-r-scripts" id="toc-working-with-r-scripts" class="nav-link" data-scroll-target="#working-with-r-scripts"><span class="header-section-number">A.6</span> Working with R Scripts</a>
   <ul class="collapse">
@@ -840,32 +839,8 @@ Levels: Economics Math Physics</code></pre>
 </div>
 </div>
 </section>
-<section id="the-glimpse-function" class="level3" data-number="A.5.6">
-<h3 data-number="A.5.6" class="anchored" data-anchor-id="the-glimpse-function"><span class="header-section-number">A.5.6</span> The <code>glimpse()</code> Function</h3>
-<p>The <code>glimpse()</code> function from the tidyverse shows you the type of every column in a data frame:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(mtcars)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Rows: 32
-Columns: 11
-$ mpg  &lt;dbl&gt; 21.0, 21.0, 22.8, 21.4, 18.7, 18.1, 14.3, 24.4, 22.8, 19.2, 17.8,…
-$ cyl  &lt;dbl&gt; 6, 6, 4, 6, 8, 6, 8, 4, 4, 6, 6, 8, 8, 8, 8, 8, 8, 4, 4, 4, 4, 8,…
-$ disp &lt;dbl&gt; 160.0, 160.0, 108.0, 258.0, 360.0, 225.0, 360.0, 146.7, 140.8, 16…
-$ hp   &lt;dbl&gt; 110, 110, 93, 110, 175, 105, 245, 62, 95, 123, 123, 180, 180, 180…
-$ drat &lt;dbl&gt; 3.90, 3.90, 3.85, 3.08, 3.15, 2.76, 3.21, 3.69, 3.92, 3.92, 3.92,…
-$ wt   &lt;dbl&gt; 2.620, 2.875, 2.320, 3.215, 3.440, 3.460, 3.570, 3.190, 3.150, 3.…
-$ qsec &lt;dbl&gt; 16.46, 17.02, 18.61, 19.44, 17.02, 20.22, 15.84, 20.00, 22.90, 18…
-$ vs   &lt;dbl&gt; 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0,…
-$ am   &lt;dbl&gt; 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0,…
-$ gear &lt;dbl&gt; 4, 4, 4, 3, 3, 3, 3, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 4, 4, 4, 3, 3,…
-$ carb &lt;dbl&gt; 4, 4, 1, 1, 2, 1, 4, 2, 2, 4, 4, 3, 3, 3, 4, 4, 4, 1, 2, 1, 1, 2,…</code></pre>
-</div>
-</div>
-<p>Each variable is shown with its type abbreviation (<code>&lt;dbl&gt;</code> for double, <code>&lt;int&gt;</code> for integer, etc.). This is one of the first things you should run when loading a new dataset.</p>
-</section>
-<section id="common-type-abbreviations" class="level3" data-number="A.5.7">
-<h3 data-number="A.5.7" class="anchored" data-anchor-id="common-type-abbreviations"><span class="header-section-number">A.5.7</span> Common Type Abbreviations</h3>
+<section id="common-type-abbreviations" class="level3" data-number="A.5.6">
+<h3 data-number="A.5.6" class="anchored" data-anchor-id="common-type-abbreviations"><span class="header-section-number">A.5.6</span> Common Type Abbreviations</h3>
 <p>When working with data frames, you’ll frequently see these abbreviations:</p>
 <div id="tbl-type-abbrev" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -923,12 +898,12 @@ Table&nbsp;A.1: Common data type abbreviations in R
 </figure>
 </div>
 </section>
-<section id="data-frames" class="level3" data-number="A.5.8">
-<h3 data-number="A.5.8" class="anchored" data-anchor-id="data-frames"><span class="header-section-number">A.5.8</span> Data Frames</h3>
+<section id="data-frames" class="level3" data-number="A.5.7">
+<h3 data-number="A.5.7" class="anchored" data-anchor-id="data-frames"><span class="header-section-number">A.5.7</span> Data Frames</h3>
 <p>Data frames are the primary way that structured, tabular data is stored in R. A data frame is essentially a table where each column is a vector and each row is an observation. R comes with several built-in data frames for practice, including <code>mtcars</code>, which contains data on various car models.</p>
 <p>Use <code>head()</code> to view the first few rows of a data frame:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(mtcars)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(mtcars)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                   mpg cyl disp  hp drat    wt  qsec vs am gear carb
 Mazda RX4         21.0   6  160 110 3.90 2.620 16.46  0  1    4    4
@@ -941,19 +916,19 @@ Valiant           18.1   6  225 105 2.76 3.460 20.22  1  0    3    1</code></pre
 </div>
 <p>You can explore the structure of a data frame using several helpful functions:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(mtcars)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(mtcars)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 32</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ncol</span>(mtcars)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ncol</span>(mtcars)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 11</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(mtcars)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(mtcars)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> [1] "mpg"  "cyl"  "disp" "hp"   "drat" "wt"   "qsec" "vs"   "am"   "gear"
 [11] "carb"</code></pre>
@@ -961,19 +936,19 @@ Valiant           18.1   6  225 105 2.76 3.460 20.22  1  0    3    1</code></pre
 </div>
 <p>To access a specific column (variable) within a data frame, use the <code>$</code> operator:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(mtcars<span class="sc">$</span>mpg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(mtcars<span class="sc">$</span>mpg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 21.0 21.0 22.8 21.4 18.7 18.1</code></pre>
 </div>
 </div>
 <p>Here, <code>mtcars$mpg</code> extracts the <code>mpg</code> column from the <code>mtcars</code> data frame as a vector. I wrapped it in <code>head()</code> to show only the first few values.</p>
 </section>
-<section id="comments" class="level3" data-number="A.5.9">
-<h3 data-number="A.5.9" class="anchored" data-anchor-id="comments"><span class="header-section-number">A.5.9</span> Comments</h3>
+<section id="comments" class="level3" data-number="A.5.8">
+<h3 data-number="A.5.8" class="anchored" data-anchor-id="comments"><span class="header-section-number">A.5.8</span> Comments</h3>
 <p>In R, anything preceded by the <code>#</code> symbol is treated as a comment and will not be executed. Comments are essential for documenting your code—explaining what each section does, leaving notes for yourself, or marking areas that need revision.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Find the mean miles per gallon</span></span>
-<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(mtcars<span class="sc">$</span>mpg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Find the mean miles per gallon</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(mtcars<span class="sc">$</span>mpg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 20.09062</code></pre>
 </div>
@@ -1009,7 +984,7 @@ Figure&nbsp;A.2: Example R script with cursor position shown. Pressing Cmd/Ctrl 
 <h2 data-number="A.7" class="anchored" data-anchor-id="working-directories"><span class="header-section-number">A.7</span> Working Directories</h2>
 <p>R uses a concept called the “working directory”—the folder on your computer where R looks for files you want to load and where it saves files you create. You can see your current working directory at the top of the console, or by running:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">getwd</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">getwd</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>A good workflow is to save your R script in a dedicated folder for this course (or a subfolder for each week’s work), put all related data files in the same folder, and then set your working directory to that location. In RStudio, go to Session → Set Working Directory → To Source File Location to automatically set the working directory to wherever your script is saved.</p>
 </section>
@@ -1020,7 +995,7 @@ Figure&nbsp;A.2: Example R script with cursor position shown. Pressing Cmd/Ctrl 
 <h3 data-number="A.8.1" class="anchored" data-anchor-id="installing-packages"><span class="header-section-number">A.8.1</span> Installing Packages</h3>
 <p>You only need to install a package once on your computer. Use the <code>install.packages()</code> function:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"tidyverse"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"tidyverse"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="the-tidyverse" class="level3" data-number="A.8.2">
@@ -1032,7 +1007,7 @@ Figure&nbsp;A.2: Example R script with cursor position shown. Pressing Cmd/Ctrl 
 <h3 data-number="A.8.3" class="anchored" data-anchor-id="loading-packages"><span class="header-section-number">A.8.3</span> Loading Packages</h3>
 <p>Once a package is installed, you need to load it each time you start a new R session using <code>library()</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>When you load the tidyverse, you’ll see a message listing which packages were attached. You may also see messages about “conflicts”—this just means some tidyverse functions have the same name as functions in base R, and the tidyverse versions will take precedence. This is normal and expected behavior.</p>
 <div class="callout callout-style-default callout-important callout-titled">

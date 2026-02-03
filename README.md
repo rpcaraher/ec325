@@ -2,14 +2,18 @@
 
 Course materials for EC 325 at Colby College.
 
-View the syllabus [here](https://www.raymondcaraher.com/ec325/ec325_syllabus.html).
+View the [syllabus here](https://www.raymondcaraher.com/ec325/ec325_syllabus.html).
 
 Keep in mind that only reference materials,
-data, and ungraded in-class assignments are here.
+data, and ungraded in-class exercises are here.
 Graded assignments,
 including concept checks and problem sets,
 will only be posted on Moodle.
 Don't forget you also have to submit your work to Moodle.
+
+## Getting Started
+
+Follow the steps in [EC325 Installation Guide](https://www.raymondcaraher.com/ec325/ec325_installation_guide.html) to get all the software set up for the course.
 
 ## What is Git and GitHub?
 
@@ -28,59 +32,6 @@ You don't need to become a Git expert for this class. You only need to know how 
 
 That's it! The instructions below will walk you through both.
 
-## Getting Started
-
-### Step 1: Install Git
-
-Before you can use Git with RStudio, you need to install it on your computer.
-
-**Mac:** Git may already be installed. To check, open **Terminal** (search for it in Spotlight) and type `git --version`. If you see a version number, you're all set! If not, you'll be prompted to install the Xcode Command Line Tools—click **Install** and follow the prompts. Alternatively, download Git from [git-scm.com/download/mac](https://git-scm.com/download/mac).
-
-**Windows:** Download the installer from [git-scm.com/download/win](https://git-scm.com/download/win) and run it. Use the default options—just keep clicking **Next**. When asked about "Adjusting your PATH environment," select **"Git from the command line and also from 3rd-party software"** (usually the default). After installation, restart RStudio if it was open.
-
-### Step 2: Create a GitHub Account
-
-If you don't already have one, create a free account at [github.com](https://github.com).
-
-### Step 3: Configure Git
-
-Before using Git, you need to tell it who you are.
-Open your terminal (Terminal on Mac, Git Bash or Command Prompt on Windows) and run:
-
-```bash
-git config --global user.name "Your Name"
-git config --global user.email "your.email@example.com"
-```
-
-Replace "Your Name" with your actual name and use the email address associated with your GitHub account.
-These settings identify you as the author of changes you make.
-
-You can verify your settings with:
-
-```bash
-git config --list
-```
-
-### Step 4: Clone This Repository in RStudio
-
-1. Open RStudio
-2. Go to **File → New Project → Version Control → Git**
-3. In the "Repository URL" field, paste:
-   ```
-   https://github.com/rpcaraher/ec325.git
-   ```
-4. Choose a location on your computer to save the project (e.g., your Documents folder)
-5. Click **Create Project**
-
-RStudio will download all the course materials to your computer.
-
-<!-- TODO: Add screenshot of RStudio clone dialog -->
-
-### Step 5: Open the Project
-
-After cloning, always open the course materials by double-clicking the `ec325.Rproj` file. 
-This ensures your working directory is set correctly and file paths in the code will work.
-
 ## Updating Course Materials
 
 When I announce updates to the course materials:
@@ -88,8 +39,6 @@ When I announce updates to the course materials:
 1. Open the project in RStudio
 2. Go to the **Git** tab (usually in the upper-right pane)
 3. Click the **Pull** button (down arrow)
-
-<!-- TODO: Add screenshot of Git pane with Pull button highlighted -->
 
 That's it! Your materials are now up to date.
 
@@ -102,6 +51,7 @@ ec325/
 ├── data/              # Datasets for labs and problem sets
 ├── labs/              # In-class lab exercises
 ├── student-work/      # YOUR work goes here (not tracked by Git!)
+├── other/             # Other documents and files I use
 └── docs/              # Rendered book (also viewable online at link below)
 ```
 

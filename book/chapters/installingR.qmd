@@ -456,33 +456,18 @@ numbers <- c(1, 2, 3)
 as.character(numbers)
 ```
 
-### The `glimpse()` Function
-
-The `glimpse()` function from the tidyverse shows you the type of every column in a data frame:
-
-```{r}
-#| message: false
-library(tidyverse)
-glimpse(mtcars)
-```
-
-Each variable is shown with its type abbreviation (`<dbl>` for double, `<int>` for integer, etc.).
-This is one of the first things you should run when loading a new dataset.
-
 ### Common Type Abbreviations
 
 When working with data frames, you'll frequently see these abbreviations:
 
-| Abbreviation | Type | Description |
-|--------------|------|-------------|
-| `<dbl>` | Double | Numbers with decimals |
-| `<int>` | Integer | Whole numbers |
-| `<chr>` | Character | Text strings |
-| `<fct>` | Factor | Categorical variable |
-| `<lgl>` | Logical | TRUE/FALSE |
-| `<date>` | Date | Calendar dates |
-| `<dttm>` | Datetime | Date and time |
-
+| Abbreviation | Type | Description | Example |
+|--------------|------|-------------|---------|
+| `<dbl>` | Double | Numbers with decimals | `3.14`, `2.5` |
+| `<int>` | Integer | Whole numbers | `1`, `42` |
+| `<chr>` | Character | Text strings | `"hello"`, `"NY"` |
+| `<fct>` | Factor | Categorical variable | `factor("low", "med", "high")` |
+| `<lgl>` | Logical | TRUE/FALSE | `TRUE`, `FALSE` |
+| `<date>` | Date | Calendar dates | `as.Date("2024-01-15")` |
 : Common data type abbreviations in R {#tbl-type-abbrev}
 
 
@@ -641,11 +626,44 @@ you need to load it each time you start a new R session using `library()`:
 library(tidyverse)
 ```
 
-When you load the tidyverse, 
+When you load the `tidyverse`, 
 you'll see a message listing which packages were attached.
-You may also see messages about "conflicts"---this just means some tidyverse functions have the same name as functions in base R, 
-and the tidyverse versions will take precedence.
+You may also see messages about "conflicts"---this just means some `tidyverse` functions have the same name as functions in base R, 
+and the `tidyverse` versions will take precedence.
 This is normal and expected behavior.
+
+### The Pipe Operator
+
+One of the most useful features of the `tidyverse` is the **pipe operator**: `|>`.
+The pipe takes the result of whatever is on its left and passes it as the first argument to the function on its right.
+
+Think of the pipe like a conjunction in a sentence.
+Just as "and" or "then" connect actions in English,
+the pipe connects operations in R.
+Instead of saying "Take the data, then filter it, then summarize it,"
+you write code that reads almost the same way:
+
+```{r}
+#| eval: false
+data |>
+  filter(year == 2020) |>
+  summarize(mean_income = mean(income))
+```
+
+This code reads naturally from top to bottom:
+"Start with `data`, *then* filter to rows where year equals 2020, *then* summarize by calculating the mean income."
+
+Without the pipe, you would need to either nest functions inside each other (hard to read) or create intermediate objects at each step (clutters your environment).
+The pipe lets you write code that mirrors how you think about the analysis.
+
+::: {.callout-note}
+## Base R Pipe vs. Magrittr Pipe
+R now has a built-in pipe (`|>`) that works without loading any packages.
+The `tidyverse` historically used `%>%` from the `magrittr` package,
+which you may see other people use.
+Both work similarly for most purposes.
+We'll use the base R pipe `|>` in this course.
+:::
 
 ::: {.callout-important}
 ## Remember the Difference
