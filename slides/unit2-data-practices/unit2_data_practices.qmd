@@ -479,10 +479,337 @@ install.packages("tidyverse")
 library(tidyverse)
 ```
 
+#  Descriptive Statistics in R
 
-#  Data Analysis in R
+## What is the `tidyverse`?
 
-## SLIDES IN PROGRESS
+- We will work with the suite of `tidyverse` functions to do data manipulation and exploration
+- The `tidyverse` is a collection of R packages designed for data science. 
+- These packages share a common philosophy and work seamlessly together
+
+
+. . .
+
+Includes:
+
+- `dplyr`: the engine for data cleaning and manipulation
+- `ggplot2`: the engine for data visualization
+- `readr`: the engine for reading a diverse set of data files
+
+. . .
+
+We will work with all of these engines.
+
+
+## The `mtcars` data
+
+- Let's learn about `tidyverse` functions using the `mtcars` data
+
+```{r}
+#| output-location: fragment
+
+mtcars
+```
+
+## The Pipe `|>` {.smaller}
+
+- Takes whatever is to the left of `|>` and passes it as the first argument to the function to the right of `|>`
+- Kind of like a conjunction in a sentence
+  - Just like the way "and" or "then" connects parts of a phrase, the `|>` connects parts of a data task
+- Example: Take the `mtcars` data *AND* filter it to only cars greater than 2 tons *AND* create a new variables which converts MPG to KMPL
+
+. . .
+
+```{r}
+#| echo: true
+#| code-line-numbers: "1|2|3"
+#| output: false
+
+mtcars |>
+  filter(age >= 18) |>
+  mutate(kmpl = mpg / 2.352)
+
+```
+
+. . .
+
+```{r}
+#| echo: false
+
+mtcars |>
+  filter(age >= 18) |>
+  mutate(kmpl = mpg / 2.352)
+
+```
+
+## Key Functions for Data Manipulation
+
+- The `tidyverse` gives us a set of intuitive *verbs* for working with data
+- Each function does **one thing** well
+- They all follow the same pattern: first argument is the data, then the details
+
+## `filter()`: Subset Rows {.smaller}
+
+- **Purpose:** Keep only the rows that meet a condition
+- **Key arguments:**
+  - `.data`: the data frame (or piped in with `|>`)
+  - `...`: one or more logical conditions
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+mtcars |>
+  filter(mpg > 25)
+```
+
+## `select()`: Choose Columns {.smaller}
+
+- **Purpose:** Keep (or drop) specific columns from a data frame
+- **Key arguments:**
+  - `...`: column names to keep (or use `-` to drop)
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+mtcars |>
+  select(mpg, cyl, wt)
+
+```
+
+## `mutate()`: Create New Variables {.smaller}
+
+- **Purpose:** Add new columns or modify existing ones
+- **Key arguments:**
+  - `...`: name-value pairs (e.g., `new_col = expression`)
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+mtcars |>
+  mutate(kmpl = mpg * 0.425) |>
+  select(mpg, kmpl)
+
+```
+
+## Conditional Assignment with `ifelse()` {.smaller}
+
+- Often we want to create a variable whose value **depends on a condition**
+- `ifelse()` checks a condition for every row and assigns a value accordingly
+
+. . .
+
+**Arguments:**
+
+- `test`: a logical condition (e.g., `mpg > 20`)
+- `yes`: value to assign if the condition is `TRUE`
+- `no`: value to assign if the condition is `FALSE`
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+mtcars |>
+  mutate(efficiency = ifelse(mpg > 20, "High", "Low")) |>
+  select(mpg, efficiency) |>
+  head(6)
+```
+
+## `ifelse()` Inside `mutate()` {.smaller}
+
+- `ifelse()` is most powerful when paired with `mutate()`
+- This lets us create new categorical variables from numeric ones---very useful for group comparisons
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+mtcars |>
+  mutate(
+    power_class = ifelse(hp > 150, "High Power", "Standard"),
+    weight_class = ifelse(wt > 3, "Heavy", "Light")
+  ) |>
+  select(hp, power_class, wt, weight_class) |>
+  head(6)
+```
+
+## `case_when()`: Multiple Conditions {.smaller}
+
+- What if we need **more than two** categories?
+- `case_when()` lets us chain multiple conditions together
+- Each line follows the pattern: `condition ~ value`
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+mtcars |>
+  mutate(cyl_label = case_when(
+    cyl == 4 ~ "Four",
+    cyl == 6 ~ "Six",
+    cyl == 8 ~ "Eight"
+  )) |>
+  select(cyl, cyl_label) |>
+  head(6)
+```
+
+## `summarize()`: Compute Summary Statistics {.smaller}
+
+- **Purpose:** Collapse a data frame into a single summary row
+- **Key arguments:**
+  - `...`: summary functions (e.g., `mean()`, `sd()`, `n()`)
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+mtcars |>
+  summarize(
+    mean_mpg = mean(mpg),
+    sd_mpg = sd(mpg),
+    n = n()
+  )
+```
+
+## `group_by()` + `summarize()`: Grouped Summaries {.smaller}
+
+- **Purpose:** Split data into groups and summarize each group separately
+- `group_by()` **key argument:** the column(s) to group by
+- Pair it with `summarize()` to get statistics *by group*
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+mtcars |>
+  group_by(cyl) |>
+  summarize(
+    mean_mpg = mean(mpg),
+    mean_hp = mean(hp),
+    n = n()
+  )
+```
+
+## `arrange()`: Sort Rows {.smaller}
+
+- **Purpose:** Reorder rows based on one or more columns
+- **Key arguments:**
+  - `...`: columns to sort by (use `desc()` for descending order)
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+mtcars |>
+  arrange(desc(mpg)) |>
+  select(mpg, cyl, hp)
+
+```
+
+## Practice: Try It Yourself! {.smaller}
+
+Using the `mtcars` data frame, try to answer each of the following questions using `tidyverse` functions. Give each one a try before clicking to reveal the answer!
+
+## Practice 1 {.smaller}
+
+**What is the average horsepower (`hp`) of all cars in the dataset?**
+
+- *Hint:* You only need `summarize()` and `mean()`
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+mtcars |>
+  summarize(mean_hp = mean(hp))
+```
+
+## Practice 2 {.smaller}
+
+**What is the average MPG for cars with more than 4 cylinders vs. 4 or fewer?**
+
+- *Hint:* First `mutate()` a grouping variable, then `group_by()` and `summarize()`
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+mtcars |>
+  mutate(cyl_group = ifelse(cyl > 4, "More than 4", "4 or fewer")) |>
+  group_by(cyl_group) |>
+  summarize(mean_mpg = mean(mpg))
+```
+
+## Practice 3 {.smaller}
+
+**Which car has the highest horsepower? Show only its `mpg`, `hp`, and `wt`.**
+
+- *Hint:* `arrange()` in descending order, then `select()` and `head()`
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+mtcars |>
+  arrange(desc(hp)) |>
+  select(mpg, hp, wt) |>
+  head(1)
+```
+
+## Practice 4 {.smaller}
+
+**Create a summary table showing the number of cars, mean weight (`wt`), and mean MPG for each number of cylinders (`cyl`).**
+
+- *Hint:* `group_by()` + `summarize()` with `n()`, `mean(wt)`, and `mean(mpg)`
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+mtcars |>
+  group_by(cyl) |>
+  summarize(
+    n_cars = n(),
+    mean_wt = mean(wt),
+    mean_mpg = mean(mpg)
+  )
+```
+
+## Practice 5 {.smaller}
+
+**Among cars that weigh less than 3,000 lbs (`wt < 3`), what is the mean and standard deviation of their quarter-mile time (`qsec`)?**
+
+- *Hint:* `filter()` first, then `summarize()`
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+mtcars |>
+  filter(wt < 3) |>
+  summarize(
+    mean_qsec = mean(qsec),
+    sd_qsec = sd(qsec),
+    n = n()
+  )
+```
+
 
 #  Visualizations in R
 
