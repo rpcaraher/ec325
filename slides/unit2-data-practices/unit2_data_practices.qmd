@@ -4,6 +4,7 @@ subtitle: "EC 325: Econometrics"
 author: "Prof. Caraher"
 institute: "Colby College"
 date: "today"
+embed-resources: true
 format:
   revealjs:
     theme: simple
@@ -21,7 +22,6 @@ execute:
 #| echo: false
 
 library(tidyverse)
-library(palmerpenguins)
 ```
 
 
@@ -231,12 +231,25 @@ You should see four main panels:
 
 - For now, **let's just focus on the console**
 
-- Feel free to follow along!
+## How to Follow Along
+
+Throughout these slides, look for this marker:
+
+. . .
+
+::: {.callout-note icon=false}
+## 🖥️ Try it yourself!
+Type along in your console as we go
+:::
 
 ## Basic R Operations {.smaller}
 
+::: {.callout-note icon=false}
+## 🖥️ Try it yourself!
+:::
+
 - R can work as a calculator!
-- Type each one of the expressions below in your console and let me know what you get
+- Type each expression below in your console:
 
 . . .
 
@@ -276,9 +289,12 @@ You should see four main panels:
 
 ## Objects and Assignment {.smaller}
 
+::: {.callout-note icon=false}
+## 🖥️ Try it yourself!
+:::
+
 - Store things as an object using the assignment operator `<-`
-- We can then just recall the object by name to access whatever is saved to it!
-- We can then use it in calculations, functions, etc.
+- Try typing these in your console:
 
 . . .
 
@@ -312,10 +328,15 @@ x + y
 
 ```
 
-## Vectors
+## Vectors {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Try it yourself!
+:::
 
 - A vector is a sequence of values of the same type
-- We can perform operations on vectors, and it will apply it to each element of the vector
+- Use the `c()` function to **combine** values into a vector
+- Operations apply to each element:
 
 . . .
 
@@ -350,10 +371,13 @@ ages + primes
 
 ## Functions {.smaller}
 
-- Functions are pre-packaged sets of instructions that perform specific tasks
-- Every function requires we input an *argument*, which it uses to produce some output
+::: {.callout-note icon=false}
+## 🖥️ Try it yourself!
+:::
 
-- The `seq()` function generates a sequence of numbers:
+- Functions are pre-packaged sets of instructions that perform specific tasks
+- Every function requires an *argument* to produce output
+- Try the `seq()` function, which generates a sequence of numbers:
 
 . . .
 
@@ -377,22 +401,21 @@ bb
 ## Data Frames {.smaller}
 
 - A data frame is the main way datasets are stored as objects
-- Basically resembles a spreadsheet
-- rows = observations**, **columns = variables
-- (the `head()` function will print only the first `n` rows to the console)
+- Basically resembles a spreadsheet: rows = observations, columns = variables
+- The `head()` function prints only the first `n` rows:
 
 . . .
 
 ```{r}
 #| echo: true
 #| output-location: fragment
-#| 
-head(penguins, 4)
+
+head(mtcars, 4)
 ```
 
 . . .
 
-- We can Pull a specific column with `$` (useful for many functions)
+- We can pull a specific column with `$` (useful for many functions)
 
 . . .
 
@@ -400,7 +423,7 @@ head(penguins, 4)
 #| echo: true
 #| output-location: fragment
 
-head(penguins$body_mass_g, 10)
+head(mtcars$mpg, 10)
 
 ```
 
@@ -468,6 +491,8 @@ greeting + "3"  # Error!
 1. Install the package (only do it once!)
 2. Load the package using `library()` (every time!)
 
+. . .
+
 ```{r}
 #| eval: false
 #| echo: true
@@ -479,9 +504,9 @@ install.packages("tidyverse")
 library(tidyverse)
 ```
 
-#  Descriptive Statistics in R
+#  Data Manipulation in R
 
-## What is the `tidyverse`?
+## What is the `tidyverse`? {.smaller}
 
 - We will work with the suite of `tidyverse` functions to do data manipulation and exploration
 - The `tidyverse` is a collection of R packages designed for data science. 
@@ -505,6 +530,8 @@ We will work with all of these engines.
 
 - Let's learn about `tidyverse` functions using the `mtcars` data
 
+. . .
+
 ```{r}
 #| output-location: fragment
 
@@ -514,32 +541,16 @@ mtcars
 ## The Pipe `|>` {.smaller}
 
 - Takes whatever is to the left of `|>` and passes it as the first argument to the function to the right of `|>`
-- Kind of like a conjunction in a sentence
-  - Just like the way "and" or "then" connects parts of a phrase, the `|>` connects parts of a data task
-- Example: Take the `mtcars` data *AND* filter it to only cars greater than 2 tons *AND* create a new variables which converts MPG to KMPL
+- Kind of like "and then" in a sentence
 
 . . .
 
 ```{r}
-#| echo: true
-#| code-line-numbers: "1|2|3"
-#| output: false
+#| output-location: fragment
 
+# Take mtcars AND THEN filter to high-mpg cars
 mtcars |>
-  filter(age >= 18) |>
-  mutate(kmpl = mpg / 2.352)
-
-```
-
-. . .
-
-```{r}
-#| echo: false
-
-mtcars |>
-  filter(age >= 18) |>
-  mutate(kmpl = mpg / 2.352)
-
+  filter(mpg > 25)
 ```
 
 ## Key Functions for Data Manipulation
@@ -551,9 +562,6 @@ mtcars |>
 ## `filter()`: Subset Rows {.smaller}
 
 - **Purpose:** Keep only the rows that meet a condition
-- **Key arguments:**
-  - `.data`: the data frame (or piped in with `|>`)
-  - `...`: one or more logical conditions
 
 . . .
 
@@ -567,8 +575,6 @@ mtcars |>
 ## `select()`: Choose Columns {.smaller}
 
 - **Purpose:** Keep (or drop) specific columns from a data frame
-- **Key arguments:**
-  - `...`: column names to keep (or use `-` to drop)
 
 . . .
 
@@ -583,8 +589,6 @@ mtcars |>
 ## `mutate()`: Create New Variables {.smaller}
 
 - **Purpose:** Add new columns or modify existing ones
-- **Key arguments:**
-  - `...`: name-value pairs (e.g., `new_col = expression`)
 
 . . .
 
@@ -592,80 +596,198 @@ mtcars |>
 #| output-location: fragment
 
 mtcars |>
+  mutate(kmpl = mpg * 0.425)
+```
+
+## Chaining Multiple Verbs Together {.smaller}
+
+- The real power of the pipe: **chain multiple operations** in sequence
+- Read it like a sentence: "Take the data, *then* filter, *then* mutate, *then* select..."
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+mtcars |>
+  filter(cyl == 4) |>
   mutate(kmpl = mpg * 0.425) |>
-  select(mpg, kmpl)
-
+  select(mpg, kmpl, wt)
 ```
 
-## Conditional Assignment with `ifelse()` {.smaller}
+## Saving Your Work as a New Object {.smaller}
 
-- Often we want to create a variable whose value **depends on a condition**
-- `ifelse()` checks a condition for every row and assigns a value accordingly
-
-. . .
-
-**Arguments:**
-
-- `test`: a logical condition (e.g., `mpg > 20`)
-- `yes`: value to assign if the condition is `TRUE`
-- `no`: value to assign if the condition is `FALSE`
+- So far, we've just been **printing** results to the console
+- To keep the manipulated data, **save it as a new object** using `<-`
 
 . . .
 
 ```{r}
 #| output-location: fragment
 
-mtcars |>
-  mutate(efficiency = ifelse(mpg > 20, "High", "Low")) |>
-  select(mpg, efficiency) |>
-  head(6)
+# Create a new dataset with only efficient 4-cylinder cars
+efficient_cars <- mtcars |>
+  filter(cyl == 4, mpg > 25) |>
+  select(mpg, hp, wt)
+
+efficient_cars
 ```
 
-## `ifelse()` Inside `mutate()` {.smaller}
+. . .
 
-- `ifelse()` is most powerful when paired with `mutate()`
-- This lets us create new categorical variables from numeric ones---very useful for group comparisons
+- Now `efficient_cars` is stored in your environment and can be used later!
+
+# Descriptive Statistics in R
+
+## Remember: Know Your Data {.smaller}
+
+Before any analysis, we need to answer three key questions:
+
+. . .
+
+1. **Are there errors?** Is the distribution reasonable?
+    - Use descriptive stats: `mean()`, `min()`, `max()`, `summarize()`
+
+. . .
+
+2. **Is there missing data?** How much?
+    - Use `is.na()`, `sum(is.na())`
+
+. . .
+
+3. **Are there outliers or patterns?**
+    - Use visualizations: histograms, scatterplots
+
+. . .
+
+Let's learn the tools to answer these questions!
+
+## Descriptive Statistics Functions {.smaller}
+
+- R has built-in functions for computing common descriptive statistics
+- These operate on **vectors** (i.e., columns of a data frame; reference them using `$`)
+
+. . .
+
+| Function | What it computes |
+|----------|-----------------|
+| `mean()` | Average |
+| `sd()` | Standard deviation |
+| `median()` | Median (middle value) |
+| `min()` / `max()` | Minimum / Maximum |
+| `n()` | Number of observations |
+
+## Descriptive Statistics Functions {.smaller}
+
+```{r}
+#| output-location: fragment
+
+mean(mtcars$mpg)
+```
 
 . . .
 
 ```{r}
 #| output-location: fragment
 
-mtcars |>
-  mutate(
-    power_class = ifelse(hp > 150, "High Power", "Standard"),
-    weight_class = ifelse(wt > 3, "Heavy", "Light")
-  ) |>
-  select(hp, power_class, wt, weight_class) |>
-  head(6)
+sd(mtcars$mpg)
 ```
-
-## `case_when()`: Multiple Conditions {.smaller}
-
-- What if we need **more than two** categories?
-- `case_when()` lets us chain multiple conditions together
-- Each line follows the pattern: `condition ~ value`
 
 . . .
 
 ```{r}
 #| output-location: fragment
 
-mtcars |>
-  mutate(cyl_label = case_when(
-    cyl == 4 ~ "Four",
-    cyl == 6 ~ "Six",
-    cyl == 8 ~ "Eight"
-  )) |>
-  select(cyl, cyl_label) |>
-  head(6)
+min(mtcars$mpg)
 ```
+
+
+- These are useful on their own, but become **much more powerful** inside `summarize()`
+
+## Handling Missing Data {.smaller}
+
+- Before computing statistics, check for **missing values** (`NA`)
+- Many R functions return `NA` if any value is missing
+
+. . .
+
+- `is.na()` checks for missing values; `sum(is.na())` counts them
+- The `airquality` dataset (built into R) has some missing values:
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+sum(is.na(airquality$Ozone))
+```
+
+## Handling Missing Data {.smaller}
+
+- If you try to compute the mean with missing values:
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+mean(airquality$Ozone)
+```
+
+. . .
+
+- Use `na.rm = TRUE` to ignore missing values:
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+mean(airquality$Ozone, na.rm = TRUE)
+```
+
+## What Do We Do About Missing Data? {.smaller}
+
+- In this class, we will largely **ignore missing values** using `na.rm = TRUE` (or similar arguments depending on the function)
+- This is fine when data are **missing at random**
+
+. . .
+
+- But be careful: sometimes data are **missing systematically**
+- When this happens, ignoring missing values can lead to **biased results**
+
+## Systematically Missing Data: Examples {.smaller}
+
+When might data be missing in a non-random way?
+
+. . .
+
+- **Income surveys**: High earners may refuse to report income
+  - Dropping them underestimates average income
+
+. . .
+
+- **Health studies**: Sicker patients may drop out of a study
+  - Remaining sample looks healthier than it really is
+
+. . .
+
+- **Student evaluations**: Students who dropped the course don't fill them out
+  - Evaluations only reflect students who stayed
+
+## Systematically Missing Data {.smaller}
+
+- **Takeaway**: Always ask *why* data might be missing
+- If missingness is related to the outcome you're studying, simple fixes like `na.rm = TRUE` can give misleading results
+
+. . .
+
+- Advanced methods exist to handle this (multiple imputation, selection models)
+- For now, just be aware of the issue!
 
 ## `summarize()`: Compute Summary Statistics {.smaller}
 
 - **Purpose:** Collapse a data frame into a single summary row
-- **Key arguments:**
-  - `...`: summary functions (e.g., `mean()`, `sd()`, `n()`)
 
 . . .
 
@@ -683,8 +805,7 @@ mtcars |>
 ## `group_by()` + `summarize()`: Grouped Summaries {.smaller}
 
 - **Purpose:** Split data into groups and summarize each group separately
-- `group_by()` **key argument:** the column(s) to group by
-- Pair it with `summarize()` to get statistics *by group*
+- Pair `group_by()` with `summarize()` to get statistics *by group*
 
 . . .
 
@@ -698,6 +819,62 @@ mtcars |>
     mean_hp = mean(hp),
     n = n()
   )
+```
+
+. . .
+
+- When computing descriptive statistics with `summarize()`, you don't need to use `$`!
+
+## Storing Summary Statistics as Objects {.smaller}
+
+- It is sometimes useful to **save** your summary statistics as an object
+- This lets you reference them later — for example, in a plot or a report
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+mpg_by_cyl <- mtcars |>
+  group_by(cyl) |>
+  summarize(
+    mean_mpg = mean(mpg),
+    sd_mpg = sd(mpg)
+  )
+
+mpg_by_cyl
+```
+
+. . .
+
+- Now `mpg_by_cyl` is stored in your environment and can be used just like any other data frame
+
+## `count()`: See Unique Values {.smaller}
+
+- **Purpose:** Quickly count the number of rows for each unique value of a variable
+- A shortcut for `group_by() |> summarize(n = n())`
+- Great for getting a feel for categorical variables in your data
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+mtcars |>
+  count(cyl)
+```
+
+. . .
+
+- You can also count combinations of variables:
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+mtcars |>
+  count(cyl, am)
 ```
 
 ## `arrange()`: Sort Rows {.smaller}
@@ -717,9 +894,45 @@ mtcars |>
 
 ```
 
+## Quick Summary Tools {.smaller}
+
+- Writing out each statistic with `summarize()` gives you full control, but sometimes you just want a **quick overview**
+- R has some handy built-in functions for this
+
+. . .
+
+**`summary()`** — gives you min, quartiles, mean, and max for every column:
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+summary(mtcars)
+```
+
+## Quick Summary Tools {.smaller}
+
+**`glimpse()`** — shows the structure of your data (variable names, types, and first few values):
+
+```{r}
+#| output-location: fragment
+
+glimpse(mtcars)
+```
+
+. . .
+
+- `summary()` is great for spotting outliers and missing values at a glance
+- `glimpse()` is great for checking variable types and making sure your data loaded correctly
+
 ## Practice: Try It Yourself! {.smaller}
 
-Using the `mtcars` data frame, try to answer each of the following questions using `tidyverse` functions. Give each one a try before clicking to reveal the answer!
+::: {.callout-note icon=false}
+## 🖥️ Your turn!
+:::
+
+Using the `mtcars` data frame, answer each question using `tidyverse` functions. Try before clicking to reveal the answer!
 
 ## Practice 1 {.smaller}
 
@@ -738,9 +951,9 @@ mtcars |>
 
 ## Practice 2 {.smaller}
 
-**What is the average MPG for cars with more than 4 cylinders vs. 4 or fewer?**
+**What is the average MPG for cars by the number of gears it has?
 
-- *Hint:* First `mutate()` a grouping variable, then `group_by()` and `summarize()`
+- *Hint:* First `group_by()` then `summarize()` and `mean()`
 
 . . .
 
@@ -748,8 +961,7 @@ mtcars |>
 #| output-location: fragment
 
 mtcars |>
-  mutate(cyl_group = ifelse(cyl > 4, "More than 4", "4 or fewer")) |>
-  group_by(cyl_group) |>
+  group_by(gear) |>
   summarize(mean_mpg = mean(mpg))
 ```
 
@@ -757,7 +969,7 @@ mtcars |>
 
 **Which car has the highest horsepower? Show only its `mpg`, `hp`, and `wt`.**
 
-- *Hint:* `arrange()` in descending order, then `select()` and `head()`
+- *Hint:* `arrange()` in descending order using `desc()`, then `select()` and `head()`
 
 . . .
 
@@ -813,6 +1025,332 @@ mtcars |>
 
 #  Visualizations in R
 
+## Why Visualize Data?
 
+- Numbers are useful, but graphs often reveal patterns that statistics miss
+- Effective visualization is both a **diagnostic tool** and a way to **communicate results**
 
+. . .
+
+::: {.callout-tip}
+## Key Insight
+A good visualization translates complex data into a clear visual format, revealing patterns, trends, and relationships that would be difficult to see in tables of numbers.
+:::
+
+## The Grammar of Graphics: `ggplot2`
+
+- We use `ggplot2` (part of the `tidyverse`) for creating visualizations
+- The "gg" stands for **grammar of graphics**
+
+. . .
+
+Every ggplot has two main components:
+
+1. **The scaffolding**: titles, axis labels, legends, sources
+2. **The content**: the actual data encoded as visual elements (points, lines, bars)
+
+. . .
+
+- Key insight: we build plots **layer by layer**
+
+## Installing a New Package {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Try it yourself!
+:::
+
+- For visualization practice, we'll use the `palmerpenguins` dataset
+- First, install and load the package:
+
+```{r}
+#| eval: false
+#| echo: true
+
+# Install the package (only need to do this once!)
+install.packages("palmerpenguins")
+
+# Load it
+library(palmerpenguins)
+```
+
+```{r}
+#| echo: false
+
+library(palmerpenguins)
+```
+
+## The Palmer Penguins Data {.smaller}
+
+- The `palmerpenguins` dataset contains measurements of 344 penguins from three species
+- Let's take a look:
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+glimpse(penguins)
+```
+
+## Building a Plot: Start with Data
+
+- Start by creating an empty plot object with `ggplot()`
+
+. . .
+
+```{r}
+#| output-location: fragment
+#| fig-height: 3.5
+
+ggplot(data = penguins)
+```
+
+- This creates the plotting area but doesn't show any data yet!
+
+## Building a Plot: Add a Layer {.smaller}
+
+- Add a **layer** with points using `geom_point()`
+- Specify an **aesthetic mapping** with `aes()`: which variables go where
+
+. . .
+
+```{r}
+#| output-location: fragment
+#| fig-height: 3.5
+
+ggplot(data = penguins) +
+  geom_point(aes(x = flipper_length_mm, y = body_mass_g))
+```
+
+## What Do We See?
+
+- Clear **positive relationship**: penguins with longer flippers tend to be heavier
+- But could this be driven by **different species**?
+
+. . .
+
+- Let's encode species information using **color**
+
+## Adding Color by Species {.smaller}
+
+```{r}
+#| output-location: fragment
+#| fig-height: 4
+
+ggplot(data = penguins) +
+  geom_point(aes(x = flipper_length_mm, y = body_mass_g, color = species))
+```
+
+## What Do We Learn?
+
+- Gentoo penguins (blue) are generally larger
+- The positive relationship exists **within each species**
+- This suggests the relationship isn't just due to species differences
+
+## What is a Line of Best Fit?
+
+- A **line of best fit** is a straight line that best summarizes the relationship between two variables
+- It is the line that minimizes the total distance between itself and all the data points
+
+. . .
+
+- Useful for:
+  - Visualizing the **direction** of a relationship (positive or negative)
+  - Summarizing the **overall trend** in the data
+  - Making **predictions** for values we haven't observed
+
+## Adding a Line of Best Fit {.smaller}
+
+- Add a line of best fit with `geom_smooth()`
+- This is a new **layer**, not a new aesthetic
+
+. . .
+
+```{r}
+#| output-location: fragment
+#| fig-height: 3.5
+
+ggplot(data = penguins) +
+  geom_point(aes(x = flipper_length_mm, y = body_mass_g, color = species)) +
+  geom_smooth(aes(x = flipper_length_mm, y = body_mass_g), method = "lm")
+```
+
+## Proper Labeling {.smaller}
+
+- Good labels are **essential** for clear communication
+- Use `labs()` to add titles, axis labels, and legend titles
+
+. . .
+
+```{r}
+#| output-location: fragment
+#| fig-height: 3
+
+ggplot(data = penguins) +
+  geom_point(aes(x = flipper_length_mm, y = body_mass_g, color = species)) +
+  geom_smooth(aes(x = flipper_length_mm, y = body_mass_g), method = "lm") +
+  labs(
+    title = "Body Mass and Flipper Length",
+    x = "Flipper Length (mm)",
+    y = "Body Mass (g)",
+    color = "Species"
+  ) +
+  theme_minimal()
+```
+
+## Histograms: Visualizing Distributions {.smaller}
+
+- Histograms show the distribution of a **single continuous variable**
+- Use `geom_histogram()` to create them
+
+. . .
+
+```{r}
+#| output-location: fragment
+#| fig-height: 3.5
+
+ggplot(penguins) +
+  geom_histogram(aes(x = body_mass_g), binwidth = 200,
+                 fill = "steelblue", alpha = 0.7) +
+  labs(title = "Distribution of Penguin Body Mass",
+       x = "Body Mass (g)", y = "Count") +
+  theme_minimal()
+```
+
+## The `binwidth` Argument {.smaller}
+
+- `binwidth` controls how wide each bar is
+- Smaller binwidths = more bars = more detail
+
+```{r}
+#| echo: false
+#| layout-ncol: 3
+#| fig-height: 3
+
+ggplot(penguins) +
+
+  geom_histogram(aes(x = body_mass_g), binwidth = 100, fill = "steelblue", alpha = 0.7) +
+  labs(title = "binwidth = 100", x = "Body Mass (g)", y = "Count") +
+  theme_minimal()
+
+ggplot(penguins) +
+  geom_histogram(aes(x = body_mass_g), binwidth = 200, fill = "steelblue", alpha = 0.7) +
+  labs(title = "binwidth = 200", x = "Body Mass (g)", y = "Count") +
+  theme_minimal()
+
+ggplot(penguins) +
+  geom_histogram(aes(x = body_mass_g), binwidth = 500, fill = "steelblue", alpha = 0.7) +
+  labs(title = "binwidth = 500", x = "Body Mass (g)", y = "Count") +
+  theme_minimal()
+```
+
+## Quick Reference: Key ggplot2 Functions {.smaller}
+
+| Function | What it does |
+|----------|--------------|
+| `ggplot(data)` | Initialize plot with data |
+| `aes(x, y, color, ...)` | Map variables to aesthetics |
+| `geom_point()` | Add points (scatterplot) |
+| `geom_smooth()` | Add trend line |
+| `geom_histogram()` | Add histogram |
+| `geom_col()` | Add bar chart |
+| `labs()` | Add labels and titles |
+| `theme_minimal()` | Clean, minimal theme |
+
+## Building Intuition
+
+The layered approach of ggplot2 mirrors how we think about data analysis:
+
+. . .
+
+1. Start with the **data**
+2. Add **visual representations** (geoms)
+3. Refine with **labels and formatting**
+
+. . .
+
+Experiment with different geometries, aesthetics, and layers to find the visualization that best tells your data's story!
+
+## Practice: Visualization Exercises {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Your turn!
+:::
+
+Using the `penguins` data, try to create each of the following visualizations. Give each one a try before clicking to reveal the answer!
+
+## Visualization Practice 1 {.smaller}
+
+**Create a histogram of penguin flipper length (`flipper_length_mm`).**
+
+- *Hint:* Use `geom_histogram()` with `aes(x = ...)`
+
+. . .
+
+```{r}
+#| output-location: fragment
+#| fig-height: 3
+
+ggplot(penguins) +
+  geom_histogram(aes(x = flipper_length_mm), binwidth = 5,
+                 fill = "steelblue", alpha = 0.7) +
+  labs(x = "Flipper Length (mm)", y = "Count") +
+  theme_minimal()
+```
+
+## Visualization Practice 2 {.smaller}
+
+**Create a scatterplot of bill length (`bill_length_mm`) vs. bill depth (`bill_depth_mm`).**
+
+- *Hint:* Use `geom_point()` with `aes(x = ..., y = ...)`
+
+. . .
+
+```{r}
+#| output-location: fragment
+#| fig-height: 3
+
+ggplot(penguins) +
+  geom_point(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  labs(x = "Bill Length (mm)", y = "Bill Depth (mm)") +
+  theme_minimal()
+```
+
+## Visualization Practice 3 {.smaller}
+
+**Modify the previous scatterplot to color the points by species.**
+
+- *Hint:* Add `color = species` inside `aes()`
+
+. . .
+
+```{r}
+#| output-location: fragment
+#| fig-height: 3
+
+ggplot(penguins) +
+  geom_point(aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
+  labs(x = "Bill Length (mm)", y = "Bill Depth (mm)", color = "Species") +
+  theme_minimal()
+```
+
+## Visualization Practice 4 {.smaller}
+
+**Add a line of best fit to the scatterplot of flipper length vs. body mass, and add proper axis labels and a title.**
+
+- *Hint:* Combine `geom_point()`, `geom_smooth(method = "lm")`, and `labs()`
+
+. . .
+
+```{r}
+#| output-location: fragment
+#| fig-height: 2.5
+
+ggplot(penguins) +
+  geom_point(aes(x = flipper_length_mm, y = body_mass_g), alpha = 0.6) +
+  geom_smooth(aes(x = flipper_length_mm, y = body_mass_g), method = "lm") +
+  labs(title = "Penguin Body Mass vs. Flipper Length",
+       x = "Flipper Length (mm)", y = "Body Mass (g)") +
+  theme_minimal()
+```
 
