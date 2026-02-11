@@ -1023,6 +1023,162 @@ mtcars |>
 ```
 
 
+# Working with Scripts
+
+## Why Use Scripts?
+
+- So far, we've been typing directly into the **console**
+- But the console doesn't save your work!
+
+. . .
+
+- A **script** is a text file (`.R`) that contains your code
+- You can save it, edit it, and run it again later
+
+. . .
+
+- Scripts are essential for **replication** — the foundation of credible research
+
+## The Replication Standard
+
+::: {.callout-important}
+## Definition
+Research meets the **replication standard** when an independent researcher can exactly duplicate the results using only the information provided.
+:::
+
+. . .
+
+- Remember Reinhart-Rogoff: only because they shared their data and code could Thomas Herndon discover the errors
+- Without replication materials, the mistakes might never have been found
+
+## Why Replication Matters
+
+1. **Allows others to check our work**
+    - Errors happen — replication catches them
+
+. . .
+
+2. **Keeps our work honest**
+    - If we know others will check, we're more careful
+
+. . .
+
+3. **Helps our future selves**
+    - What seems obvious today is often opaque in 6 months
+    - Good documentation means you can return to a project and understand what you did
+
+## Creating a Script in RStudio {.smaller}
+
+- **File → New File → R Script** (or `Ctrl/Cmd + Shift + N`)
+- Type your code in the script editor (top-left panel)
+- Run code by:
+    - Placing cursor on a line and pressing `Ctrl/Cmd + Enter`
+    - Selecting multiple lines and pressing `Ctrl/Cmd + Enter`
+    - Clicking "Run" button
+
+. . .
+
+- **Save your script** with `Ctrl/Cmd + S` — give it a descriptive name like `unit2_analysis.R`
+
+## Working Directories {.smaller}
+
+- The **working directory** is the folder R looks in when reading or saving files
+- If you try to load a file that's not in your working directory, R won't find it!
+
+. . .
+
+- Check your current working directory:
+
+```{r}
+#| eval: false
+#| echo: true
+
+getwd()
+```
+
+. . .
+
+- You *can* set it manually with `setwd()`, but there's a better way...
+
+## R Projects: The Easy Solution
+
+- An **R Project** (`.Rproj` file) automatically sets your working directory to the project folder
+
+. . .
+
+::: {.callout-tip}
+## Good News!
+If you're using the R Project saved in our course Git repository, your working directory is already set correctly. You don't need to worry about it!
+:::
+
+. . .
+
+- Just make sure you open RStudio by clicking on the `.Rproj` file (not just opening RStudio directly)
+
+## Good Coding Practices {.smaller}
+
+**Use comments extensively** — explain what your code does and *why*
+
+```{r}
+#| eval: false
+#| echo: true
+
+# Calculate average MPG by number of cylinders
+# We group by cylinders because engine size affects fuel efficiency
+mtcars |>
+  group_by(cyl) |>
+  summarize(mean_mpg = mean(mpg))
+```
+
+. . .
+
+**Use descriptive variable names**
+
+- `x1` ❌ → `years_education` ✅
+- `temp` ❌ → `avg_wage_by_state` ✅
+
+## Organizing Your Script {.smaller}
+
+A well-organized script has clear sections:
+
+```{r}
+#| eval: false
+#| echo: true
+
+# =============================================================
+# Project: Unit 2 Analysis
+# Author: Your Name
+# Date: February 2026
+# =============================================================
+
+# Load packages -------------------------------------------
+library(tidyverse)
+
+# Load data -----------------------------------------------
+my_data <- read_csv("data/my_dataset.csv")
+
+# Clean data ----------------------------------------------
+# ... cleaning code here ...
+
+# Analysis ------------------------------------------------
+# ... analysis code here ...
+```
+
+## The Bottom Line
+
+- **Always work in scripts**, not the console
+- **Comment your code** so others (and future you) can understand it
+- **Save and organize** your work logically
+
+. . .
+
+::: {.callout-tip}
+## Remember
+If you can't replicate your own results, neither can anyone else!
+:::
+
+
+
 #  Visualizations in R
 
 ## Why Visualize Data?

@@ -444,7 +444,7 @@
   <meta name="generator" content="quarto-1.5.57">
 
   <meta name="author" content="Prof. Caraher">
-  <meta name="dcterms.date" content="2026-02-09">
+  <meta name="dcterms.date" content="2026-02-11">
   <title>Good Data Practices with R and RStudio</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1223,7 +1223,7 @@ Prof. Caraher
     </div>
 </div>
 
-  <p class="date">2026-02-09</p>
+  <p class="date">2026-02-11</p>
 </section>
 <section>
 <section id="good-data-practices" class="title-slide slide level1 center">
@@ -1355,33 +1355,33 @@ Prof. Caraher
 <tbody>
 <tr class="odd">
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">10</td>
-<td style="text-align: right;">84</td>
-<td style="text-align: right;">44</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">56</td>
+<td style="text-align: right;">30</td>
 </tr>
 <tr class="even">
 <td style="text-align: right;">2</td>
-<td style="text-align: right;">17</td>
-<td style="text-align: right;">132</td>
-<td style="text-align: right;">39</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">20</td>
 </tr>
 <tr class="odd">
 <td style="text-align: right;">3</td>
 <td style="text-align: right;">10</td>
-<td style="text-align: right;">82</td>
+<td style="text-align: right;">62</td>
 <td style="text-align: right;">59</td>
 </tr>
 <tr class="even">
 <td style="text-align: right;">4</td>
-<td style="text-align: right;">16</td>
-<td style="text-align: right;">92</td>
-<td style="text-align: right;">41</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">180</td>
+<td style="text-align: right;">45</td>
 </tr>
 <tr class="odd">
 <td style="text-align: right;">5</td>
-<td style="text-align: right;">17</td>
-<td style="text-align: right;">59</td>
-<td style="text-align: right;">50</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">135</td>
+<td style="text-align: right;">27</td>
 </tr>
 </tbody>
 </table>
@@ -1805,6 +1805,8 @@ Hornet 4 Drive 21.4   6  258 110 3.08 3.215 19.44  1  0    3    1</code></pre>
 <li class="fragment">Install the package (only do it once!)</li>
 <li class="fragment">Load the package using <code>library()</code> (every time!)</li>
 </ol>
+</div>
+<div class="fragment">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href></a><span class="co"># Step 1: Install ONCE (like downloading an app)</span></span>
 <span id="cb32-2"><a href></a><span class="fu">install.packages</span>(<span class="st">&quot;tidyverse&quot;</span>)</span>
@@ -2709,6 +2711,205 @@ Maserati Bora  15 335 3.57</code></pre>
 </div>
 </section></section>
 <section>
+<section id="working-with-scripts" class="title-slide slide level1 center">
+<h1>Working with Scripts</h1>
+
+</section>
+<section id="why-use-scripts" class="slide level2">
+<h2>Why Use Scripts?</h2>
+<ul>
+<li class="fragment">So far, we’ve been typing directly into the <strong>console</strong></li>
+<li class="fragment">But the console doesn’t save your work!</li>
+</ul>
+<div class="fragment">
+<ul>
+<li class="fragment">A <strong>script</strong> is a text file (<code>.R</code>) that contains your code</li>
+<li class="fragment">You can save it, edit it, and run it again later</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li class="fragment">Scripts are essential for <strong>replication</strong> — the foundation of credible research</li>
+</ul>
+</div>
+</section>
+<section id="the-replication-standard" class="slide level2">
+<h2>The Replication Standard</h2>
+<div class="callout callout-important callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Definition</strong></p>
+</div>
+<div class="callout-content">
+<p>Research meets the <strong>replication standard</strong> when an independent researcher can exactly duplicate the results using only the information provided.</p>
+</div>
+</div>
+</div>
+<div class="fragment">
+<ul>
+<li class="fragment">Remember Reinhart-Rogoff: only because they shared their data and code could Thomas Herndon discover the errors</li>
+<li class="fragment">Without replication materials, the mistakes might never have been found</li>
+</ul>
+</div>
+</section>
+<section id="why-replication-matters" class="slide level2">
+<h2>Why Replication Matters</h2>
+<ol type="1">
+<li class="fragment"><strong>Allows others to check our work</strong>
+<ul>
+<li class="fragment">Errors happen — replication catches them</li>
+</ul></li>
+</ol>
+<div class="fragment">
+<ol start="2" type="1">
+<li class="fragment"><strong>Keeps our work honest</strong>
+<ul>
+<li class="fragment">If we know others will check, we’re more careful</li>
+</ul></li>
+</ol>
+</div>
+<div class="fragment">
+<ol start="3" type="1">
+<li class="fragment"><strong>Helps our future selves</strong>
+<ul>
+<li class="fragment">What seems obvious today is often opaque in 6 months</li>
+<li class="fragment">Good documentation means you can return to a project and understand what you did</li>
+</ul></li>
+</ol>
+</div>
+</section>
+<section id="creating-a-script-in-rstudio" class="slide level2">
+<h2>Creating a Script in RStudio</h2>
+<ul>
+<li class="fragment"><strong>File → New File → R Script</strong> (or <code>Ctrl/Cmd + Shift + N</code>)</li>
+<li class="fragment">Type your code in the script editor (top-left panel)</li>
+<li class="fragment">Run code by:
+<ul>
+<li class="fragment">Placing cursor on a line and pressing <code>Ctrl/Cmd + Enter</code></li>
+<li class="fragment">Selecting multiple lines and pressing <code>Ctrl/Cmd + Enter</code></li>
+<li class="fragment">Clicking “Run” button</li>
+</ul></li>
+</ul>
+<div class="fragment">
+<ul>
+<li class="fragment"><strong>Save your script</strong> with <code>Ctrl/Cmd + S</code> — give it a descriptive name like <code>unit2_analysis.R</code></li>
+</ul>
+</div>
+</section>
+<section id="working-directories" class="slide level2 smaller">
+<h2>Working Directories</h2>
+<ul>
+<li class="fragment">The <strong>working directory</strong> is the folder R looks in when reading or saving files</li>
+<li class="fragment">If you try to load a file that’s not in your working directory, R won’t find it!</li>
+</ul>
+<div class="fragment">
+<ul>
+<li class="fragment">Check your current working directory:</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href></a><span class="fu">getwd</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div class="fragment">
+<ul>
+<li class="fragment">You <em>can</em> set it manually with <code>setwd()</code>, but there’s a better way…</li>
+</ul>
+</div>
+</section>
+<section id="r-projects-the-easy-solution" class="slide level2">
+<h2>R Projects: The Easy Solution</h2>
+<ul>
+<li class="fragment">An <strong>R Project</strong> (<code>.Rproj</code> file) automatically sets your working directory to the project folder</li>
+</ul>
+<div class="fragment">
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Good News!</strong></p>
+</div>
+<div class="callout-content">
+<p>If you’re using the R Project saved in our course Git repository, your working directory is already set correctly. You don’t need to worry about it!</p>
+</div>
+</div>
+</div>
+</div>
+<div class="fragment">
+<ul>
+<li class="fragment">Just make sure you open RStudio by clicking on the <code>.Rproj</code> file (not just opening RStudio directly)</li>
+</ul>
+</div>
+</section>
+<section id="good-coding-practices" class="slide level2 smaller">
+<h2>Good Coding Practices</h2>
+<p><strong>Use comments extensively</strong> — explain what your code does and <em>why</em></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href></a><span class="co"># Calculate average MPG by number of cylinders</span></span>
+<span id="cb86-2"><a href></a><span class="co"># We group by cylinders because engine size affects fuel efficiency</span></span>
+<span id="cb86-3"><a href></a>mtcars <span class="sc">|&gt;</span></span>
+<span id="cb86-4"><a href></a>  <span class="fu">group_by</span>(cyl) <span class="sc">|&gt;</span></span>
+<span id="cb86-5"><a href></a>  <span class="fu">summarize</span>(<span class="at">mean_mpg =</span> <span class="fu">mean</span>(mpg))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment">
+<p><strong>Use descriptive variable names</strong></p>
+<ul>
+<li class="fragment"><code>x1</code> ❌ → <code>years_education</code> ✅</li>
+<li class="fragment"><code>temp</code> ❌ → <code>avg_wage_by_state</code> ✅</li>
+</ul>
+</div>
+</section>
+<section id="organizing-your-script" class="slide level2 smaller">
+<h2>Organizing Your Script</h2>
+<p>A well-organized script has clear sections:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href></a><span class="co"># =============================================================</span></span>
+<span id="cb87-2"><a href></a><span class="co"># Project: Unit 2 Analysis</span></span>
+<span id="cb87-3"><a href></a><span class="co"># Author: Your Name</span></span>
+<span id="cb87-4"><a href></a><span class="co"># Date: February 2026</span></span>
+<span id="cb87-5"><a href></a><span class="co"># =============================================================</span></span>
+<span id="cb87-6"><a href></a></span>
+<span id="cb87-7"><a href></a><span class="co"># Load packages -------------------------------------------</span></span>
+<span id="cb87-8"><a href></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb87-9"><a href></a></span>
+<span id="cb87-10"><a href></a><span class="co"># Load data -----------------------------------------------</span></span>
+<span id="cb87-11"><a href></a>my_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/my_dataset.csv&quot;</span>)</span>
+<span id="cb87-12"><a href></a></span>
+<span id="cb87-13"><a href></a><span class="co"># Clean data ----------------------------------------------</span></span>
+<span id="cb87-14"><a href></a><span class="co"># ... cleaning code here ...</span></span>
+<span id="cb87-15"><a href></a></span>
+<span id="cb87-16"><a href></a><span class="co"># Analysis ------------------------------------------------</span></span>
+<span id="cb87-17"><a href></a><span class="co"># ... analysis code here ...</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="the-bottom-line" class="slide level2">
+<h2>The Bottom Line</h2>
+<ul>
+<li class="fragment"><strong>Always work in scripts</strong>, not the console</li>
+<li class="fragment"><strong>Comment your code</strong> so others (and future you) can understand it</li>
+<li class="fragment"><strong>Save and organize</strong> your work logically</li>
+</ul>
+<div class="fragment">
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Remember</strong></p>
+</div>
+<div class="callout-content">
+<p>If you can’t replicate your own results, neither can anyone else!</p>
+</div>
+</div>
+</div>
+</div>
+</section></section>
+<section>
 <section id="visualizations-in-r" class="title-slide slide level1 center">
 <h1>Visualizations in R</h1>
 
@@ -2771,11 +2972,11 @@ Maserati Bora  15 335 3.57</code></pre>
 <li class="fragment">First, install and load the package:</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href></a><span class="co"># Install the package (only need to do this once!)</span></span>
-<span id="cb85-2"><a href></a><span class="fu">install.packages</span>(<span class="st">&quot;palmerpenguins&quot;</span>)</span>
-<span id="cb85-3"><a href></a></span>
-<span id="cb85-4"><a href></a><span class="co"># Load it</span></span>
-<span id="cb85-5"><a href></a><span class="fu">library</span>(palmerpenguins)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href></a><span class="co"># Install the package (only need to do this once!)</span></span>
+<span id="cb88-2"><a href></a><span class="fu">install.packages</span>(<span class="st">&quot;palmerpenguins&quot;</span>)</span>
+<span id="cb88-3"><a href></a></span>
+<span id="cb88-4"><a href></a><span class="co"># Load it</span></span>
+<span id="cb88-5"><a href></a><span class="fu">library</span>(palmerpenguins)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="the-palmer-penguins-data" class="slide level2 smaller">
@@ -2786,7 +2987,7 @@ Maserati Bora  15 335 3.57</code></pre>
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href></a><span class="fu">glimpse</span>(penguins)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href></a><span class="fu">glimpse</span>(penguins)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -2811,7 +3012,7 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href></a><span class="fu">ggplot</span>(<span class="at">data =</span> penguins)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href></a><span class="fu">ggplot</span>(<span class="at">data =</span> penguins)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output-display">
@@ -2835,8 +3036,8 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href></a><span class="fu">ggplot</span>(<span class="at">data =</span> penguins) <span class="sc">+</span></span>
-<span id="cb89-2"><a href></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href></a><span class="fu">ggplot</span>(<span class="at">data =</span> penguins) <span class="sc">+</span></span>
+<span id="cb92-2"><a href></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output-display">
@@ -2864,8 +3065,8 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 <section id="adding-color-by-species" class="slide level2 smaller">
 <h2>Adding Color by Species</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href></a><span class="fu">ggplot</span>(<span class="at">data =</span> penguins) <span class="sc">+</span></span>
-<span id="cb90-2"><a href></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g, <span class="at">color =</span> species))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href></a><span class="fu">ggplot</span>(<span class="at">data =</span> penguins) <span class="sc">+</span></span>
+<span id="cb93-2"><a href></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g, <span class="at">color =</span> species))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output-display">
@@ -2910,9 +3111,9 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href></a><span class="fu">ggplot</span>(<span class="at">data =</span> penguins) <span class="sc">+</span></span>
-<span id="cb91-2"><a href></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g, <span class="at">color =</span> species)) <span class="sc">+</span></span>
-<span id="cb91-3"><a href></a>  <span class="fu">geom_smooth</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g), <span class="at">method =</span> <span class="st">&quot;lm&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href></a><span class="fu">ggplot</span>(<span class="at">data =</span> penguins) <span class="sc">+</span></span>
+<span id="cb94-2"><a href></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g, <span class="at">color =</span> species)) <span class="sc">+</span></span>
+<span id="cb94-3"><a href></a>  <span class="fu">geom_smooth</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g), <span class="at">method =</span> <span class="st">&quot;lm&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output-display">
@@ -2933,16 +3134,16 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href></a><span class="fu">ggplot</span>(<span class="at">data =</span> penguins) <span class="sc">+</span></span>
-<span id="cb92-2"><a href></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g, <span class="at">color =</span> species)) <span class="sc">+</span></span>
-<span id="cb92-3"><a href></a>  <span class="fu">geom_smooth</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g), <span class="at">method =</span> <span class="st">&quot;lm&quot;</span>) <span class="sc">+</span></span>
-<span id="cb92-4"><a href></a>  <span class="fu">labs</span>(</span>
-<span id="cb92-5"><a href></a>    <span class="at">title =</span> <span class="st">&quot;Body Mass and Flipper Length&quot;</span>,</span>
-<span id="cb92-6"><a href></a>    <span class="at">x =</span> <span class="st">&quot;Flipper Length (mm)&quot;</span>,</span>
-<span id="cb92-7"><a href></a>    <span class="at">y =</span> <span class="st">&quot;Body Mass (g)&quot;</span>,</span>
-<span id="cb92-8"><a href></a>    <span class="at">color =</span> <span class="st">&quot;Species&quot;</span></span>
-<span id="cb92-9"><a href></a>  ) <span class="sc">+</span></span>
-<span id="cb92-10"><a href></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb95-1"><a href></a><span class="fu">ggplot</span>(<span class="at">data =</span> penguins) <span class="sc">+</span></span>
+<span id="cb95-2"><a href></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g, <span class="at">color =</span> species)) <span class="sc">+</span></span>
+<span id="cb95-3"><a href></a>  <span class="fu">geom_smooth</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g), <span class="at">method =</span> <span class="st">&quot;lm&quot;</span>) <span class="sc">+</span></span>
+<span id="cb95-4"><a href></a>  <span class="fu">labs</span>(</span>
+<span id="cb95-5"><a href></a>    <span class="at">title =</span> <span class="st">&quot;Body Mass and Flipper Length&quot;</span>,</span>
+<span id="cb95-6"><a href></a>    <span class="at">x =</span> <span class="st">&quot;Flipper Length (mm)&quot;</span>,</span>
+<span id="cb95-7"><a href></a>    <span class="at">y =</span> <span class="st">&quot;Body Mass (g)&quot;</span>,</span>
+<span id="cb95-8"><a href></a>    <span class="at">color =</span> <span class="st">&quot;Species&quot;</span></span>
+<span id="cb95-9"><a href></a>  ) <span class="sc">+</span></span>
+<span id="cb95-10"><a href></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output-display">
@@ -2963,12 +3164,12 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href></a><span class="fu">ggplot</span>(penguins) <span class="sc">+</span></span>
-<span id="cb93-2"><a href></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">x =</span> body_mass_g), <span class="at">binwidth =</span> <span class="dv">200</span>,</span>
-<span id="cb93-3"><a href></a>                 <span class="at">fill =</span> <span class="st">&quot;steelblue&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
-<span id="cb93-4"><a href></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Distribution of Penguin Body Mass&quot;</span>,</span>
-<span id="cb93-5"><a href></a>       <span class="at">x =</span> <span class="st">&quot;Body Mass (g)&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Count&quot;</span>) <span class="sc">+</span></span>
-<span id="cb93-6"><a href></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href></a><span class="fu">ggplot</span>(penguins) <span class="sc">+</span></span>
+<span id="cb96-2"><a href></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">x =</span> body_mass_g), <span class="at">binwidth =</span> <span class="dv">200</span>,</span>
+<span id="cb96-3"><a href></a>                 <span class="at">fill =</span> <span class="st">&quot;steelblue&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb96-4"><a href></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Distribution of Penguin Body Mass&quot;</span>,</span>
+<span id="cb96-5"><a href></a>       <span class="at">x =</span> <span class="st">&quot;Body Mass (g)&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Count&quot;</span>) <span class="sc">+</span></span>
+<span id="cb96-6"><a href></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output-display">
@@ -3085,11 +3286,11 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href></a><span class="fu">ggplot</span>(penguins) <span class="sc">+</span></span>
-<span id="cb94-2"><a href></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm), <span class="at">binwidth =</span> <span class="dv">5</span>,</span>
-<span id="cb94-3"><a href></a>                 <span class="at">fill =</span> <span class="st">&quot;steelblue&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
-<span id="cb94-4"><a href></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Flipper Length (mm)&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Count&quot;</span>) <span class="sc">+</span></span>
-<span id="cb94-5"><a href></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb97"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href></a><span class="fu">ggplot</span>(penguins) <span class="sc">+</span></span>
+<span id="cb97-2"><a href></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm), <span class="at">binwidth =</span> <span class="dv">5</span>,</span>
+<span id="cb97-3"><a href></a>                 <span class="at">fill =</span> <span class="st">&quot;steelblue&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb97-4"><a href></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Flipper Length (mm)&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Count&quot;</span>) <span class="sc">+</span></span>
+<span id="cb97-5"><a href></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output-display">
@@ -3110,10 +3311,10 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb95-1"><a href></a><span class="fu">ggplot</span>(penguins) <span class="sc">+</span></span>
-<span id="cb95-2"><a href></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> bill_length_mm, <span class="at">y =</span> bill_depth_mm)) <span class="sc">+</span></span>
-<span id="cb95-3"><a href></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Bill Length (mm)&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Bill Depth (mm)&quot;</span>) <span class="sc">+</span></span>
-<span id="cb95-4"><a href></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb98"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href></a><span class="fu">ggplot</span>(penguins) <span class="sc">+</span></span>
+<span id="cb98-2"><a href></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> bill_length_mm, <span class="at">y =</span> bill_depth_mm)) <span class="sc">+</span></span>
+<span id="cb98-3"><a href></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Bill Length (mm)&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Bill Depth (mm)&quot;</span>) <span class="sc">+</span></span>
+<span id="cb98-4"><a href></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output-display">
@@ -3134,10 +3335,10 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href></a><span class="fu">ggplot</span>(penguins) <span class="sc">+</span></span>
-<span id="cb96-2"><a href></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> bill_length_mm, <span class="at">y =</span> bill_depth_mm, <span class="at">color =</span> species)) <span class="sc">+</span></span>
-<span id="cb96-3"><a href></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Bill Length (mm)&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Bill Depth (mm)&quot;</span>, <span class="at">color =</span> <span class="st">&quot;Species&quot;</span>) <span class="sc">+</span></span>
-<span id="cb96-4"><a href></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb99"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb99-1"><a href></a><span class="fu">ggplot</span>(penguins) <span class="sc">+</span></span>
+<span id="cb99-2"><a href></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> bill_length_mm, <span class="at">y =</span> bill_depth_mm, <span class="at">color =</span> species)) <span class="sc">+</span></span>
+<span id="cb99-3"><a href></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Bill Length (mm)&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Bill Depth (mm)&quot;</span>, <span class="at">color =</span> <span class="st">&quot;Species&quot;</span>) <span class="sc">+</span></span>
+<span id="cb99-4"><a href></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output-display">
@@ -3158,12 +3359,12 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb97"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href></a><span class="fu">ggplot</span>(penguins) <span class="sc">+</span></span>
-<span id="cb97-2"><a href></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g), <span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
-<span id="cb97-3"><a href></a>  <span class="fu">geom_smooth</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g), <span class="at">method =</span> <span class="st">&quot;lm&quot;</span>) <span class="sc">+</span></span>
-<span id="cb97-4"><a href></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Penguin Body Mass vs. Flipper Length&quot;</span>,</span>
-<span id="cb97-5"><a href></a>       <span class="at">x =</span> <span class="st">&quot;Flipper Length (mm)&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Body Mass (g)&quot;</span>) <span class="sc">+</span></span>
-<span id="cb97-6"><a href></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href></a><span class="fu">ggplot</span>(penguins) <span class="sc">+</span></span>
+<span id="cb100-2"><a href></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g), <span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb100-3"><a href></a>  <span class="fu">geom_smooth</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g), <span class="at">method =</span> <span class="st">&quot;lm&quot;</span>) <span class="sc">+</span></span>
+<span id="cb100-4"><a href></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Penguin Body Mass vs. Flipper Length&quot;</span>,</span>
+<span id="cb100-5"><a href></a>       <span class="at">x =</span> <span class="st">&quot;Flipper Length (mm)&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Body Mass (g)&quot;</span>) <span class="sc">+</span></span>
+<span id="cb100-6"><a href></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output-display">
