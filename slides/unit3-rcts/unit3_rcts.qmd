@@ -1,0 +1,1082 @@
+---
+title: "Causality and Randomized Control Trials"
+subtitle: "EC 325: Econometrics"
+author: "Prof. Caraher"
+institute: "Colby College"
+date: "today"
+date-format: "medium"
+embed-resources: true
+format:
+  revealjs:
+    theme: colby-theme.scss
+    slide-number: true
+    incremental: true
+    footer: "EC325 | Unit 3 | Causality and RCTs"
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+#| echo: false
+
+library(tidyverse)
+```
+
+
+# The Problem with Simple Comparisons
+
+## Recap: The Health Insurance Question
+
+- In Unit 1, we discussed how econometrics focuses on identifying **causal effects** rather than mere correlations
+
+- People with health insurance tend to be healthier than people without it
+
+. . .
+
+- This correlation is undeniable
+
+
+## The Problem with Simple Comparisons {.smaller}
+
+- Suppose you conduct a survey and ask people if they believe they are in "good health"
+- For those with insurance, 70% report having good health
+- For those without insurance, only 40% report having good health
+
+. . .
+
+- But can we interpret this as evidence that insurance *causes* better health?
+- People who have health insurance differ from those who don't in many ways **beyond** just their insurance status
+  - May also be **wealthier**, **educated**, and have **stable employment**
+
+. . .
+
+- All of these factors independently affect health outcomes
+
+## Apples to Oranges
+
+- When we compare two groups of people, insured vs. uninsured, we're not just comparing the effect of insurance
+
+- We're comparing people who differ along **many dimensions**
+
+. . .
+
+::: {.callout-note}
+## Selection Bias
+**Selection bias** occurs when we compare groups that differ systematically in ways beyond just the treatment we're studying. In other words, we are comparing **apples to oranges**.
+:::
+
+## What We Really Want
+
+- The comparison we *want* to make: two otherwise identical people who differ **only** in insurance status
+
+- An **apples to apples** comparison
+
+. . .
+
+- This is the essence of *ceteris paribus*: **all else being equal**
+
+- The difference between treated and untreated units reveals the causal effect of treatment
+
+## Discussion: Can You Think of Other Examples? {.smaller}
+
+::: {.callout-tip}
+## Discussion Question
+Think of another example where a simple comparison between two groups might be misleading. What factors might differ between the groups beyond the treatment?
+:::
+
+. . .
+
+Some examples:
+
+- College graduates vs. non-graduates (wages) -- differ in motivation, family background, innate ability
+- People who exercise vs. those who don't (health) -- differ in income, education, baseline health
+- Schools with small class sizes vs. large (test scores) -- differ in funding, location, student demographics
+
+## The Core Challenge
+
+- Most of this course is about methods for dealing with selection bias
+
+. . .
+
+- Today: the **gold standard** solution -- Randomized Control Trials
+
+. . .
+
+- But first, let's build some intuition using a thought experiment...
+
+
+# The Multiverse of Possibilities
+
+## A Thought Experiment: Rick and Morty
+
+![Rick and Morty: A show about infinite parallel universes.](images/rick_and_morty_title.png){fig-align="center" width="60%"}
+
+. . .
+
+- [Clip](https://www.youtube.com/watch?v=SA4iXmmVq74)
+- Rick possesses a "portal gun" that lets him travel across infinite **parallel universes**
+- Each universe has a Morty identical in every way except for one characteristic
+
+## The Causal Effect of College
+
+- Suppose we want to know: does attending college increase wages?
+
+. . .
+
+- We **cannot** simply compare college graduates to non-graduates
+  - These groups differ in motivation, family background, innate ability, etc.
+
+. . .
+
+- But imagine we could observe two Mortys from parallel universes...
+
+## Morty C-137 vs. College Morty {.smaller}
+
+::: {layout-ncol=2}
+![Morty C-137](images/c137_morty.png){height=350px}
+
+![College Morty](images/college_morty.png){height=350px}
+:::
+
+. . .
+
+- These two Mortys are identical in every way -- same intelligence, same family, same opportunities -- **except** one went to college
+
+- This is a truly *ceteris paribus* comparison -- the wage difference = the **true causal effect** of college
+
+## The Fundamental Problem
+
+- Of course, the fundamental problem is that **we don't have a portal gun**
+
+. . .
+
+- We only observe **one** version of reality, not parallel universes
+
+. . .
+
+- We can never observe both what happened AND what *would have* happened
+
+## The Counterfactual
+
+::: {.callout-important}
+## Definition
+The **counterfactual** is the unobserved "what if" scenario -- what would have happened to an individual under the alternative treatment status.
+:::
+
+. . .
+
+- For a college graduate: what would their wage have been if they had NOT gone to college?
+- For a non-graduate: what would their wage have been if they HAD gone to college?
+
+. . .
+
+- We can **never** directly observe counterfactuals
+
+## So What Do We Do?
+
+- We need another way to make valid causal comparisons **without** a portal gun
+
+. . .
+
+- The solution that comes closest to achieving *ceteris paribus* conditions in the real world:
+
+. . .
+
+- The **Randomized Control Trial** (RCT)
+
+
+# Randomized Control Trials: The Next Best Thing
+
+## How Do Drug Companies Test New Drugs?
+
+- Consider how a pharmaceutical company tests whether a new drug works
+
+. . .
+
+- They do NOT just give the drug to sick people and see if they get better
+
+. . .
+
+- Why not?
+
+. . .
+
+- That would be subject to **selection bias** -- sicker people might seek out the drug, people who recover might be healthier to begin with
+
+## Instead: The Randomized Control Trial
+
+Drug companies conduct a **Randomized Control Trial** (RCT):
+
+. . .
+
+1. **Sample** a group of volunteers from the population of interest
+
+. . .
+
+2. **Randomly assign** some to receive the drug ("treatment" group) and others a placebo ("control" group)
+
+. . .
+
+3. **Compare** the average outcomes between treatment and control groups
+
+. . .
+
+- The difference in average outcomes can this be interpreted as the **causal effect** of the treatment
+
+## The Key Insight
+
+::: {.callout-important}
+## Why Randomization Works
+Random assignment ensures that, on average, the treatment and control groups have **identical characteristics** -- both observed and unobserved. Any difference in outcomes can therefore be attributed to the treatment itself.
+:::
+
+. . .
+
+- Random assignment **eliminates selection bias**
+
+## A Simple Example {.smaller}
+
+- Suppose we want to know: does a tutoring program improve test scores?
+
+. . .
+
+- **Bad approach:** Compare students who signed up for tutoring vs. those who didn't
+  - Problem: students who sign up may be more motivated or struggling more
+
+. . .
+
+- **RCT approach:**
+  1. Sample 200 students
+  2. Randomly assign 100 to tutoring, 100 to no tutoring
+  3. Compare average test scores by finding the difference in average test scores 
+
+. . .
+
+- Because assignment was random, the groups are comparable on average!
+
+## But Why "On Average"?
+
+- We said randomization makes groups identical **"on average"**
+
+. . .
+
+- What does "on average" really mean?
+
+. . .
+
+- Why does it work better with larger samples?
+
+. . .
+
+- The answer lies in a fundamental result from probability theory...
+
+
+# The Law of Large Numbers
+
+## The Law of Large Numbers (LLN)
+
+- The **Law of Large Numbers** states that as the sample size increases, the sample average converges to the population average
+
+. . .
+
+- Formally, if $Y_1, Y_2, ..., Y_n$ are i.i.d. random variables with mean $\mu$:
+
+. . .
+
+$$\text{plim}(\bar{Y}_n) = \mu$$
+
+. . .
+
+- where $\bar{Y}_n$ is the sample average and $\text{plim}$ denotes the probability limit
+
+## Seeing the LLN in Action: Rolling Dice
+
+- Suppose our random variable $Y$ is the outcome from rolling a dice
+- The expected value of rolling a fair six-sided die, $E[Y]$:
+
+. . .
+
+$$\mu = \frac{1 + 2 + 3 + 4 + 5 + 6}{6} = 3.5$$
+
+. . .
+
+- If we roll once or twice, we might be far from 3.5
+
+- But what if we roll many, many times?
+
+. . .
+
+- Let's find out!
+
+## New Function: `sample()` {.smaller}
+
+`sample()` randomly picks values from a set -- like rolling dice or flipping coins:
+
+```{r}
+#| echo: true
+#| eval: false
+
+sample(x, size, replace = TRUE)
+```
+
+- `x` = the values to choose from (e.g., `c(1, 2, 3, 4, 5, 6)`)
+- `size` = how many values to pick
+- `replace = TRUE` means the same value can be picked again
+
+## Simulating Dice Rolls in R {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Try it yourself!
+:::
+
+- Let's use `sample()` to "roll" a die
+
+. . .
+
+- Let's roll the dice once:
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+dice <- c(1, 2, 3, 4, 5, 6)
+roll_1 <- sample(dice, size = 1, replace = TRUE)
+roll_1
+```
+
+## Rolling 5 Times {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Try it yourself!
+:::
+
+- Now roll 5 times and take the average:
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+roll_5 <- sample(dice, size = 5, replace = TRUE)
+roll_5
+```
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+mean(roll_5)
+```
+
+. . .
+
+- With 5 rolls, our average is a little closer to the expected value
+
+## Rolling More Times {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Try it yourself!
+:::
+
+- Now try 25, 50, and 100 rolls:
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+rolls_25 <- sample(dice, size = 25, replace = TRUE)
+mean(rolls_25)
+```
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+rolls_50 <- sample(dice, size = 50, replace = TRUE)
+mean(rolls_50)
+```
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+rolls_100 <- sample(dice, size = 100, replace = TRUE)
+mean(rolls_100)
+```
+
+## How the LLN Enables Causal Inference
+
+- When we randomly assign individuals to treatment and control groups, we are drawing **random samples** from the same population
+
+- The LLN guarantees that, with a large enough sample, the **average characteristics** of each group will converge to the population average -- and therefore, **to each other**
+
+. . .
+
+::: {.callout-important}
+## Why This Matters
+The LLN is why randomization eliminates selection bias: with large enough samples, treatment and control groups become **statistically identical** in all characteristics -- both observed and unobserved.
+:::
+
+. . .
+
+- The key word is "enough" -- we need a sufficiently large sample
+
+## But How Large Is "Large Enough"?
+
+- With 5 people in each group? Probably not enough.
+
+. . .
+
+- With 500? Almost certainly enough.
+
+. . .
+
+- Let's see this directly with a simulation...
+
+
+# Seeing Randomization Work
+
+## Our Setup {.smaller}
+
+Imagine we want to know: **do extra office hours improve test scores?**
+
+- 5,000 students with different **weekly study hours** (1 to 10)
+- **Test score** depends on study habits: more studying → higher score
+- Students who study more also **attend office hours** more (NOT random!)
+
+. . .
+
+- The **true causal effect** of office hours = **zero**
+
+. . .
+
+- But because studious students self-select into office hours, a naive comparison will be **misleading**
+
+## New Function: `ifelse()` {.smaller}
+
+`ifelse()` checks a condition and returns one value if TRUE, another if FALSE:
+
+```{r}
+#| echo: true
+#| eval: false
+
+ifelse(condition, value_if_true, value_if_false)
+```
+
+. . .
+
+```{r}
+#| echo: true
+
+x <- c(3, 7, 2, 9)
+ifelse(x > 5, "high", "low")
+```
+
+. . .
+
+- We'll use this to assign students to office hours based on their study habits
+
+## Creating the Population {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Try it yourself!
+:::
+
+Copy-paste this into a new R script!
+
+```{r}
+#| echo: true
+
+# Set seed for replication draws
+set.seed(123)
+# Set population size
+n <- 5000
+
+dat <- tibble(
+  # Randomly assign office hours to students
+  study_hours = sample(1:10, size = n, replace = TRUE)
+) |>
+  mutate(
+    # Students who study more attend office hours (NOT random!)
+    attended_oh = ifelse(study_hours > 5, 1, 0),
+    # Test score depends on study habits. TRUE effect of office hours = 0
+    test_score = 50 + 3 * study_hours + 0 * attended_oh
+  )
+```
+
+. . .
+
+- Notice: `test_score` depends on `study_hours` but **not** on `attended_oh`
+- The true causal effect of office hours is **zero**!
+
+## The Selection Bias Problem {.smaller}
+
+```{r}
+#| echo: true
+
+dat |>
+  group_by(attended_oh) |>
+  summarize(
+    avg_study = mean(study_hours),
+    avg_score = mean(test_score)
+  )
+```
+
+. . .
+
+- Students who attended office hours study more **and** score higher
+- Even though office hours have **zero** causal effect!
+- This is **selection bias**: studious students selected into office hours
+
+## Can Randomization Fix This?
+
+- What if we **randomly assigned** students to office hours instead of letting them self-select?
+
+. . .
+
+- Let's try it at different sample sizes and watch the difference shrink...
+
+## New Functions: `slice_sample()`, `first()`, and `last()` {.smaller}
+
+Three new functions we'll need:
+
+**`slice_sample()`** randomly picks rows from a data frame:
+
+```{r}
+#| echo: true
+
+dat |> slice_sample(n = 3)
+```
+
+. . .
+
+**`first()`** and **`last()`** grab the first or last value in a column:
+
+```{r}
+#| echo: true
+
+example <- tibble(group = c("A", "B"), value = c(10, 20))
+example
+first(example$value)
+last(example$value)
+```
+
+## Random Assignment: N = 20 {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Try it yourself!
+:::
+
+```{r}
+#| echo: true
+
+n_sample <- 20
+
+set.seed(42)
+sample_data <- dat |>
+  slice_sample(n = n_sample) |>
+  mutate(rand_treat = sample(c(0, 1), size = n_sample, replace = TRUE))
+
+# Average study hours and test score by group
+group_means <- sample_data |>
+  group_by(rand_treat) |>
+  summarize(
+    avg_study = mean(study_hours),
+    avg_score = mean(test_score)
+  )
+group_means
+```
+
+## Difference in Means: N = 20 {.smaller}
+
+```{r}
+#| echo: true
+
+# Difference: Treated (last row) minus Control (first row)
+group_means |>
+  summarize(
+    diff_study = last(avg_study) - first(avg_study),
+    diff_score = last(avg_score) - first(avg_score)
+  )
+```
+
+. . .
+
+- With only 20 people, the difference in test scores is **far from zero**
+- A small sample can give a misleading result!
+
+## Random Assignment: N = 100 {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Try it yourself!
+:::
+
+Just change `n_sample` and re-run:
+
+```{r}
+#| echo: true
+
+n_sample <- 100
+
+set.seed(42)
+sample_data <- dat |>
+  slice_sample(n = n_sample) |>
+  mutate(rand_treat = sample(c(0, 1), size = n_sample, replace = TRUE))
+
+group_means <- sample_data |>
+  group_by(rand_treat) |>
+  summarize(
+    avg_study = mean(study_hours),
+    avg_score = mean(test_score)
+  )
+group_means
+```
+
+## Random Assignment: N = 100 {.smaller}
+
+```{r}
+#| echo: true
+
+group_means |>
+  summarize(
+    diff_study = last(avg_study) - first(avg_study),
+    diff_score = last(avg_score) - first(avg_score)
+  )
+```
+
+. . .
+
+- Getting closer to zero!
+
+## Random Assignment: N = 500 {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Try it yourself!
+:::
+
+```{r}
+#| echo: true
+
+n_sample <- 500
+
+set.seed(42)
+sample_data <- dat |>
+  slice_sample(n = n_sample) |>
+  mutate(rand_treat = sample(c(0, 1), size = n_sample, replace = TRUE))
+
+group_means <- sample_data |>
+  group_by(rand_treat) |>
+  summarize(
+    avg_study = mean(study_hours),
+    avg_score = mean(test_score)
+  )
+group_means
+```
+
+## Random Assignment: N = 500 {.smaller}
+
+```{r}
+#| echo: true
+
+group_means |>
+  summarize(
+    diff_study = last(avg_study) - first(avg_study),
+    diff_score = last(avg_score) - first(avg_score)
+  )
+```
+
+. . .
+
+- The differences are **very small** now
+
+## Random Assignment: N = 2000 {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Try it yourself!
+:::
+
+```{r}
+#| echo: true
+
+n_sample <- 2000
+
+set.seed(42)
+sample_data <- dat |>
+  slice_sample(n = n_sample) |>
+  mutate(rand_treat = sample(c(0, 1), size = n_sample, replace = TRUE))
+
+group_means <- sample_data |>
+  group_by(rand_treat) |>
+  summarize(
+    avg_study = mean(study_hours),
+    avg_score = mean(test_score)
+  )
+group_means
+```
+
+## Random Assignment: N = 2000 {.smaller}
+
+```{r}
+#| echo: true
+
+group_means |>
+  summarize(
+    diff_study = last(avg_study) - first(avg_study),
+    diff_score = last(avg_score) - first(avg_score)
+  )
+```
+
+. . .
+
+- The difference is **essentially zero** -- the true causal effect!
+- This is the **Law of Large Numbers** in action
+
+## The Takeaway
+
+::: {.callout-important}
+## The Power of Randomization + Sample Size
+With random assignment, the difference in group means equals the **true causal effect on average**. Larger samples make each experiment **more precise**, reducing the chance of a misleading result.
+:::
+
+. . .
+
+- Any remaining difference at large N is just random variation, NOT systematic selection bias
+
+
+# The Potential Outcomes Framework
+
+## From Intuition to Math
+
+- Now that we intuitively understand WHY simple comparisons can mislead and HOW randomization helps...
+
+. . .
+
+- Let's formalize these ideas mathematically using the **Potential Outcomes Framework**
+
+. . .
+
+- This framework gives us precise language for discussing causal effects
+
+## Defining Potential Outcomes {.smaller}
+
+- For any individual $i$, define two **potential outcomes**:
+
+. . .
+
+- $Y_{1i}$: The outcome individual $i$ would experience **if treated**
+- $Y_{0i}$: The outcome individual $i$ would experience **if not treated**
+
+. . .
+
+- The **causal effect** for individual $i$:
+
+$$\kappa_i = Y_{1i} - Y_{0i}$$
+
+## Connecting to the Multiverse
+
+- This framework captures the "multiverse" intuition:
+
+. . .
+
+- $Y_{1i}$ = **College Morty's** wage
+- $Y_{0i}$ = **Morty C-137's** wage
+- $\kappa_i$ = The causal effect of college for Morty
+
+. . .
+
+- But remember: we only observe **one** of these outcomes for each person
+
+## The Fundamental Problem of Causal Inference
+
+- We only observe **one** potential outcome for each individual
+
+. . .
+
+- If person $i$ attends college: observe $Y_{1i}$, never see $Y_{0i}$
+- If person $i$ does NOT attend: observe $Y_{0i}$, never see $Y_{1i}$
+
+. . .
+
+::: {.callout-important}
+## The Fundamental Problem
+We can never observe both potential outcomes for the same individual. The counterfactual is always missing.
+:::
+
+## The Treatment Indicator {.smaller}
+
+- Let $D_i$ be a **treatment indicator**:
+
+$$D_i = \begin{cases} 1 & \text{if individual } i \text{ is treated} \\ 0 & \text{otherwise} \end{cases}$$
+
+. . .
+
+- What we actually observe:
+
+$$Y_i = D_i \cdot Y_{1i} + (1 - D_i) \cdot Y_{0i}$$
+
+. . .
+
+- We observe the treated outcome for treated individuals and the untreated outcome for untreated individuals -- but **never both**
+
+## The Simple Difference in Means {.smaller}
+
+- Suppose we compare average outcomes between treated and untreated:
+
+$$E[Y_i | D_i = 1] - E[Y_i | D_i = 0]$$
+
+. . .
+
+- Since we only observe $Y_{1i}$ for treated and $Y_{0i}$ for untreated:
+
+$$E[Y_{1i} | D_i = 1] - E[Y_{0i} | D_i = 0]$$
+
+. . .
+
+- Is this the causal effect? **Not necessarily!**
+
+## The Selection Bias Decomposition {.smaller}
+
+- Add and subtract the counterfactual term $E[Y_{0i} | D_i = 1]$:
+
+. . .
+
+$$E[Y_{1i} | D_i = 1] - E[Y_{0i} | D_i = 0]$$
+
+. . .
+
+$$= \underbrace{E[Y_{1i} | D_i = 1] - E[Y_{0i} | D_i = 1]}_{\text{Causal effect for the treated}} + \underbrace{E[Y_{0i} | D_i = 1] - E[Y_{0i} | D_i = 0]}_{\text{Selection bias}}$$
+
+## The Key Equation
+
+::: {.callout-important}
+## The Selection Bias Decomposition
+
+$$\underbrace{E[Y_i | D_i = 1] - E[Y_i | D_i = 0]}_{\text{Observed difference}} = \underbrace{\kappa}_{\text{Causal effect}} + \underbrace{E[Y_{0i} | D_i = 1] - E[Y_{0i} | D_i = 0]}_{\text{Selection bias}}$$
+:::
+
+. . .
+
+- A simple difference in group means = **Causal effect + Selection bias**
+
+## What Is the Selection Bias Term? {.smaller}
+
+- Selection bias: $E[Y_{0i} | D_i = 1] - E[Y_{0i} | D_i = 0]$
+
+. . .
+
+- This compares the **untreated potential outcomes** of the two groups
+
+. . .
+
+- In the health insurance example:
+  - People who *choose* to get insurance would be healthier **even without insurance** (wealthier, more health-conscious)
+  - So $E[Y_{0i} | D_i = 1] > E[Y_{0i} | D_i = 0]$
+  - Selection bias is **positive**: simple comparisons **overstate** the causal effect
+
+## How Randomization Eliminates Selection Bias {.smaller}
+
+- With random assignment, treatment and control groups are drawn from the **same population**
+
+. . .
+
+- By the LLN, their average potential outcomes converge:
+
+$$E[Y_{0i} | D_i = 1] = E[Y_{0i} | D_i = 0]$$
+
+. . .
+
+- Plugging into our decomposition:
+
+$$E[Y_i | D_i = 1] - E[Y_i | D_i = 0] = \kappa + 0 = \kappa$$
+
+. . .
+
+- **With random assignment, the simple difference in means equals the causal effect!**
+
+## Summary of the Framework
+
+::: {.callout-tip}
+## The Potential Outcomes Framework in Three Sentences
+1. Each individual has two potential outcomes ($Y_{1i}$ and $Y_{0i}$), but we only observe one.
+2. Simple comparisons confound the causal effect with selection bias.
+3. Randomization sets selection bias to zero, so the difference in means = the causal effect.
+:::
+
+
+# The Oregon Health Insurance Experiment
+
+## RCTs in the Real World
+
+- Most econometric research **cannot** rely on randomization
+
+- We typically work with observational data where treatment is not randomly assigned
+
+. . .
+
+- Much of this course focuses on methods for addressing selection bias in such settings
+
+. . .
+
+- But there have been a few **landmark RCTs** in economics -- let's look at one
+
+## The Oregon Health Insurance Experiment {.smaller}
+
+- One of the most influential RCTs in economics -- and it directly addresses our health insurance question
+- Throughout the 2000s, many U.S. states expanded Medicaid coverage
+- Most states simply extended coverage to everyone newly eligible
+
+. . .
+
+- But in 2008, Oregon did something unique:
+  - Facing limited resources, they offered Medicaid coverage through a **public lottery**
+  - People who wanted coverage could sign up
+  - **Winners** could apply for coverage; **losers** remained uninsured
+
+. . .
+
+- Eligibility: Oregon residents aged 19-64, uninsured for 6+ months, income below poverty line
+
+## Why This Is So Valuable
+
+- Because lottery winners were chosen **randomly**:
+
+. . .
+
+- The comparison between winners and losers provides a **valid causal estimate** of the effect of health insurance
+
+. . .
+
+- Free from the selection bias that plagues observational studies
+
+. . .
+
+- This is exactly the logic of an RCT -- applied to a major policy question!
+
+## Results {.smaller}
+
+- Lottery winners (relative to losers) experienced:
+
+. . .
+
+1. **Increased take-up of Medicaid** -- the lottery actually changed insurance status
+
+. . .
+
+2. **Increased use of medical resources** -- more hospital and outpatient services
+
+. . .
+
+3. **Modest physical health improvements** -- but significant improvements in:
+    - Mental health
+    - Financial security (reduced medical debt, less catastrophic spending)
+
+. . .
+
+- These findings come from a **rigorous RCT**, not observational comparisons
+
+## Discussion
+
+::: {.callout-tip}
+## Discussion Question
+The Oregon experiment found modest effects of insurance on physical health. Does this mean expanding health insurance is not worthwhile? What other outcomes might matter for policy decisions?
+:::
+
+
+# Practice Exercises
+
+## Practice: Test Your Understanding {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Your turn!
+:::
+
+Let's put everything together with some practice exercises. Give each one a try before clicking to reveal the answer!
+
+## Practice 1 {.smaller}
+
+**A researcher compares average incomes of people who moved to a new city vs. those who stayed. She finds movers earn more. Can she conclude that moving *causes* higher income? Why or why not?**
+
+. . .
+
+*Answer:* No. This comparison suffers from **selection bias**. People who move may be younger, more educated, more ambitious, or have better job offers -- all of which independently affect income. The groups are not comparable.
+
+## Practice 2 {.smaller}
+
+**Write the selection bias decomposition for the following scenario:** A company compares productivity of employees who work from home vs. those in the office. Let $Y_{1i}$ = productivity if working from home, $Y_{0i}$ = productivity if in office.
+
+. . .
+
+*Answer:*
+
+$$E[Y_i | D_i = 1] - E[Y_i | D_i = 0] = \underbrace{E[Y_{1i} - Y_{0i} | D_i = 1]}_{\text{Causal effect}} + \underbrace{E[Y_{0i} | D_i = 1] - E[Y_{0i} | D_i = 0]}_{\text{Selection bias}}$$
+
+. . .
+
+- The selection bias could be positive (more self-disciplined workers choose WFH) or negative (less productive workers choose WFH)
+
+## Practice 3 {.smaller}
+
+**For each scenario, identify the likely direction of selection bias (positive, negative, or ambiguous):**
+
+. . .
+
+a. Effect of private school on test scores (parents who choose private school are wealthier and more involved)
+
+. . .
+
+- *Positive* -- overstates the causal effect
+
+. . .
+
+b. Effect of a job training program on employment (those who sign up may be more desperate for work)
+
+. . .
+
+- *Negative* -- understates the causal effect
+
+. . .
+
+c. Effect of exercise on mental health (motivated people may exercise more, but people with mental health struggles may also use exercise as treatment)
+
+. . .
+
+- *Ambiguous* -- could go either direction
+
+
+# Summary and Key Takeaways
+
+## What We Learned in This Unit {.smaller}
+
+1. **Selection bias** arises when treated and untreated groups differ systematically -- we are comparing apples to oranges
+
+2. **Ceteris paribus** comparisons isolate the causal effect by holding everything constant except treatment
+
+3. **RCTs** eliminate selection bias by ensuring groups are drawn from the same population
+
+4. The **Law of Large Numbers** guarantees that with large samples, randomly assigned groups have identical average characteristics
+
+5. The **potential outcomes framework** formalizes: $\kappa = Y_{1i} - Y_{0i}$
+
+6. Simple differences in means = Causal effect + Selection bias. Randomization sets bias to zero.
+
+## The Key Equation
+
+$$\underbrace{E[Y_i | D_i = 1] - E[Y_i | D_i = 0]}_{\text{Observed difference}} = \underbrace{\kappa}_{\text{Causal effect}} + \underbrace{E[Y_{0i} | D_i = 1] - E[Y_{0i} | D_i = 0]}_{\text{Selection bias}}$$
+
+. . .
+
+- With randomization: Selection bias = 0
+
+. . .
+
+- Without randomization: We need other tools (the rest of this course!)
+
+- Next up: **Ordinary Least Squares (OLS)**
