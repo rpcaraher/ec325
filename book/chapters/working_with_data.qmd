@@ -1,0 +1,902 @@
+# Importing and Working with Data {#sec-working-with-data}
+
+```{r}
+#| echo: false
+#| output: false
+#| message: false
+#| warning: false
+
+library(tidyverse)
+
+```
+
+```{=html}
+
+<style>
+.problem {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+.context {
+    background-color: #e8f4f8;
+    padding: 12px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border-left: 4px solid #2874a6;
+}
+.question {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #fff3cd;
+    border-radius: 5px;
+}
+.answer-row {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.answer-row label {
+    min-width: 320px;
+    font-weight: 500;
+}
+select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    min-width: 300px;
+    cursor: pointer;
+}
+select:focus {
+    border-color: #2874a6;
+    outline: none;
+}
+.correct {
+    border-color: #28a745 !important;
+    background-color: #d4edda !important;
+}
+.incorrect {
+    border-color: #dc3545 !important;
+    background-color: #f8d7da !important;
+}
+.explanation {
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #e7f3ff;
+    border-radius: 5px;
+    border-left: 4px solid #2874a6;
+}
+.note {
+    font-size: 0.85em;
+    color: #666;
+    font-style: italic;
+}
+</style>
+
+<script>
+function checkAnswer(selectElement, correctValue) {
+    if (selectElement.value === '') {
+        selectElement.classList.remove('correct', 'incorrect');
+    } else if (selectElement.value === correctValue) {
+        selectElement.classList.remove('incorrect');
+        selectElement.classList.add('correct');
+    } else {
+        selectElement.classList.remove('correct');
+        selectElement.classList.add('incorrect');
+    }
+}
+</script>
+
+```
+
+
+::: {.callout-tip collapse="true"}
+## **Key Questions**
+- How do I import data files into R?
+- What are README files and codebooks, and why do they matter?
+- What are the first things I should do after loading a dataset?
+- What is the difference between wide and long data?
+- How do I reshape data between wide and long formats?
+- How do I export data from R?
+:::
+
+::: {.callout-note collapse="true"}
+## **Suggested Readings**
+- @wickham_r_2023, Ch. 7-8, 11
+:::
+
+
+Every empirical analysis starts with the same step:
+getting data into R.
+Whether you're working with a dataset from a published paper,
+government statistics,
+or data you collected yourself,
+you need to know how to import it,
+understand its structure,
+and get it into the right shape for your analysis.
+This appendix walks you through the entire process,
+from reading in a data file to reshaping and exporting your results.
+
+
+## README Files and Codebooks
+
+Before you ever open a dataset in R,
+you should look for its **documentation**.
+Two types of documentation are especially important:
+the README file and the codebook.
+
+### README Files
+
+A README file provides a high-level overview of a dataset or project.
+It typically contains information about where the data came from,
+when it was collected,
+who collected it,
+and any important notes about how the data should be used or cited.
+README files are usually plain text (`.txt`) or Markdown (`.md`) files.
+
+A good README for a research dataset might look something like this:
+
+```
+================================================================
+README: County-Level Birth Outcomes Data
+================================================================
+
+Source:       National Vital Statistics System (NVSS)
+Years:        2015-2020
+Unit:         County-year
+Coverage:     All U.S. counties with 100+ births per year
+
+Description:
+  This dataset contains county-level measures of birth outcomes
+  including low birth weight rates, preterm birth rates, and
+  infant mortality rates. Data are derived from individual birth
+  certificate records aggregated to the county level.
+
+Files:
+  birth_outcomes.csv     - Main analysis dataset
+  county_covariates.csv  - County demographic characteristics
+  codebook.txt           - Variable descriptions and coding
+
+Notes:
+  - Counties with fewer than 100 births in a given year are
+    suppressed for privacy.
+  - Infant mortality rates are per 1,000 live births.
+  - FIPS codes follow 2015 county definitions.
+
+Citation:
+  National Center for Health Statistics. National Vital
+  Statistics System, Natality Data, 2015-2020.
+================================================================
+```
+
+Even if a dataset doesn't come with a README,
+you should create one for your own projects.
+When you come back to an analysis six months later,
+you will thank yourself for writing down where the data came from and what the key variables mean.
+
+### Codebooks
+
+A **codebook** (sometimes called a data dictionary) is more detailed than a README.
+It describes every variable in the dataset:
+what it measures,
+what values it can take,
+how missing values are coded,
+and any important notes about interpretation.
+
+Here's an example of what a codebook might look like for the birth outcomes dataset described above:
+
+```
+================================================================
+CODEBOOK: birth_outcomes.csv
+================================================================
+
+Variable        Type      Description
+----------------------------------------------------------------
+fips            character 5-digit county FIPS code
+state           character 2-letter state abbreviation
+county_name     character County name
+year            integer   Calendar year (2015-2020)
+total_births    integer   Total number of live births
+lbw_rate        numeric   Low birth weight rate (% of births
+                          under 2,500 grams)
+preterm_rate    numeric   Preterm birth rate (% of births
+                          before 37 weeks gestation)
+imr             numeric   Infant mortality rate
+                          (deaths per 1,000 live births)
+median_income   numeric   County median household income
+                          (in 2020 dollars)
+pct_uninsured   numeric   Percent of population uninsured
+urban           integer   1 = metropolitan county,
+                          0 = non-metropolitan county
+
+Missing Values: Coded as NA
+================================================================
+```
+
+::: {.callout-important}
+## Always Look for Documentation First
+Before you start analyzing any dataset,
+look for the README and codebook.
+Understanding what your variables actually measure---and
+how they are coded---is essential for avoiding errors in your analysis.
+For example,
+if you don't know that `imr` is measured per 1,000 live births,
+you might mistakenly interpret a coefficient as a percentage change.
+:::
+
+
+## Importing Data
+
+The `tidyverse` includes a package called `readr` that provides fast,
+consistent functions for reading data files into R.
+When you load the `tidyverse` with `library(tidyverse)`,
+`readr` is automatically loaded for you.
+
+### CSV Files
+
+The most common data format you'll encounter is the **CSV** (comma-separated values) file.
+A CSV file is essentially a plain text file where each row is an observation and each value is separated by commas.
+To read a CSV file, use `read_csv()`:
+
+```{r}
+#| eval: false
+
+# Read a CSV file from your working directory
+birth_data <- read_csv("birth_outcomes.csv")
+```
+
+When you run `read_csv()`,
+it will print a message showing you what type it assigned to each column.
+This is helpful for catching issues---for example,
+if a column you expected to be numeric shows up as character,
+that might indicate there are non-numeric entries (like "N/A" or "-") in the data that need to be addressed.
+
+You can also read CSV files directly from a URL,
+which is convenient for datasets hosted online:
+
+```{r}
+#| message: false
+
+# Read a CSV file from a URL
+storms_data <- read_csv("https://vincentarelbundock.github.io/Rdatasets/csv/dplyr/storms.csv")
+
+head(storms_data)
+```
+
+### Other Delimited Files
+
+Not all text-based data files use commas as separators.
+Some use tabs, semicolons, or other characters.
+The `readr` package (included when loading the `tidyverse`) has functions for common variants:
+
+```{r}
+#| eval: false
+
+# Tab-separated files
+my_data <- read_tsv("data_file.tsv")
+
+# Semicolon-separated files (common in some European data)
+my_data <- read_delim("data_file.csv", delim = ";")
+
+```
+
+### Excel Files
+
+Many datasets,
+especially those from government agencies or organizations,
+come in Excel format (`.xlsx` or `.xls`).
+To read Excel files,
+you need the `readxl` package,
+which is installed as part of the `tidyverse` but not loaded automatically:
+
+```{r}
+#| eval: false
+
+library(readxl)
+
+# Read the first sheet of an Excel file
+my_data <- read_excel("data_file.xlsx")
+
+# Read a specific sheet
+my_data <- read_excel("data_file.xlsx", sheet = "Sheet2")
+
+# Read a specific sheet by number
+my_data <- read_excel("data_file.xlsx", sheet = 2)
+```
+
+### Stata and Other Statistical Software Files
+
+If you're working with data from other statistical software,
+the `haven` package (also installed with `tidyverse` but not loaded automatically)
+can read files from Stata (`.dta`), SPSS (`.sav`), and SAS (`.sas7bdat`):
+
+```{r}
+#| eval: false
+
+library(haven)
+
+# Read a Stata file
+stata_data <- read_dta("data_file.dta")
+
+# Read an SPSS file
+spss_data <- read_sav("data_file.sav")
+```
+
+Stata files are particularly common in economics research,
+so `read_dta()` is a function you will use often.
+
+### R Data Files
+
+R has its own file formats for saving data.
+The most common is `.rds`,
+which stores a single R object:
+
+```{r}
+#| eval: false
+
+# Read an RDS file
+my_data <- read_rds("data_file.rds")
+```
+
+You may also encounter `.RData` or `.rda` files,
+which can store multiple objects at once.
+These are loaded using `load()`:
+
+```{r}
+#| eval: false
+
+# Load an RData file (objects are loaded into your environment
+# with whatever names they were saved with)
+load("data_file.RData")
+```
+
+::: {.callout-tip}
+## Which Function Do I Use?
+Here's a quick reference for which import function to use based on your file type:
+
+| File Extension | Function | Package |
+|---------------|----------|---------|
+| `.csv` | `read_csv()` | readr (tidyverse) |
+| `.tsv` | `read_tsv()` | readr (tidyverse) |
+| `.xlsx` / `.xls` | `read_excel()` | readxl |
+| `.dta` | `read_dta()` | haven |
+| `.sav` | `read_sav()` | haven |
+| `.rds` | `read_rds()` | readr (tidyverse) |
+| `.RData` | `load()` | base R |
+: Import functions by file type {#tbl-import-functions}
+:::
+
+
+## First Things to Do with Your Data
+
+You've imported your data---now what?
+Before jumping into any analysis,
+you should take a few minutes to explore the dataset and make sure everything looks right.
+For a deeper discussion of why this matters---and how descriptive statistics and visualization can help you catch errors---see @sec-data-practices.
+Here we'll focus on the three functions you should run every time you load a new dataset.
+
+Let's demonstrate using the `penguins` dataset from the `palmerpenguins` package:
+
+```{r}
+#| message: false
+
+library(palmerpenguins)
+data(penguins)
+```
+
+### `head()`: Look at the First Few Rows
+
+The `head()` function shows you the first few rows of your data,
+giving you an immediate sense of what variables are present and what the values look like:
+
+```{r}
+head(penguins)
+```
+
+By default, `head()` shows 6 rows.
+You can change this with the `n` argument (e.g., `head(penguins, n = 10)`).
+
+### `glimpse()`: Get a Compact Overview
+
+The `glimpse()` function shows every column's name, data type, and first several values.
+This is one of the most efficient ways to quickly understand a dataset's structure:
+
+```{r}
+glimpse(penguins)
+```
+
+From this output,
+we can immediately see that the dataset has 344 rows and 8 columns,
+and we can verify that each variable has the type we'd expect
+(e.g., `species` is a factor, `bill_length_mm` is a double).
+
+### `summary()`: Check Key Statistics
+
+The `summary()` function provides basic descriptive statistics for every variable---minimums,
+maximums, means, medians, and counts of missing values:
+
+```{r}
+summary(penguins)
+```
+
+This lets you quickly verify that variable ranges make sense and spot any missing data.
+For example,
+we can see that `sex` has 11 `NA's`---something to keep in mind for our analysis.
+
+
+## Data Structure: Wide vs. Long
+
+One of the most important concepts in data management is the distinction between **wide** and **long** data formats.
+The same information can be arranged in fundamentally different ways,
+and the format you need depends on what you're trying to do with the data.
+Understanding this distinction---and knowing how to switch between formats---is a crucial skill for applied econometrics.
+
+### Wide Data
+
+In **wide format**,
+each row represents a single observational unit (like a country, state, or person),
+and each time period or category gets its own column.
+This is how data often appears in spreadsheets and published tables.
+
+Here's an example of wide-format data showing GDP per capita for several countries across three years:
+
+```{r}
+gdp_wide <- tibble(
+  country = c("United States", "United Kingdom", "Germany", "Japan"),
+  gdp_2018 = c(62887, 42943, 47603, 39287),
+  gdp_2019 = c(65298, 42330, 46468, 40247),
+  gdp_2020 = c(63544, 40285, 45724, 39539)
+)
+
+gdp_wide
+```
+
+Wide data is easy to read as a table.
+You can quickly compare across years for a given country by scanning across a row,
+or compare across countries for a given year by scanning down a column.
+
+### Long Data
+
+In **long format**,
+each row represents a single observation for a single unit at a single point in time.
+Instead of having separate columns for each year,
+there is one column that identifies the time period and another column that holds the value.
+
+Here is the same GDP data in long format:
+
+```{r}
+gdp_long <- tibble(
+  country = rep(c("United States", "United Kingdom", "Germany", "Japan"), each = 3),
+  year = rep(c(2018, 2019, 2020), times = 4),
+  gdp_per_capita = c(62887, 65298, 63544,
+                     42943, 42330, 40285,
+                     47603, 46468, 45724,
+                     39287, 40247, 39539)
+)
+
+gdp_long
+```
+
+Long data has more rows but fewer columns.
+Each row is a single country-year observation.
+This format might seem less intuitive at first,
+but it is often the format that R functions---especially `ggplot2` for visualization and regression functions---expect.
+
+### When to Use Which Format
+
+Wide format is natural for presenting data in tables,
+reading data quickly by eye,
+and working with data where you want to compare values across time periods within a row.
+
+Long format is necessary for most data analysis in R.
+Specifically,
+`ggplot2` works best with long data because you can map variables like `year` to aesthetics (like color or facets).
+Regression functions like `lm()` and `feols()` require long data when you want to include time as a variable.
+The `dplyr` verbs like `group_by()` and `summarize()` are designed for long data.
+
+As a general rule:
+if your data has column names that contain variable values (like `gdp_2018`, `gdp_2019`, `gdp_2020`),
+it is probably in wide format and may need to be converted to long format for analysis.
+
+
+## Reshaping Data with `pivot_longer()` and `pivot_wider()`
+
+The `tidyr` package (part of the `tidyverse`) provides two functions for reshaping data:
+`pivot_longer()` converts wide data to long,
+and `pivot_wider()` converts long data to wide.
+
+### Wide to Long with `pivot_longer()`
+
+Let's convert our wide GDP data to long format:
+
+```{r}
+gdp_long <- gdp_wide |>
+  pivot_longer(
+    cols = starts_with("gdp_"),
+    names_to = "year",
+    values_to = "gdp_per_capita"
+  )
+
+gdp_long
+```
+
+Let's break down the three key arguments:
+
+- `cols` tells R which columns to "pivot" or stack. Here we use `starts_with("gdp_")` to select all columns whose names begin with `"gdp_"`. You could also list the columns explicitly as `cols = c(gdp_2018, gdp_2019, gdp_2020)`.
+- `names_to` is the name of the *new* column that will store the old column names. We call it `"year"` because the old column names (`gdp_2018`, `gdp_2019`, `gdp_2020`) represent years.
+- `values_to` is the name of the *new* column that will store the values. We call it `"gdp_per_capita"`.
+
+Notice that the `year` column still has the `gdp_` prefix attached.
+We can clean that up by adding `names_prefix` to strip the prefix:
+
+```{r}
+gdp_long <- gdp_wide |>
+  pivot_longer(
+    cols = starts_with("gdp_"),
+    names_to = "year",
+    names_prefix = "gdp_",
+    values_to = "gdp_per_capita"
+  )
+
+gdp_long
+```
+
+Now the `year` column contains just the year numbers.
+However, notice that `year` is still a character type (because it was extracted from column names).
+We can convert it to numeric by adding `names_transform`:
+
+```{r}
+gdp_long <- gdp_wide |>
+  pivot_longer(
+    cols = starts_with("gdp_"),
+    names_to = "year",
+    names_prefix = "gdp_",
+    names_transform = list(year = as.integer),
+    values_to = "gdp_per_capita"
+  )
+
+gdp_long
+```
+
+Now `year` is a proper integer column,
+ready for use in regressions or plots.
+
+### A More Detailed Example
+
+Let's work through a slightly more complex example.
+Suppose you have state-level data on unemployment rates and poverty rates across several years:
+
+```{r}
+state_wide <- tibble(
+  state = c("Maine", "Vermont", "New Hampshire"),
+  unemp_2018 = c(3.4, 2.7, 2.5),
+  unemp_2019 = c(3.0, 2.4, 2.6),
+  unemp_2020 = c(5.4, 5.0, 6.2),
+  poverty_2018 = c(12.9, 11.3, 7.6),
+  poverty_2019 = c(11.6, 10.2, 7.3),
+  poverty_2020 = c(11.4, 10.8, 7.1)
+)
+
+state_wide
+```
+
+This dataset has two variables (unemployment and poverty) each measured across three years.
+To pivot this to long format,
+we need to handle the fact that column names encode *two* pieces of information:
+the variable name and the year.
+We use `names_sep` to tell `pivot_longer()` how to split the column names:
+
+```{r}
+state_long <- state_wide |>
+  pivot_longer(
+    cols = -state,
+    names_to = c("variable", "year"),
+    names_sep = "_",
+    values_to = "value"
+  )
+
+state_long
+```
+
+Here we used `cols = -state` to pivot all columns *except* `state`.
+The `names_sep = "_"` tells R to split each column name at the underscore,
+putting the first part into a column called `variable` and the second part into a column called `year`.
+
+If you'd prefer each variable to have its own column (which is usually more useful for analysis),
+you can add one more step using `pivot_wider()`:
+
+```{r}
+state_tidy <- state_long |>
+  pivot_wider(
+    names_from = variable,
+    values_from = value
+  )
+
+state_tidy
+```
+
+Now each row is a state-year observation with separate columns for unemployment and poverty---exactly the format you'd want for a regression or a plot.
+
+### Long to Wide with `pivot_wider()`
+
+Sometimes you need to go in the other direction---converting long data to wide.
+This is common when creating summary tables or when a dataset arrived in long format but you need it wide for a specific purpose.
+
+`pivot_wider()` is essentially the reverse of `pivot_longer()`:
+
+```{r}
+gdp_wide_again <- gdp_long |>
+  pivot_wider(
+    names_from = year,
+    values_from = gdp_per_capita,
+    names_prefix = "gdp_"
+  )
+
+gdp_wide_again
+```
+
+The key arguments for `pivot_wider()` are:
+
+- `names_from` specifies which column contains the values that will become the new column names.
+- `values_from` specifies which column contains the values that will fill those new columns.
+- `names_prefix` (optional) adds a prefix to the new column names. Without it, the columns would just be named `2018`, `2019`, `2020`---which are valid R column names but harder to work with because they start with numbers.
+
+### Another `pivot_wider()` Example
+
+Suppose you have panel data on birth outcomes and want to create a table comparing states:
+
+```{r}
+birth_long <- tibble(
+  state = rep(c("Maine", "Vermont", "New Hampshire"), each = 3),
+  year = rep(2018:2020, times = 3),
+  lbw_rate = c(7.1, 7.3, 7.0,
+               6.8, 6.5, 6.9,
+               6.2, 6.4, 6.1)
+)
+
+birth_long
+```
+
+To create a wide table comparing states across years:
+
+```{r}
+birth_wide <- birth_long |>
+  pivot_wider(
+    names_from = year,
+    values_from = lbw_rate
+  )
+
+birth_wide
+```
+
+This wide format is convenient for a presentation table where you want to compare across years at a glance.
+
+::: {.callout-note}
+## Remembering the Difference
+A helpful way to remember: `pivot_longer()` makes your data *longer* (more rows, fewer columns), and `pivot_wider()` makes your data *wider* (fewer rows, more columns). If your column names contain data values (like years), you probably need `pivot_longer()`. If you want to spread values across columns, you need `pivot_wider()`.
+:::
+
+
+## Exporting Data
+
+After cleaning, reshaping, or creating a new dataset,
+you'll often want to save it for future use or to share with others.
+The `tidyverse` provides straightforward functions for exporting data.
+
+### Writing CSV Files
+
+The most common export format is CSV,
+because it can be opened by virtually any software:
+
+```{r}
+#| eval: false
+
+# Write a data frame to a CSV file
+write_csv(gdp_long, "gdp_data_clean.csv")
+```
+
+This creates a file called `gdp_data_clean.csv` in your working directory.
+The file will contain the data in plain text with commas separating the values---no special formatting, no formulas, just clean data.
+
+### Writing R Data Files
+
+If you're saving data that will only be used in R,
+the `.rds` format is preferable because it preserves all of R's data types (factors, dates, etc.)
+and is more compact than CSV:
+
+```{r}
+#| eval: false
+
+# Save as an RDS file
+write_rds(gdp_long, "gdp_data_clean.rds")
+```
+
+To read it back in later:
+
+```{r}
+#| eval: false
+
+gdp_long <- read_rds("gdp_data_clean.rds")
+```
+
+### Writing Stata Files
+
+If you need to share data with someone using Stata,
+the `haven` package can write `.dta` files:
+
+```{r}
+#| eval: false
+
+library(haven)
+
+write_dta(gdp_long, "gdp_data_clean.dta")
+```
+
+### Writing Excel Files
+
+To export to Excel format,
+you can use the `writexl` package:
+
+```{r}
+#| eval: false
+
+library(writexl)
+
+write_xlsx(gdp_long, "gdp_data_clean.xlsx")
+```
+
+::: {.callout-tip}
+## Export Function Quick Reference
+
+| Format | Function | Package |
+|--------|----------|---------|
+| CSV | `write_csv()` | readr (tidyverse) |
+| TSV | `write_tsv()` | readr (tidyverse) |
+| RDS | `write_rds()` | readr (tidyverse) |
+| Stata (.dta) | `write_dta()` | haven |
+| Excel (.xlsx) | `write_xlsx()` | writexl |
+: Export functions by file type {#tbl-export-functions}
+:::
+
+
+## Summary and Conclusion
+
+This appendix covered the essential workflow for getting data into and out of R and understanding its structure along the way.
+
+### Key Takeaways
+
+- **Documentation first:** Always look for README files and codebooks before analyzing a dataset. Understanding what your variables measure and how they're coded prevents errors downstream.
+
+- **Import with the right function:** Use `read_csv()` for CSV files, `read_excel()` for Excel files, `read_dta()` for Stata files, and `read_rds()` for R data files. The `tidyverse` and its companion packages cover virtually every common file format.
+
+- **Explore before you analyze:** Run `head()`, `glimpse()`, and `summary()` on every new dataset. Check for missing values and verify that variable types and ranges make sense. This quick health check catches problems early.
+
+- **Know wide vs. long:** Wide data has one row per unit with separate columns for time periods; long data has one row per unit-time observation. Most R analysis functions expect long data.
+
+- **Reshape with pivot functions:** Use `pivot_longer()` to go from wide to long and `pivot_wider()` to go from long to wide. The key arguments are `cols`, `names_to`/`names_from`, and `values_to`/`values_from`.
+
+- **Export in the right format:** Use `write_csv()` for universal compatibility, `write_rds()` for R-only workflows, and format-specific functions like `write_dta()` when sharing with colleagues who use other software.
+
+
+## Check Your Understanding
+
+:::: {.content-visible when-format="html"}
+
+For each question below,
+select the best answer from the dropdown menu.
+The dropdown will turn green if correct and red if incorrect.
+Click the "Show Explanation" toggle to see a full explanation of the answer after attempting each question.
+
+```{=html}
+<div class="question">
+<div class="answer-row">
+    <label>i. Which function should you use to read a CSV file using the tidyverse? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">read.csv()</option>
+        <option value="b">read_csv()</option>
+        <option value="c">import_csv()</option>
+        <option value="d">load_csv()</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>ii. What does the <code>glimpse()</code> function show you? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Only the first 6 rows of data</option>
+        <option value="b">Descriptive statistics for each variable</option>
+        <option value="c">Column names, types, and a preview of values</option>
+        <option value="d">A histogram of each variable</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iii. A dataset has columns named <code>state</code>, <code>pop_2018</code>, <code>pop_2019</code>, and <code>pop_2020</code>. What format is this data in? </label>
+    <select onchange="checkAnswer(this, 'a')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Wide format</option>
+        <option value="b">Long format</option>
+        <option value="c">Tidy format</option>
+        <option value="d">Panel format</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iv. Which function converts wide data to long data? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">pivot_wider()</option>
+        <option value="b">pivot_longer()</option>
+        <option value="c">gather()</option>
+        <option value="d">reshape()</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>v. In <code>pivot_longer()</code>, what does the <code>values_to</code> argument specify? </label>
+    <select onchange="checkAnswer(this, 'd')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Which columns to pivot</option>
+        <option value="b">The name of the column that will store the old column names</option>
+        <option value="c">Which rows to keep</option>
+        <option value="d">The name of the column that will store the data values</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>vi. What is the main advantage of saving data as an <code>.rds</code> file rather than a <code>.csv</code> file? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">RDS files can be opened in Excel</option>
+        <option value="b">RDS files are always smaller</option>
+        <option value="c">RDS files preserve R data types like factors and dates</option>
+        <option value="d">RDS files can store multiple datasets</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>vii. <strong>(Challenge)</strong> You have a long dataset with columns <code>country</code>, <code>year</code>, and <code>gdp</code>. You want to create a table where each year is its own column. Which arguments would you use in <code>pivot_wider()</code>? </label>
+    <select onchange="checkAnswer(this, 'a')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">names_from = year, values_from = gdp</option>
+        <option value="b">names_to = year, values_to = gdp</option>
+        <option value="c">cols = year, values_to = gdp</option>
+        <option value="d">names_from = gdp, values_from = year</option>
+    </select>
+</div>
+</div>
+
+```
+
+::: {.callout-tip collapse="true"}
+## Show Explanation
+
+i. The tidyverse function for reading CSV files is `read_csv()` (with an underscore), from the `readr` package. Note that base R has a similar function called `read.csv()` (with a period), but `read_csv()` is faster, handles column types more intelligently, and produces tibbles rather than basic data frames.
+
+ii. `glimpse()` provides a compact overview of a data frame showing every column's name, its data type (e.g., `<dbl>`, `<chr>`, `<fct>`), and the first several values. This makes it one of the most efficient ways to quickly understand a dataset's structure. `head()` shows rows, and `summary()` shows statistics.
+
+iii. This is wide format data. The giveaway is that the column names contain data values (the years 2018, 2019, 2020). In long format, there would be a single `year` column and a single `population` column, with each state-year combination as its own row.
+
+iv. `pivot_longer()` converts wide data to long data by stacking multiple columns into two new columns (one for the names, one for the values). `pivot_wider()` does the opposite. The older functions `gather()` and `spread()` did similar things but have been superseded by the pivot functions.
+
+v. The `values_to` argument specifies the name of the new column that will contain the data values from the pivoted columns. For example, if you're pivoting columns `gdp_2018`, `gdp_2019`, and `gdp_2020`, the values in those columns will all go into the column you name in `values_to`. The `names_to` argument handles the column names, and `cols` specifies which columns to pivot.
+
+vi. RDS files preserve all of R's data types, including factors, dates, and other special types. When you save a factor as CSV and read it back, it becomes a character variable and you have to convert it again. RDS files also tend to be smaller because they use compression. However, RDS files can only be read by R, which is a trade-off compared to the universally readable CSV format.
+
+vii. In `pivot_wider()`, `names_from` specifies the column whose values will become the new column names (here, `year` values like 2018, 2019, 2020 become column names), and `values_from` specifies the column whose values will fill those new columns (here, the `gdp` values). Note that `pivot_wider()` uses `names_from`/`values_from`, while `pivot_longer()` uses `names_to`/`values_to`---the "from" and "to" suffixes indicate the direction of the transformation.
+
+:::
+
+::::
+
+:::: {.content-hidden when-format="html"}
+
+*Note: This section contains interactive content only available in the HTML version.*
+
+::::

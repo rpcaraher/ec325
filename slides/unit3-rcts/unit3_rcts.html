@@ -1222,7 +1222,7 @@ Prof. Caraher
     </div>
 </div>
 
-  <p class="date">Feb 14, 2026</p>
+  <p class="date">Feb 16, 2026</p>
 </section>
 <section>
 <section id="the-problem-with-simple-comparisons" class="title-slide slide level1 center">
@@ -1670,7 +1670,7 @@ Prof. Caraher
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 4</code></pre>
+<pre><code>[1] 1</code></pre>
 </div>
 </div>
 </div>
@@ -1697,7 +1697,7 @@ Prof. Caraher
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 4 4 3 5 2</code></pre>
+<pre><code>[1] 4 2 1 6 5</code></pre>
 </div>
 </div>
 </div>
@@ -1739,7 +1739,7 @@ Prof. Caraher
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 3.2</code></pre>
+<pre><code>[1] 4.24</code></pre>
 </div>
 </div>
 </div>
@@ -1750,7 +1750,7 @@ Prof. Caraher
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 3.4</code></pre>
+<pre><code>[1] 3.22</code></pre>
 </div>
 </div>
 </div>
@@ -1761,7 +1761,7 @@ Prof. Caraher
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 3.57</code></pre>
+<pre><code>[1] 3.39</code></pre>
 </div>
 </div>
 </div>
@@ -2025,8 +2025,8 @@ Prof. Caraher
 </ul>
 </div>
 </section>
-<section id="random-assignment-n-100" class="slide level2 smaller">
-<h2>Random Assignment: N = 100</h2>
+<section id="random-assignment-n-2000" class="slide level2 smaller">
+<h2>Random Assignment: N = 2000</h2>
 <div class="callout callout-note no-icon callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -2039,7 +2039,7 @@ Prof. Caraher
 </div>
 <p>Just change <code>n_sample</code> and re-run:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href></a>n_sample <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href></a>n_sample <span class="ot">&lt;-</span> <span class="dv">2000</span></span>
 <span id="cb32-2"><a href></a></span>
 <span id="cb32-3"><a href></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
 <span id="cb32-4"><a href></a>sample_data <span class="ot">&lt;-</span> dat <span class="sc">|&gt;</span></span>
@@ -2057,120 +2057,6 @@ Prof. Caraher
 <pre><code># A tibble: 2 × 3
   rand_treat avg_study avg_score
        &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
-1          0      6.05      68.1
-2          1      5.86      67.6</code></pre>
-</div>
-</div>
-</section>
-<section id="random-assignment-n-100-1" class="slide level2 smaller">
-<h2>Random Assignment: N = 100</h2>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href></a>group_means <span class="sc">|&gt;</span></span>
-<span id="cb34-2"><a href></a>  <span class="fu">summarize</span>(</span>
-<span id="cb34-3"><a href></a>    <span class="at">diff_study =</span> <span class="fu">last</span>(avg_study) <span class="sc">-</span> <span class="fu">first</span>(avg_study),</span>
-<span id="cb34-4"><a href></a>    <span class="at">diff_score =</span> <span class="fu">last</span>(avg_score) <span class="sc">-</span> <span class="fu">first</span>(avg_score)</span>
-<span id="cb34-5"><a href></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 1 × 2
-  diff_study diff_score
-       &lt;dbl&gt;      &lt;dbl&gt;
-1     -0.188     -0.565</code></pre>
-</div>
-</div>
-<div class="fragment">
-<ul>
-<li class="fragment">Getting closer to zero!</li>
-</ul>
-</div>
-</section>
-<section id="random-assignment-n-500" class="slide level2 smaller">
-<h2>Random Assignment: N = 500</h2>
-<div class="callout callout-note no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>🖥️ Try it yourself!</strong></p>
-</div>
-<div class="callout-content">
-
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href></a>n_sample <span class="ot">&lt;-</span> <span class="dv">500</span></span>
-<span id="cb36-2"><a href></a></span>
-<span id="cb36-3"><a href></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
-<span id="cb36-4"><a href></a>sample_data <span class="ot">&lt;-</span> dat <span class="sc">|&gt;</span></span>
-<span id="cb36-5"><a href></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> n_sample) <span class="sc">|&gt;</span></span>
-<span id="cb36-6"><a href></a>  <span class="fu">mutate</span>(<span class="at">rand_treat =</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">size =</span> n_sample, <span class="at">replace =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb36-7"><a href></a></span>
-<span id="cb36-8"><a href></a>group_means <span class="ot">&lt;-</span> sample_data <span class="sc">|&gt;</span></span>
-<span id="cb36-9"><a href></a>  <span class="fu">group_by</span>(rand_treat) <span class="sc">|&gt;</span></span>
-<span id="cb36-10"><a href></a>  <span class="fu">summarize</span>(</span>
-<span id="cb36-11"><a href></a>    <span class="at">avg_study =</span> <span class="fu">mean</span>(study_hours),</span>
-<span id="cb36-12"><a href></a>    <span class="at">avg_score =</span> <span class="fu">mean</span>(test_score)</span>
-<span id="cb36-13"><a href></a>  )</span>
-<span id="cb36-14"><a href></a>group_means</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 2 × 3
-  rand_treat avg_study avg_score
-       &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
-1          0      5.39      66.2
-2          1      5.67      67.0</code></pre>
-</div>
-</div>
-</section>
-<section id="random-assignment-n-500-1" class="slide level2 smaller">
-<h2>Random Assignment: N = 500</h2>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href></a>group_means <span class="sc">|&gt;</span></span>
-<span id="cb38-2"><a href></a>  <span class="fu">summarize</span>(</span>
-<span id="cb38-3"><a href></a>    <span class="at">diff_study =</span> <span class="fu">last</span>(avg_study) <span class="sc">-</span> <span class="fu">first</span>(avg_study),</span>
-<span id="cb38-4"><a href></a>    <span class="at">diff_score =</span> <span class="fu">last</span>(avg_score) <span class="sc">-</span> <span class="fu">first</span>(avg_score)</span>
-<span id="cb38-5"><a href></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 1 × 2
-  diff_study diff_score
-       &lt;dbl&gt;      &lt;dbl&gt;
-1      0.283      0.850</code></pre>
-</div>
-</div>
-<div class="fragment">
-<ul>
-<li class="fragment">The differences are <strong>very small</strong> now</li>
-</ul>
-</div>
-</section>
-<section id="random-assignment-n-2000" class="slide level2 smaller">
-<h2>Random Assignment: N = 2000</h2>
-<div class="callout callout-note no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>🖥️ Try it yourself!</strong></p>
-</div>
-<div class="callout-content">
-
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href></a>n_sample <span class="ot">&lt;-</span> <span class="dv">2000</span></span>
-<span id="cb40-2"><a href></a></span>
-<span id="cb40-3"><a href></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
-<span id="cb40-4"><a href></a>sample_data <span class="ot">&lt;-</span> dat <span class="sc">|&gt;</span></span>
-<span id="cb40-5"><a href></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> n_sample) <span class="sc">|&gt;</span></span>
-<span id="cb40-6"><a href></a>  <span class="fu">mutate</span>(<span class="at">rand_treat =</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">size =</span> n_sample, <span class="at">replace =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb40-7"><a href></a></span>
-<span id="cb40-8"><a href></a>group_means <span class="ot">&lt;-</span> sample_data <span class="sc">|&gt;</span></span>
-<span id="cb40-9"><a href></a>  <span class="fu">group_by</span>(rand_treat) <span class="sc">|&gt;</span></span>
-<span id="cb40-10"><a href></a>  <span class="fu">summarize</span>(</span>
-<span id="cb40-11"><a href></a>    <span class="at">avg_study =</span> <span class="fu">mean</span>(study_hours),</span>
-<span id="cb40-12"><a href></a>    <span class="at">avg_score =</span> <span class="fu">mean</span>(test_score)</span>
-<span id="cb40-13"><a href></a>  )</span>
-<span id="cb40-14"><a href></a>group_means</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 2 × 3
-  rand_treat avg_study avg_score
-       &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
 1          0      5.34      66.0
 2          1      5.51      66.5</code></pre>
 </div>
@@ -2179,11 +2065,11 @@ Prof. Caraher
 <section id="random-assignment-n-2000-1" class="slide level2 smaller">
 <h2>Random Assignment: N = 2000</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href></a>group_means <span class="sc">|&gt;</span></span>
-<span id="cb42-2"><a href></a>  <span class="fu">summarize</span>(</span>
-<span id="cb42-3"><a href></a>    <span class="at">diff_study =</span> <span class="fu">last</span>(avg_study) <span class="sc">-</span> <span class="fu">first</span>(avg_study),</span>
-<span id="cb42-4"><a href></a>    <span class="at">diff_score =</span> <span class="fu">last</span>(avg_score) <span class="sc">-</span> <span class="fu">first</span>(avg_score)</span>
-<span id="cb42-5"><a href></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href></a>group_means <span class="sc">|&gt;</span></span>
+<span id="cb34-2"><a href></a>  <span class="fu">summarize</span>(</span>
+<span id="cb34-3"><a href></a>    <span class="at">diff_study =</span> <span class="fu">last</span>(avg_study) <span class="sc">-</span> <span class="fu">first</span>(avg_study),</span>
+<span id="cb34-4"><a href></a>    <span class="at">diff_score =</span> <span class="fu">last</span>(avg_score) <span class="sc">-</span> <span class="fu">first</span>(avg_score)</span>
+<span id="cb34-5"><a href></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 × 2
   diff_study diff_score
@@ -2435,80 +2321,6 @@ Prof. Caraher
 </div>
 </div>
 </div>
-</section>
-<section id="coding-exercise-selection-bias-in-numbers" class="slide level2 smaller">
-<h2>Coding Exercise: Selection Bias in Numbers</h2>
-<div class="callout callout-note no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>🖥️ Try it yourself!</strong></p>
-</div>
-<div class="callout-content">
-
-</div>
-</div>
-</div>
-<p><strong>Task:</strong> Using our <code>dat</code> data frame (with non-random treatment), compute the mean test score for students who attended office hours vs. those who didn’t. What is the observed difference? We know the true causal effect is 0 – what does the difference represent?</p>
-<ul>
-<li class="fragment"><em>Hint:</em> <code>group_by(attended_oh) |&gt; summarize(avg_score = mean(test_score))</code></li>
-</ul>
-<div class="fragment">
-<div class="cell">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href></a>dat <span class="sc">|&gt;</span></span>
-<span id="cb44-2"><a href></a>  <span class="fu">group_by</span>(attended_oh) <span class="sc">|&gt;</span></span>
-<span id="cb44-3"><a href></a>  <span class="fu">summarize</span>(<span class="at">avg_score =</span> <span class="fu">mean</span>(test_score))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell fragment">
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 2 × 2
-  attended_oh avg_score
-        &lt;dbl&gt;     &lt;dbl&gt;
-1           0      58.9
-2           1      74.1</code></pre>
-</div>
-</div>
-</div>
-<div class="fragment">
-<ul>
-<li class="fragment">The entire observed difference is <strong>selection bias</strong> (since the true causal effect = 0)</li>
-</ul>
-</div>
-</section>
-<section id="coding-exercise-confirm-randomization-works" class="slide level2 smaller">
-<h2>Coding Exercise: Confirm Randomization Works</h2>
-<div class="callout callout-note no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>🖥️ Try it yourself!</strong></p>
-</div>
-<div class="callout-content">
-
-</div>
-</div>
-</div>
-<p><strong>Task:</strong> Take a random sample of N=1000 from <code>dat</code>, randomly assign treatment, and compute the difference in mean test scores. Is it close to the true causal effect of 0?</p>
-<ul>
-<li class="fragment"><em>Hint:</em> Combine <code>slice_sample()</code>, <code>mutate()</code>, <code>group_by()</code>, and <code>summarize()</code></li>
-</ul>
-<div class="fragment">
-<div class="cell">
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
-<span id="cb46-2"><a href></a>dat <span class="sc">|&gt;</span></span>
-<span id="cb46-3"><a href></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">1000</span>) <span class="sc">|&gt;</span></span>
-<span id="cb46-4"><a href></a>  <span class="fu">mutate</span>(<span class="at">rand_treat =</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">size =</span> <span class="dv">1000</span>, <span class="at">replace =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb46-5"><a href></a>  <span class="fu">group_by</span>(rand_treat) <span class="sc">|&gt;</span></span>
-<span id="cb46-6"><a href></a>  <span class="fu">summarize</span>(<span class="at">avg_score =</span> <span class="fu">mean</span>(test_score))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell fragment">
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 2 × 2
-  rand_treat avg_score
-       &lt;dbl&gt;     &lt;dbl&gt;
-1          0      66.7
-2          1      66.7</code></pre>
-</div>
-</div>
-</div>
 </section></section>
 <section>
 <section id="the-oregon-health-insurance-experiment" class="title-slide slide level1 center">
@@ -2576,6 +2388,228 @@ Prof. Caraher
 </ul>
 </div>
 </section>
+<section id="using-the-ohie-data" class="slide level2">
+<h2>Using the OHIE Data</h2>
+<ul>
+<li class="fragment"><p>Let’s apply what we’ve learned to a <strong>real dataset</strong> from the OHIE</p></li>
+<li class="fragment"><p>But first: we need to learn how to <strong>load data into R</strong></p></li>
+</ul>
+<div class="fragment">
+<ul>
+<li class="fragment">The OHIE data is stored as a <code>.csv</code> file – one of the most common data formats you’ll encounter</li>
+</ul>
+</div>
+</section>
+<section id="what-is-a-csv-file" class="slide level2">
+<h2>What Is a CSV File?</h2>
+<ul>
+<li class="fragment"><p><strong>CSV</strong> = Comma-Separated Values</p></li>
+<li class="fragment"><p>A plain text file where each row is an observation and columns are separated by commas</p></li>
+</ul>
+<div class="fragment">
+<ul>
+<li class="fragment">You can open a CSV in any text editor and see something like:</li>
+</ul>
+</div>
+<div class="fragment">
+<pre><code>person_id,treatment,female,race
+1,1,0,white
+2,1,1,white
+5,1,1,NA</code></pre>
+</div>
+<div class="fragment">
+<ul>
+<li class="fragment">Simple, universal, and widely used in economics and data science</li>
+</ul>
+</div>
+</section>
+<section id="before-you-load-data-read-the-readme" class="slide level2 smaller">
+<h2>Before You Load Data: Read the README</h2>
+<ul>
+<li class="fragment"><p>A raw CSV file is just numbers and short labels – not very informative on its own</p></li>
+<li class="fragment"><p>Good datasets come with a <strong>README</strong> and/or a <strong>codebook</strong> that tell you what you’re looking at</p></li>
+</ul>
+<div class="fragment">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>README vs. Codebook</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li class="fragment"><p>A <strong>README</strong> describes the dataset at a high level: where it came from, how it was collected, the sample size, and citation information</p></li>
+<li class="fragment"><p>A <strong>codebook</strong> (sometimes part of the README) defines each variable: its name, type, what the values mean, and how missing data is coded</p></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="fragment">
+<ul>
+<li class="fragment"><p>The OHIE data includes a <code>README.txt</code> in the <code>data/ohie/</code> folder – <strong>always</strong> check for documentation like this before diving in</p></li>
+<li class="fragment"><p>Knowing that <code>treatment</code> is binary (1 = lottery winner, 0 = not selected) and that missing values are coded as <code>NA</code> saves you a lot of confusion later</p></li>
+</ul>
+</div>
+</section>
+<section id="working-directories-a-quick-note" class="slide level2 smaller">
+<h2>Working Directories: A Quick Note</h2>
+<ul>
+<li class="fragment"><p>When R reads a file, it looks for it <strong>relative to the working directory</strong></p></li>
+<li class="fragment"><p>The working directory is the folder R considers “home base”</p></li>
+</ul>
+<div class="fragment">
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>R Projects Make This Easy</strong></p>
+</div>
+<div class="callout-content">
+<p>If you cloned the course repository with Git and opened the <code>.Rproj</code> file, your working directory is <strong>automatically</strong> set to the project root. You can verify this with <code>getwd()</code>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="fragment">
+<ul>
+<li class="fragment"><p>This means you can use <strong>relative paths</strong> like <code>&quot;data/ohie/ohie_sample.csv&quot;</code> instead of long absolute paths</p></li>
+<li class="fragment"><p>If your working directory is wrong, <code>read_csv()</code> won’t find the file!</p></li>
+</ul>
+</div>
+</section>
+<section id="introducing-read_csv" class="slide level2 smaller">
+<h2>Introducing <code>read_csv()</code></h2>
+<ul>
+<li class="fragment"><code>read_csv()</code> is from the <code>readr</code> package (part of <code>tidyverse</code>) and reads CSV files into R as a <strong>tibble</strong></li>
+</ul>
+<div class="fragment">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb37-2"><a href></a></span>
+<span id="cb37-3"><a href></a>ohie <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/ohie/ohie_sample.csv&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div class="fragment">
+<ul>
+<li class="fragment"><strong><code>read_csv()</code></strong> vs. <strong><code>read.csv()</code></strong>: Base R has <code>read.csv()</code>, but <code>read_csv()</code> is faster, handles column types better, and produces tibbles instead of data frames</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li class="fragment">Always use <code>read_csv()</code> in this course</li>
+</ul>
+</div>
+</section>
+<section id="loading-the-ohie-data" class="slide level2 smaller">
+<h2>Loading the OHIE Data</h2>
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>🖥️ Try it yourself!</strong></p>
+</div>
+<div class="callout-content">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href></a>ohie <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/ohie/ohie_sample.csv&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment">
+<ul>
+<li class="fragment"><code>read_csv()</code> prints a <strong>column specification</strong> telling you what type each variable was read as
+<ul>
+<li class="fragment"><code>col_double()</code> = numeric, <code>col_character()</code> = text</li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="first-look-head-and-glimpse" class="slide level2 smaller">
+<h2>First Look: <code>head()</code> and <code>glimpse()</code></h2>
+<div class="callout callout-note no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>🖥️ Try it yourself!</strong></p>
+</div>
+<div class="callout-content">
+
+</div>
+</div>
+</div>
+<ul>
+<li class="fragment"><code>head()</code> shows the first few rows:</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href></a><span class="fu">head</span>(ohie)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 11
+  person_id treatment female race   hisp educ   hhinc ever_medi any_hosp any_doc
+      &lt;dbl&gt;     &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt;  &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;
+1         1         1      0 white     0 hsdeg      1         0        0       0
+2         2         1      1 white     0 hsdeg      5         0        0       0
+3         5         1      1 &lt;NA&gt;      1 hsdeg     11         0        0       0
+4         6         1      0 white     0 colld…     4         0        0       1
+5         8         0      0 white     0 lths       1         0        0       0
+6         9         0      1 white     0 hsdeg      5         0        0       1
+# ℹ 1 more variable: good_health &lt;dbl&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="first-look-glimpse" class="slide level2 smaller">
+<h2>First Look: <code>glimpse()</code></h2>
+<ul>
+<li class="fragment"><code>glimpse()</code> gives a compact overview of every column:</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href></a><span class="fu">glimpse</span>(ohie)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 23,777
+Columns: 11
+$ person_id   &lt;dbl&gt; 1, 2, 5, 6, 8, 9, 10, 13, 14, 23, 25, 26, 27, 28, 29, 30, …
+$ treatment   &lt;dbl&gt; 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0…
+$ female      &lt;dbl&gt; 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1…
+$ race        &lt;chr&gt; &quot;white&quot;, &quot;white&quot;, NA, &quot;white&quot;, &quot;white&quot;, &quot;white&quot;, &quot;white&quot;, …
+$ hisp        &lt;dbl&gt; 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0…
+$ educ        &lt;chr&gt; &quot;hsdeg&quot;, &quot;hsdeg&quot;, &quot;hsdeg&quot;, &quot;colldeg&quot;, &quot;lths&quot;, &quot;hsdeg&quot;, &quot;mt…
+$ hhinc       &lt;dbl&gt; 1, 5, 11, 4, 1, 5, 5, 2, 10, 9, 4, 2, 4, 11, 5, 1, 14, 6, …
+$ ever_medi   &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+$ any_hosp    &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+$ any_doc     &lt;dbl&gt; 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0…
+$ good_health &lt;dbl&gt; 1, 1, 1, 1, NA, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, …</code></pre>
+</div>
+</div>
+<div class="fragment">
+<ul>
+<li class="fragment">23,777 observations and 11 variables – just as the README described</li>
+</ul>
+</div>
+</section>
+<section id="what-do-we-have" class="slide level2 smaller">
+<h2>What Do We Have?</h2>
+<p>Key variables in the OHIE data:</p>
+<ul>
+<li class="fragment"><strong><code>treatment</code></strong>: Was this person selected in the lottery? (1 = yes, 0 = no)</li>
+<li class="fragment"><strong><code>ever_medi</code></strong>: Did they ever enroll in Medicaid?</li>
+<li class="fragment"><strong><code>good_health</code></strong>: Do they report good health or better?</li>
+<li class="fragment"><strong><code>any_doc</code></strong>: Did they visit a doctor?</li>
+<li class="fragment"><strong><code>any_hosp</code></strong>: Were they hospitalized?</li>
+</ul>
+<div class="fragment">
+<ul>
+<li class="fragment"><p>Because <code>treatment</code> was <strong>randomly assigned</strong>, we can compare outcomes between lottery winners and losers to estimate <strong>causal effects</strong></p></li>
+<li class="fragment"><p>This is exactly the difference-in-means estimator we derived!</p></li>
+</ul>
+</div>
+</section>
+<section id="analysis" class="slide level2">
+<h2>Analysis</h2>
+<p>This will be your job for problem set 1!</p>
+</section>
 <section id="results" class="slide level2 smaller">
 <h2>Results</h2>
 <ul>
@@ -2604,22 +2638,6 @@ Prof. Caraher
 <ul>
 <li class="fragment">These findings come from a <strong>rigorous RCT</strong>, not observational comparisons</li>
 </ul>
-</div>
-</section>
-<section id="discussion" class="slide level2">
-<h2>Discussion</h2>
-<div class="callout callout-tip callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>Discussion Question</strong></p>
-</div>
-<div class="callout-content">
-<p>The Oregon experiment found modest effects of insurance on physical health. Does this mean expanding health insurance is not worthwhile? What other outcomes might matter for policy decisions?</p>
-</div>
-</div>
 </div>
 </section></section>
 <section>

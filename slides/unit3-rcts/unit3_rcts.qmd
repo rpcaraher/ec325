@@ -613,95 +613,13 @@ group_means |>
 - With only 20 people, the difference in test scores is **far from zero**
 - A small sample can give a misleading result!
 
-## Random Assignment: N = 100 {.smaller}
+## Random Assignment: N = 2000 {.smaller}
 
 ::: {.callout-note icon=false}
 ## 🖥️ Try it yourself!
 :::
 
 Just change `n_sample` and re-run:
-
-```{r}
-#| echo: true
-
-n_sample <- 100
-
-set.seed(42)
-sample_data <- dat |>
-  slice_sample(n = n_sample) |>
-  mutate(rand_treat = sample(c(0, 1), size = n_sample, replace = TRUE))
-
-group_means <- sample_data |>
-  group_by(rand_treat) |>
-  summarize(
-    avg_study = mean(study_hours),
-    avg_score = mean(test_score)
-  )
-group_means
-```
-
-## Random Assignment: N = 100 {.smaller}
-
-```{r}
-#| echo: true
-
-group_means |>
-  summarize(
-    diff_study = last(avg_study) - first(avg_study),
-    diff_score = last(avg_score) - first(avg_score)
-  )
-```
-
-. . .
-
-- Getting closer to zero!
-
-## Random Assignment: N = 500 {.smaller}
-
-::: {.callout-note icon=false}
-## 🖥️ Try it yourself!
-:::
-
-```{r}
-#| echo: true
-
-n_sample <- 500
-
-set.seed(42)
-sample_data <- dat |>
-  slice_sample(n = n_sample) |>
-  mutate(rand_treat = sample(c(0, 1), size = n_sample, replace = TRUE))
-
-group_means <- sample_data |>
-  group_by(rand_treat) |>
-  summarize(
-    avg_study = mean(study_hours),
-    avg_score = mean(test_score)
-  )
-group_means
-```
-
-## Random Assignment: N = 500 {.smaller}
-
-```{r}
-#| echo: true
-
-group_means |>
-  summarize(
-    diff_study = last(avg_study) - first(avg_study),
-    diff_score = last(avg_score) - first(avg_score)
-  )
-```
-
-. . .
-
-- The differences are **very small** now
-
-## Random Assignment: N = 2000 {.smaller}
-
-::: {.callout-note icon=false}
-## 🖥️ Try it yourself!
-:::
 
 ```{r}
 #| echo: true
@@ -960,6 +878,175 @@ $$E[Y_i | D_i = 1] - E[Y_i | D_i = 0] = \kappa + 0 = \kappa$$
 
 - This is exactly the logic of an RCT -- applied to a major policy question!
 
+## Using the OHIE Data
+
+- Let's apply what we've learned to a **real dataset** from the OHIE
+
+- But first: we need to learn how to **load data into R**
+
+. . .
+
+- The OHIE data is stored as a `.csv` file -- one of the most common data formats you'll encounter
+
+## What Is a CSV File?
+
+- **CSV** = Comma-Separated Values
+
+- A plain text file where each row is an observation and columns are separated by commas
+
+. . .
+
+- You can open a CSV in any text editor and see something like:
+
+. . .
+
+```
+person_id,treatment,female,race
+1,1,0,white
+2,1,1,white
+5,1,1,NA
+```
+
+. . .
+
+- Simple, universal, and widely used in economics and data science
+
+## Before You Load Data: Read the README {.smaller}
+
+- A raw CSV file is just numbers and short labels -- not very informative on its own
+
+- Good datasets come with a **README** and/or a **codebook** that tell you what you're looking at
+
+. . .
+
+::: {.callout-note}
+## README vs. Codebook
+
+- A **README** describes the dataset at a high level: where it came from, how it was collected, the sample size, and citation information
+
+- A **codebook** (sometimes part of the README) defines each variable: its name, type, what the values mean, and how missing data is coded
+:::
+
+. . .
+
+- The OHIE data includes a `README.txt` in the `data/ohie/` folder -- **always** check for documentation like this before diving in
+
+- Knowing that `treatment` is binary (1 = lottery winner, 0 = not selected) and that missing values are coded as `NA` saves you a lot of confusion later
+
+## Working Directories: A Quick Note {.smaller}
+
+- When R reads a file, it looks for it **relative to the working directory**
+
+- The working directory is the folder R considers "home base"
+
+. . .
+
+::: {.callout-tip}
+## R Projects Make This Easy
+If you cloned the course repository with Git and opened the `.Rproj` file, your working directory is **automatically** set to the project root. You can verify this with `getwd()`.
+:::
+
+. . .
+
+- This means you can use **relative paths** like `"data/ohie/ohie_sample.csv"` instead of long absolute paths
+
+- If your working directory is wrong, `read_csv()` won't find the file!
+
+## Introducing `read_csv()` {.smaller}
+
+- `read_csv()` is from the `readr` package (part of `tidyverse`) and reads CSV files into R as a **tibble**
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: false
+
+library(tidyverse)
+
+ohie <- read_csv("data/ohie/ohie_sample.csv")
+```
+
+. . .
+
+- **`read_csv()`** vs. **`read.csv()`**: Base R has `read.csv()`, but `read_csv()` is faster, handles column types better, and produces tibbles instead of data frames
+
+. . .
+
+- Always use `read_csv()` in this course
+
+## Loading the OHIE Data {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Try it yourself!
+:::
+
+```{r}
+#| echo: false
+
+ohie <- read_csv("../../data/ohie/ohie_sample.csv")
+```
+
+```{r}
+#| echo: true
+#| eval: false
+ohie <- read_csv("data/ohie/ohie_sample.csv")
+```
+
+
+. . .
+
+- `read_csv()` prints a **column specification** telling you what type each variable was read as
+  - `col_double()` = numeric, `col_character()` = text
+
+## First Look: `head()` and `glimpse()` {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Try it yourself!
+:::
+
+- `head()` shows the first few rows:
+
+```{r}
+#| echo: true
+
+head(ohie)
+```
+
+## First Look: `glimpse()` {.smaller}
+
+- `glimpse()` gives a compact overview of every column:
+
+```{r}
+#| echo: true
+
+glimpse(ohie)
+```
+
+. . .
+
+- 23,777 observations and 11 variables -- just as the README described
+
+## What Do We Have? {.smaller}
+
+Key variables in the OHIE data:
+
+- **`treatment`**: Was this person selected in the lottery? (1 = yes, 0 = no)
+- **`ever_medi`**: Did they ever enroll in Medicaid?
+- **`good_health`**: Do they report good health or better?
+- **`any_doc`**: Did they visit a doctor?
+- **`any_hosp`**: Were they hospitalized?
+
+. . .
+
+- Because `treatment` was **randomly assigned**, we can compare outcomes between lottery winners and losers to estimate **causal effects**
+
+- This is exactly the difference-in-means estimator we derived!
+
+## Analysis
+
+This will be your job for problem set 1!
+
 ## Results {.smaller}
 
 - Lottery winners (relative to losers) experienced:
@@ -981,14 +1068,6 @@ $$E[Y_i | D_i = 1] - E[Y_i | D_i = 0] = \kappa + 0 = \kappa$$
 . . .
 
 - These findings come from a **rigorous RCT**, not observational comparisons
-
-## Discussion
-
-::: {.callout-tip}
-## Discussion Question
-The Oregon experiment found modest effects of insurance on physical health. Does this mean expanding health insurance is not worthwhile? What other outcomes might matter for policy decisions?
-:::
-
 
 # Practice Exercises
 
