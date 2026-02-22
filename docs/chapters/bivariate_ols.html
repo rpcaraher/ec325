@@ -360,7 +360,7 @@ window.Quarto = {
   <li><a href="#fitted-values-and-the-regression-line" id="toc-fitted-values-and-the-regression-line" class="nav-link" data-scroll-target="#fitted-values-and-the-regression-line"><span class="header-section-number">4.3.1</span> Fitted Values and the Regression Line</a></li>
   <li><a href="#residuals-the-prediction-errors" id="toc-residuals-the-prediction-errors" class="nav-link" data-scroll-target="#residuals-the-prediction-errors"><span class="header-section-number">4.3.2</span> Residuals: The Prediction Errors</a></li>
   <li><a href="#a-numerical-example" id="toc-a-numerical-example" class="nav-link" data-scroll-target="#a-numerical-example"><span class="header-section-number">4.3.3</span> A Numerical Example</a></li>
-  <li><a href="#the-key-insight-minimize-the-residuals" id="toc-the-key-insight-minimize-the-residuals" class="nav-link" data-scroll-target="#the-key-insight-minimize-the-residuals"><span class="header-section-number">4.3.4</span> The Key Insight: Minimize the Residuals</a></li>
+  <li><a href="#the-goal-minimize-the-residuals" id="toc-the-goal-minimize-the-residuals" class="nav-link" data-scroll-target="#the-goal-minimize-the-residuals"><span class="header-section-number">4.3.4</span> The Goal: Minimize the Residuals</a></li>
   </ul></li>
   <li><a href="#deriving-the-ols-estimator" id="toc-deriving-the-ols-estimator" class="nav-link" data-scroll-target="#deriving-the-ols-estimator"><span class="header-section-number">4.4</span> Deriving the OLS Estimator</a>
   <ul class="collapse">
@@ -370,44 +370,54 @@ window.Quarto = {
   <li><a href="#solving-for-the-slope" id="toc-solving-for-the-slope" class="nav-link" data-scroll-target="#solving-for-the-slope"><span class="header-section-number">4.4.4</span> Solving for the Slope</a></li>
   <li><a href="#confirming-its-a-minimum" id="toc-confirming-its-a-minimum" class="nav-link" data-scroll-target="#confirming-its-a-minimum"><span class="header-section-number">4.4.5</span> Confirming It’s a Minimum</a></li>
   </ul></li>
-  <li><a href="#computing-ols-in-r" id="toc-computing-ols-in-r" class="nav-link" data-scroll-target="#computing-ols-in-r"><span class="header-section-number">4.5</span> Computing OLS in R</a>
+  <li><a href="#a-worked-example-by-hand" id="toc-a-worked-example-by-hand" class="nav-link" data-scroll-target="#a-worked-example-by-hand"><span class="header-section-number">4.5</span> A Worked Example by Hand</a>
   <ul class="collapse">
-  <li><a href="#basic-syntax" id="toc-basic-syntax" class="nav-link" data-scroll-target="#basic-syntax"><span class="header-section-number">4.5.1</span> Basic Syntax</a></li>
-  <li><a href="#example-mpg-and-horsepower" id="toc-example-mpg-and-horsepower" class="nav-link" data-scroll-target="#example-mpg-and-horsepower"><span class="header-section-number">4.5.2</span> Example: MPG and Horsepower</a></li>
+  <li><a href="#step-1-compute-the-means" id="toc-step-1-compute-the-means" class="nav-link" data-scroll-target="#step-1-compute-the-means"><span class="header-section-number">4.5.1</span> Step 1: Compute the Means</a></li>
+  <li><a href="#step-2-compute-the-deviations" id="toc-step-2-compute-the-deviations" class="nav-link" data-scroll-target="#step-2-compute-the-deviations"><span class="header-section-number">4.5.2</span> Step 2: Compute the Deviations</a></li>
+  <li><a href="#step-3-compute-the-slope" id="toc-step-3-compute-the-slope" class="nav-link" data-scroll-target="#step-3-compute-the-slope"><span class="header-section-number">4.5.3</span> Step 3: Compute the Slope</a></li>
+  <li><a href="#step-4-compute-the-intercept" id="toc-step-4-compute-the-intercept" class="nav-link" data-scroll-target="#step-4-compute-the-intercept"><span class="header-section-number">4.5.4</span> Step 4: Compute the Intercept</a></li>
+  <li><a href="#step-5-check-fitted-values-and-residuals" id="toc-step-5-check-fitted-values-and-residuals" class="nav-link" data-scroll-target="#step-5-check-fitted-values-and-residuals"><span class="header-section-number">4.5.5</span> Step 5: Check Fitted Values and Residuals</a></li>
   </ul></li>
-  <li><a href="#goodness-of-fit-r-squared" id="toc-goodness-of-fit-r-squared" class="nav-link" data-scroll-target="#goodness-of-fit-r-squared"><span class="header-section-number">4.6</span> Goodness-of-Fit: R-Squared</a></li>
-  <li><a href="#the-gauss-markov-assumptions" id="toc-the-gauss-markov-assumptions" class="nav-link" data-scroll-target="#the-gauss-markov-assumptions"><span class="header-section-number">4.7</span> The Gauss-Markov Assumptions</a>
+  <li><a href="#computing-ols-in-r" id="toc-computing-ols-in-r" class="nav-link" data-scroll-target="#computing-ols-in-r"><span class="header-section-number">4.6</span> Computing OLS in R</a>
   <ul class="collapse">
-  <li><a href="#assumption-1-linear-in-parameters" id="toc-assumption-1-linear-in-parameters" class="nav-link" data-scroll-target="#assumption-1-linear-in-parameters"><span class="header-section-number">4.7.1</span> Assumption 1: Linear in Parameters</a></li>
-  <li><a href="#assumption-2-random-sampling" id="toc-assumption-2-random-sampling" class="nav-link" data-scroll-target="#assumption-2-random-sampling"><span class="header-section-number">4.7.2</span> Assumption 2: Random Sampling</a></li>
-  <li><a href="#assumption-3-variation-in-the-independent-variable" id="toc-assumption-3-variation-in-the-independent-variable" class="nav-link" data-scroll-target="#assumption-3-variation-in-the-independent-variable"><span class="header-section-number">4.7.3</span> Assumption 3: Variation in the Independent Variable</a></li>
-  <li><a href="#assumption-4-zero-conditional-mean" id="toc-assumption-4-zero-conditional-mean" class="nav-link" data-scroll-target="#assumption-4-zero-conditional-mean"><span class="header-section-number">4.7.4</span> Assumption 4: Zero Conditional Mean</a></li>
-  <li><a href="#assumption-5-homoskedasticity" id="toc-assumption-5-homoskedasticity" class="nav-link" data-scroll-target="#assumption-5-homoskedasticity"><span class="header-section-number">4.7.5</span> Assumption 5: Homoskedasticity</a></li>
-  <li><a href="#summary-which-assumptions-matter-for-what" id="toc-summary-which-assumptions-matter-for-what" class="nav-link" data-scroll-target="#summary-which-assumptions-matter-for-what"><span class="header-section-number">4.7.6</span> Summary: Which Assumptions Matter for What?</a></li>
+  <li><a href="#basic-syntax" id="toc-basic-syntax" class="nav-link" data-scroll-target="#basic-syntax"><span class="header-section-number">4.6.1</span> Basic Syntax</a></li>
+  <li><a href="#example-mpg-and-horsepower" id="toc-example-mpg-and-horsepower" class="nav-link" data-scroll-target="#example-mpg-and-horsepower"><span class="header-section-number">4.6.2</span> Example: MPG and Horsepower</a></li>
   </ul></li>
-  <li><a href="#unbiasedness-of-ols" id="toc-unbiasedness-of-ols" class="nav-link" data-scroll-target="#unbiasedness-of-ols"><span class="header-section-number">4.8</span> Unbiasedness of OLS</a>
+  <li><a href="#goodness-of-fit-r-squared" id="toc-goodness-of-fit-r-squared" class="nav-link" data-scroll-target="#goodness-of-fit-r-squared"><span class="header-section-number">4.7</span> Goodness-of-Fit: R-Squared</a></li>
+  <li><a href="#the-gauss-markov-assumptions" id="toc-the-gauss-markov-assumptions" class="nav-link" data-scroll-target="#the-gauss-markov-assumptions"><span class="header-section-number">4.8</span> The Gauss-Markov Assumptions</a>
   <ul class="collapse">
-  <li><a href="#population-parameters-vs.-sample-estimates" id="toc-population-parameters-vs.-sample-estimates" class="nav-link" data-scroll-target="#population-parameters-vs.-sample-estimates"><span class="header-section-number">4.8.1</span> Population Parameters vs.&nbsp;Sample Estimates</a></li>
-  <li><a href="#what-does-unbiasedness-mean" id="toc-what-does-unbiasedness-mean" class="nav-link" data-scroll-target="#what-does-unbiasedness-mean"><span class="header-section-number">4.8.2</span> What Does Unbiasedness Mean?</a></li>
-  <li><a href="#proof-sketch" id="toc-proof-sketch" class="nav-link" data-scroll-target="#proof-sketch"><span class="header-section-number">4.8.3</span> Proof Sketch</a></li>
-  <li><a href="#simulation-unbiasedness-in-action" id="toc-simulation-unbiasedness-in-action" class="nav-link" data-scroll-target="#simulation-unbiasedness-in-action"><span class="header-section-number">4.8.4</span> Simulation: Unbiasedness in Action</a></li>
+  <li><a href="#assumption-1-linear-in-parameters" id="toc-assumption-1-linear-in-parameters" class="nav-link" data-scroll-target="#assumption-1-linear-in-parameters"><span class="header-section-number">4.8.1</span> Assumption 1: Linear in Parameters</a></li>
+  <li><a href="#assumption-2-random-sampling" id="toc-assumption-2-random-sampling" class="nav-link" data-scroll-target="#assumption-2-random-sampling"><span class="header-section-number">4.8.2</span> Assumption 2: Random Sampling</a></li>
+  <li><a href="#assumption-3-variation-in-the-independent-variable" id="toc-assumption-3-variation-in-the-independent-variable" class="nav-link" data-scroll-target="#assumption-3-variation-in-the-independent-variable"><span class="header-section-number">4.8.3</span> Assumption 3: Variation in the Independent Variable</a></li>
+  <li><a href="#assumption-4-zero-conditional-mean" id="toc-assumption-4-zero-conditional-mean" class="nav-link" data-scroll-target="#assumption-4-zero-conditional-mean"><span class="header-section-number">4.8.4</span> Assumption 4: Zero Conditional Mean</a></li>
+  <li><a href="#assumption-5-homoskedasticity" id="toc-assumption-5-homoskedasticity" class="nav-link" data-scroll-target="#assumption-5-homoskedasticity"><span class="header-section-number">4.8.5</span> Assumption 5: Homoskedasticity</a></li>
+  <li><a href="#summary-which-assumptions-matter-for-what" id="toc-summary-which-assumptions-matter-for-what" class="nav-link" data-scroll-target="#summary-which-assumptions-matter-for-what"><span class="header-section-number">4.8.6</span> Summary: Which Assumptions Matter for What?</a></li>
   </ul></li>
-  <li><a href="#omitted-variable-bias" id="toc-omitted-variable-bias" class="nav-link" data-scroll-target="#omitted-variable-bias"><span class="header-section-number">4.9</span> Omitted Variable Bias</a></li>
-  <li><a href="#unbiasedness-and-causality-why-this-all-matters" id="toc-unbiasedness-and-causality-why-this-all-matters" class="nav-link" data-scroll-target="#unbiasedness-and-causality-why-this-all-matters"><span class="header-section-number">4.10</span> Unbiasedness and Causality: Why This All Matters</a>
+  <li><a href="#unbiasedness-of-ols" id="toc-unbiasedness-of-ols" class="nav-link" data-scroll-target="#unbiasedness-of-ols"><span class="header-section-number">4.9</span> Unbiasedness of OLS</a>
   <ul class="collapse">
-  <li><a href="#when-can-we-interpret-hatbeta_1-causally" id="toc-when-can-we-interpret-hatbeta_1-causally" class="nav-link" data-scroll-target="#when-can-we-interpret-hatbeta_1-causally"><span class="header-section-number">4.10.1</span> When Can We Interpret <span class="math inline">\(\hat{\beta}_1\)</span> Causally?</a></li>
-  <li><a href="#correlation-vs.-causation-revisited" id="toc-correlation-vs.-causation-revisited" class="nav-link" data-scroll-target="#correlation-vs.-causation-revisited"><span class="header-section-number">4.10.2</span> Correlation vs.&nbsp;Causation, Revisited</a></li>
+  <li><a href="#population-parameters-vs.-sample-estimates" id="toc-population-parameters-vs.-sample-estimates" class="nav-link" data-scroll-target="#population-parameters-vs.-sample-estimates"><span class="header-section-number">4.9.1</span> Population Parameters vs.&nbsp;Sample Estimates</a></li>
+  <li><a href="#what-does-unbiasedness-mean" id="toc-what-does-unbiasedness-mean" class="nav-link" data-scroll-target="#what-does-unbiasedness-mean"><span class="header-section-number">4.9.2</span> What Does Unbiasedness Mean?</a></li>
+  <li><a href="#proof-sketch" id="toc-proof-sketch" class="nav-link" data-scroll-target="#proof-sketch"><span class="header-section-number">4.9.3</span> Proof Sketch</a></li>
+  <li><a href="#simulation-unbiasedness-in-action" id="toc-simulation-unbiasedness-in-action" class="nav-link" data-scroll-target="#simulation-unbiasedness-in-action"><span class="header-section-number">4.9.4</span> Simulation: Unbiasedness in Action</a></li>
+  <li><a href="#when-can-we-interpret-hatbeta_1-causally" id="toc-when-can-we-interpret-hatbeta_1-causally" class="nav-link" data-scroll-target="#when-can-we-interpret-hatbeta_1-causally"><span class="header-section-number">4.9.5</span> When Can We Interpret <span class="math inline">\(\hat{\beta}_1\)</span> Causally?</a></li>
+  <li><a href="#correlation-vs.-causation-revisited" id="toc-correlation-vs.-causation-revisited" class="nav-link" data-scroll-target="#correlation-vs.-causation-revisited"><span class="header-section-number">4.9.6</span> Correlation vs.&nbsp;Causation, Revisited</a></li>
   </ul></li>
-  <li><a href="#variance-of-the-ols-estimator" id="toc-variance-of-the-ols-estimator" class="nav-link" data-scroll-target="#variance-of-the-ols-estimator"><span class="header-section-number">4.11</span> Variance of the OLS Estimator</a></li>
-  <li><a href="#standard-errors" id="toc-standard-errors" class="nav-link" data-scroll-target="#standard-errors"><span class="header-section-number">4.12</span> Standard Errors</a></li>
-  <li><a href="#ols-is-blue" id="toc-ols-is-blue" class="nav-link" data-scroll-target="#ols-is-blue"><span class="header-section-number">4.13</span> OLS is BLUE</a></li>
-  <li><a href="#summary-and-conclusion" id="toc-summary-and-conclusion" class="nav-link" data-scroll-target="#summary-and-conclusion"><span class="header-section-number">4.14</span> Summary and Conclusion</a>
+  <li><a href="#variance-of-the-ols-estimator" id="toc-variance-of-the-ols-estimator" class="nav-link" data-scroll-target="#variance-of-the-ols-estimator"><span class="header-section-number">4.10</span> Variance of the OLS Estimator</a>
   <ul class="collapse">
-  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">4.14.1</span> Key Takeaways</a></li>
+  <li><a href="#starting-point-decomposing-the-estimator" id="toc-starting-point-decomposing-the-estimator" class="nav-link" data-scroll-target="#starting-point-decomposing-the-estimator"><span class="header-section-number">4.10.1</span> Starting Point: Decomposing the Estimator</a></li>
+  <li><a href="#treating-the-denominator-as-a-constant" id="toc-treating-the-denominator-as-a-constant" class="nav-link" data-scroll-target="#treating-the-denominator-as-a-constant"><span class="header-section-number">4.10.2</span> Treating the Denominator as a Constant</a></li>
+  <li><a href="#applying-the-homoskedasticity-assumption" id="toc-applying-the-homoskedasticity-assumption" class="nav-link" data-scroll-target="#applying-the-homoskedasticity-assumption"><span class="header-section-number">4.10.3</span> Applying the Homoskedasticity Assumption</a></li>
+  <li><a href="#putting-it-all-together" id="toc-putting-it-all-together" class="nav-link" data-scroll-target="#putting-it-all-together"><span class="header-section-number">4.10.4</span> Putting It All Together</a></li>
+  <li><a href="#what-does-this-tell-us" id="toc-what-does-this-tell-us" class="nav-link" data-scroll-target="#what-does-this-tell-us"><span class="header-section-number">4.10.5</span> What Does This Tell Us?</a></li>
   </ul></li>
-  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">4.15</span> Check Your Understanding</a>
+  <li><a href="#standard-errors" id="toc-standard-errors" class="nav-link" data-scroll-target="#standard-errors"><span class="header-section-number">4.11</span> Standard Errors</a></li>
+  <li><a href="#summary-and-conclusion" id="toc-summary-and-conclusion" class="nav-link" data-scroll-target="#summary-and-conclusion"><span class="header-section-number">4.12</span> Summary and Conclusion</a>
   <ul class="collapse">
-  <li><a href="#practice-interpreting-regression-output" id="toc-practice-interpreting-regression-output" class="nav-link" data-scroll-target="#practice-interpreting-regression-output"><span class="header-section-number">4.15.1</span> Practice: Interpreting Regression Output</a></li>
+  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">4.12.1</span> Key Takeaways</a></li>
+  </ul></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">4.13</span> Check Your Understanding</a>
+  <ul class="collapse">
+  <li><a href="#practice-interpreting-regression-output" id="toc-practice-interpreting-regression-output" class="nav-link" data-scroll-target="#practice-interpreting-regression-output"><span class="header-section-number">4.13.1</span> Practice: Interpreting Regression Output</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -655,7 +665,7 @@ wage = \beta_0 + \beta_1 \cdot educ + \mu
 </section>
 <section id="the-regression-line-predicted-values-and-residuals" class="level2" data-number="4.3">
 <h2 data-number="4.3" class="anchored" data-anchor-id="the-regression-line-predicted-values-and-residuals"><span class="header-section-number">4.3</span> The Regression Line: Predicted Values and Residuals</h2>
-<p>The entire goal of linear regression is to use our <em>sample</em> of the data from the wider <em>population</em> to estimate the values of <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> that are the best possible estimates we can generate. We call these estimates <span class="math inline">\(\hat{\beta_0}\)</span> and <span class="math inline">\(\hat{\beta_1}\)</span>, and the method we use to calculate these estimates the <strong>estimator</strong>.</p>
+<p>The entire goal of linear regression is to use our <em>sample</em> of the data from the wider <em>population</em> to estimate the values of <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> that are the best possible estimates we can generate. We call these estimates <span class="math inline">\(\hat{\beta_0}\)</span> and <span class="math inline">\(\hat{\beta_1}\)</span>, and the method we use to calculate these estimates the <strong>estimator</strong>. We can never actually get the <em>true</em> population values <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span>; we have to rely on estimates!</p>
 <p>Before we derive estimators for <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span>, let’s introduce some key concepts that will guide our approach.</p>
 <section id="fitted-values-and-the-regression-line" class="level3" data-number="4.3.1">
 <h3 data-number="4.3.1" class="anchored" data-anchor-id="fitted-values-and-the-regression-line"><span class="header-section-number">4.3.1</span> Fitted Values and the Regression Line</h3>
@@ -767,8 +777,8 @@ Table&nbsp;4.1: Example regression data showing actual values, predicted values,
 </div>
 <p>Notice how the residual column equals the actual value minus the predicted value. For the first observation, the car has 110 horsepower and gets 21 MPG. Our regression predicts it should get about 22.59 MPG, so the residual is <span class="math inline">\(21 - 22.59 = -1.59\)</span>. The negative residual means we <em>overpredicted</em>—the car actually gets slightly worse fuel economy than our model predicted.</p>
 </section>
-<section id="the-key-insight-minimize-the-residuals" class="level3" data-number="4.3.4">
-<h3 data-number="4.3.4" class="anchored" data-anchor-id="the-key-insight-minimize-the-residuals"><span class="header-section-number">4.3.4</span> The Key Insight: Minimize the Residuals</h3>
+<section id="the-goal-minimize-the-residuals" class="level3" data-number="4.3.4">
+<h3 data-number="4.3.4" class="anchored" data-anchor-id="the-goal-minimize-the-residuals"><span class="header-section-number">4.3.4</span> The Goal: Minimize the Residuals</h3>
 <p>Here’s the crucial idea: we want to choose <span class="math inline">\(\hat{\beta}_0\)</span> and <span class="math inline">\(\hat{\beta}_1\)</span> so that our predictions are as good as possible. In other words, we want to make the residuals as small as possible.</p>
 <p>But we can’t simply minimize the sum of residuals <span class="math inline">\(\sum \hat{\mu}_i\)</span>, because positive and negative residuals would cancel out. Instead, we minimize the <strong>Sum of Squared Residuals (SSR)</strong>:</p>
 <p><span class="math display">\[
@@ -834,7 +844,7 @@ SSR = \sum_{i=1}^{n} \hat{\mu}_i^2 = \sum_{i=1}^{n} (y_i - \hat{\beta}_0 - \hat{
 <p><span class="math display">\[
 \sum_{i=1}^{n} x_i(y_i - \bar{y}) = \hat{\beta}_1 \sum_{i=1}^{n} x_i(x_i - \bar{x})
 \]</span></p>
-<p>Using the summation properties <span class="math inline">\(\sum x_i(y_i - \bar{y}) = \sum(x_i - \bar{x})(y_i - \bar{y})\)</span> and <span class="math inline">\(\sum x_i(x_i - \bar{x}) = \sum(x_i - \bar{x})^2\)</span>:</p>
+<p>Using the summation properties <span class="math inline">\(\sum x_i(y_i - \bar{y}) = \sum(x_i - \bar{x})(y_i - \bar{y})\)</span> and <span class="math inline">\(\sum x_i(x_i - \bar{x}) = \sum(x_i - \bar{x})^2\)</span><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>:</p>
 <p><span class="math display">\[
 \sum_{i=1}^{n} (x_i - \bar{x})(y_i - \bar{y}) = \hat{\beta}_1 \sum_{i=1}^{n} (x_i - \bar{x})^2
 \]</span></p>
@@ -872,19 +882,229 @@ The OLS Slope Formula
 <p>This last expression reveals something important: bivariate OLS is essentially a scaled version of the correlation between <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>. And as we discussed in <a href="intro.html" class="quarto-xref"><span>Chapter 1</span></a>, correlation does not imply causation! We must be very careful about interpreting bivariate OLS results causally.</p>
 </section>
 </section>
-<section id="computing-ols-in-r" class="level2" data-number="4.5">
-<h2 data-number="4.5" class="anchored" data-anchor-id="computing-ols-in-r"><span class="header-section-number">4.5</span> Computing OLS in R</h2>
+<section id="a-worked-example-by-hand" class="level2" data-number="4.5">
+<h2 data-number="4.5" class="anchored" data-anchor-id="a-worked-example-by-hand"><span class="header-section-number">4.5</span> A Worked Example by Hand</h2>
+<p>Before we let R do the heavy lifting, let’s apply the OLS formulas to a tiny dataset to make sure we understand what’s going on. Suppose we survey 5 workers and record their years of education (<span class="math inline">\(x\)</span>) and hourly wage in dollars (<span class="math inline">\(y\)</span>):</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Worker</th>
+<th style="text-align: center;"><span class="math inline">\(x_i\)</span> (Years of Education)</th>
+<th style="text-align: center;"><span class="math inline">\(y_i\)</span> (Hourly Wage)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">10</td>
+<td style="text-align: center;">12</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">15</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">14</td>
+<td style="text-align: center;">17</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">16</td>
+<td style="text-align: center;">22</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">18</td>
+<td style="text-align: center;">24</td>
+</tr>
+</tbody>
+</table>
+<section id="step-1-compute-the-means" class="level3" data-number="4.5.1">
+<h3 data-number="4.5.1" class="anchored" data-anchor-id="step-1-compute-the-means"><span class="header-section-number">4.5.1</span> Step 1: Compute the Means</h3>
+<p><span class="math display">\[
+\bar{x} = \frac{10 + 12 + 14 + 16 + 18}{5} = \frac{70}{5} = 14
+\]</span></p>
+<p><span class="math display">\[
+\bar{y} = \frac{12 + 15 + 17 + 22 + 24}{5} = \frac{90}{5} = 18
+\]</span></p>
+</section>
+<section id="step-2-compute-the-deviations" class="level3" data-number="4.5.2">
+<h3 data-number="4.5.2" class="anchored" data-anchor-id="step-2-compute-the-deviations"><span class="header-section-number">4.5.2</span> Step 2: Compute the Deviations</h3>
+<p>We need <span class="math inline">\((x_i - \bar{x})\)</span>, <span class="math inline">\((y_i - \bar{y})\)</span>, their product, and <span class="math inline">\((x_i - \bar{x})^2\)</span>:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 7%">
+<col style="width: 7%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 32%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;"><span class="math inline">\(x_i\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(y_i\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(x_i - \bar{x}\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(y_i - \bar{y}\)</span></th>
+<th style="text-align: center;"><span class="math inline">\((x_i - \bar{x})(y_i - \bar{y})\)</span></th>
+<th style="text-align: center;"><span class="math inline">\((x_i - \bar{x})^2\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">10</td>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">−4</td>
+<td style="text-align: center;">−6</td>
+<td style="text-align: center;">24</td>
+<td style="text-align: center;">16</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">15</td>
+<td style="text-align: center;">−2</td>
+<td style="text-align: center;">−3</td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">14</td>
+<td style="text-align: center;">17</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">−1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">16</td>
+<td style="text-align: center;">22</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">18</td>
+<td style="text-align: center;">24</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">24</td>
+<td style="text-align: center;">16</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><strong>Sum</strong></td>
+<td style="text-align: center;"><strong>62</strong></td>
+<td style="text-align: center;"><strong>40</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Notice that the deviations <span class="math inline">\((x_i - \bar{x})\)</span> sum to zero, just as Result 1 in <a href="statsreview.html" class="quarto-xref"><span>Appendix B</span></a> promises.</p>
+</section>
+<section id="step-3-compute-the-slope" class="level3" data-number="4.5.3">
+<h3 data-number="4.5.3" class="anchored" data-anchor-id="step-3-compute-the-slope"><span class="header-section-number">4.5.3</span> Step 3: Compute the Slope</h3>
+<p>Applying <a href="#eq-b1-formula" class="quarto-xref">Equation&nbsp;<span>4.3</span></a>:</p>
+<p><span class="math display">\[
+\hat{\beta}_1 = \frac{\sum(x_i - \bar{x})(y_i - \bar{y})}{\sum(x_i - \bar{x})^2} = \frac{62}{40} = 1.55
+\]</span></p>
+<p>Each additional year of education is associated with $1.55 higher hourly wages in our sample.</p>
+</section>
+<section id="step-4-compute-the-intercept" class="level3" data-number="4.5.4">
+<h3 data-number="4.5.4" class="anchored" data-anchor-id="step-4-compute-the-intercept"><span class="header-section-number">4.5.4</span> Step 4: Compute the Intercept</h3>
+<p>Applying <a href="#eq-b0-formula" class="quarto-xref">Equation&nbsp;<span>4.2</span></a>:</p>
+<p><span class="math display">\[
+\hat{\beta}_0 = \bar{y} - \hat{\beta}_1 \bar{x} = 18 - 1.55 \times 14 = 18 - 21.7 = -3.7
+\]</span></p>
+<p>Our estimated regression line is:</p>
+<p><span class="math display">\[
+\hat{y}_i = -3.7 + 1.55 \, x_i
+\]</span></p>
+<p>The intercept (−3.7) is the predicted wage for someone with zero years of education. This doesn’t have a meaningful real-world interpretation here—nobody in our data has zero years of education—but the intercept is still necessary for the line to fit the data correctly.</p>
+</section>
+<section id="step-5-check-fitted-values-and-residuals" class="level3" data-number="4.5.5">
+<h3 data-number="4.5.5" class="anchored" data-anchor-id="step-5-check-fitted-values-and-residuals"><span class="header-section-number">4.5.5</span> Step 5: Check Fitted Values and Residuals</h3>
+<p>Let’s plug each <span class="math inline">\(x_i\)</span> into our equation and compute the residuals <span class="math inline">\(\hat{\mu}_i = y_i - \hat{y}_i\)</span>:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;"><span class="math inline">\(x_i\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(y_i\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(\hat{y}_i\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(\hat{\mu}_i = y_i - \hat{y}_i\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">10</td>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">11.8</td>
+<td style="text-align: center;">0.2</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">15</td>
+<td style="text-align: center;">14.9</td>
+<td style="text-align: center;">0.1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">14</td>
+<td style="text-align: center;">17</td>
+<td style="text-align: center;">18.0</td>
+<td style="text-align: center;">−1.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">16</td>
+<td style="text-align: center;">22</td>
+<td style="text-align: center;">21.1</td>
+<td style="text-align: center;">0.9</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">18</td>
+<td style="text-align: center;">24</td>
+<td style="text-align: center;">24.2</td>
+<td style="text-align: center;">−0.2</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><strong>Sum of residuals</strong></td>
+<td style="text-align: center;"><strong>0.0</strong></td>
+</tr>
+</tbody>
+</table>
+<p>As expected, the residuals sum to zero. This isn’t a coincidence—it’s guaranteed by the first-order condition from Section 4.4.2, which requires <span class="math inline">\(\sum(y_i - \hat{\beta}_0 - \hat{\beta}_1 x_i) = 0\)</span>.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Try It Yourself
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Before moving on, try reproducing this example on paper or in a calculator. Getting comfortable with the mechanics of these formulas will make everything that follows easier to understand.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="computing-ols-in-r" class="level2" data-number="4.6">
+<h2 data-number="4.6" class="anchored" data-anchor-id="computing-ols-in-r"><span class="header-section-number">4.6</span> Computing OLS in R</h2>
 <p>While we derived the formulas by hand, in practice we use software to compute OLS estimates. In R, the <code>lm()</code> function (for “linear model”) performs OLS regression.</p>
-<section id="basic-syntax" class="level3" data-number="4.5.1">
-<h3 data-number="4.5.1" class="anchored" data-anchor-id="basic-syntax"><span class="header-section-number">4.5.1</span> Basic Syntax</h3>
+<section id="basic-syntax" class="level3" data-number="4.6.1">
+<h3 data-number="4.6.1" class="anchored" data-anchor-id="basic-syntax"><span class="header-section-number">4.6.1</span> Basic Syntax</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># General syntax</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">lm</span>(y <span class="sc">~</span> x, <span class="at">data =</span> your_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The formula <code>y ~ x</code> specifies that <span class="math inline">\(y\)</span> is the dependent variable and <span class="math inline">\(x\)</span> is the independent variable. An intercept is included by default.</p>
 </section>
-<section id="example-mpg-and-horsepower" class="level3" data-number="4.5.2">
-<h3 data-number="4.5.2" class="anchored" data-anchor-id="example-mpg-and-horsepower"><span class="header-section-number">4.5.2</span> Example: MPG and Horsepower</h3>
+<section id="example-mpg-and-horsepower" class="level3" data-number="4.6.2">
+<h3 data-number="4.6.2" class="anchored" data-anchor-id="example-mpg-and-horsepower"><span class="header-section-number">4.6.2</span> Example: MPG and Horsepower</h3>
 <p>Let’s estimate the relationship between fuel efficiency (MPG) and engine horsepower using the built-in <code>mtcars</code> dataset:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the data</span></span>
@@ -916,11 +1136,12 @@ Multiple R-squared:  0.6024,    Adjusted R-squared:  0.5892
 F-statistic: 45.46 on 1 and 30 DF,  p-value: 1.788e-07</code></pre>
 </div>
 </div>
-<p>The output shows our estimates: <span class="math inline">\(\hat{\beta}_0 = 30.10\)</span> and <span class="math inline">\(\hat{\beta}_1 = -0.07\)</span>. The slope suggests that each additional unit of horsepower is associated with about 0.07 fewer miles per gallon.</p>
+<p>The output shows our estimates: <span class="math inline">\(\hat{\beta}_0 = 30.10\)</span> and <span class="math inline">\(\hat{\beta}_1 = -0.07\)</span>. The slope suggests that each additional unit of horsepower is associated with about 0.07 fewer miles per gallon. Similarly, according to this estimate, a car with 50 additional horsepower is associated with about 3.5 (<span class="math inline">\(50 \times 0.07\)</span>) fewer miles per gallon.</p>
+<p>A one-unit increase isn’t always the most meaningful way to think about a coefficient. When the units of <span class="math inline">\(x\)</span> are hard to interpret on their own, it can be helpful to consider a <strong>one standard deviation</strong> increase instead. In this dataset, the standard deviation of horsepower is about 68.6. So a one standard deviation increase in horsepower is associated with a change in fuel economy of roughly <span class="math inline">\(68.6 \times (-0.07) \approx 4.8\)</span> fewer miles per gallon. This gives a better sense of what a “typical” difference in horsepower implies for fuel economy.</p>
 </section>
 </section>
-<section id="goodness-of-fit-r-squared" class="level2" data-number="4.6">
-<h2 data-number="4.6" class="anchored" data-anchor-id="goodness-of-fit-r-squared"><span class="header-section-number">4.6</span> Goodness-of-Fit: R-Squared</h2>
+<section id="goodness-of-fit-r-squared" class="level2" data-number="4.7">
+<h2 data-number="4.7" class="anchored" data-anchor-id="goodness-of-fit-r-squared"><span class="header-section-number">4.7</span> Goodness-of-Fit: R-Squared</h2>
 <p>How well does our regression line fit the data? The <strong>R-squared</strong> (<span class="math inline">\(R^2\)</span>) provides one measure of goodness-of-fit.</p>
 <p>Define:</p>
 <ul>
@@ -932,7 +1153,7 @@ F-statistic: 45.46 on 1 and 30 DF,  p-value: 1.788e-07</code></pre>
 <p><span class="math display">\[
 R^2 = \frac{SSE}{SST} = 1 - \frac{SSR}{SST}
 \]</span></p>
-<p>This measures the fraction of the total variation in <span class="math inline">\(y\)</span> that is explained by the regression. <span class="math inline">\(R^2\)</span> ranges from 0 (no explanatory power) to 1 (perfect fit).</p>
+<p>This measures the fraction of the total variation in <span class="math inline">\(y\)</span> that is explained by the regression. <span class="math inline">\(R^2\)</span> ranges from 0 (no explanatory power) to 1 (perfect fit). We usually interpret the calculated value as a percent. For example if the <span class="math inline">\(R^2 = 0.386\)</span>, you might say something the model *explains about <span class="math inline">\(39\%\)</span> of the variation in <span class="math inline">\(y\)</span>.</p>
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -947,12 +1168,12 @@ Interpreting R-Squared
 </div>
 </div>
 </section>
-<section id="the-gauss-markov-assumptions" class="level2" data-number="4.7">
-<h2 data-number="4.7" class="anchored" data-anchor-id="the-gauss-markov-assumptions"><span class="header-section-number">4.7</span> The Gauss-Markov Assumptions</h2>
+<section id="the-gauss-markov-assumptions" class="level2" data-number="4.8">
+<h2 data-number="4.8" class="anchored" data-anchor-id="the-gauss-markov-assumptions"><span class="header-section-number">4.8</span> The Gauss-Markov Assumptions</h2>
 <p>We’ve derived the OLS formulas, but how do we know if the estimates are any good? The formulas will always give us <em>some</em> numbers, but whether those numbers have useful statistical properties depends on certain conditions being met.</p>
 <p>The <strong>Gauss-Markov assumptions</strong> are a set of conditions under which OLS has desirable properties. Understanding these assumptions is crucial: they tell us when we can trust our estimates and when we should be skeptical.</p>
-<section id="assumption-1-linear-in-parameters" class="level3" data-number="4.7.1">
-<h3 data-number="4.7.1" class="anchored" data-anchor-id="assumption-1-linear-in-parameters"><span class="header-section-number">4.7.1</span> Assumption 1: Linear in Parameters</h3>
+<section id="assumption-1-linear-in-parameters" class="level3" data-number="4.8.1">
+<h3 data-number="4.8.1" class="anchored" data-anchor-id="assumption-1-linear-in-parameters"><span class="header-section-number">4.8.1</span> Assumption 1: Linear in Parameters</h3>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -975,8 +1196,8 @@ Gauss-Markov Assumption 1: Linear in Parameters
 </ul>
 <p><strong>What would violate this assumption:</strong> Models where parameters enter non-linearly, such as <span class="math inline">\(y = \beta_0 + x^{\beta_1} + \mu\)</span> or <span class="math inline">\(y = \frac{1}{1 + e^{-\beta_0 - \beta_1 x}} + \mu\)</span> (a logistic function). These require different estimation techniques.</p>
 </section>
-<section id="assumption-2-random-sampling" class="level3" data-number="4.7.2">
-<h3 data-number="4.7.2" class="anchored" data-anchor-id="assumption-2-random-sampling"><span class="header-section-number">4.7.2</span> Assumption 2: Random Sampling</h3>
+<section id="assumption-2-random-sampling" class="level3" data-number="4.8.2">
+<h3 data-number="4.8.2" class="anchored" data-anchor-id="assumption-2-random-sampling"><span class="header-section-number">4.8.2</span> Assumption 2: Random Sampling</h3>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1000,8 +1221,8 @@ Gauss-Markov Assumption 2: Random Sampling
 <li><p><strong>Clustered data:</strong> Students within the same classroom, or workers within the same firm, may be more similar to each other than to randomly selected individuals.</p></li>
 </ul>
 </section>
-<section id="assumption-3-variation-in-the-independent-variable" class="level3" data-number="4.7.3">
-<h3 data-number="4.7.3" class="anchored" data-anchor-id="assumption-3-variation-in-the-independent-variable"><span class="header-section-number">4.7.3</span> Assumption 3: Variation in the Independent Variable</h3>
+<section id="assumption-3-variation-in-the-independent-variable" class="level3" data-number="4.8.3">
+<h3 data-number="4.8.3" class="anchored" data-anchor-id="assumption-3-variation-in-the-independent-variable"><span class="header-section-number">4.8.3</span> Assumption 3: Variation in the Independent Variable</h3>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1023,8 +1244,8 @@ Gauss-Markov Assumption 3: Sample Variation in <span class="math inline">\(x\)</
 <p>If all <span class="math inline">\(x_i\)</span> equal <span class="math inline">\(\bar{x}\)</span>, the denominator is zero, and the formula is undefined. Intuitively, if everyone has 12 years of education, we have no way to estimate what would happen with 13 years of education.</p>
 <p><strong>In practice:</strong> This assumption is almost always satisfied. It would only fail in unusual circumstances, like if you accidentally collected a sample where everyone happened to have the exact same value of <span class="math inline">\(x\)</span>. However, having <em>little</em> variation in <span class="math inline">\(x\)</span> (even if not zero) can lead to imprecise estimates, as we’ll see when discussing variance.</p>
 </section>
-<section id="assumption-4-zero-conditional-mean" class="level3" data-number="4.7.4">
-<h3 data-number="4.7.4" class="anchored" data-anchor-id="assumption-4-zero-conditional-mean"><span class="header-section-number">4.7.4</span> Assumption 4: Zero Conditional Mean</h3>
+<section id="assumption-4-zero-conditional-mean" class="level3" data-number="4.8.4">
+<h3 data-number="4.8.4" class="anchored" data-anchor-id="assumption-4-zero-conditional-mean"><span class="header-section-number">4.8.4</span> Assumption 4: Zero Conditional Mean</h3>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1046,10 +1267,10 @@ Gauss-Markov Assumption 4: Zero Conditional Mean
 <p><span class="math display">\[E[\mu | educ = 8] = E[\mu | educ = 12] = E[\mu | educ = 16] = 0\]</span></p>
 <p>Is this plausible? Probably not. People with higher ability tend to get more education (because school is easier for them, or because they enjoy learning). So among people with 16 years of education, average ability is probably higher than among people with 8 years. This means <span class="math inline">\(E[\mu | educ = 16] &gt; E[\mu | educ = 8]\)</span>, violating the assumption.</p>
 <p><strong>Why it matters:</strong> When this assumption fails, OLS is <strong>biased</strong>. The estimate <span class="math inline">\(\hat{\beta}_1\)</span> will systematically overshoot or undershoot the true <span class="math inline">\(\beta_1\)</span>. In the education example, if high-ability people get more education, our estimate of the “return to education” will partly capture the “return to ability,” making education look more valuable than it really is.</p>
-<p>This is the essence of <strong>omitted variable bias</strong>, which we’ll explore in detail shortly.</p>
+<p>This is the essence of <strong>omitted variable bias</strong>, which we’ll explore in more detail in <a href="multivariate_ols.html" class="quarto-xref"><span>Chapter 5</span></a>.</p>
 </section>
-<section id="assumption-5-homoskedasticity" class="level3" data-number="4.7.5">
-<h3 data-number="4.7.5" class="anchored" data-anchor-id="assumption-5-homoskedasticity"><span class="header-section-number">4.7.5</span> Assumption 5: Homoskedasticity</h3>
+<section id="assumption-5-homoskedasticity" class="level3" data-number="4.8.5">
+<h3 data-number="4.8.5" class="anchored" data-anchor-id="assumption-5-homoskedasticity"><span class="header-section-number">4.8.5</span> Assumption 5: Homoskedasticity</h3>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1068,10 +1289,6 @@ Gauss-Markov Assumption 5: Homoskedasticity
 <p><strong>Example: Income and Spending</strong></p>
 <p>Consider a regression of consumption spending on income. For low-income households, spending is relatively constrained—there’s not much room for variation because most income goes to necessities. For high-income households, there’s much more discretion in spending patterns, leading to greater variation. This would create heteroskedasticity: <span class="math inline">\(Var(\mu | income)\)</span> increases with income.</p>
 <div class="cell">
-<div class="cell-output cell-output-stderr">
-<pre><code>`geom_smooth()` using formula = 'y ~ x'
-`geom_smooth()` using formula = 'y ~ x'</code></pre>
-</div>
 <div class="cell-output-display">
 <div id="fig-homohetero" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -1088,68 +1305,41 @@ Figure&nbsp;4.3: Left: Homoskedasticity—the spread of points around the line i
 <p><strong>Why it matters:</strong> Unlike Assumption 4, violating homoskedasticity does <strong>not</strong> make OLS biased. Your estimate of <span class="math inline">\(\beta_1\)</span> is still centered on the true value. However, heteroskedasticity affects the <em>variance</em> and <em>standard errors</em> of the estimator. The usual standard error formulas become incorrect, which can lead to invalid hypothesis tests and confidence intervals.</p>
 <p>We’ll discuss how to handle heteroskedasticity later in the course using <strong>robust standard errors</strong>.</p>
 </section>
-<section id="summary-which-assumptions-matter-for-what" class="level3" data-number="4.7.6">
-<h3 data-number="4.7.6" class="anchored" data-anchor-id="summary-which-assumptions-matter-for-what"><span class="header-section-number">4.7.6</span> Summary: Which Assumptions Matter for What?</h3>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 16%">
-<col style="width: 35%">
-<col style="width: 47%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Assumption</th>
-<th>Needed for Unbiasedness?</th>
-<th>Needed for Valid Standard Errors?</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>1. Linear in parameters</td>
-<td>Yes</td>
-<td>Yes</td>
-</tr>
-<tr class="even">
-<td>2. Random sampling</td>
-<td>Yes</td>
-<td>Yes</td>
-</tr>
-<tr class="odd">
-<td>3. Variation in <span class="math inline">\(x\)</span></td>
-<td>Yes (otherwise undefined)</td>
-<td>Yes</td>
-</tr>
-<tr class="even">
-<td>4. Zero conditional mean</td>
-<td><strong>Yes</strong></td>
-<td>Yes</td>
-</tr>
-<tr class="odd">
-<td>5. Homoskedasticity</td>
-<td>No</td>
-<td><strong>Yes</strong></td>
-</tr>
-</tbody>
-</table>
-<p>The key insight: Assumptions 1-4 are required for OLS to be <strong>unbiased</strong> (on average, we hit the target). Assumption 5 is additionally required for the usual standard error formulas to be valid and for OLS to be <strong>BLUE</strong> (Best Linear Unbiased Estimator).</p>
+<section id="summary-which-assumptions-matter-for-what" class="level3" data-number="4.8.6">
+<h3 data-number="4.8.6" class="anchored" data-anchor-id="summary-which-assumptions-matter-for-what"><span class="header-section-number">4.8.6</span> Summary: Which Assumptions Matter for What?</h3>
+<p>Assumptions 1–4 (linearity in parameters, random sampling, variation in <span class="math inline">\(x\)</span>, and zero conditional mean) are all required for OLS to be <strong>unbiased</strong>—that is, for the estimator to hit the true parameter values on average. If any one of these assumptions fails, OLS may systematically over- or under-estimate the true <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span>.</p>
+<p>Assumption 5 (homoskedasticity) is <em>not</em> needed for unbiasedness. Even if this fails, OLS still gets the right answer on average. However, homoskedasticity <em>is</em> required for an additional property:</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<strong>BLUE</strong>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If all five Gauss-Markov assumptions hold, OLS is the <strong>Best Linear Unbiased Estimator (BLUE)</strong>. The Gauss–Markov theorem tells us that when all five assumptions hold, OLS has the smallest variance among <em>all</em> estimators that are (a) linear functions of the outcome variable <span class="math inline">\(y\)</span> and (b) unbiased. In other words, no other linear unbiased estimator can produce more precise estimates than OLS. When assumption 5 fails, OLS is still unbiased, but it is no longer the most efficient—other estimators could do better.</p>
+</div>
+</div>
 </section>
 </section>
-<section id="unbiasedness-of-ols" class="level2" data-number="4.8">
-<h2 data-number="4.8" class="anchored" data-anchor-id="unbiasedness-of-ols"><span class="header-section-number">4.8</span> Unbiasedness of OLS</h2>
-<p>Before discussing unbiasedness, let’s revisit an important distinction we introduced in <a href="statsreview.html" class="quarto-xref"><span>Appendix B</span></a>: the difference between the <strong>population</strong> and the <strong>sample</strong>.</p>
-<section id="population-parameters-vs.-sample-estimates" class="level3" data-number="4.8.1">
-<h3 data-number="4.8.1" class="anchored" data-anchor-id="population-parameters-vs.-sample-estimates"><span class="header-section-number">4.8.1</span> Population Parameters vs.&nbsp;Sample Estimates</h3>
+<section id="unbiasedness-of-ols" class="level2" data-number="4.9">
+<h2 data-number="4.9" class="anchored" data-anchor-id="unbiasedness-of-ols"><span class="header-section-number">4.9</span> Unbiasedness of OLS</h2>
+<section id="population-parameters-vs.-sample-estimates" class="level3" data-number="4.9.1">
+<h3 data-number="4.9.1" class="anchored" data-anchor-id="population-parameters-vs.-sample-estimates"><span class="header-section-number">4.9.1</span> Population Parameters vs.&nbsp;Sample Estimates</h3>
+<p>Before discussing unbiasedness, recall an important distinction we introduced in <a href="statsreview.html" class="quarto-xref"><span>Appendix B</span></a>: the difference between the <strong>population</strong> and the <strong>sample</strong>.</p>
 <p>The <strong>population</strong> represents the entire group we’re interested in studying. In our wage-education example, the population might be all workers in the U.S. economy. The population regression model describes the <em>true</em> relationship in this population:</p>
 <p><span class="math display">\[
 y = \beta_0 + \beta_1 x + \mu
 \]</span></p>
 <p>The parameters <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> are <strong>population parameters</strong>—fixed, unknown constants that describe how <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> are related for everyone in the population. We never observe these true values directly.</p>
 <p>Instead, we collect a <strong>sample</strong>—a subset of observations from the population. Using this sample, we compute <strong>estimates</strong> <span class="math inline">\(\hat{\beta}_0\)</span> and <span class="math inline">\(\hat{\beta}_1\)</span>. These estimates are our best guesses for the unknown population parameters.</p>
-<p>Here’s the key insight: <em>if we drew a different sample, we would get different estimates</em>. Your classmate analyzing a different random sample of workers would compute different values of <span class="math inline">\(\hat{\beta}_0\)</span> and <span class="math inline">\(\hat{\beta}_1\)</span> than you would. This randomness in the estimates is called <strong>sampling variability</strong>.</p>
+<p>Critically, <em>if we drew a different sample, we would get different estimates</em>. Your classmate analyzing a different random sample of workers would compute different values of <span class="math inline">\(\hat{\beta}_0\)</span> and <span class="math inline">\(\hat{\beta}_1\)</span> than you would, even though the population and regression model are the same. This randomness in the estimates is called <strong>sampling variability</strong>.</p>
 </section>
-<section id="what-does-unbiasedness-mean" class="level3" data-number="4.8.2">
-<h3 data-number="4.8.2" class="anchored" data-anchor-id="what-does-unbiasedness-mean"><span class="header-section-number">4.8.2</span> What Does Unbiasedness Mean?</h3>
-<p>Given that estimates vary from sample to sample, how do we know if our estimation procedure is any good? One desirable property is <strong>unbiasedness</strong>.</p>
+<section id="what-does-unbiasedness-mean" class="level3" data-number="4.9.2">
+<h3 data-number="4.9.2" class="anchored" data-anchor-id="what-does-unbiasedness-mean"><span class="header-section-number">4.9.2</span> What Does Unbiasedness Mean?</h3>
+<p>Given that estimates vary from sample to sample, how do we know if our specific estimation is any good? One desirable property is <strong>unbiasedness</strong>.</p>
 <p>An estimator <span class="math inline">\(\hat{\theta}\)</span> is <strong>unbiased</strong> if its expected value equals the true population parameter:</p>
 <p><span class="math display">\[
 E[\hat{\theta}] = \theta
@@ -1164,22 +1354,36 @@ E[\hat{\theta}] = \theta
 <p>…then that average would equal the true <span class="math inline">\(\beta_1\)</span>.</p>
 <p>In other words, our estimation procedure doesn’t systematically overshoot or undershoot the target. Individual estimates might be too high or too low, but on average, we get it right.</p>
 </section>
-<section id="proof-sketch" class="level3" data-number="4.8.3">
-<h3 data-number="4.8.3" class="anchored" data-anchor-id="proof-sketch"><span class="header-section-number">4.8.3</span> Proof Sketch</h3>
-<p>Starting from our formula for <span class="math inline">\(\hat{\beta}_1\)</span> and substituting the true model <span class="math inline">\(y_i = \beta_0 + \beta_1 x_i + \mu_i\)</span>:</p>
+<section id="proof-sketch" class="level3" data-number="4.9.3">
+<h3 data-number="4.9.3" class="anchored" data-anchor-id="proof-sketch"><span class="header-section-number">4.9.3</span> Proof Sketch</h3>
+<p>We start from the OLS slope formula (<a href="#eq-b1-formula" class="quarto-xref">Equation&nbsp;<span>4.3</span></a>):</p>
 <p><span class="math display">\[
-\hat{\beta}_1 = \beta_1 + \frac{\sum_{i=1}^{n}(x_i - \bar{x})\mu_i}{\sum_{i=1}^{n}(x_i - \bar{x})^2}
+\hat{\beta}_1 = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{\sum_{i=1}^{n}(x_i - \bar{x})^2}
 \]</span></p>
-<p>Taking expectations and using the zero conditional mean assumption (<span class="math inline">\(E[\mu_i | x_i] = 0\)</span>):</p>
+<p>Now substitute the true population model <span class="math inline">\(y_i = \beta_0 + \beta_1 x_i + \mu_i\)</span> into the numerator. Since <span class="math inline">\(\bar{y} = \beta_0 + \beta_1 \bar{x} + \bar{\mu}\)</span>, we get <span class="math inline">\(y_i - \bar{y} = \beta_1(x_i - \bar{x}) + (\mu_i - \bar{\mu})\)</span>. Plugging this in:</p>
+<p><span class="math display">\[
+\hat{\beta}_1 = \frac{\sum_{i=1}^{n}(x_i - \bar{x})[\beta_1(x_i - \bar{x}) + (\mu_i - \bar{\mu})]}{\sum_{i=1}^{n}(x_i - \bar{x})^2}
+\]</span></p>
+<p>Distributing the numerator and splitting the fraction:</p>
+<p><span class="math display">\[
+\hat{\beta}_1 = \beta_1 \frac{\sum(x_i - \bar{x})^2}{\sum(x_i - \bar{x})^2} + \frac{\sum(x_i - \bar{x})(\mu_i - \bar{\mu})}{\sum(x_i - \bar{x})^2}
+\]</span></p>
+<p>The first fraction equals 1, so:</p>
+<p><span id="eq-decomposition"><span class="math display">\[
+\hat{\beta}_1 = \beta_1 + \frac{\sum_{i=1}^{n}(x_i - \bar{x})\mu_i}{\sum_{i=1}^{n}(x_i - \bar{x})^2}
+\tag{4.4}\]</span></span></p>
+<p>where the <span class="math inline">\(\bar{\mu}\)</span> term drops out because <span class="math inline">\(\sum(x_i - \bar{x}) = 0\)</span> (Result 1 from <a href="statsreview.html" class="quarto-xref"><span>Appendix B</span></a>).</p>
+<p>This is a powerful decomposition. It says: <strong>our estimate = the truth + estimation error</strong>. The estimation error depends on how the unobserved errors <span class="math inline">\(\mu_i\)</span> happen to line up with the <span class="math inline">\(x_i\)</span> values in our particular sample.</p>
+<p>Now take expectations. Treating the <span class="math inline">\(x_i\)</span> as fixed (Assumption 2), the only random part is the <span class="math inline">\(\mu_i\)</span> terms. Under the zero conditional mean assumption (<span class="math inline">\(E[\mu_i | x_i] = 0\)</span>):</p>
 <p><span class="math display">\[
 E[\hat{\beta}_1] = \beta_1 + \frac{\sum_{i=1}^{n}(x_i - \bar{x}) \cdot 0}{\sum_{i=1}^{n}(x_i - \bar{x})^2} = \beta_1
 \]</span></p>
-<p>Thus, OLS is unbiased when the Gauss-Markov assumptions hold.</p>
+<p>Thus, OLS is unbiased when the Gauss-Markov assumptions 1–4 hold.</p>
 </section>
-<section id="simulation-unbiasedness-in-action" class="level3" data-number="4.8.4">
-<h3 data-number="4.8.4" class="anchored" data-anchor-id="simulation-unbiasedness-in-action"><span class="header-section-number">4.8.4</span> Simulation: Unbiasedness in Action</h3>
+<section id="simulation-unbiasedness-in-action" class="level3" data-number="4.9.4">
+<h3 data-number="4.9.4" class="anchored" data-anchor-id="simulation-unbiasedness-in-action"><span class="header-section-number">4.9.4</span> Simulation: Unbiasedness in Action</h3>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1188,41 +1392,41 @@ Show Code: Unbiasedness Simulation
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div id="callout-13" class="callout-13-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a "population" with known parameters</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1248</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>n_pop <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>x_pop <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">100</span>, <span class="at">size =</span> n_pop, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>err_pop <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n_pop)</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># True model: y = 3.5 + 2.21*x + error</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>pop_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> x_pop,</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="fl">3.5</span> <span class="sc">+</span> <span class="fl">2.21</span> <span class="sc">*</span> x <span class="sc">+</span> err_pop</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Draw many samples and estimate beta_1 each time</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">812476</span>)</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>n_simulations <span class="ot">&lt;-</span> <span class="dv">500</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>sample_size <span class="ot">&lt;-</span> <span class="dv">25</span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>sim_results <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(<span class="dv">1</span><span class="sc">:</span>n_simulations, <span class="cf">function</span>(i) {</span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Draw a random sample</span></span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  sample_data <span class="ot">&lt;-</span> <span class="fu">slice_sample</span>(pop_data, <span class="at">n =</span> sample_size, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Estimate OLS</span></span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  reg <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> x, <span class="at">data =</span> sample_data)</span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(</span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">iteration =</span> i,</span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">b1_hat =</span> <span class="fu">coef</span>(reg)[<span class="dv">2</span>]</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the average of all estimates</span></span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>mean_b1 <span class="ot">&lt;-</span> <span class="fu">mean</span>(sim_results<span class="sc">$</span>b1_hat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a "population" with known parameters</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1248</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>n_pop <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>x_pop <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">100</span>, <span class="at">size =</span> n_pop, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>err_pop <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n_pop)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># True model: y = 3.5 + 2.21*x + error</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>pop_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> x_pop,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="fl">3.5</span> <span class="sc">+</span> <span class="fl">2.21</span> <span class="sc">*</span> x <span class="sc">+</span> err_pop</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Draw many samples and estimate beta_1 each time</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">812476</span>)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>n_simulations <span class="ot">&lt;-</span> <span class="dv">500</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>sample_size <span class="ot">&lt;-</span> <span class="dv">25</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>sim_results <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(<span class="dv">1</span><span class="sc">:</span>n_simulations, <span class="cf">function</span>(i) {</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Draw a random sample</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  sample_data <span class="ot">&lt;-</span> <span class="fu">slice_sample</span>(pop_data, <span class="at">n =</span> sample_size, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Estimate OLS</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>  reg <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> x, <span class="at">data =</span> sample_data)</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">iteration =</span> i,</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">b1_hat =</span> <span class="fu">coef</span>(reg)[<span class="dv">2</span>]</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the average of all estimates</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>mean_b1 <span class="ot">&lt;-</span> <span class="fu">mean</span>(sim_results<span class="sc">$</span>b1_hat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -1241,46 +1445,18 @@ Figure&nbsp;4.4: Distribution of OLS slope estimates across 500 samples. The gre
 </div>
 </div>
 </div>
-<p>The simulation in <a href="#fig-unbiasedness" class="quarto-xref">Figure&nbsp;<span>4.4</span></a> confirms the theory: while individual estimates vary around the true value, the average across many samples equals the true parameter.</p>
+<p>The simulation in <a href="#fig-unbiasedness" class="quarto-xref">Figure&nbsp;<span>4.4</span></a> confirms the theory. Each of the 500 samples of size 25 produces a different estimate of <span class="math inline">\(\beta_1\)</span>—some too high, some too low—because each sample is a different random draw from the population. This spread is <strong>sampling variability</strong>, and it is completely normal. The key thing about unbiasedness is that these estimates are centered on the true value of 2.21: the overestimates and underestimates cancel out on average, so the mean across all 500 estimates lands right on the truth.</p>
 </section>
-</section>
-<section id="omitted-variable-bias" class="level2" data-number="4.9">
-<h2 data-number="4.9" class="anchored" data-anchor-id="omitted-variable-bias"><span class="header-section-number">4.9</span> Omitted Variable Bias</h2>
-<p>What happens when the zero conditional mean assumption fails? The most common culprit is <strong>omitted variable bias</strong>: we’ve left out a variable that affects both <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>.</p>
-<p>Consider the true model:</p>
-<p><span class="math display">\[
-y = \beta_0 + \beta_1 x + \beta_2 z + \mu
-\]</span></p>
-<p>If we omit <span class="math inline">\(z\)</span> and estimate only <span class="math inline">\(y = \beta_0 + \beta_1 x + \nu\)</span> (where <span class="math inline">\(\nu = \beta_2 z + \mu\)</span>), then whenever <span class="math inline">\(z\)</span> is correlated with <span class="math inline">\(x\)</span>, we have <span class="math inline">\(E[\nu | x] \neq 0\)</span>, and our estimate of <span class="math inline">\(\beta_1\)</span> is biased.</p>
-<p><strong>Example:</strong> In the education-wage regression, if ability (<span class="math inline">\(z\)</span>) affects both education choices (<span class="math inline">\(x\)</span>) and wages (<span class="math inline">\(y\)</span>), then omitting ability creates bias. The estimated “return to education” will partly reflect the return to ability.</p>
-<div class="cell">
-<div class="cell-output-display">
-<div id="fig-ovb" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-ovb-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4.5: With omitted variable bias, the average of OLS estimates (green) systematically differs from the true value (red). The bias persists even with many samples.
-</figcaption>
-<div aria-describedby="fig-ovb-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="bivariate_ols_files/figure-html/fig-ovb-1.png" class="img-fluid figure-img" style="width:80.0%">
-</div>
-</figure>
-</div>
-</div>
-</div>
-</section>
-<section id="unbiasedness-and-causality-why-this-all-matters" class="level2" data-number="4.10">
-<h2 data-number="4.10" class="anchored" data-anchor-id="unbiasedness-and-causality-why-this-all-matters"><span class="header-section-number">4.10</span> Unbiasedness and Causality: Why This All Matters</h2>
-<p>Let’s step back and connect what we’ve learned to the bigger picture. In <a href="rcts.html" class="quarto-xref"><span>Chapter 3</span></a>, we discussed how the fundamental challenge of causal inference is selection bias: people who receive “treatment” (more education, a new drug, a policy intervention) may differ systematically from those who don’t. This makes it hard to know whether differences in outcomes are caused by the treatment or by those pre-existing differences.</p>
-<p>Now we can see the same problem through the lens of regression. <strong>The zero conditional mean assumption is essentially a “no selection bias” assumption.</strong></p>
-<section id="when-can-we-interpret-hatbeta_1-causally" class="level3" data-number="4.10.1">
-<h3 data-number="4.10.1" class="anchored" data-anchor-id="when-can-we-interpret-hatbeta_1-causally"><span class="header-section-number">4.10.1</span> When Can We Interpret <span class="math inline">\(\hat{\beta}_1\)</span> Causally?</h3>
+<section id="when-can-we-interpret-hatbeta_1-causally" class="level3" data-number="4.9.5">
+<h3 data-number="4.9.5" class="anchored" data-anchor-id="when-can-we-interpret-hatbeta_1-causally"><span class="header-section-number">4.9.5</span> When Can We Interpret <span class="math inline">\(\hat{\beta}_1\)</span> Causally?</h3>
 <p>Consider our wage regression: <span class="math display">\[wage = \beta_0 + \beta_1 \cdot educ + \mu\]</span></p>
 <p>When <span class="math inline">\(E[\mu | educ] = 0\)</span>, our OLS estimate <span class="math inline">\(\hat{\beta}_1\)</span> is unbiased for <span class="math inline">\(\beta_1\)</span>. But what does <span class="math inline">\(\beta_1\)</span> actually represent?</p>
 <p>If the zero conditional mean assumption holds, then <span class="math inline">\(\beta_1\)</span> represents the <strong>causal effect</strong> of education on wages: how much wages would change if we could take a person and give them one more year of education, holding everything else constant. In this case, <span class="math inline">\(\hat{\beta}_1\)</span> is an unbiased estimate of this causal effect.</p>
-<p>But if <span class="math inline">\(E[\mu | educ] \neq 0\)</span>—say, because high-ability people get more education—then <span class="math inline">\(\beta_1\)</span> no longer represents a pure causal effect. It conflates the effect of education with the effect of ability. Our estimate <span class="math inline">\(\hat{\beta}_1\)</span> is biased, and we cannot interpret it as the causal effect of education.</p>
+<p>But if <span class="math inline">\(E[\mu | educ] \neq 0\)</span>—say, because high-ability people get more education—then <span class="math inline">\(\beta_1\)</span> no longer represents a pure causal effect. It conflates the effect of education with the effect of ability. Our estimate <span class="math inline">\(\hat{\beta}_1\)</span> is biased, and we cannot interpret it as the causal effect of education. In other words, our estimate <span class="math inline">\(\hat{\beta}_1\)</span> reflects some <strong>selection bias</strong>, in that there is some systemic differences groups at different values of <span class="math inline">\(x\)</span>.</p>
 </section>
-<section id="correlation-vs.-causation-revisited" class="level3" data-number="4.10.2">
-<h3 data-number="4.10.2" class="anchored" data-anchor-id="correlation-vs.-causation-revisited"><span class="header-section-number">4.10.2</span> Correlation vs.&nbsp;Causation, Revisited</h3>
+<section id="correlation-vs.-causation-revisited" class="level3" data-number="4.9.6">
+<h3 data-number="4.9.6" class="anchored" data-anchor-id="correlation-vs.-causation-revisited"><span class="header-section-number">4.9.6</span> Correlation vs.&nbsp;Causation, Revisited</h3>
+<p>If our estimate <span class="math inline">\(\hat{\beta}_1\)</span> can’t be interpreted causally, what is it?</p>
 <p>Recall that the OLS slope can be written as: <span class="math display">\[\hat{\beta}_1 = \rho_{xy} \frac{\sigma_y}{\sigma_x}\]</span></p>
 <p>Bivariate OLS is fundamentally measuring the <em>correlation</em> between <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>, scaled by their relative standard deviations. Correlation becomes causation <strong>only when the Gauss-Markov assumptions hold</strong>—especially the zero conditional mean assumption.</p>
 <p>This is why we emphasize these assumptions so heavily. Without them:</p>
@@ -1289,46 +1465,84 @@ Figure&nbsp;4.5: With omitted variable bias, the average of OLS estimates (green
 <li>Those numbers still describe the correlation in your data</li>
 <li>But you <strong>cannot</strong> interpret those numbers as causal effects</li>
 </ul>
-<div class="callout callout-style-default callout-warning callout-titled">
+</section>
+</section>
+<section id="variance-of-the-ols-estimator" class="level2" data-number="4.10">
+<h2 data-number="4.10" class="anchored" data-anchor-id="variance-of-the-ols-estimator"><span class="header-section-number">4.10</span> Variance of the OLS Estimator</h2>
+<p>As discussed above, our OLS estimates will always–biased or unbiased–vary from sample to sample. The <strong>variance</strong> of <span class="math inline">\(\hat{\beta}_1\)</span> tells us how much variation to expect amoung our different estimates.</p>
+<p>In this section we derive the formula step by step.</p>
+<section id="starting-point-decomposing-the-estimator" class="level3" data-number="4.10.1">
+<h3 data-number="4.10.1" class="anchored" data-anchor-id="starting-point-decomposing-the-estimator"><span class="header-section-number">4.10.1</span> Starting Point: Decomposing the Estimator</h3>
+<p>Recall from the unbiasedness proof that we can write:</p>
+<p><span class="math display">\[
+\hat{\beta}_1 = \beta_1 + \frac{\sum_{i=1}^{n}(x_i - \bar{x})\mu_i}{\sum_{i=1}^{n}(x_i - \bar{x})^2}
+\]</span></p>
+<p>Since <span class="math inline">\(\beta_1\)</span> is a constant, the variance of <span class="math inline">\(\hat{\beta}_1\)</span> comes entirely from the second term:</p>
+<p><span class="math display">\[
+Var(\hat{\beta}_1) = Var\left(\frac{\sum_{i=1}^{n}(x_i - \bar{x})\mu_i}{\sum_{i=1}^{n}(x_i - \bar{x})^2}\right)
+\]</span></p>
+</section>
+<section id="treating-the-denominator-as-a-constant" class="level3" data-number="4.10.2">
+<h3 data-number="4.10.2" class="anchored" data-anchor-id="treating-the-denominator-as-a-constant"><span class="header-section-number">4.10.2</span> Treating the Denominator as a Constant</h3>
+<p>Under Assumptions 2 and 3 (random sampling and variation in <span class="math inline">\(x\)</span>), we treat the <span class="math inline">\(x_i\)</span> values as fixed (or condition on them). This means <span class="math inline">\(\sum(x_i - \bar{x})^2 = SST_x\)</span> is a constant. Using the Variance Property <span class="math inline">\(Var(cX) = c^2 Var(X)\)</span>, we can pull this term out of the variance:</p>
+<p><span class="math display">\[
+Var(\hat{\beta}_1) = \frac{1}{SST_x^2} \cdot Var\left(\sum_{i=1}^{n}(x_i - \bar{x})\mu_i\right).
+\]</span></p>
+<p>Similarly, we can also pull the <span class="math inline">\(\sum(x_i - \bar{x})\mu_i\)</span> term out of the expression using the same property:</p>
+<p><span class="math display">\[
+Var(\hat{\beta}_1) = \frac{\sum_{i=1}^{n}(x_i - \bar{x})^2}{SST_x^2} \cdot Var(\mu_i) =
+\frac{SST_x}{SST_x^2} \cdot Var(\mu_i) = \frac{1}{SST_x} \cdot Var(\mu_i).
+\]</span></p>
+</section>
+<section id="applying-the-homoskedasticity-assumption" class="level3" data-number="4.10.3">
+<h3 data-number="4.10.3" class="anchored" data-anchor-id="applying-the-homoskedasticity-assumption"><span class="header-section-number">4.10.3</span> Applying the Homoskedasticity Assumption</h3>
+<p>Under Assumption 5 (homoskedasticity), the error variance is the same for every observation: <span class="math inline">\(Var(\mu_i) = \sigma^2\)</span> for all <span class="math inline">\(i\)</span>. This lets us factor <span class="math inline">\(\sigma^2\)</span> out of the variance term:</p>
+<p><span class="math display">\[
+Var(\hat{\beta}_1) = \frac{1}{SST_x} \cdot Var(\mu_i) = \frac{1}{SST_x} \cdot \sigma^2
+\]</span></p>
+</section>
+<section id="putting-it-all-together" class="level3" data-number="4.10.4">
+<h3 data-number="4.10.4" class="anchored" data-anchor-id="putting-it-all-together"><span class="header-section-number">4.10.4</span> Putting It All Together</h3>
+<p>Thus, we get our expression for the variance of the OLS estimate of our population parameter:</p>
+<p><span class="math display">\[
+Var(\hat{\beta}_1) = \frac{\sigma^2}{SST_x}
+\]</span></p>
+<p>where <span class="math inline">\(\sigma^2 = Var(\mu)\)</span> is the error variance and <span class="math inline">\(SST_x = \sum(x_i - \bar{x})^2\)</span> is the total variation in <span class="math inline">\(x\)</span>.</p>
+</section>
+<section id="what-does-this-tell-us" class="level3" data-number="4.10.5">
+<h3 data-number="4.10.5" class="anchored" data-anchor-id="what-does-this-tell-us"><span class="header-section-number">4.10.5</span> What Does This Tell Us?</h3>
+<p>This formula reveals three important things about the precision of our estimates:</p>
+<ol type="1">
+<li><p><strong>More noise (<span class="math inline">\(\sigma^2\)</span>) means more variance:</strong> If there’s a lot of unexplained variation in <span class="math inline">\(y\)</span>, our estimates are less precise. Unfortunately, we typically can’t control this.</p></li>
+<li><p><strong>More variation in <span class="math inline">\(x\)</span> means less variance:</strong> Spreading out our observations of <span class="math inline">\(x\)</span> gives us more information about the relationship and more precise estimates.</p></li>
+<li><p><strong>Larger samples help:</strong> More observations mean more total variation in <span class="math inline">\(x\)</span> (larger <span class="math inline">\(SST_x\)</span>), which pushes the variance down. This is one reason why larger samples are better.</p></li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-The Key Insight
+Which Assumptions Did We Use?
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>OLS always estimates <em>something</em>. Whether that something is a causal effect or merely a correlation depends entirely on whether the assumptions are satisfied. Most of econometrics is about finding clever ways to make the zero conditional mean assumption more plausible.</p>
+<p>Notice that the variance formula requires <em>all five</em> Gauss-Markov assumptions: Assumptions 1–4 for unbiasedness (so the decomposition in Step 1 holds), and Assumption 5 (homoskedasticity) to factor <span class="math inline">\(\sigma^2\)</span> out of the sum. This is why the variance formula <span class="math inline">\(\sigma^2 / SST_x\)</span> is only valid under homoskedasticity.</p>
 </div>
 </div>
 </section>
 </section>
-<section id="variance-of-the-ols-estimator" class="level2" data-number="4.11">
-<h2 data-number="4.11" class="anchored" data-anchor-id="variance-of-the-ols-estimator"><span class="header-section-number">4.11</span> Variance of the OLS Estimator</h2>
-<p>Even when OLS is unbiased, our estimates vary from sample to sample. The <strong>variance</strong> of <span class="math inline">\(\hat{\beta}_1\)</span> tells us how much variation to expect.</p>
-<p>Under the Gauss-Markov assumptions:</p>
-<p><span class="math display">\[
-Var(\hat{\beta}_1) = \frac{\sigma^2}{SST_x}
-\]</span></p>
-<p>where <span class="math inline">\(\sigma^2 = Var(\mu)\)</span> is the error variance and <span class="math inline">\(SST_x = \sum(x_i - \bar{x})^2\)</span> is the total variation in <span class="math inline">\(x\)</span>.</p>
-<p>This formula reveals two key insights:</p>
-<ol type="1">
-<li><p><strong>More noise (<span class="math inline">\(\sigma^2\)</span>) means more variance:</strong> If there’s a lot of unexplained variation in <span class="math inline">\(y\)</span>, our estimates are less precise.</p></li>
-<li><p><strong>More variation in <span class="math inline">\(x\)</span> means less variance:</strong> Spreading out our observations of <span class="math inline">\(x\)</span> gives us more information and more precise estimates. This also implies that larger samples (which have more total variation) yield more precise estimates.</p></li>
-</ol>
-</section>
-<section id="standard-errors" class="level2" data-number="4.12">
-<h2 data-number="4.12" class="anchored" data-anchor-id="standard-errors"><span class="header-section-number">4.12</span> Standard Errors</h2>
+<section id="standard-errors" class="level2" data-number="4.11">
+<h2 data-number="4.11" class="anchored" data-anchor-id="standard-errors"><span class="header-section-number">4.11</span> Standard Errors</h2>
 <p>The <strong>standard error</strong> of <span class="math inline">\(\hat{\beta}_1\)</span> is the square root of the variance:</p>
 <p><span class="math display">\[
 se(\hat{\beta}_1) = \frac{\hat{\sigma}}{\sqrt{SST_x}}
 \]</span></p>
 <p>where <span class="math inline">\(\hat{\sigma} = \sqrt{\frac{SSR}{n-2}}\)</span> is the estimated standard deviation of the errors.</p>
-<p>Standard errors quantify the precision of our estimates and are essential for hypothesis testing and confidence intervals (which we’ll cover in the next chapter).</p>
+<p>Standard errors quantify the precision of our estimates and are essential for hypothesis testing and confidence intervals (which we’ll cover in <a href="statistical_inference.html" class="quarto-xref"><span>Chapter 6</span></a>).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># R reports standard errors automatically</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm_mpg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># R reports standard errors automatically</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm_mpg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
@@ -1352,38 +1566,26 @@ F-statistic: 45.46 on 1 and 30 DF,  p-value: 1.788e-07</code></pre>
 </div>
 <p>The standard error of <span class="math inline">\(\hat{\beta}_1\)</span> is 0.01, shown in the <code>Std. Error</code> column.</p>
 </section>
-<section id="ols-is-blue" class="level2" data-number="4.13">
-<h2 data-number="4.13" class="anchored" data-anchor-id="ols-is-blue"><span class="header-section-number">4.13</span> OLS is BLUE</h2>
-<p>Under all five Gauss-Markov assumptions, OLS is <strong>BLUE</strong>:</p>
-<ul>
-<li><strong>B</strong>est: Lowest variance among all linear unbiased estimators</li>
-<li><strong>L</strong>inear: The estimator is a linear function of the <span class="math inline">\(y_i\)</span>’s</li>
-<li><strong>U</strong>nbiased: <span class="math inline">\(E[\hat{\beta}] = \beta\)</span></li>
-<li><strong>E</strong>stimator: It’s a rule for using sample data to estimate population parameters</li>
-</ul>
-<p>This is a powerful result: among all estimators that are linear and unbiased, OLS has the smallest variance. You cannot do better without either using non-linear methods or accepting some bias.</p>
-</section>
-<section id="summary-and-conclusion" class="level2" data-number="4.14">
-<h2 data-number="4.14" class="anchored" data-anchor-id="summary-and-conclusion"><span class="header-section-number">4.14</span> Summary and Conclusion</h2>
+<section id="summary-and-conclusion" class="level2" data-number="4.12">
+<h2 data-number="4.12" class="anchored" data-anchor-id="summary-and-conclusion"><span class="header-section-number">4.12</span> Summary and Conclusion</h2>
 <p>This chapter introduced Ordinary Least Squares regression, the foundational tool of econometrics. We started with the goal of modeling how the conditional expectation <span class="math inline">\(E[Y|X]\)</span> varies with <span class="math inline">\(x\)</span>, and showed how the linear regression model <span class="math inline">\(y = \beta_0 + \beta_1 x + \mu\)</span> provides a framework for this.</p>
 <p>We derived the OLS estimator by minimizing the sum of squared residuals, learned to compute regressions in R, and explored the properties of the OLS regression line. We then turned to the statistical properties of OLS, introducing the Gauss-Markov assumptions and proving that OLS is unbiased when these assumptions hold. When the zero conditional mean assumption fails—typically due to omitted variables—our estimates become biased.</p>
 <p>Crucially, we connected unbiasedness to causality: the zero conditional mean assumption is what allows us to interpret OLS coefficients as causal effects rather than mere correlations. Without this assumption, OLS still produces numbers, but those numbers cannot be given a causal interpretation.</p>
 <p>Finally, we discussed the variance of OLS estimates and the conditions under which OLS is the best linear unbiased estimator.</p>
-<section id="key-takeaways" class="level3" data-number="4.14.1">
-<h3 data-number="4.14.1" class="anchored" data-anchor-id="key-takeaways"><span class="header-section-number">4.14.1</span> Key Takeaways</h3>
+<section id="key-takeaways" class="level3" data-number="4.12.1">
+<h3 data-number="4.12.1" class="anchored" data-anchor-id="key-takeaways"><span class="header-section-number">4.12.1</span> Key Takeaways</h3>
 <ul>
 <li><p><strong>The goal</strong> is to estimate the conditional expectation <span class="math inline">\(E[Y|X] = \beta_0 + \beta_1 x\)</span></p></li>
 <li><p><strong>The OLS slope</strong> equals the covariance of <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> divided by the variance of <span class="math inline">\(x\)</span>: <span class="math display">\[\hat{\beta}_1 = \frac{Cov(x,y)}{Var(x)}\]</span></p></li>
 <li><p><strong>Bivariate OLS is essentially correlation</strong>—be very careful about causal interpretation</p></li>
 <li><p><strong>The Gauss-Markov assumptions</strong> (especially zero conditional mean) are required for unbiasedness</p></li>
-<li><p><strong>Omitted variable bias</strong> arises when we exclude a variable correlated with both <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span></p></li>
 <li><p><strong>Causality requires unbiasedness</strong>—only when <span class="math inline">\(E[\mu|x] = 0\)</span> can we interpret <span class="math inline">\(\hat{\beta}_1\)</span> as a causal effect</p></li>
 <li><p><strong>OLS is BLUE</strong> under the Gauss-Markov assumptions—best among linear unbiased estimators</p></li>
 </ul>
 </section>
 </section>
-<section id="check-your-understanding" class="level2" data-number="4.15">
-<h2 data-number="4.15" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">4.15</span> Check Your Understanding</h2>
+<section id="check-your-understanding" class="level2" data-number="4.13">
+<h2 data-number="4.13" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">4.13</span> Check Your Understanding</h2>
 <div class="question">
 <div class="answer-row">
     <label>i. In the model \(y = \beta_0 + \beta_1 x + \mu\), what does \(\beta_1\) represent? </label>
@@ -1430,24 +1632,13 @@ F-statistic: 45.46 on 1 and 30 DF,  p-value: 1.788e-07</code></pre>
 </div>
 
 <div class="answer-row">
-    <label>v. Omitted variable bias occurs when: </label>
-    <select onchange="checkAnswer(this, 'c')">
+    <label>vi. Which Gauss-Markov assumption, if violated, would make OLS biased but would NOT affect the validity of the usual standard error formulas on its own? </label>
+    <select onchange="checkAnswer(this, 'd')">
         <option value="">-- Select Answer --</option>
-        <option value="a">We include too many variables in the regression</option>
-        <option value="b">The sample size is too small</option>
-        <option value="c">We exclude a variable correlated with both x and y</option>
-        <option value="d">The error term is heteroskedastic</option>
-    </select>
-</div>
-
-<div class="answer-row">
-    <label>vi. Which Gauss-Markov assumption is required for unbiasedness but NOT for calculating the OLS formulas? </label>
-    <select onchange="checkAnswer(this, 'b')">
-        <option value="">-- Select Answer --</option>
-        <option value="a">Linear in parameters</option>
-        <option value="b">Zero conditional mean</option>
-        <option value="c">Variation in x</option>
-        <option value="d">Homoskedasticity</option>
+        <option value="a">Homoskedasticity</option>
+        <option value="b">Linear in parameters</option>
+        <option value="c">Random sampling</option>
+        <option value="d">None—every assumption needed for unbiasedness is also needed for valid standard errors</option>
     </select>
 </div>
 
@@ -1463,7 +1654,7 @@ F-statistic: 45.46 on 1 and 30 DF,  p-value: 1.788e-07</code></pre>
 </div>
 </div>
 <div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-13-contents" aria-controls="callout-13" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1472,22 +1663,21 @@ Show Explanation
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-13" class="callout-13-contents callout-collapse collapse">
+<div id="callout-15" class="callout-15-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="i">
 <li><p>The slope coefficient <span class="math inline">\(\beta_1\)</span> is the marginal effect—it tells us how much <span class="math inline">\(y\)</span> changes when <span class="math inline">\(x\)</span> increases by one unit. The intercept <span class="math inline">\(\beta_0\)</span> gives the predicted value when <span class="math inline">\(x = 0\)</span>.</p></li>
 <li><p>The zero conditional mean assumption <span class="math inline">\(E[\mu|x] = 0\)</span> states that the expected value of the error term is zero for any given value of <span class="math inline">\(x\)</span>. This is crucial for unbiasedness.</p></li>
 <li><p>The OLS slope equals the sample covariance of <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> divided by the sample variance of <span class="math inline">\(x\)</span>. This follows directly from the derivation.</p></li>
 <li><p>Unbiasedness means that if we could repeat the sampling process many times, the <em>average</em> of our estimates would equal the true parameter. Individual estimates can still miss the target.</p></li>
-<li><p>Omitted variable bias occurs when we leave out a variable that belongs in the model and is correlated with our included independent variable. This causes <span class="math inline">\(E[\mu|x] \neq 0\)</span>.</p></li>
-<li><p>The zero conditional mean assumption (<span class="math inline">\(E[\mu|x] = 0\)</span>) is needed to prove OLS is unbiased, but it is not needed to derive the OLS formulas themselves. The calculus minimization approach works regardless of this assumption—it just tells us which values minimize squared residuals.</p></li>
+<li><p>This is a trick question. Assumptions 1–4 are all required for both unbiasedness <em>and</em> valid standard errors. There is no assumption that affects bias alone without also affecting inference. Homoskedasticity (Assumption 5) goes the other way—it affects standard errors but <em>not</em> unbiasedness.</p></li>
 <li><p>As sample size increases, we get more variation in <span class="math inline">\(x\)</span>, so <span class="math inline">\(SST = \sum(x_i - \bar{x})^2\)</span> increases. Since this appears in the denominator, the variance of our estimate decreases. Larger samples give more precise estimates.</p></li>
 </ol>
 </div>
 </div>
 </div>
-<section id="practice-interpreting-regression-output" class="level3" data-number="4.15.1">
-<h3 data-number="4.15.1" class="anchored" data-anchor-id="practice-interpreting-regression-output"><span class="header-section-number">4.15.1</span> Practice: Interpreting Regression Output</h3>
+<section id="practice-interpreting-regression-output" class="level3" data-number="4.13.1">
+<h3 data-number="4.13.1" class="anchored" data-anchor-id="practice-interpreting-regression-output"><span class="header-section-number">4.13.1</span> Practice: Interpreting Regression Output</h3>
 <p>The following questions present regression results for you to interpret.</p>
 <div class="context" style="margin-bottom: 20px;">
 <strong>Regression 1:</strong> A researcher estimates the relationship between test scores and class size using data from California elementary schools:
@@ -1580,12 +1770,12 @@ n = 48, R-squared = 0.21
         <option value="a">The R-squared is too low</option>
         <option value="b">The sample size is too small</option>
         <option value="c">The coefficient is negative</option>
-        <option value="d">Omitted variables (like anti-smoking policies or income) may affect both price and consumption</option>
+        <option value="d">Omitted variables  may affect both price and consumption</option>
     </select>
 </div>
 </div>
 <div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-16-contents" aria-controls="callout-16" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1594,7 +1784,7 @@ Show Explanation
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div id="callout-16" class="callout-16-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="i">
 <li><p>The slope coefficient <span class="math inline">\(\beta_1\)</span> is the marginal effect—it tells us how much <span class="math inline">\(y\)</span> changes when <span class="math inline">\(x\)</span> increases by one unit. The intercept <span class="math inline">\(\beta_0\)</span> gives the predicted value when <span class="math inline">\(x = 0\)</span>.</p></li>
@@ -1626,6 +1816,12 @@ Wooldridge, Jeffrey M. 2019. <em>Introductory Econometrics: A Modern Approach</e
 </div>
 </div>
 </section>
+</section>
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn1"><p>Why can we replace <span class="math inline">\(\sum x_i(y_i - \bar{y})\)</span> with <span class="math inline">\(\sum (x_i - \bar{x})(y_i - \bar{y})\)</span>? Expand the second expression: <span class="math inline">\(\sum (x_i - \bar{x})(y_i - \bar{y}) = \sum x_i(y_i - \bar{y}) - \bar{x}\sum(y_i - \bar{y})\)</span>. But from Result 1 in <a href="statsreview.html" class="quarto-xref"><span>Appendix B</span></a>, deviations from the mean always sum to zero, so <span class="math inline">\(\sum(y_i - \bar{y}) = 0\)</span>. The second term vanishes and the two expressions are equal. The same logic applies to <span class="math inline">\(\sum x_i(x_i - \bar{x}) = \sum(x_i - \bar{x})^2\)</span>.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
 </section>
 
 </main> <!-- /main -->

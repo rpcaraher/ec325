@@ -1,0 +1,1587 @@
+---
+title: "Bivariate Regression and OLS"
+subtitle: "EC 325: Econometrics"
+author: "Prof. Caraher"
+institute: "Colby College"
+date: "today"
+date-format: "medium"
+embed-resources: true
+format:
+  revealjs:
+    theme: colby-theme.scss
+    slide-number: true
+    incremental: true
+    footer: "EC325 | Unit 4 | Bivariate Regression and OLS"
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+#| echo: false
+
+library(tidyverse)
+```
+
+
+# From RCTs to Regression
+
+## Where We've Been
+
+- In Unit 3, we learned that **Randomized Control Trials** provide the gold standard for causal inference
+
+- Random assignment eliminates selection bias: the simple difference in means equals the causal effect
+
+. . .
+
+- But most economic questions **cannot** be answered with experiments
+
+- We typically work with **observational data** where treatment is not randomly assigned
+
+## Where We're Going
+
+- Today: **Ordinary Least Squares (OLS)** regression -- the workhorse tool of econometrics
+
+. . .
+
+- We focus on the **bivariate** case (one independent variable) to build intuition
+
+. . .
+
+::: {.callout-important}
+## The Big Question
+When can we interpret a regression coefficient as a **causal effect** vs. a mere **correlation**?
+:::
+
+## Population vs. Sample: The Key Distinction
+
+- There is a **true relationship** between variables in the population -- we call this the **population regression model**
+
+. . .
+
+- We never observe the whole population -- we only have a **sample**
+
+. . .
+
+- **Population parameters** ($\beta_0$, $\beta_1$): fixed, unknown constants -- the "truth" we want to learn
+
+- **Sample estimates** ($\hat{\beta}_0$, $\hat{\beta}_1$): calculated from our data -- our best guesses
+
+. . .
+
+- Today's roadmap: write down the population model → figure out how to estimate it from a sample → ask when those estimates are trustworthy
+
+
+# Modeling Relationships Between Variables
+
+## What Do We Mean by "Relationship"?
+
+- Suppose we have two variables, $y$ and $x$
+
+- We want to study "how $x$ is related to $y$"
+
+. . .
+
+- We need a precise, mathematical way to do this
+
+. . .
+
+- The most natural approach: what is the **average** value of $y$ for each different value of $x$?
+
+## Conditional Expectations
+
+- This idea is called the **conditional expectation**
+
+. . .
+
+$$E[Y | X = x]$$
+
+. . .
+
+- "If we knew that $X$ took on some specific value $x$, what would we expect $Y$ to be, **on average**?"
+
+. . .
+
+- The conditional expectation is the central quantity we want to model and estimate
+
+## Example: Education and Wages {.smaller}
+
+- $X$ = education level (HS degree, College degree, Professional degree)
+- $Y$ = hourly wage
+
+. . .
+
+- For each education level, compute the average wage among people in that group
+
+. . .
+
+```{r}
+#| echo: false
+#| fig-height: 4
+#| fig-align: center
+
+set.seed(42)
+n <- 150
+ed_levels <- c("HS Degree", "College Degree", "Prof. Degree")
+education <- sample(ed_levels, size = n, replace = TRUE, prob = c(0.4, 0.4, 0.2))
+wage <- case_when(
+  education == "HS Degree" ~ rnorm(n, mean = 18, sd = 5),
+  education == "College Degree" ~ rnorm(n, mean = 30, sd = 7),
+  education == "Prof. Degree" ~ rnorm(n, mean = 50, sd = 10)
+)
+wage <- pmax(wage, 5)
+
+ed_data <- tibble(education = factor(education, levels = ed_levels), wage = wage)
+
+cond_means <- ed_data |>
+  group_by(education) |>
+  summarize(mean_wage = mean(wage))
+
+ggplot(ed_data, aes(x = education, y = wage)) +
+  geom_jitter(alpha = 0.4, width = 0.2, color = "steelblue") +
+  geom_point(data = cond_means, aes(x = education, y = mean_wage),
+             color = "red", size = 5, shape = 18) +
+  labs(x = "Education Level", y = "Hourly Wage ($)",
+       title = "Wages by Education Level",
+       subtitle = "Red diamonds show conditional expectations (group averages)") +
+  theme_minimal(base_size = 16)
+```
+
+## What Do We See?
+
+- The **red diamonds** show the conditional expectations: $E[Y|X=\text{HS}]$, $E[Y|X=\text{College}]$, $E[Y|X=\text{Prof}]$
+
+. . .
+
+- These averages tell us how wages **change** as education increases
+
+. . .
+
+- This is precisely what we want to estimate!
+
+
+# Visualizing Relationships: Scatter Plots
+
+## Why Scatter Plots? {.smaller}
+
+- When both $x$ and $y$ are **continuous**, a scatter plot is the best way to visualize their relationship
+
+. . .
+
+- Each point represents one observation: its $x$ value and its $y$ value
+
+. . .
+
+- Scatter plots help us:
+  - See the **direction** of a relationship (positive or negative)
+  - Identify **outliers** or unusual patterns
+  - Judge whether a **linear** model is appropriate
+
+## Introduction to `ggplot2` {.smaller}
+
+- We'll use the `ggplot2` package (part of the `tidyverse`) for all our visualizations
+
+. . .
+
+- `ggplot2` builds plots **layer by layer** -- you start with data, then add visual elements on top:
+
+. . .
+
+1. **Start with data:** `ggplot(data = your_data)` -- creates an empty canvas
+2. **Add a geometry:** `+ geom_point(...)` for scatter plots, `+ geom_histogram(...)` for histograms, etc.
+3. **Map variables to aesthetics:** inside `aes()`, tell R which columns go on each axis (and optionally `color`, `size`, `shape`, etc.)
+4. **Polish:** add labels with `labs()` and a clean theme with `theme_minimal()`
+
+. . .
+
+::: {.callout-tip}
+## Want More?
+The Unit 2 lecture notes cover `ggplot2` in much more detail, including histograms, bar charts, and more customization options. Refer back to those as needed!
+:::
+
+## Building a Scatter Plot {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Try it yourself!
+:::
+
+- Let's build a scatter plot step by step. Start with data and add points using `geom_point()`:
+
+. . .
+
+```{r}
+#| output-location: fragment
+#| fig-height: 3.5
+
+ggplot(data = mtcars) +
+  geom_point(aes(x = hp, y = mpg))
+```
+
+## Making Publication-Quality Plots {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Try it yourself!
+:::
+
+Always add proper labels and a clean theme:
+
+. . .
+
+```{r}
+#| output-location: fragment
+#| fig-height: 3
+
+ggplot(data = mtcars) +
+  geom_point(aes(x = hp, y = mpg, size = 3, alpha = 0.7)) +
+  labs(
+    title = "Fuel Efficiency vs. Engine Power",
+    x = "Horsepower",
+    y = "Miles per Gallon",
+  ) +
+  theme_minimal()
+```
+
+## Adding a Line of Best Fit {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Try it yourself!
+:::
+
+- `geom_smooth(method = "lm")` adds a straight line that "best fits" the data
+
+. . .
+
+```{r}
+#| output-location: fragment
+#| fig-height: 3
+
+ggplot(data = mtcars) +
+  geom_point(aes(x = hp, y = mpg), alpha = 0.6) +
+  geom_smooth(aes(x = hp, y = mpg), method = "lm", se = TRUE) +
+  labs(x = "Horsepower", y = "Miles per Gallon",
+       title = "MPG vs. Horsepower with Line of Best Fit") +
+  theme_minimal()
+```
+
+## Try It: Scatter Plot Practice {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Your turn!
+:::
+
+**Create a scatter plot of `wt` (weight) vs. `mpg` (fuel efficiency). Add proper labels.**
+
+- *Hint:* Use `geom_point()` + `labs()`
+
+. . .
+
+```{r}
+#| output-location: fragment
+#| fig-height: 2.5
+
+ggplot(mtcars) +
+  geom_point(aes(x = wt, y = mpg), alpha = 0.7) +
+  labs(x = "Weight (1000 lbs)", y = "Miles per Gallon",
+       title = "Heavier Cars Get Worse Fuel Efficiency") +
+  theme_minimal()
+```
+
+
+# The Population Regression Model
+
+## Writing Down the Population Model {.smaller}
+
+- We start by describing the **true relationship** in the population -- even though we can't observe it directly
+
+. . .
+
+- The simplest regression model relates $y$ to a single variable $x$:
+
+. . .
+
+$$y = \beta_0 + \beta_1 x + \mu$$
+
+. . .
+
+where:
+
+- $y$ is the **dependent variable** (outcome)
+- $x$ is the **independent variable** (explanatory)
+- $\mu$ is the **error term** (everything else that affects $y$)
+- $\beta_0$ and $\beta_1$ are **population parameters** (unknown)
+
+## The Error Term
+
+- The error term $\mu$ is crucial -- it captures **everything** that affects $y$ other than $x$
+
+. . .
+
+- In a wage equation: $wage = \beta_0 + \beta_1 \cdot educ + \mu$
+
+. . .
+
+- $\mu$ might include:
+  - Ability and motivation
+  - Family connections
+  - Luck
+  - Work experience
+
+## Example: Education and Wages {.smaller}
+
+- With some assumptions, the regression line traces out the **conditional expectation**: $E[y|x] = \beta_0 + \beta_1 x$
+
+. . .
+
+- We can interpret the coefficients like we would any linear equation:
+
+- $\beta_0$ is the value of $y$ when $x=0$
+
+- $\beta_1$ is the **marginal effect**: a one-unit increase in $x$ changes $y$ by $\beta_1$ units, on average
+
+. . .
+
+- Let's make this concrete:
+
+$$wage = \beta_0 + \beta_1 \cdot educ + \mu$$
+
+- $wage$ = dollars per hour
+- $educ$ = years of education
+
+. . .
+
+- If $\beta_1 = 2.50$: each additional year of education is associated with **$2.50 higher hourly wages**, on average
+
+
+# From Population to Sample
+
+## We Can't See the Population
+
+- The population model $y = \beta_0 + \beta_1 x + \mu$ describes the **true** relationship present in the **population**
+
+. . .
+
+- But $\beta_0$ and $\beta_1$ are **unknown** -- we never observe the whole population
+
+. . .
+
+- Instead, we use our **sample** to compute **estimates**, which we write with "hats":
+
+. . .
+
+- $\hat{\beta}_0$ = our estimate of $\beta_0$
+- $\hat{\beta}_1$ = our estimate of $\beta_1$
+
+## Predicted Values and the Fitted Line
+
+- Using our estimates, we construct the **regression line**:
+
+. . .
+
+$$\hat{y} = \hat{\beta}_0 + \hat{\beta}_1 x$$
+
+. . .
+
+- For any value of $x$, this gives us $\hat{y}$, the **predicted value** of $y$
+
+- This is exactly what `geom_smooth(method = "lm")` draws!
+
+## The Fitted Line in R {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Try it yourself!
+:::
+
+- When we add `geom_smooth(method = "lm")`, R estimates $\hat{\beta}_0$ and $\hat{\beta}_1$ behind the scenes and plots the line $\hat{y} = \hat{\beta}_0 + \hat{\beta}_1 x$
+
+. . .
+
+```{r}
+#| output-location: fragment
+#| fig-height: 3
+
+ggplot(mtcars, aes(x = hp, y = mpg)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(method = "lm", se = FALSE, color = "steelblue", linewidth = 1.2) +
+  labs(x = "Horsepower", y = "Miles per Gallon",
+       title = "The fitted regression line: ŷ = β̂₀ + β̂₁ × hp") +
+  theme_minimal()
+```
+
+## Residuals: The Prediction Errors {.smaller}
+
+- Our predictions won't be perfect. The **residual** for observation $i$ is:
+
+. . .
+
+$$\hat{\mu}_i = y_i - \hat{y}_i = y_i - (\hat{\beta}_0 + \hat{\beta}_1 x_i)$$
+
+. . .
+
+- Positive residual: we **underpredicted** (actual > predicted)
+- Negative residual: we **overpredicted** (actual < predicted)
+
+## Visualizing Residuals {.smaller}
+
+```{r}
+#| echo: false
+#| fig-height: 4.5
+#| fig-align: center
+
+reg_fit <- lm(mpg ~ hp, data = mtcars)
+mtcars_aug <- mtcars |>
+  mutate(fitted = fitted(reg_fit), resid = residuals(reg_fit))
+
+highlight_idx <- c(6, 15, 20)
+highlight_data <- mtcars_aug[highlight_idx, ]
+
+ggplot(mtcars_aug, aes(x = hp, y = mpg)) +
+  geom_segment(data = highlight_data,
+               aes(x = hp, xend = hp, y = fitted, yend = mpg),
+               color = "salmon", linewidth = 1.2, linetype = "dashed") +
+  geom_smooth(method = "lm", se = FALSE, color = "steelblue", linewidth = 1.2) +
+  geom_point(size = 2.5, alpha = 0.6) +
+  geom_point(data = highlight_data, size = 3.5, color = "red") +
+  annotate("text", x = 220, y = 28, label = "Residuals\n(prediction errors)",
+           color = "salmon", fontface = "italic", size = 5) +
+  labs(x = "Horsepower", y = "Miles per Gallon",
+       title = "Regression Line with Residuals",
+       subtitle = "Dashed lines show the gap between actual and predicted values") +
+  theme_minimal(base_size = 16)
+```
+
+## The Goal: Minimize the Residuals
+
+- We want to make residuals as small as possible
+
+. . .
+
+- Can't just minimize $\sum \hat{\mu}_i$ -- positive and negative residuals would cancel out!
+
+. . .
+
+- Instead, minimize the **Sum of Squared Residuals (SSR)**:
+
+. . .
+
+$$SSR = \sum_{i=1}^{n} \hat{\mu}_i^2 = \sum_{i=1}^{n} (y_i - \hat{\beta}_0 - \hat{\beta}_1 x_i)^2$$
+
+. . .
+
+- This is where the name **"Ordinary Least Squares"** comes from!
+
+
+# The OLS Estimator
+
+## The Minimization Problem
+
+- Given $n$ observations $\{(x_i, y_i): i = 1, ..., n\}$, find $\hat{\beta}_0$ and $\hat{\beta}_1$ that minimize:
+
+. . .
+
+$$\min_{\hat{\beta}_0, \hat{\beta}_1} \sum_{i=1}^{n} (y_i - \hat{\beta}_0 - \hat{\beta}_1 x_i)^2$$
+
+. . .
+
+- This is a calculus optimization problem -- take partial derivatives, set equal to zero, solve
+
+. . .
+
+::: {.callout-tip}
+## Full Derivation
+The step-by-step derivation using first-order conditions is in Section 4.4 of the lecture notes. We'll skip the algebra here and focus on the **result** and its **intuition**.
+:::
+
+## The OLS Formulas {.smaller}
+
+- Solving the minimization problem gives us:
+
+. . .
+
+::: {.callout-important}
+## The OLS Slope
+$$\hat{\beta}_1 = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{\sum_{i=1}^{n}(x_i - \bar{x})^2} = \frac{Cov(x, y)}{Var(x)}$$
+:::
+
+. . .
+
+**The OLS Intercept:**
+
+$$\hat{\beta}_0 = \bar{y} - \hat{\beta}_1 \bar{x}$$
+
+. . .
+
+- The regression line always passes through the point $(\bar{x}, \bar{y})$ -- the "center" of the data!
+
+## An Important Observation
+
+- The slope can also be written as:
+
+. . .
+
+$$\hat{\beta}_1 = \rho_{xy} \frac{\sigma_y}{\sigma_x}$$
+
+. . .
+
+- Bivariate OLS is essentially a **scaled version of the correlation** between $x$ and $y$
+
+. . .
+
+- And as we discussed in Unit 1: **correlation does not imply causation!**
+
+. . .
+
+- We must be very careful about interpreting bivariate OLS results causally
+
+## Visualizing OLS: Step 1 -- The Data {.smaller}
+
+Let's build up the intuition for what OLS does, step by step.
+
+```{r}
+#| echo: false
+#| fig-height: 4
+#| fig-align: center
+
+set.seed(15)
+demo_x <- runif(20, 1, 10)
+demo_y <- 2 + 1.5 * demo_x + rnorm(20, 0, 2)
+demo_data <- tibble(x = demo_x, y = demo_y)
+demo_fit <- lm(y ~ x, data = demo_data)
+demo_data <- demo_data |> mutate(fitted = fitted(demo_fit))
+
+ggplot(demo_data, aes(x = x, y = y)) +
+  geom_point(size = 3) +
+  labs(x = "x", y = "y",
+       title = "Step 1: Start with the data") +
+  theme_minimal(base_size = 16)
+```
+
+- We have 20 observations. How should we draw a line to summarize this relationship?
+
+## Visualizing OLS: Step 2 -- Try a Line {.smaller}
+
+```{r}
+#| echo: false
+#| fig-height: 4
+#| fig-align: center
+
+ggplot(demo_data, aes(x = x, y = y)) +
+  geom_smooth(method = "lm", se = FALSE, color = "steelblue", linewidth = 1.2) +
+  geom_point(size = 3) +
+  labs(x = "x", y = "y",
+       title = "Step 2: Fit a line through the data") +
+  theme_minimal(base_size = 16)
+```
+
+- The blue line is our "best guess" -- but what makes it "best"?
+
+## Visualizing OLS: Step 3 -- One Residual {.smaller}
+
+```{r}
+#| echo: false
+#| fig-height: 4
+#| fig-align: center
+
+# Pick one point to highlight
+hi <- demo_data |> slice(5)
+
+ggplot(demo_data, aes(x = x, y = y)) +
+  geom_smooth(method = "lm", se = FALSE, color = "steelblue", linewidth = 1.2) +
+  geom_segment(data = hi, aes(x = x, xend = x, y = fitted, yend = y),
+               color = "salmon", linewidth = 1.5, linetype = "dashed") +
+  geom_point(size = 3, alpha = 0.4) +
+  geom_point(data = hi, size = 4, color = "red") +
+  annotate("text", x = hi$x + 0.5, y = (hi$y + hi$fitted) / 2,
+           label = paste0("Residual\nû = ", round(hi$y - hi$fitted, 1)),
+           color = "salmon", fontface = "bold", size = 4.5) +
+  labs(x = "x", y = "y",
+       title = "Step 3: Measure the prediction error (residual) for one point") +
+  theme_minimal(base_size = 16)
+```
+
+- The **residual** is the vertical distance between the point and the line
+
+## Visualizing OLS: Step 4 -- Square the Residual {.smaller}
+
+```{r}
+#| echo: false
+#| fig-height: 4
+#| fig-align: center
+
+sq_size <- abs(hi$y - hi$fitted)
+
+ggplot(demo_data, aes(x = x, y = y)) +
+  geom_rect(data = hi,
+            aes(xmin = x, xmax = x + sq_size,
+                ymin = pmin(y, fitted), ymax = pmax(y, fitted)),
+            fill = "salmon", alpha = 0.4) +
+  geom_smooth(method = "lm", se = FALSE, color = "steelblue", linewidth = 1.2) +
+  geom_point(size = 3, alpha = 0.4) +
+  geom_point(data = hi, size = 4, color = "red") +
+  annotate("text", x = hi$x + sq_size / 2, y = (hi$y + hi$fitted) / 2,
+           label = paste0("û² = ", round((hi$y - hi$fitted)^2, 1)),
+           color = "darkred", fontface = "bold", size = 4.5) +
+  labs(x = "x", y = "y",
+       title = "Step 4: Square it -- this is what OLS minimizes") +
+  theme_minimal(base_size = 16)
+```
+
+- We **square** the residual so that positive and negative errors don't cancel
+
+## Visualizing OLS: Step 5 -- All Squared Residuals {.smaller}
+
+```{r}
+#| echo: false
+#| fig-height: 4
+#| fig-align: center
+
+ggplot(demo_data, aes(x = x, y = y)) +
+  geom_rect(aes(xmin = x, xmax = x + abs(y - fitted),
+                ymin = pmin(y, fitted), ymax = pmax(y, fitted)),
+            fill = "salmon", alpha = 0.3) +
+  geom_smooth(method = "lm", se = FALSE, color = "steelblue", linewidth = 1.2) +
+  geom_point(size = 3) +
+  labs(x = "x", y = "y",
+       title = "Step 5: OLS minimizes the TOTAL area of all squares",
+       subtitle = "Each pink square = one squared residual. OLS makes the total area as small as possible.") +
+  theme_minimal(base_size = 16)
+```
+
+. . .
+
+- OLS chooses $\hat{\beta}_0$ and $\hat{\beta}_1$ to make the **total pink area** as small as possible!
+
+
+# Computing OLS in R
+
+## The `lm()` Function {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Try it yourself!
+:::
+
+- In R, the `lm()` function ("linear model") performs OLS regression:
+
+. . .
+
+```{r}
+#| echo: true
+#| eval: false
+
+# General syntax
+lm(y ~ x, data = your_data)
+```
+
+. . .
+
+- The formula `y ~ x` says: "$y$ is the dependent variable, $x$ is the independent variable"
+- An **intercept** is included by default
+
+## Example: MPG and Horsepower {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Try it yourself!
+:::
+
+```{r}
+#| output-location: fragment
+
+# Estimate the regression
+lm_mpg <- lm(mpg ~ hp, data = mtcars)
+
+# View the results
+summary(lm_mpg)
+```
+
+## Reading the Output {.smaller}
+
+- $\hat{\beta}_0 = 30.10$: A car with **zero** horsepower is predicted to get 30.1 MPG (not meaningful here!)
+
+. . .
+
+- $\hat{\beta}_1 = -0.068$: Each additional unit of horsepower is associated with about **0.07 fewer miles per gallon**
+
+. . .
+
+- **R-squared = 0.60**: Horsepower explains about **60%** of the variation in MPG
+
+. . .
+
+- We'll discuss standard errors and p-values in the next unit
+
+## Visualizing the Regression Output {.smaller}
+
+```{r}
+#| fig-height: 3.5
+#| echo: false
+
+ggplot(mtcars, aes(x = hp, y = mpg)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(method = "lm", se = FALSE, color = "steelblue") +
+  labs(x = "Horsepower", y = "Miles per Gallon",
+       title = "OLS Regression: MPG on Horsepower",
+       subtitle = paste0("ŷ = ", round(coef(lm_mpg)[1], 1),
+                         " + (", round(coef(lm_mpg)[2], 3), ") × hp")) +
+  theme_minimal()
+```
+
+## Try It: Run Your Own Regression {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Your turn!
+:::
+
+**Regress `mpg` on `wt` (weight) using the `mtcars` data. What does the slope tell you?**
+
+- *Hint:* Use `lm(mpg ~ wt, data = mtcars)` and `summary()`
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+lm_wt <- lm(mpg ~ wt, data = mtcars)
+coef(lm_wt)
+```
+
+. . .
+
+- Each additional 1,000 lbs of weight is associated with about **5.3 fewer** miles per gallon
+
+
+# Goodness-of-Fit: R-Squared
+
+## How Well Does Our Line Fit?
+
+- **R-squared** ($R^2$) measures the fraction of variation in $y$ explained by the regression
+
+. . .
+
+$$R^2 = 1 - \frac{SSR}{SST}$$
+
+. . .
+
+where:
+
+- $SST = \sum(y_i - \bar{y})^2$ = **total** variation in $y$
+- $SSR = \sum\hat{\mu}_i^2$ = **unexplained** variation (residuals)
+
+## R-Squared: Nearly Useless Regression {.smaller}
+
+```{r}
+#| echo: false
+#| fig-height: 4
+#| fig-align: center
+
+set.seed(99)
+n_demo <- 80
+x_demo <- runif(n_demo, 0, 10)
+
+y_noise <- 5 + 0.3 * x_demo + rnorm(n_demo, 0, 8)
+r2_noise <- round(summary(lm(y_noise ~ x_demo))$r.squared, 2)
+
+ggplot(tibble(x = x_demo, y = y_noise), aes(x, y)) +
+  geom_point(alpha = 0.5, size = 2.5) +
+  geom_smooth(method = "lm", se = FALSE, color = "steelblue", linewidth = 1.2) +
+  labs(title = paste0("R² = ", r2_noise, " — Almost no explanatory power"),
+       subtitle = "x explains virtually none of the variation in y",
+       x = "x", y = "y") +
+  theme_minimal(base_size = 16)
+```
+
+- The data is a **cloud** -- knowing $x$ barely helps predict $y$
+
+## R-Squared: Moderate Fit {.smaller}
+
+```{r}
+#| echo: false
+#| fig-height: 4
+#| fig-align: center
+
+y_mod <- 5 + 1.5 * x_demo + rnorm(n_demo, 0, 3)
+r2_mod <- round(summary(lm(y_mod ~ x_demo))$r.squared, 2)
+
+ggplot(tibble(x = x_demo, y = y_mod), aes(x, y)) +
+  geom_point(alpha = 0.5, size = 2.5) +
+  geom_smooth(method = "lm", se = FALSE, color = "steelblue", linewidth = 1.2) +
+  labs(title = paste0("R² = ", r2_mod, " — Clear trend, but lots of noise"),
+       subtitle = "x explains some variation, but many points are far from the line",
+       x = "x", y = "y") +
+  theme_minimal(base_size = 16)
+```
+
+- A clear **upward trend**, but individual predictions would be imprecise
+
+## R-Squared: Near-Perfect Fit {.smaller}
+
+```{r}
+#| echo: false
+#| fig-height: 4
+#| fig-align: center
+
+y_tight <- 5 + 1.5 * x_demo + rnorm(n_demo, 0, 0.3)
+r2_tight <- round(summary(lm(y_tight ~ x_demo))$r.squared, 2)
+
+ggplot(tibble(x = x_demo, y = y_tight), aes(x, y)) +
+  geom_point(alpha = 0.5, size = 2.5) +
+  geom_smooth(method = "lm", se = FALSE, color = "steelblue", linewidth = 1.2) +
+  labs(title = paste0("R² = ", r2_tight, " — Nearly perfect fit"),
+       subtitle = "Almost all variation in y is explained by x",
+       x = "x", y = "y") +
+  theme_minimal(base_size = 16)
+```
+
+- Points hug the line tightly -- $x$ explains almost everything about $y$
+
+## Caution About R-Squared
+
+::: {.callout-warning}
+## Don't Over-Interpret R-Squared
+
+- A **high** $R^2$ does NOT mean we have a causal estimate -- it just means $x$ is correlated with $y$
+
+- A **low** $R^2$ does NOT mean our estimate is wrong or unimportant
+
+- In cross-sectional data, $R^2$ values of 0.1 to 0.3 are common and can still represent economically meaningful relationships
+:::
+
+
+# What Makes a Good Estimator?
+
+## Can We Trust Our Estimates? {.smaller}
+
+- We now know how to compute $\hat{\beta}_0$ and $\hat{\beta}_1$ -- but should we trust the numbers?
+
+. . .
+
+- Remember: population parameters ($\beta$) are fixed, but *different samples give different estimates* ($\hat{\beta}$)
+
+. . .
+
+- The property we want is **unbiasedness**: on average, our estimates hit the target
+
+. . .
+
+::: {.callout-important}
+## Unbiasedness
+$E[\hat{\beta}_1] = \beta_1$ — no systematic tendency to over- or under-estimate. Individual shots miss, but the **center** of all shots lands on the bullseye.
+:::
+
+. . .
+
+- The key question: **under what conditions** is OLS unbiased? That depends on **assumptions**.
+
+
+# The Gauss-Markov Assumptions
+
+## Assumptions 1--3: The "Mechanical" Requirements {.smaller}
+
+These first three assumptions are relatively easy to check. See the lecture notes for details and examples.
+
+. . .
+
+| Assumption | What it says | In plain English |
+|------------|-------------|-----------------|
+| 1. Linear in parameters | $y = \beta_0 + \beta_1 x + \mu$ | The model is linear in the $\beta$'s (not necessarily in $x$!) |
+| 2. Random sampling | Obs. are i.i.d. draws | Our sample is representative of the population |
+| 3. Variation in $x$ | $\sum(x_i - \bar{x})^2 > 0$ | $x$ isn't the same value for everyone |
+
+. . .
+
+- These are usually satisfied in practice -- the **hard** assumption is next
+
+## Assumption 4: Zero Conditional Mean
+
+$$E[\mu | x] = 0$$
+
+. . .
+
+::: {.callout-important}
+## The Most Important Assumption
+The average value of all unobserved factors affecting $y$ is the **same** regardless of the value of $x$.
+:::
+
+## What Does "Zero Conditional Mean" Mean? {.smaller}
+
+- In words: $E[\mu | x] = 0$ means the **error term is unrelated to** $x$
+
+. . .
+
+- For *every* possible value of $x$, the average of all unobserved factors is zero
+
+. . .
+
+- Think of it this way: if you could gather all people with $x = 10$ and average their $\mu$ values, you'd get zero. Same for $x = 20$. Same for any $x$.
+
+## Visualizing the Zero Conditional Mean {.smaller}
+
+```{r}
+#| echo: false
+#| fig-height: 4
+#| fig-align: center
+
+set.seed(50)
+n_zcm <- 300
+x_zcm <- runif(n_zcm, 0, 10)
+mu_good <- rnorm(n_zcm, 0, 2)
+y_zcm <- 3 + 2 * x_zcm + mu_good
+
+zcm_data <- tibble(x = x_zcm, y = y_zcm, mu = mu_good)
+
+# Bin the data and compute mean residuals
+zcm_bins <- zcm_data |>
+  mutate(x_bin = cut(x, breaks = 5)) |>
+  group_by(x_bin) |>
+  summarize(mean_mu = mean(mu), mid_x = mean(x), .groups = "drop")
+
+ggplot(zcm_data, aes(x = x, y = mu)) +
+  geom_point(alpha = 0.3, color = "steelblue") +
+  geom_hline(yintercept = 0, color = "red", linewidth = 1.2, linetype = "dashed") +
+  geom_point(data = zcm_bins, aes(x = mid_x, y = mean_mu),
+             color = "red", size = 5, shape = 18) +
+  labs(x = "x", y = "Error term (μ)",
+       title = "When E[μ | x] = 0 holds",
+       subtitle = "Red diamonds: average μ within each bin ≈ 0 regardless of x") +
+  theme_minimal(base_size = 16)
+```
+
+- No matter where we look along the x-axis, errors average to **zero**
+
+## When the Zero Conditional Mean Fails {.smaller}
+
+```{r}
+#| echo: false
+#| fig-height: 4
+#| fig-align: center
+
+set.seed(50)
+mu_bad <- rnorm(n_zcm, 0, 2) + 0.8 * x_zcm - 4  # mu is correlated with x
+y_bad <- 3 + 2 * x_zcm + mu_bad
+
+zcm_bad <- tibble(x = x_zcm, y = y_bad, mu = mu_bad)
+
+zcm_bins_bad <- zcm_bad |>
+  mutate(x_bin = cut(x, breaks = 5)) |>
+  group_by(x_bin) |>
+  summarize(mean_mu = mean(mu), mid_x = mean(x), .groups = "drop")
+
+ggplot(zcm_bad, aes(x = x, y = mu)) +
+  geom_point(alpha = 0.3, color = "coral") +
+  geom_hline(yintercept = 0, color = "red", linewidth = 1.2, linetype = "dashed") +
+  geom_point(data = zcm_bins_bad, aes(x = mid_x, y = mean_mu),
+             color = "darkred", size = 5, shape = 18) +
+  labs(x = "x", y = "Error term (μ)",
+       title = "When E[μ | x] = 0 FAILS",
+       subtitle = "Average μ is negative at low x and positive at high x — errors are correlated with x!") +
+  theme_minimal(base_size = 16)
+```
+
+- The average error **rises** with $x$ -- the error is correlated with our independent variable
+
+## Why Does This Matter for Wages? {.smaller}
+
+- Consider the wage equation: $wage = \beta_0 + \beta_1 \cdot educ + \mu$
+
+. . .
+
+- For $E[\mu | educ] = 0$ we need:
+
+. . .
+
+- Among people with 8 years of education: average $\mu$ = 0
+- Among people with 12 years of education: average $\mu$ = 0
+- Among people with 16 years of education: average $\mu$ = 0
+
+. . .
+
+- Is this plausible? People with more education tend to have higher **ability** (which is in $\mu$)
+
+. . .
+
+- So $E[\mu | educ = 16] > E[\mu | educ = 8]$ -- the assumption **fails**
+
+. . .
+
+- This is the fundamental challenge of causal inference with observational data!
+
+## Summary: The Four Assumptions for Unbiasedness
+
+| Assumption | What it says |
+|------------|-------------|
+| 1. Linear in parameters | $y = \beta_0 + \beta_1 x + \mu$ |
+| 2. Random sampling | Observations are independent draws |
+| 3. Variation in $x$ | $\sum(x_i - \bar{x})^2 > 0$ |
+| **4. Zero conditional mean** | $E[\mu \| x] = 0$ |
+
+. . .
+
+- Under these four assumptions, **OLS is unbiased**: $E[\hat{\beta}_1] = \beta_1$
+
+
+# Seeing Unbiasedness in Action
+
+## Simulating Unbiasedness {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Try it yourself!
+:::
+
+Let's prove unbiasedness to ourselves! First, create a "population" with **known** parameters:
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+set.seed(1248)
+n_pop <- 1000
+pop_data <- tibble(
+  x = sample(1:100, size = n_pop, replace = TRUE),
+  y = 3.5 + 2.21 * x + rnorm(n_pop)
+)
+
+# The TRUE slope is 2.21
+```
+
+## Drawing Many Samples {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Try it yourself!
+:::
+
+Now draw 500 random samples and estimate $\hat{\beta}_1$ each time:
+
+```{r}
+#| output-location: fragment
+
+set.seed(812476)
+n_sims <- 500
+sample_size <- 25
+
+sim_results <- tibble(
+  iteration = 1:n_sims,
+  b1_hat = map_dbl(1:n_sims, function(i) {
+    samp <- slice_sample(pop_data, n = sample_size, replace = TRUE)
+    coef(lm(y ~ x, data = samp))[2]
+  })
+)
+
+mean(sim_results$b1_hat)
+```
+
+## Visualizing Unbiasedness {.smaller}
+
+```{r}
+#| echo: false
+#| fig-height: 4
+#| fig-align: center
+
+ggplot(sim_results, aes(x = b1_hat)) +
+  geom_histogram(binwidth = 0.015, fill = "steelblue", alpha = 0.7, color = "white") +
+  geom_vline(xintercept = 2.21, color = "red", linewidth = 1.2, linetype = "dashed") +
+  geom_vline(xintercept = mean(sim_results$b1_hat), color = "forestgreen",
+             linewidth = 1.2) +
+  annotate("text", x = 2.28, y = 40, label = paste0("True β₁ = 2.21"),
+           color = "red", size = 5, fontface = "bold") +
+  annotate("text", x = 2.14, y = 35,
+           label = paste0("Mean = ", round(mean(sim_results$b1_hat), 3)),
+           color = "forestgreen", size = 5, fontface = "bold") +
+  labs(x = expression(hat(beta)[1]), y = "Count",
+       title = "Distribution of OLS Slope Estimates Across 500 Samples",
+       subtitle = "Each bar represents estimates that fell in a narrow range") +
+  theme_minimal(base_size = 16)
+```
+
+. . .
+
+- Individual estimates vary, but the **average** equals the true value!
+
+
+# So What? Bias, OVB, and Causality
+
+## When Assumption 4 Fails {.smaller}
+
+- When $E[\mu | x] \neq 0$, OLS is **biased** -- and the most common reason is **omitted variable bias**
+
+. . .
+
+- If a variable that belongs in the model is left out AND is correlated with $x$, our slope picks up the effect of both
+
+. . .
+
+- Example: estimating the return to education while omitting ability → $\hat{\beta}_1$ **overstates** the causal effect
+
+. . .
+
+- Remember from Unit 3: this is essentially **selection bias** -- people who choose more education also tend to have higher ability
+
+## The Big Picture {.smaller}
+
+- When $E[\mu | x] = 0$: $\hat{\beta}_1$ is an unbiased estimate of the **causal effect**
+
+- When $E[\mu | x] \neq 0$: $\hat{\beta}_1$ measures **correlation**, not causation
+
+. . .
+
+::: {.callout-important}
+## Correlation vs. Causation
+OLS always estimates *something*. Whether that something is a **causal effect** or merely a **correlation** depends entirely on whether the assumptions hold. Most of econometrics is about finding clever ways to make the zero conditional mean assumption more plausible.
+:::
+
+. . .
+
+::: {.callout-tip}
+## Coming Up Next
+**Multivariate regression** gives us the tools to **control for** confounding variables by adding more $x$'s to our model -- directly addressing omitted variable bias.
+:::
+
+
+# Variance, Standard Errors, and BLUE
+
+## Beyond Unbiasedness
+
+- Unbiasedness tells us OLS is "right on average" -- but individual estimates can vary a lot
+
+. . .
+
+- We also care about **precision**: how much do estimates bounce around from sample to sample?
+
+. . .
+
+- This is measured by the **variance** of the estimator
+
+## Assumption 5: Homoskedasticity {.smaller}
+
+- To derive the variance of OLS, we need one more assumption:
+
+. . .
+
+$$Var(\mu | x) = \sigma^2$$
+
+. . .
+
+- The "spread" of errors is **constant** across all values of $x$
+
+. . .
+
+```{r}
+#| echo: false
+#| fig-height: 3
+#| fig-align: center
+#| layout-ncol: 2
+
+set.seed(77)
+n_h <- 100
+x_h <- runif(n_h, 1, 10)
+y_homo <- 2 + 1.5 * x_h + rnorm(n_h, 0, 2)
+y_hetero <- 2 + 1.5 * x_h + rnorm(n_h, 0, 0.3 * x_h)
+
+ggplot(tibble(x = x_h, y = y_homo), aes(x, y)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(method = "lm", se = FALSE, color = "steelblue") +
+  labs(title = "Homoskedasticity", subtitle = "Constant spread",
+       x = "x", y = "y") +
+  theme_minimal(base_size = 14)
+
+ggplot(tibble(x = x_h, y = y_hetero), aes(x, y)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(method = "lm", se = FALSE, color = "steelblue") +
+  labs(title = "Heteroskedasticity", subtitle = "Spread increases with x",
+       x = "x", y = "y") +
+  theme_minimal(base_size = 14)
+```
+
+## Deriving the Variance of $\hat{\beta}_1$: Sketch {.smaller}
+
+- Start from the slope formula. Using the fact that $y_i = \beta_0 + \beta_1 x_i + \mu_i$:
+
+. . .
+
+$$\hat{\beta}_1 = \beta_1 + \frac{\sum(x_i - \bar{x})\mu_i}{\sum(x_i - \bar{x})^2}$$
+
+. . .
+
+- The only random piece is $\mu_i$, so the variance comes from the second term:
+
+. . .
+
+$$Var(\hat{\beta}_1) = Var\left(\frac{\sum(x_i - \bar{x})\mu_i}{\sum(x_i - \bar{x})^2}\right)$$
+
+## Deriving the Variance: Result {.smaller}
+
+- Since $\sum(x_i - \bar{x})^2$ is a constant (fixed in our sample) and the $\mu_i$ are independent with constant variance $\sigma^2$:
+
+. . .
+
+$$Var(\hat{\beta}_1) = \frac{\sum(x_i - \bar{x})^2 \cdot \sigma^2}{\left[\sum(x_i - \bar{x})^2\right]^2} = \frac{\sigma^2}{\sum(x_i - \bar{x})^2}$$
+
+. . .
+
+::: {.callout-important}
+## Variance of the OLS Slope
+$$Var(\hat{\beta}_1) = \frac{\sigma^2}{SST_x}$$
+
+where $\sigma^2 = Var(\mu)$ is the error variance and $SST_x = \sum(x_i - \bar{x})^2$ is the total variation in $x$.
+:::
+
+## What Affects Precision? {.smaller}
+
+$$Var(\hat{\beta}_1) = \frac{\sigma^2}{SST_x}$$
+
+. . .
+
+Two key insights:
+
+. . .
+
+1. **More noise** ($\sigma^2$ ↑) → **less** precise estimates (wider distribution)
+
+. . .
+
+2. **More variation in $x$** ($SST_x$ ↑) → **more** precise estimates (tighter distribution)
+
+. . .
+
+- Let's see this with simulations!
+
+## Effect of Error Variance on Precision {.smaller}
+
+```{r}
+#| echo: false
+#| fig-height: 4
+#| fig-align: center
+
+set.seed(444)
+n_var <- 500
+
+# Population with low noise
+pop_low <- tibble(x = sample(1:100, 1000, replace = TRUE),
+                  y = 5 + 2 * x + rnorm(1000, 0, 5))
+# Population with high noise
+pop_high <- tibble(x = sample(1:100, 1000, replace = TRUE),
+                   y = 5 + 2 * x + rnorm(1000, 0, 50))
+
+sim_var <- tibble(
+  iteration = 1:n_var,
+  low_noise = map_dbl(1:n_var, function(i) {
+    samp <- slice_sample(pop_low, n = 30, replace = TRUE)
+    coef(lm(y ~ x, data = samp))[2]
+  }),
+  high_noise = map_dbl(1:n_var, function(i) {
+    samp <- slice_sample(pop_high, n = 30, replace = TRUE)
+    coef(lm(y ~ x, data = samp))[2]
+  })
+)
+
+sim_var_long <- sim_var |>
+  pivot_longer(cols = c(low_noise, high_noise),
+               names_to = "scenario", values_to = "estimate") |>
+  mutate(scenario = ifelse(scenario == "low_noise",
+                           paste0("Low noise (σ = 5), SD = ", round(sd(sim_var$low_noise), 2)),
+                           paste0("High noise (σ = 50), SD = ", round(sd(sim_var$high_noise), 2))))
+
+ggplot(sim_var_long, aes(x = estimate, fill = scenario)) +
+  geom_histogram(binwidth = 0.06, alpha = 0.6, position = "identity", color = "white") +
+  geom_vline(xintercept = 2, color = "red", linewidth = 1.2, linetype = "dashed") +
+  annotate("text", x = 2, y = 75, label = "True β₁ = 2", color = "red",
+           size = 5, fontface = "bold", hjust = -0.1) +
+  scale_fill_manual(values = c("steelblue", "coral")) +
+  labs(x = expression(hat(beta)[1]), y = "Count", fill = "",
+       title = "More noise → less precise estimates",
+       subtitle = "Both are unbiased (centered on 2), but high noise has much wider spread") +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom")
+```
+
+## Effect of Variation in $x$ on Precision {.smaller}
+
+```{r}
+#| echo: false
+#| fig-height: 4
+#| fig-align: center
+
+set.seed(555)
+
+# Population with low variation in x
+pop_low_x <- tibble(x = sample(40:60, 1000, replace = TRUE),
+                    y = 5 + 2 * x + rnorm(1000, 0, 15))
+# Population with high variation in x
+pop_high_x <- tibble(x = sample(1:100, 1000, replace = TRUE),
+                     y = 5 + 2 * x + rnorm(1000, 0, 15))
+
+sim_x <- tibble(
+  iteration = 1:n_var,
+  low_var_x = map_dbl(1:n_var, function(i) {
+    samp <- slice_sample(pop_low_x, n = 30, replace = TRUE)
+    coef(lm(y ~ x, data = samp))[2]
+  }),
+  high_var_x = map_dbl(1:n_var, function(i) {
+    samp <- slice_sample(pop_high_x, n = 30, replace = TRUE)
+    coef(lm(y ~ x, data = samp))[2]
+  })
+)
+
+sim_x_long <- sim_x |>
+  pivot_longer(cols = c(low_var_x, high_var_x),
+               names_to = "scenario", values_to = "estimate") |>
+  mutate(scenario = ifelse(scenario == "low_var_x",
+                           paste0("x range: 40-60, SD = ", round(sd(sim_x$low_var_x), 2)),
+                           paste0("x range: 1-100, SD = ", round(sd(sim_x$high_var_x), 2))))
+
+ggplot(sim_x_long, aes(x = estimate, fill = scenario)) +
+  geom_histogram(binwidth = 0.06, alpha = 0.6, position = "identity", color = "white") +
+  geom_vline(xintercept = 2, color = "red", linewidth = 1.2, linetype = "dashed") +
+  annotate("text", x = 2, y = 70, label = "True β₁ = 2", color = "red",
+           size = 5, fontface = "bold", hjust = -0.1) +
+  scale_fill_manual(values = c("coral", "forestgreen")) +
+  labs(x = expression(hat(beta)[1]), y = "Count", fill = "",
+       title = "More variation in x → more precise estimates",
+       subtitle = "Both are unbiased, but wider x range gives tighter estimates") +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom")
+```
+
+## Effect of Sample Size on Precision {.smaller}
+
+```{r}
+#| echo: false
+#| fig-height: 4
+#| fig-align: center
+
+set.seed(666)
+
+pop_n <- tibble(x = sample(1:100, 2000, replace = TRUE),
+                y = 5 + 2 * x + rnorm(2000, 0, 20))
+
+sim_n <- tibble(
+  iteration = 1:n_var,
+  n_15 = map_dbl(1:n_var, function(i) {
+    samp <- slice_sample(pop_n, n = 15, replace = TRUE)
+    coef(lm(y ~ x, data = samp))[2]
+  }),
+  n_200 = map_dbl(1:n_var, function(i) {
+    samp <- slice_sample(pop_n, n = 200, replace = TRUE)
+    coef(lm(y ~ x, data = samp))[2]
+  })
+)
+
+sim_n_long <- sim_n |>
+  pivot_longer(cols = c(n_15, n_200),
+               names_to = "scenario", values_to = "estimate") |>
+  mutate(scenario = ifelse(scenario == "n_15",
+                           paste0("n = 15, SD = ", round(sd(sim_n$n_15), 2)),
+                           paste0("n = 200, SD = ", round(sd(sim_n$n_200), 2))))
+
+ggplot(sim_n_long, aes(x = estimate, fill = scenario)) +
+  geom_histogram(binwidth = 0.06, alpha = 0.6, position = "identity", color = "white") +
+  geom_vline(xintercept = 2, color = "red", linewidth = 1.2, linetype = "dashed") +
+  annotate("text", x = 2, y = 80, label = "True β₁ = 2", color = "red",
+           size = 5, fontface = "bold", hjust = -0.1) +
+  scale_fill_manual(values = c("coral", "forestgreen")) +
+  labs(x = expression(hat(beta)[1]), y = "Count", fill = "",
+       title = "Larger samples → more precise estimates",
+       subtitle = "Larger n means more variation in x (higher SST_x) → tighter distribution") +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom")
+```
+
+## Standard Errors
+
+- The **standard error** is the estimated standard deviation of $\hat{\beta}_1$:
+
+. . .
+
+$$se(\hat{\beta}_1) = \frac{\hat{\sigma}}{\sqrt{SST_x}}$$
+
+. . .
+
+- where $\hat{\sigma}$ estimates the error standard deviation from the residuals
+
+. . .
+
+- Standard errors quantify the **precision** of our estimates
+
+- They are essential for hypothesis testing and confidence intervals (next unit!)
+
+## OLS is BLUE
+
+Under all five Gauss-Markov assumptions, OLS is **BLUE**:
+
+. . .
+
+- **B**est: Lowest variance among all linear unbiased estimators
+- **L**inear: A linear function of the data
+- **U**nbiased: $E[\hat{\beta}] = \beta$
+- **E**stimator: A rule for using sample data to estimate parameters
+
+. . .
+
+- You cannot do better without accepting some bias or using non-linear methods!
+
+## Which Assumptions Matter for What? {.smaller}
+
+| Assumption | Needed for Unbiasedness? | Needed for BLUE? |
+|------------|:------------------------:|:----------------:|
+| 1. Linear in parameters | Yes | Yes |
+| 2. Random sampling | Yes | Yes |
+| 3. Variation in $x$ | Yes | Yes |
+| **4. Zero conditional mean** | **Yes** | Yes |
+| 5. Homoskedasticity | No | **Yes** |
+
+. . .
+
+- Assumptions 1-4 → OLS is **unbiased**
+- All five → OLS is **BLUE** (Best Linear Unbiased Estimator)
+
+
+# Practice Exercises
+
+## Practice: Interpreting Regression Output {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Your turn!
+:::
+
+**A researcher estimates the relationship between test scores and class size:**
+
+```
+             Estimate  Std. Error
+(Intercept)   698.93      10.36
+str            -2.28       0.52
+
+n = 420, R-squared = 0.051
+```
+
+*(`str` = student-teacher ratio)*
+
+. . .
+
+**Questions:**
+
+1. What happens to predicted scores with 5 more students per teacher?
+2. What is the predicted score when `str = 20`?
+3. What does the R-squared tell us?
+
+## Practice: Answers {.smaller}
+
+1. $5 \times (-2.28) = -11.4$ points lower
+
+. . .
+
+2. $698.93 + (-2.28)(20) = 698.93 - 45.6 = 653.33$
+
+. . .
+
+3. About 5.1% of the variation in test scores is explained by class size. This is low, but does NOT mean class size is unimportant -- it just means other factors also matter.
+
+## Practice: Run a Full Analysis {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Your turn!
+:::
+
+Using `mtcars`, complete the following:
+
+1. Create a scatter plot of `disp` (displacement) vs. `mpg` with a line of best fit
+2. Run `lm(mpg ~ disp, data = mtcars)` and interpret the slope
+3. What is the R-squared? What does it mean?
+
+. . .
+
+```{r}
+#| output-location: fragment
+#| fig-height: 2.5
+
+ggplot(mtcars, aes(x = disp, y = mpg)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(method = "lm") +
+  labs(x = "Displacement (cu.in.)", y = "MPG",
+       title = "MPG vs. Engine Displacement") +
+  theme_minimal()
+```
+
+## Practice: Results {.smaller}
+
+```{r}
+#| output-location: fragment
+
+summary(lm(mpg ~ disp, data = mtcars))
+```
+
+## Practice: Identifying Assumption Violations {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Your turn!
+:::
+
+**For each scenario, which Gauss-Markov assumption is most likely violated? Discuss with your neighbor!**
+
+. . .
+
+1. You study the effect of education on wages, but can't observe ability
+
+. . .
+
+- *Assumption 4 (zero conditional mean): ability is in the error term and correlated with education*
+
+. . .
+
+2. You survey only college students about the effect of income on happiness
+
+. . .
+
+- *Assumption 2 (random sampling): your sample is not representative of the general population*
+
+
+# Summary and Key Takeaways
+
+## What We Learned {.smaller}
+
+1. The **conditional expectation** $E[Y|X]$ is what we want to estimate
+
+. . .
+
+2. **Scatter plots** with `ggplot2` visualize relationships and regression lines
+
+. . .
+
+3. The **OLS slope** = $Cov(x,y)/Var(x)$ -- essentially a scaled correlation
+
+. . .
+
+4. The **Gauss-Markov assumptions** (especially zero conditional mean) determine when OLS is unbiased
+
+. . .
+
+5. **Unbiasedness** means OLS hits the target on average; **precision** depends on noise and variation in $x$
+
+. . .
+
+6. **Causality requires unbiasedness** -- only when $E[\mu|x] = 0$ can we interpret $\hat{\beta}_1$ causally
+
+## The Key Equations
+
+**The OLS Slope:**
+
+$$\hat{\beta}_1 = \frac{Cov(x, y)}{Var(x)} = \frac{\sum(x_i - \bar{x})(y_i - \bar{y})}{\sum(x_i - \bar{x})^2}$$
+
+. . .
+
+**The OLS Intercept:**
+
+$$\hat{\beta}_0 = \bar{y} - \hat{\beta}_1 \bar{x}$$
+
+. . .
+
+**The Variance of the Slope:**
+
+$$Var(\hat{\beta}_1) = \frac{\sigma^2}{SST_x}$$
+
+## Looking Ahead
+
+- Next up: **Multivariate Regression** -- adding more $x$ variables to address omitted variable bias
+
+. . .
+
+- Then: **Statistical Inference** -- hypothesis testing, confidence intervals, and when we can say a result is "statistically significant"

@@ -314,6 +314,8 @@ The entire goal of linear regression is to use our *sample* of the data from the
 to estimate the values of $\beta_0$ and $\beta_1$ that are the best possible estimates we can generate.
 We call these estimates $\hat{\beta_0}$ and $\hat{\beta_1}$,
 and the method we use to calculate these estimates the **estimator**.
+We can never actually get the *true* population values $\beta_0$ and $\beta_1$;
+we have to rely on estimates!
 
 Before we derive estimators for $\beta_0$ and $\beta_1$,
 let's introduce some key concepts that will guide our approach.
@@ -427,7 +429,7 @@ Our regression predicts it should get about 22.59 MPG,
 so the residual is $21 - 22.59 = -1.59$.
 The negative residual means we *overpredicted*---the car actually gets slightly worse fuel economy than our model predicted.
 
-### The Key Insight: Minimize the Residuals
+### The Goal: Minimize the Residuals
 
 Here's the crucial idea:
 we want to choose $\hat{\beta}_0$ and $\hat{\beta}_1$ so that our predictions are as good as possible.
@@ -539,7 +541,7 @@ $$
 \sum_{i=1}^{n} x_i(y_i - \bar{y}) = \hat{\beta}_1 \sum_{i=1}^{n} x_i(x_i - \bar{x})
 $$
 
-Using the summation properties $\sum x_i(y_i - \bar{y}) = \sum(x_i - \bar{x})(y_i - \bar{y})$ and $\sum x_i(x_i - \bar{x}) = \sum(x_i - \bar{x})^2$:
+Using the summation properties $\sum x_i(y_i - \bar{y}) = \sum(x_i - \bar{x})(y_i - \bar{y})$ and $\sum x_i(x_i - \bar{x}) = \sum(x_i - \bar{x})^2$[^summation-trick]:
 
 $$
 \sum_{i=1}^{n} (x_i - \bar{x})(y_i - \bar{y}) = \hat{\beta}_1 \sum_{i=1}^{n} (x_i - \bar{x})^2
@@ -550,6 +552,8 @@ Solving for $\hat{\beta}_1$:
 $$
 \hat{\beta}_1 = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{\sum_{i=1}^{n}(x_i - \bar{x})^2}
 $$ {#eq-b1-formula}
+
+[^summation-trick]: Why can we replace $\sum x_i(y_i - \bar{y})$ with $\sum (x_i - \bar{x})(y_i - \bar{y})$? Expand the second expression: $\sum (x_i - \bar{x})(y_i - \bar{y}) = \sum x_i(y_i - \bar{y}) - \bar{x}\sum(y_i - \bar{y})$. But from Result 1 in @sec-stats-review, deviations from the mean always sum to zero, so $\sum(y_i - \bar{y}) = 0$. The second term vanishes and the two expressions are equal. The same logic applies to $\sum x_i(x_i - \bar{x}) = \sum(x_i - \bar{x})^2$.
 
 ### Confirming It's a Minimum
 
@@ -584,6 +588,90 @@ bivariate OLS is essentially a scaled version of the correlation between $x$ and
 And as we discussed in @sec-introduction,
 correlation does not imply causation!
 We must be very careful about interpreting bivariate OLS results causally.
+
+
+## A Worked Example by Hand
+
+Before we let R do the heavy lifting, let's apply the OLS formulas to a tiny dataset to make sure we understand what's going on. Suppose we survey 5 workers and record their years of education ($x$) and hourly wage in dollars ($y$):
+
+| Worker | $x_i$ (Years of Education) | $y_i$ (Hourly Wage) |
+|:------:|:--------------------------:|:--------------------:|
+| 1      | 10                         | 12                   |
+| 2      | 12                         | 15                   |
+| 3      | 14                         | 17                   |
+| 4      | 16                         | 22                   |
+| 5      | 18                         | 24                   |
+
+### Step 1: Compute the Means
+
+$$
+\bar{x} = \frac{10 + 12 + 14 + 16 + 18}{5} = \frac{70}{5} = 14
+$$
+
+$$
+\bar{y} = \frac{12 + 15 + 17 + 22 + 24}{5} = \frac{90}{5} = 18
+$$
+
+### Step 2: Compute the Deviations
+
+We need $(x_i - \bar{x})$, $(y_i - \bar{y})$, their product, and $(x_i - \bar{x})^2$:
+
+| $x_i$ | $y_i$ | $x_i - \bar{x}$ | $y_i - \bar{y}$ | $(x_i - \bar{x})(y_i - \bar{y})$ | $(x_i - \bar{x})^2$ |
+|:------:|:------:|:----------------:|:----------------:|:---------------------------------:|:--------------------:|
+| 10     | 12     | −4               | −6               | 24                                | 16                   |
+| 12     | 15     | −2               | −3               | 6                                 | 4                    |
+| 14     | 17     | 0                | −1               | 0                                 | 0                    |
+| 16     | 22     | 2                | 4                | 8                                 | 4                    |
+| 18     | 24     | 4                | 6                | 24                                | 16                   |
+|        |        |                  | **Sum**          | **62**                            | **40**               |
+
+Notice that the deviations $(x_i - \bar{x})$ sum to zero, just as Result 1 in @sec-stats-review promises.
+
+### Step 3: Compute the Slope
+
+Applying @eq-b1-formula:
+
+$$
+\hat{\beta}_1 = \frac{\sum(x_i - \bar{x})(y_i - \bar{y})}{\sum(x_i - \bar{x})^2} = \frac{62}{40} = 1.55
+$$
+
+Each additional year of education is associated with \$1.55 higher hourly wages in our sample.
+
+### Step 4: Compute the Intercept
+
+Applying @eq-b0-formula:
+
+$$
+\hat{\beta}_0 = \bar{y} - \hat{\beta}_1 \bar{x} = 18 - 1.55 \times 14 = 18 - 21.7 = -3.7
+$$
+
+Our estimated regression line is:
+
+$$
+\hat{y}_i = -3.7 + 1.55 \, x_i
+$$
+
+The intercept (−3.7) is the predicted wage for someone with zero years of education. This doesn't have a meaningful real-world interpretation here---nobody in our data has zero years of education---but the intercept is still necessary for the line to fit the data correctly.
+
+### Step 5: Check Fitted Values and Residuals
+
+Let's plug each $x_i$ into our equation and compute the residuals $\hat{\mu}_i = y_i - \hat{y}_i$:
+
+| $x_i$ | $y_i$ | $\hat{y}_i$ | $\hat{\mu}_i = y_i - \hat{y}_i$ |
+|:------:|:------:|:------------:|:--------------------------------:|
+| 10     | 12     | 11.8         | 0.2                              |
+| 12     | 15     | 14.9         | 0.1                              |
+| 14     | 17     | 18.0         | −1.0                             |
+| 16     | 22     | 21.1         | 0.9                              |
+| 18     | 24     | 24.2         | −0.2                             |
+|        |        | **Sum of residuals** | **0.0**                   |
+
+As expected, the residuals sum to zero. This isn't a coincidence---it's guaranteed by the first-order condition from Section 4.4.2, which requires $\sum(y_i - \hat{\beta}_0 - \hat{\beta}_1 x_i) = 0$.
+
+::: {.callout-tip}
+## Try It Yourself
+Before moving on, try reproducing this example on paper or in a calculator. Getting comfortable with the mechanics of these formulas will make everything that follows easier to understand.
+:::
 
 
 ## Computing OLS in R
@@ -626,7 +714,15 @@ summary(lm_mpg)
 The output shows our estimates:
 $\hat{\beta}_0 = 30.10$ and $\hat{\beta}_1 = -0.07$.
 The slope suggests that each additional unit of horsepower is associated with about 0.07 fewer miles per gallon.
+Similarly,
+according to this estimate,
+a car with 50 additional horsepower is associated with about 3.5 ($50 \times 0.07$) fewer miles per gallon.
 
+A one-unit increase isn't always the most meaningful way to think about a coefficient.
+When the units of $x$ are hard to interpret on their own, it can be helpful to consider a **one standard deviation** increase instead.
+In this dataset, the standard deviation of horsepower is about `r round(sd(mtcars$hp), 1)`.
+So a one standard deviation increase in horsepower is associated with a change in fuel economy of roughly $`r round(sd(mtcars$hp), 1)` \times (-0.07) \approx `r round(sd(mtcars$hp) * 0.07, 1)`$ fewer miles per gallon.
+This gives a better sense of what a "typical" difference in horsepower implies for fuel economy.
 
 ## Goodness-of-Fit: R-Squared
 
@@ -647,6 +743,9 @@ $$
 
 This measures the fraction of the total variation in $y$ that is explained by the regression.
 $R^2$ ranges from 0 (no explanatory power) to 1 (perfect fit).
+We usually interpret the calculated value as a percent.
+For example if the $R^2 = 0.386$,
+you might say something the model *explains about $39\%$ of the variation in $y$.
 
 ::: {.callout-warning}
 ## Interpreting R-Squared
@@ -806,7 +905,7 @@ our estimate of the "return to education" will partly capture the "return to abi
 making education look more valuable than it really is.
 
 This is the essence of **omitted variable bias**,
-which we'll explore in detail shortly.
+which we'll explore in more detail in @sec-multivariate.
 
 ### Assumption 5: Homoskedasticity
 
@@ -842,6 +941,8 @@ $Var(\mu | income)$ increases with income.
 #| fig-width: 9
 #| fig-height: 4
 #| out-width: "90%"
+#| message: false
+#| warning: false
 
 set.seed(123)
 n <- 200
@@ -885,26 +986,23 @@ We'll discuss how to handle heteroskedasticity later in the course using **robus
 
 ### Summary: Which Assumptions Matter for What?
 
-| Assumption | Needed for Unbiasedness? | Needed for Valid Standard Errors? |
-|------------|-------------------------|----------------------------------|
-| 1. Linear in parameters | Yes | Yes |
-| 2. Random sampling | Yes | Yes |
-| 3. Variation in $x$ | Yes (otherwise undefined) | Yes |
-| 4. Zero conditional mean | **Yes** | Yes |
-| 5. Homoskedasticity | No | **Yes** |
+Assumptions 1--4 (linearity in parameters, random sampling, variation in $x$, and zero conditional mean) are all required for OLS to be **unbiased**---that is, for the estimator to hit the true parameter values on average. If any one of these assumptions fails, OLS may systematically over- or under-estimate the true $\beta_0$ and $\beta_1$.
 
-The key insight:
-Assumptions 1-4 are required for OLS to be **unbiased** (on average, we hit the target).
-Assumption 5 is additionally required for the usual standard error formulas to be valid and for OLS to be **BLUE** (Best Linear Unbiased Estimator).
+Assumption 5 (homoskedasticity) is *not* needed for unbiasedness. Even if this fails, OLS still gets the right answer on average. However, homoskedasticity *is* required for an additional property:
+
+::: {.callout-note}
+## **BLUE**
+If all five Gauss-Markov assumptions hold, OLS is the **Best Linear Unbiased Estimator (BLUE)**. The Gauss--Markov theorem tells us that when all five assumptions hold, OLS has the smallest variance among *all* estimators that are (a) linear functions of the outcome variable $y$ and (b) unbiased. In other words, no other linear unbiased estimator can produce more precise estimates than OLS. When assumption 5 fails, OLS is still unbiased, but it is no longer the most efficient---other estimators could do better.
+:::
 
 
 ## Unbiasedness of OLS
 
-Before discussing unbiasedness,
-let's revisit an important distinction we introduced in @sec-stats-review:
-the difference between the **population** and the **sample**.
-
 ### Population Parameters vs. Sample Estimates
+
+Before discussing unbiasedness,
+recall an important distinction we introduced in @sec-stats-review:
+the difference between the **population** and the **sample**.
 
 The **population** represents the entire group we're interested in studying.
 In our wage-education example,
@@ -925,15 +1023,16 @@ Using this sample,
 we compute **estimates** $\hat{\beta}_0$ and $\hat{\beta}_1$.
 These estimates are our best guesses for the unknown population parameters.
 
-Here's the key insight:
+Critically,
 *if we drew a different sample, we would get different estimates*.
-Your classmate analyzing a different random sample of workers would compute different values of $\hat{\beta}_0$ and $\hat{\beta}_1$ than you would.
+Your classmate analyzing a different random sample of workers would compute different values of $\hat{\beta}_0$ and $\hat{\beta}_1$ than you would,
+even though the population and regression model are the same.
 This randomness in the estimates is called **sampling variability**.
 
 ### What Does Unbiasedness Mean?
 
 Given that estimates vary from sample to sample,
-how do we know if our estimation procedure is any good?
+how do we know if our specific estimation is any good?
 One desirable property is **unbiasedness**.
 
 An estimator $\hat{\theta}$ is **unbiased** if its expected value equals the true population parameter:
@@ -961,20 +1060,41 @@ we get it right.
 
 ### Proof Sketch
 
-Starting from our formula for $\hat{\beta}_1$ and substituting the true model $y_i = \beta_0 + \beta_1 x_i + \mu_i$:
+We start from the OLS slope formula (@eq-b1-formula):
+
+$$
+\hat{\beta}_1 = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{\sum_{i=1}^{n}(x_i - \bar{x})^2}
+$$
+
+Now substitute the true population model $y_i = \beta_0 + \beta_1 x_i + \mu_i$ into the numerator. Since $\bar{y} = \beta_0 + \beta_1 \bar{x} + \bar{\mu}$, we get $y_i - \bar{y} = \beta_1(x_i - \bar{x}) + (\mu_i - \bar{\mu})$. Plugging this in:
+
+$$
+\hat{\beta}_1 = \frac{\sum_{i=1}^{n}(x_i - \bar{x})[\beta_1(x_i - \bar{x}) + (\mu_i - \bar{\mu})]}{\sum_{i=1}^{n}(x_i - \bar{x})^2}
+$$
+
+Distributing the numerator and splitting the fraction:
+
+$$
+\hat{\beta}_1 = \beta_1 \frac{\sum(x_i - \bar{x})^2}{\sum(x_i - \bar{x})^2} + \frac{\sum(x_i - \bar{x})(\mu_i - \bar{\mu})}{\sum(x_i - \bar{x})^2}
+$$
+
+The first fraction equals 1, so:
 
 $$
 \hat{\beta}_1 = \beta_1 + \frac{\sum_{i=1}^{n}(x_i - \bar{x})\mu_i}{\sum_{i=1}^{n}(x_i - \bar{x})^2}
-$$
+$$ {#eq-decomposition}
 
-Taking expectations and using the zero conditional mean assumption ($E[\mu_i | x_i] = 0$):
+where the $\bar{\mu}$ term drops out because $\sum(x_i - \bar{x}) = 0$ (Result 1 from @sec-stats-review).
+
+This is a powerful decomposition. It says: **our estimate = the truth + estimation error**. The estimation error depends on how the unobserved errors $\mu_i$ happen to line up with the $x_i$ values in our particular sample.
+
+Now take expectations. Treating the $x_i$ as fixed (Assumption 2), the only random part is the $\mu_i$ terms. Under the zero conditional mean assumption ($E[\mu_i | x_i] = 0$):
 
 $$
 E[\hat{\beta}_1] = \beta_1 + \frac{\sum_{i=1}^{n}(x_i - \bar{x}) \cdot 0}{\sum_{i=1}^{n}(x_i - \bar{x})^2} = \beta_1
 $$
 
-Thus,
-OLS is unbiased when the Gauss-Markov assumptions hold.
+Thus, OLS is unbiased when the Gauss-Markov assumptions 1--4 hold.
 
 ### Simulation: Unbiasedness in Action
 
@@ -1055,100 +1175,17 @@ ggplot(sim_results, aes(x = b1_hat)) +
   geom_histogram(bins = 30, fill = "lightgrey", color = "black", alpha = 0.7) +
   geom_vline(xintercept = 2.21, color = "darkred", linewidth = 1.5) +
   geom_vline(xintercept = mean_b1, color = "darkgreen", linewidth = 1.5, linetype = "dashed") +
-  annotate("text", x = 2.17, y = 45, label = "True β₁ = 2.21", color = "darkred", size = 4) +
-  annotate("text", x = 2.25, y = 40, label = paste0("Avg. estimate = ", round(mean_b1, 3)),
+  annotate("text", x = 2.19, y = 45, label = "True β = 2.21", color = "darkred", size = 4) +
+  annotate("text", x = 2.225, y = 40, label = paste0("Avg. estimate = ", round(mean_b1, 3)),
            color = "darkgreen", size = 4) +
   labs(x = expression(hat(beta)[1]), y = "Count") +
   theme_minimal()
 ```
 
-The simulation in @fig-unbiasedness confirms the theory:
-while individual estimates vary around the true value,
-the average across many samples equals the true parameter.
-
-
-## Omitted Variable Bias
-
-What happens when the zero conditional mean assumption fails?
-The most common culprit is **omitted variable bias**:
-we've left out a variable that affects both $x$ and $y$.
-
-Consider the true model:
-
-$$
-y = \beta_0 + \beta_1 x + \beta_2 z + \mu
-$$
-
-If we omit $z$ and estimate only $y = \beta_0 + \beta_1 x + \nu$ (where $\nu = \beta_2 z + \mu$),
-then whenever $z$ is correlated with $x$,
-we have $E[\nu | x] \neq 0$,
-and our estimate of $\beta_1$ is biased.
-
-**Example:** In the education-wage regression,
-if ability ($z$) affects both education choices ($x$) and wages ($y$),
-then omitting ability creates bias.
-The estimated "return to education" will partly reflect the return to ability.
-
-```{r}
-#| echo: false
-#| label: fig-ovb
-#| fig-cap: "With omitted variable bias, the average of OLS estimates (green) systematically differs from the true value (red). The bias persists even with many samples."
-#| fig-width: 7
-#| fig-height: 4
-#| out-width: "80%"
-
-# Create population with omitted variable
-set.seed(1248)
-n_pop <- 1000
-z <- sample(1:100, size = n_pop, replace = TRUE)
-err1 <- rnorm(n_pop)
-err2 <- rnorm(n_pop)
-
-pop_biased <- tibble(
-  z = z,
-  x = 2.27 + 1.45 * z + err1,  # x depends on z
-  y = 3.52 + 2.21 * x + 0.23 * z + err2  # y depends on both x and z
-)
-
-# Simulate estimation (incorrectly omitting z)
-set.seed(124890)
-n_simulations <- 500
-sample_size <- 25
-
-sim_biased <- map_dfr(1:n_simulations, function(i) {
-  sample_data <- slice_sample(pop_biased, n = sample_size, replace = TRUE)
-  reg <- lm(y ~ x, data = sample_data)  # Omit z!
-  tibble(iteration = i, b1_hat = coef(reg)[2])
-})
-
-mean_biased <- mean(sim_biased$b1_hat)
-
-ggplot(sim_biased, aes(x = b1_hat)) +
-  geom_histogram(bins = 30, fill = "lightgrey", color = "black", alpha = 0.7) +
-  geom_vline(xintercept = 2.21, color = "darkred", linewidth = 1.5) +
-  geom_vline(xintercept = mean_biased, color = "darkgreen", linewidth = 1.5, linetype = "dashed") +
-  annotate("text", x = 2.17, y = 50, label = "True β₁ = 2.21", color = "darkred", size = 4) +
-  annotate("text", x = mean_biased + 0.03, y = 45,
-           label = paste0("Avg. estimate = ", round(mean_biased, 2)),
-           color = "darkgreen", size = 4) +
-  labs(x = expression(hat(beta)[1]), y = "Count",
-       title = "OLS with Omitted Variable Bias") +
-  theme_minimal()
-```
-
-
-## Unbiasedness and Causality: Why This All Matters
-
-Let's step back and connect what we've learned to the bigger picture.
-In @sec-rcts,
-we discussed how the fundamental challenge of causal inference is selection bias:
-people who receive "treatment" (more education,
-a new drug,
-a policy intervention) may differ systematically from those who don't.
-This makes it hard to know whether differences in outcomes are caused by the treatment or by those pre-existing differences.
-
-Now we can see the same problem through the lens of regression.
-**The zero conditional mean assumption is essentially a "no selection bias" assumption.**
+The simulation in @fig-unbiasedness confirms the theory.
+Each of the 500 samples of size 25 produces a different estimate of $\beta_1$---some too high, some too low---because each sample is a different random draw from the population.
+This spread is **sampling variability**, and it is completely normal.
+The key thing about unbiasedness is that these estimates are centered on the true value of 2.21: the overestimates and underestimates cancel out on average, so the mean across all 500 estimates lands right on the truth.
 
 ### When Can We Interpret $\hat{\beta}_1$ Causally?
 
@@ -1171,8 +1208,14 @@ because high-ability people get more education---then $\beta_1$ no longer repres
 It conflates the effect of education with the effect of ability.
 Our estimate $\hat{\beta}_1$ is biased,
 and we cannot interpret it as the causal effect of education.
+In other words,
+our estimate $\hat{\beta}_1$ reflects some **selection bias**,
+in that there is some systemic differences groups at different values of $x$.
 
 ### Correlation vs. Causation, Revisited
+
+If our estimate $\hat{\beta}_1$ can't be interpreted causally,
+what is it?
 
 Recall that the OLS slope can be written as:
 $$\hat{\beta}_1 = \rho_{xy} \frac{\sigma_y}{\sigma_x}$$
@@ -1188,21 +1231,58 @@ Without them:
 - Those numbers still describe the correlation in your data
 - But you **cannot** interpret those numbers as causal effects
 
-::: {.callout-warning}
-## The Key Insight
-OLS always estimates *something*.
-Whether that something is a causal effect or merely a correlation depends entirely on whether the assumptions are satisfied.
-Most of econometrics is about finding clever ways to make the zero conditional mean assumption more plausible.
-:::
-
 
 ## Variance of the OLS Estimator
 
-Even when OLS is unbiased,
-our estimates vary from sample to sample.
-The **variance** of $\hat{\beta}_1$ tells us how much variation to expect.
+As discussed above,
+our OLS estimates will always--biased or unbiased--vary from sample to sample.
+The **variance** of $\hat{\beta}_1$ tells us how much variation to expect amoung our different estimates.
 
-Under the Gauss-Markov assumptions:
+In this section we derive the formula step by step.
+
+### Starting Point: Decomposing the Estimator
+
+Recall from the unbiasedness proof that we can write:
+
+$$
+\hat{\beta}_1 = \beta_1 + \frac{\sum_{i=1}^{n}(x_i - \bar{x})\mu_i}{\sum_{i=1}^{n}(x_i - \bar{x})^2}
+$$
+
+Since $\beta_1$ is a constant, the variance of $\hat{\beta}_1$ comes entirely from the second term:
+
+$$
+Var(\hat{\beta}_1) = Var\left(\frac{\sum_{i=1}^{n}(x_i - \bar{x})\mu_i}{\sum_{i=1}^{n}(x_i - \bar{x})^2}\right)
+$$
+
+
+### Treating the Denominator as a Constant
+
+Under Assumptions 2 and 3 (random sampling and variation in $x$), we treat the $x_i$ values as fixed (or condition on them). This means $\sum(x_i - \bar{x})^2 = SST_x$ is a constant. Using the Variance Property $Var(cX) = c^2 Var(X)$, we can pull this term out of the variance:
+
+$$
+Var(\hat{\beta}_1) = \frac{1}{SST_x^2} \cdot Var\left(\sum_{i=1}^{n}(x_i - \bar{x})\mu_i\right).
+$$
+
+Similarly, we can also pull the $\sum(x_i - \bar{x})\mu_i$ term out of the expression using the same property:
+
+$$
+Var(\hat{\beta}_1) = \frac{\sum_{i=1}^{n}(x_i - \bar{x})^2}{SST_x^2} \cdot Var(\mu_i) = 
+\frac{SST_x}{SST_x^2} \cdot Var(\mu_i) = \frac{1}{SST_x} \cdot Var(\mu_i).
+$$
+
+### Applying the Homoskedasticity Assumption
+
+Under Assumption 5 (homoskedasticity), the error variance is the same for every observation: 
+$Var(\mu_i) = \sigma^2$ for all $i$. This lets us factor $\sigma^2$ out of the variance term:
+
+$$
+Var(\hat{\beta}_1) = \frac{1}{SST_x} \cdot Var(\mu_i) = \frac{1}{SST_x} \cdot \sigma^2
+$$
+
+
+### Putting It All Together
+
+Thus, we get our expression for the variance of the OLS estimate of our population parameter:
 
 $$
 Var(\hat{\beta}_1) = \frac{\sigma^2}{SST_x}
@@ -1210,11 +1290,20 @@ $$
 
 where $\sigma^2 = Var(\mu)$ is the error variance and $SST_x = \sum(x_i - \bar{x})^2$ is the total variation in $x$.
 
-This formula reveals two key insights:
+### What Does This Tell Us?
 
-1. **More noise ($\sigma^2$) means more variance:** If there's a lot of unexplained variation in $y$, our estimates are less precise.
+This formula reveals three important things about the precision of our estimates:
 
-2. **More variation in $x$ means less variance:** Spreading out our observations of $x$ gives us more information and more precise estimates. This also implies that larger samples (which have more total variation) yield more precise estimates.
+1. **More noise ($\sigma^2$) means more variance:** If there's a lot of unexplained variation in $y$, our estimates are less precise. Unfortunately, we typically can't control this.
+
+2. **More variation in $x$ means less variance:** Spreading out our observations of $x$ gives us more information about the relationship and more precise estimates.
+
+3. **Larger samples help:** More observations mean more total variation in $x$ (larger $SST_x$), which pushes the variance down. This is one reason why larger samples are better.
+
+::: {.callout-note}
+## Which Assumptions Did We Use?
+Notice that the variance formula requires *all five* Gauss-Markov assumptions: Assumptions 1--4 for unbiasedness (so the decomposition in Step 1 holds), and Assumption 5 (homoskedasticity) to factor $\sigma^2$ out of the sum. This is why the variance formula $\sigma^2 / SST_x$ is only valid under homoskedasticity.
+:::
 
 
 ## Standard Errors
@@ -1227,7 +1316,7 @@ $$
 
 where $\hat{\sigma} = \sqrt{\frac{SSR}{n-2}}$ is the estimated standard deviation of the errors.
 
-Standard errors quantify the precision of our estimates and are essential for hypothesis testing and confidence intervals (which we'll cover in the next chapter).
+Standard errors quantify the precision of our estimates and are essential for hypothesis testing and confidence intervals (which we'll cover in @sec-inference).
 
 ```{r}
 #| echo: true
@@ -1237,23 +1326,6 @@ summary(lm_mpg)
 ```
 
 The standard error of $\hat{\beta}_1$ is 0.01, shown in the `Std. Error` column.
-
-
-## OLS is BLUE
-
-Under all five Gauss-Markov assumptions,
-OLS is **BLUE**:
-
-- **B**est: Lowest variance among all linear unbiased estimators
-- **L**inear: The estimator is a linear function of the $y_i$'s
-- **U**nbiased: $E[\hat{\beta}] = \beta$
-- **E**stimator: It's a rule for using sample data to estimate population parameters
-
-This is a powerful result:
-among all estimators that are linear and unbiased,
-OLS has the smallest variance.
-You cannot do better without either using non-linear methods or accepting some bias.
-
 
 ## Summary and Conclusion
 
@@ -1289,8 +1361,6 @@ $$\hat{\beta}_1 = \frac{Cov(x,y)}{Var(x)}$$
 - **Bivariate OLS is essentially correlation**—be very careful about causal interpretation
 
 - **The Gauss-Markov assumptions** (especially zero conditional mean) are required for unbiasedness
-
-- **Omitted variable bias** arises when we exclude a variable correlated with both $x$ and $y$
 
 - **Causality requires unbiasedness**—only when $E[\mu|x] = 0$ can we interpret $\hat{\beta}_1$ as a causal effect
 
@@ -1348,24 +1418,13 @@ $$\hat{\beta}_1 = \frac{Cov(x,y)}{Var(x)}$$
 </div>
 
 <div class="answer-row">
-    <label>v. Omitted variable bias occurs when: </label>
-    <select onchange="checkAnswer(this, 'c')">
+    <label>vi. Which Gauss-Markov assumption, if violated, would make OLS biased but would NOT affect the validity of the usual standard error formulas on its own? </label>
+    <select onchange="checkAnswer(this, 'd')">
         <option value="">-- Select Answer --</option>
-        <option value="a">We include too many variables in the regression</option>
-        <option value="b">The sample size is too small</option>
-        <option value="c">We exclude a variable correlated with both x and y</option>
-        <option value="d">The error term is heteroskedastic</option>
-    </select>
-</div>
-
-<div class="answer-row">
-    <label>vi. Which Gauss-Markov assumption is required for unbiasedness but NOT for calculating the OLS formulas? </label>
-    <select onchange="checkAnswer(this, 'b')">
-        <option value="">-- Select Answer --</option>
-        <option value="a">Linear in parameters</option>
-        <option value="b">Zero conditional mean</option>
-        <option value="c">Variation in x</option>
-        <option value="d">Homoskedasticity</option>
+        <option value="a">Homoskedasticity</option>
+        <option value="b">Linear in parameters</option>
+        <option value="c">Random sampling</option>
+        <option value="d">None—every assumption needed for unbiasedness is also needed for valid standard errors</option>
     </select>
 </div>
 
@@ -1393,9 +1452,7 @@ iii. The OLS slope equals the sample covariance of $x$ and $y$ divided by the sa
 
 iv. Unbiasedness means that if we could repeat the sampling process many times, the *average* of our estimates would equal the true parameter. Individual estimates can still miss the target.
 
-v. Omitted variable bias occurs when we leave out a variable that belongs in the model and is correlated with our included independent variable. This causes $E[\mu|x] \neq 0$.
-
-vi. The zero conditional mean assumption ($E[\mu|x] = 0$) is needed to prove OLS is unbiased, but it is not needed to derive the OLS formulas themselves. The calculus minimization approach works regardless of this assumption—it just tells us which values minimize squared residuals.
+vi. This is a trick question. Assumptions 1--4 are all required for both unbiasedness *and* valid standard errors. There is no assumption that affects bias alone without also affecting inference. Homoskedasticity (Assumption 5) goes the other way---it affects standard errors but *not* unbiasedness.
 
 vii. As sample size increases, we get more variation in $x$, so $SST = \sum(x_i - \bar{x})^2$ increases. Since this appears in the denominator, the variance of our estimate decreases. Larger samples give more precise estimates.
 
@@ -1501,7 +1558,7 @@ n = 48, R-squared = 0.21
         <option value="a">The R-squared is too low</option>
         <option value="b">The sample size is too small</option>
         <option value="c">The coefficient is negative</option>
-        <option value="d">Omitted variables (like anti-smoking policies or income) may affect both price and consumption</option>
+        <option value="d">Omitted variables  may affect both price and consumption</option>
     </select>
 </div>
 </div>
