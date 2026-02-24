@@ -55,25 +55,6 @@ library(tidyverse)
 When can we interpret a regression coefficient as a **causal effect** vs. a mere **correlation**?
 :::
 
-## Population vs. Sample: The Key Distinction
-
-- There is a **true relationship** between variables in the population -- we call this the **population regression model**
-
-. . .
-
-- We never observe the whole population -- we only have a **sample**
-
-. . .
-
-- **Population parameters** ($\beta_0$, $\beta_1$): fixed, unknown constants -- the "truth" we want to learn
-
-- **Sample estimates** ($\hat{\beta}_0$, $\hat{\beta}_1$): calculated from our data -- our best guesses
-
-. . .
-
-- Today's roadmap: write down the population model → figure out how to estimate it from a sample → ask when those estimates are trustworthy
-
-
 # Modeling Relationships Between Variables
 
 ## What Do We Mean by "Relationship"?
@@ -215,6 +196,8 @@ The Unit 2 lecture notes cover `ggplot2` in much more detail, including histogra
 #| output-location: fragment
 #| fig-height: 3.5
 
+library(tidyverse)
+
 ggplot(data = mtcars) +
   geom_point(aes(x = hp, y = mpg))
 ```
@@ -234,7 +217,7 @@ Always add proper labels and a clean theme:
 #| fig-height: 3
 
 ggplot(data = mtcars) +
-  geom_point(aes(x = hp, y = mpg, size = 3, alpha = 0.7)) +
+  geom_point(aes(x = hp, y = mpg)) +
   labs(
     title = "Fuel Efficiency vs. Engine Power",
     x = "Horsepower",
@@ -258,8 +241,8 @@ ggplot(data = mtcars) +
 #| fig-height: 3
 
 ggplot(data = mtcars) +
-  geom_point(aes(x = hp, y = mpg), alpha = 0.6) +
-  geom_smooth(aes(x = hp, y = mpg), method = "lm", se = TRUE) +
+  geom_point(aes(x = hp, y = mpg)) +
+  geom_smooth(aes(x = hp, y = mpg), method = "lm", se = FALSE) +
   labs(x = "Horsepower", y = "Miles per Gallon",
        title = "MPG vs. Horsepower with Line of Best Fit") +
   theme_minimal()
@@ -282,7 +265,7 @@ ggplot(data = mtcars) +
 #| fig-height: 2.5
 
 ggplot(mtcars) +
-  geom_point(aes(x = wt, y = mpg), alpha = 0.7) +
+  geom_point(aes(x = wt, y = mpg)) +
   labs(x = "Weight (1000 lbs)", y = "Miles per Gallon",
        title = "Heavier Cars Get Worse Fuel Efficiency") +
   theme_minimal()
@@ -386,28 +369,6 @@ $$\hat{y} = \hat{\beta}_0 + \hat{\beta}_1 x$$
 - For any value of $x$, this gives us $\hat{y}$, the **predicted value** of $y$
 
 - This is exactly what `geom_smooth(method = "lm")` draws!
-
-## The Fitted Line in R {.smaller}
-
-::: {.callout-note icon=false}
-## 🖥️ Try it yourself!
-:::
-
-- When we add `geom_smooth(method = "lm")`, R estimates $\hat{\beta}_0$ and $\hat{\beta}_1$ behind the scenes and plots the line $\hat{y} = \hat{\beta}_0 + \hat{\beta}_1 x$
-
-. . .
-
-```{r}
-#| output-location: fragment
-#| fig-height: 3
-
-ggplot(mtcars, aes(x = hp, y = mpg)) +
-  geom_point(alpha = 0.6) +
-  geom_smooth(method = "lm", se = FALSE, color = "steelblue", linewidth = 1.2) +
-  labs(x = "Horsepower", y = "Miles per Gallon",
-       title = "The fitted regression line: ŷ = β̂₀ + β̂₁ × hp") +
-  theme_minimal()
-```
 
 ## Residuals: The Prediction Errors {.smaller}
 
