@@ -114,7 +114,7 @@ function checkAnswer(selectElement, correctValue) {
 
 In @sec-ols,
 we introduced bivariate OLS and saw that causal interpretation requires the zero conditional mean assumption: $E[\mu | x] = 0$.
-We also saw that this assumption is frequently violated due to omitted variables---factors in the error term that are correlated with both $x$ and $y$.
+We also saw that this assumption is *very* difficult to justify.
 
 This chapter introduces **multivariate OLS**,
 which allows us to explicitly control for confounding variables.
@@ -164,7 +164,9 @@ Multivariate OLS offers a solution:
 **explicitly control** for variables that might be confounders.
 
 If we're worried that family income confounds the education-wage relationship,
-we can include it in our model:
+we can include it in our population regression model by
+simply adding additional right-hand side, independent variables:
+
 
 $$
 wage = \beta_0 + \beta_1 \cdot educ + \beta_2 \cdot family\_income + \mu
@@ -172,9 +174,12 @@ $$
 
 Now $\beta_1$ represents the effect of education on wages **holding family income constant**.
 The error term $\mu$ no longer contains family income,
-so that source of bias is eliminated.
+so that specific source of bias is eliminated.
 
 ### The General Multivariate Model
+
+If we are worried about additional sources of omitted variable bias (as we probably should be),
+it is easy to expand our regression model and include even more control variables.
 
 The general multivariate linear regression model with $k$ independent variables is:
 
@@ -185,7 +190,7 @@ $$ {#eq-multivariate}
 where:
 
 - $y$ is the dependent variable
-- $x_1, x_2, \ldots, x_k$ are the independent variables
+- $x_1, x_2, \ldots, x_k$ are the independent/control variables
 - $\beta_0$ is the intercept
 - $\beta_j$ is the coefficient on $x_j$ (for $j = 1, 2, \ldots, k$)
 - $\mu$ is the error term containing all factors not included in the model
@@ -340,10 +345,12 @@ This is precisely what controlling for confounders accomplishes.
 
 ## Multivariate OLS as Matching
 
+What is actually happening "under the hood" when we say we want to "control" for a given variable?
+
 There's an intuitive way to understand what multivariate OLS does:
 it's essentially a **matching** estimator.
 When we "control for" a variable,
-we're comparing observations that have similar values of that control variable.
+we're comparing observations (i.e., values of $x_1$) that have similar values of a control variable (ie., $x_2$).
 
 ### The Returns to Education Example
 
@@ -353,12 +360,26 @@ Part of the apparent "return to education" might actually be an "industry premiu
 
 Let's work through this with simulated data to see exactly how controlling for industry works.
 
+Specifically, let's create an imaginary population where:
+
+1. Individuals have either 12. 14, or 16 years of education
+2. Those with 12, 14, and 16 years of education have a 0.20, 0.40, and 0.65 chance of working in a high-paying industry
+3. The "true" population regression model is:
+
+$$
+wage = 25000 + 3000 \cdot \text{education} + 15000 \cdot \text{professional industry} 
+$$
+
+So, the "true" effect of an additional year of education on wages is thus 3000.
+
 ```{r}
 #| echo: true
+#| code-fold: true
+#| code-summary: "Code: Simulated Population Data"
 
 # Simulate wage data
-set.seed(42)
-n <- 2000
+set.seed(12345)
+n <- 5000
 
 # Create data where:
 # - More educated workers are more likely to be in high-paying industries
@@ -422,11 +443,28 @@ naive_ba_diff <- ba_wage - hs_wage
 ```
 
 The naive comparison suggests that going from high school to some college is associated with about $`r format(round(naive_sc_diff, 0), big.mark = ",")` higher wages,
-and going from high school to a bachelor's degree is associated with about $`r format(round(naive_ba_diff, 0), big.mark = ",")` higher wages.
+and going from high school to a bachelor's degree is associated with about $`r format(round(naive_ba_diff, 0), big.mark = ",")` higher wages (i.e., the difference between average wages for those with only 12 years of education vs. 14 years, and so on).
 
-But wait—the true effect of education in our simulation is only \$3,000 per year (so \$6,000 for 2 extra years and \$12,000 for 4 extra years).
+But wait! 
+The true effect of education in our simulation is only \$3,000 per year (so \$6,000 for 2 extra years and \$12,000 for 4 extra years).
 The naive estimates are too large!
+
+We can also see this in the results if we run a simple bivariate regression:
+
+```{r}
+#| echo: true
+
+naive_ols <- lm(wage ~ educ_years, data = wage_data)
+
+summary(naive_ols)
+
+```
+
+The coefficient on `educ_years` is way bigger than the true effect!
+
 This is because more educated workers are more likely to be in high-paying industries.
+By failing to account that some industries just pay higher than others,
+our simple 
 
 ### Step 1: Compute Within-Industry Differences
 
@@ -533,7 +571,7 @@ Now let's see what regression gives us:
 ```{r}
 #| echo: true
 
-# Create numeric education variable (years beyond HS)
+# Create numeric education variable (years beyond HS - just to get easier to interpret numbers)
 wage_data <- wage_data |>
   mutate(educ_beyond_hs = educ_years - 12)
 
@@ -565,7 +603,9 @@ OLS is effectively:
 3. **Taking a weighted average** across groups,
 where weights reflect group sizes
 
-This is why multivariate regression is sometimes called a "matching" estimator—we're matching people who work in the same industry and comparing their wages based on education.
+This is why multivariate regression can sometimes be thought of as a "matching" estimator—we're matching people who work in the same industry and then comparing their wages based on education.
+The same logic applies if we have multiple control variables,
+although the grouping gets complicated fast.
 :::
 
 
@@ -678,6 +718,36 @@ $$
 
 The variance of the error term is constant across all combinations of independent variable values.
 
+## Unbiasedness of Multivariate OLS
+
+Just like with bivariate OLS,
+if Gauss-Markov assumptions 1--4 hold,
+then our multivariate OLS estimates are **unbiased:**
+
+$$
+E[\hat{\beta_j}] = \beta_j, j = {0, 1, ..., k}.
+$$
+
+We can then interpret our estimates as  *ceteris paribus* comparisons,
+or apples-to-apples comparisons *conditional on control variables*.
+
+### Observed vs. Unobserved Variables
+
+However, just because we are able to control for lots of variables doesn't mean we have a causal estimate.
+In many cases, if we have lots of *observed* correlation between control variables
+and our independent variable of interest,
+we also probably have lots of **unobserved** correlation between variables.
+
+For example,
+there could be important components of $\mu$ that we simply cannot measure sufficiently--inherent motivation in a wage regression, for example.
+Labor market surveys generally do not have an effective way to capture this,
+so this important determinant of wages is considered *unobserved*,
+and we thus have cannot include it in our multivariate regression model
+and we will therefore end up with a biased estimate.
+
+But this is not the end of the world.
+Throughout the course,
+we are going to cover some methods which allow us to deal with some of these issues.
 
 ## The Omitted Variable Bias Formula
 
@@ -686,14 +756,23 @@ we can still reason about the **direction** of the bias.
 
 ### Setup
 
-Suppose the true model is:
+Let's say our independent variable of interest is $beta_1$ (e.g., education).
+
+Suppose the true population regression model is:
 
 $$
 y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \mu
 $$
 
-But we can't observe $x_2$,
-so we estimate the misspecified model:
+In an ideal world,
+we would be able to estimate an unbiased model:
+
+$$
+\hat{y} = \hat{\beta_0} + \hat{\beta_1} x. 
+$$
+
+But we can't observe $x_2$ (it may be motivation or ability, for example),
+so instead we estimate the misspecified model:
 
 $$
 \tilde{y} = \tilde{\beta}_0 + \tilde{\beta}_1 x_1
@@ -701,7 +780,12 @@ $$
 
 where the tilde ($\tilde{}$) indicates estimates from the misspecified model.
 
+
 ### The OVB Formula
+
+It turns out there is a simple relationship between our biased estimate from
+the misspecified model, $\tilde{\beta}_1$,
+and our unbiased, correctly specified model $\hat{\beta}_1$:
 
 It can be shown that:
 
@@ -712,7 +796,7 @@ $$ {#eq-ovb-formula}
 where $\tilde{\delta}_1$ is the coefficient from regressing $x_2$ on $x_1$:
 
 $$
-x_2 = \tilde{\delta}_0 + \tilde{\delta}_1 x_1 + \text{error}
+x_2 = \tilde{\delta}_0 + \tilde{\delta}_1 x_1 + \text{error}.
 $$
 
 Taking expectations:
@@ -771,6 +855,18 @@ $$\text{Bias} = (+)(+) = \text{Positive}$$
 Our estimate suggests policing *increases* crime more than it actually does (or reduces it less than it actually does).
 This is why naive correlations between police presence and crime can be misleading.
 
+### Example: Study Hours, Course Difficulty, and GPA
+
+Consider estimating the effect of study hours on GPA while omitting course difficulty:
+
+- **Effect of course difficulty on GPA ($\beta_2$):** Negative (harder courses → lower GPA)
+- **Correlation of course difficulty with study hours ($\tilde{\delta}_1$):** Positive (harder courses → students study more)
+
+Therefore:
+$$\text{Bias} = (-)(+) = \text{Negative}$$
+
+Our estimate understates the true benefit of studying. Students who study the most tend to be taking harder courses that drag down their GPAs, so the naive estimate makes studying look *less* effective than it actually is.
+
 
 ## Variance in Multivariate OLS
 
@@ -799,7 +895,12 @@ the variance of $\hat{\beta}_j$ increases when:
 The third point is crucial:
 when your variable of interest is highly correlated with control variables,
 your estimate becomes less precise.
-This is sometimes called **imperfect multicollinearity** or the **multicollinearity problem**.
+This is sometimes called **high multicollinearity** or the **multicollinearity problem**.
+
+Note this is different from **perfect multicolinearity**,
+which makes it *impossible* to get an estimate.
+Here, we still will be able to estimate our $\beta_j$ successfully,
+but it will have a high variance and be "noisy".
 
 ### Standard Errors
 
@@ -875,36 +976,43 @@ that control is probably important.
 ## Simulation: Bias vs. Variance
 
 Let's see the bias-variance tradeoff in action with a simulation.
+We generate two populations---one where $x_2$ is irrelevant ($\beta_2 = 0$)
+and one where $x_2$ is relevant ($\beta_2 \neq 0$)---then
+repeatedly estimate $\hat{\beta}_1$ using either the short model (omit $x_2$)
+or the long model (include $x_2$).
 
 ```{r}
 #| echo: false
 #| label: fig-bias-variance
-#| fig-cap: "The bias-variance tradeoff. Left: When x₂ doesn't affect y (β₂=0), including it adds variance without reducing bias. Right: When x₂ does affect y (β₂≠0), omitting it causes bias."
-#| fig-width: 10
-#| fig-height: 4
-#| out-width: "95%"
+#| fig-cap: "The bias-variance tradeoff across all four cases. Each panel shows the sampling distribution of $\\hat{\\beta}_1$ from 1,000 simulations. The dashed red line marks the true $\\beta_1 = 2.21$."
+#| fig-width: 12
+#| fig-height: 8
+#| out-width: "100%"
 #| cache: true
+#| warning: false
 
 set.seed(124890)
 
-# Case 1: x2 is irrelevant (beta2 = 0)
+n_pop <- 10000
+
+# DGP: correlation between x1 and x2 of r ≈ 0.75
+# Variance inflation factor ≈ 2.3x — visible but not extreme
 pop_irrelevant <- tibble(
-  x2 = sample(1:100, 10000, replace = TRUE),
-  err = rnorm(10000),
-  x1 = 5.68 + 1.89 * x2 + rnorm(10000),
+  x2 = rnorm(n_pop, 50, 15),
+  err = rnorm(n_pop, 0, 10),
+  x1 = 10 + 0.6 * x2 + rnorm(n_pop, 0, 8),
   y = 8.78 + 2.21 * x1 + err  # Note: no x2 effect
 )
 
-# Case 2: x2 is relevant (beta2 != 0)
 pop_relevant <- tibble(
-  x2 = sample(1:100, 10000, replace = TRUE),
-  err = rnorm(10000),
-  x1 = 5.68 + 1.89 * x2 + rnorm(10000),
-  y = 8.78 + 2.21 * x1 + 0.15 * x2 + err  # x2 has effect
+  x2 = rnorm(n_pop, 50, 15),
+  err = rnorm(n_pop, 0, 10),
+  x1 = 10 + 0.6 * x2 + rnorm(n_pop, 0, 8),
+  y = 8.78 + 2.21 * x1 + 1.5 * x2 + err  # x2 has effect
 )
 
 # Simulation function
-simulate_estimates <- function(pop_data, include_x2, n_sims = 500, sample_size = 100) {
+simulate_estimates <- function(pop_data, include_x2, n_sims = 1000, sample_size = 100) {
   map_dfr(1:n_sims, function(i) {
     samp <- slice_sample(pop_data, n = sample_size)
     if (include_x2) {
@@ -918,60 +1026,89 @@ simulate_estimates <- function(pop_data, include_x2, n_sims = 500, sample_size =
 
 # Run simulations
 set.seed(42)
-irrel_omit <- simulate_estimates(pop_irrelevant, include_x2 = FALSE)
+irrel_omit    <- simulate_estimates(pop_irrelevant, include_x2 = FALSE)
 irrel_include <- simulate_estimates(pop_irrelevant, include_x2 = TRUE)
-rel_omit <- simulate_estimates(pop_relevant, include_x2 = FALSE)
-rel_include <- simulate_estimates(pop_relevant, include_x2 = TRUE)
+rel_omit      <- simulate_estimates(pop_relevant,   include_x2 = FALSE)
+rel_include   <- simulate_estimates(pop_relevant,   include_x2 = TRUE)
 
-# Plot Case 1: Irrelevant variable
-p1 <- ggplot() +
-  geom_histogram(data = irrel_omit, aes(x = b1, fill = "Omit x₂"), 
-                 alpha = 0.5, bins = 30, color = "white") +
-  geom_histogram(data = irrel_include, aes(x = b1, fill = "Include x₂"), 
-                 alpha = 0.5, bins = 30, color = "white") +
-  geom_vline(xintercept = 2.21, color = "darkred", linewidth = 1.5, linetype = "dashed") +
-  scale_fill_manual(values = c("Omit x₂" = "steelblue", "Include x₂" = "coral")) +
+true_beta <- 2.21
+
+# Combine all simulations into one data frame for faceting
+# Use plotmath-parseable strings for facet labels (renders in both HTML and PDF)
+all_sims <- bind_rows(
+  irrel_omit    |> mutate(case = "x[2]~'irrelevant,'~'omit'~x[2]"),
+  irrel_include |> mutate(case = "x[2]~'irrelevant,'~'include'~x[2]"),
+  rel_omit      |> mutate(case = "x[2]~'relevant,'~'omit'~x[2]"),
+  rel_include   |> mutate(case = "x[2]~'relevant,'~'include'~x[2]")
+) |>
+  mutate(
+    case = factor(case, levels = c(
+      "x[2]~'irrelevant,'~'omit'~x[2]",
+      "x[2]~'irrelevant,'~'include'~x[2]",
+      "x[2]~'relevant,'~'omit'~x[2]",
+      "x[2]~'relevant,'~'include'~x[2]"
+    )),
+    fill_group = ifelse(grepl("omit", case), "omit", "include")
+  )
+
+# Summary stats for annotation labels
+sum_stats <- all_sims |>
+  summarise(
+    sim_mean = mean(b1),
+    sim_sd = sd(b1),
+    bias = mean(b1) - true_beta,
+    .by = c(case, fill_group)
+  )
+
+ggplot(all_sims, aes(x = b1, fill = fill_group)) +
+  geom_histogram(alpha = 0.7, bins = 50, color = "white") +
+  geom_vline(xintercept = true_beta, color = "darkred", linewidth = 1.2, linetype = "dashed") +
+  geom_vline(data = sum_stats, aes(xintercept = sim_mean),
+             color = "black", linewidth = 0.8, linetype = "solid") +
+  geom_label(
+    data = sum_stats,
+    aes(x = Inf, y = Inf,
+        label = paste0("Mean = ", round(sim_mean, 3),
+                        "\nSD = ", round(sim_sd, 3),
+                        "\nBias = ", round(bias, 3))),
+    hjust = 1, vjust = 1.3, size = 3, fill = "white", alpha = 0.85,
+    label.size = 0.3, inherit.aes = FALSE
+  ) +
+  facet_wrap(~ case, ncol = 2, scales = "free", labeller = label_parsed) +
+  scale_fill_manual(values = c("omit" = "steelblue", "include" = "coral"),
+                    labels = c("omit" = expression("Omit"~x[2]),
+                               "include" = expression("Include"~x[2]))) +
   labs(
-    title = expression(paste("Case 1: ", x[2], " is irrelevant (", beta[2], " = 0)")),
     x = expression(hat(beta)[1]),
     y = "Count",
     fill = "Model"
   ) +
-  annotate("text", x = 2.21, y = 55, label = "True β₁", color = "darkred", hjust = -0.1) +
-  theme_minimal() +
-  theme(legend.position = "bottom")
-
-# Plot Case 2: Relevant variable
-p2 <- ggplot() +
-  geom_histogram(data = rel_omit, aes(x = b1, fill = "Omit x₂"), 
-                 alpha = 0.5, bins = 30, color = "white") +
-  geom_histogram(data = rel_include, aes(x = b1, fill = "Include x₂"), 
-                 alpha = 0.5, bins = 30, color = "white") +
-  geom_vline(xintercept = 2.21, color = "darkred", linewidth = 1.5, linetype = "dashed") +
-  scale_fill_manual(values = c("Omit x₂" = "steelblue", "Include x₂" = "coral")) +
-  labs(
-    title = expression(paste("Case 2: ", x[2], " is relevant (", beta[2], " ≠ 0)")),
-    x = expression(hat(beta)[1]),
-    y = "Count",
-    fill = "Model"
-  ) +
-  annotate("text", x = 2.21, y = 55, label = "True β₁", color = "darkred", hjust = -0.1) +
-  theme_minimal() +
-  theme(legend.position = "bottom")
-
-p1 + p2
+  theme_minimal(base_size = 12) +
+  theme(
+    legend.position = "none",
+    strip.text = element_text(face = "bold", size = 11)
+  )
 ```
 
-In **Case 1** (left panel),
-$x_2$ doesn't actually affect $y$.
-Including it (coral) doesn't reduce bias (both distributions are centered on the true value),
-but it does increase variance (the coral distribution is wider).
+Each panel shows one of the four possible scenarios:
 
-In **Case 2** (right panel),
-$x_2$ does affect $y$.
-Omitting it (blue) causes bias---the distribution is centered away from the true value.
-Including it (coral) eliminates the bias,
-even though variance is slightly higher.
+- **Case 1** (top-left): $x_2$ is irrelevant and we omit it.
+  Both bias and variance are small.
+  This is the *best case*---we correctly leave out a variable that doesn't belong.
+
+- **Case 2** (top-right): $x_2$ is irrelevant but we include it anyway.
+  The estimates are still centered on the true value (no bias),
+  but the distribution is *wider* (higher variance).
+  Including an irrelevant variable costs us precision for no benefit.
+
+- **Case 3** (bottom-left): $x_2$ is relevant but we omit it.
+  The distribution shifts away from the true $\beta_1$---this is **omitted variable bias**.
+  Even though the variance is low, the estimates are *systematically wrong*.
+
+- **Case 4** (bottom-right): $x_2$ is relevant and we include it.
+  The distribution is centered on the true value (no bias),
+  though variance is slightly higher than Case 1.
+  This is the *correct* specification---the variance cost is worth paying to eliminate bias.
 
 
 ## Summary

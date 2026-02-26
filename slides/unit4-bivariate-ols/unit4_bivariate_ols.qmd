@@ -956,7 +956,9 @@ ggplot(zcm_bad, aes(x = x, y = mu)) +
 
 . . .
 
-- Is this plausible? People with more education tend to have higher **ability** (which is in $\mu$)
+- Is this plausible?
+
+- People with more education tend to have higher **ability** (which is in $\mu$)
 
 . . .
 
@@ -1011,7 +1013,7 @@ pop_data <- tibble(
 ## 🖥️ Try it yourself!
 :::
 
-Now draw 500 random samples and estimate $\hat{\beta}_1$ each time:
+Now draw 500 random samples and estimate $\hat{\beta}_1$ each time. We use a `for()` loop to repeat the same set of steps a fixed number of times. The loop runs the code inside `{}` once for each value of `i` (from 1 to 500), so we don't have to copy and paste the same code 500 times:
 
 ```{r}
 #| output-location: fragment
@@ -1020,13 +1022,15 @@ set.seed(812476)
 n_sims <- 500
 sample_size <- 25
 
-sim_results <- tibble(
-  iteration = 1:n_sims,
-  b1_hat = map_dbl(1:n_sims, function(i) {
-    samp <- slice_sample(pop_data, n = sample_size, replace = TRUE)
-    coef(lm(y ~ x, data = samp))[2]
-  })
-)
+# Create a dataframe to store our results
+sim_results <- tibble(iteration = integer(), b1_hat = numeric())
+
+# Run the simulation
+for (i in 1:n_sims) {
+  samp <- slice_sample(pop_data, n = sample_size, replace = TRUE)
+  b1_hat <- coef(lm(y ~ x, data = samp))[2]
+  sim_results <- sim_results |> add_row(iteration = i, b1_hat = b1_hat)
+}
 
 mean(sim_results$b1_hat)
 ```
@@ -1043,9 +1047,9 @@ ggplot(sim_results, aes(x = b1_hat)) +
   geom_vline(xintercept = 2.21, color = "red", linewidth = 1.2, linetype = "dashed") +
   geom_vline(xintercept = mean(sim_results$b1_hat), color = "forestgreen",
              linewidth = 1.2) +
-  annotate("text", x = 2.28, y = 40, label = paste0("True β₁ = 2.21"),
+  annotate("text", x = 2.275, y = 40, label = paste0("True β = 2.21"),
            color = "red", size = 5, fontface = "bold") +
-  annotate("text", x = 2.14, y = 35,
+  annotate("text", x = 2.145, y = 35,
            label = paste0("Mean = ", round(mean(sim_results$b1_hat), 3)),
            color = "forestgreen", size = 5, fontface = "bold") +
   labs(x = expression(hat(beta)[1]), y = "Count",
@@ -1136,7 +1140,7 @@ set.seed(77)
 n_h <- 100
 x_h <- runif(n_h, 1, 10)
 y_homo <- 2 + 1.5 * x_h + rnorm(n_h, 0, 2)
-y_hetero <- 2 + 1.5 * x_h + rnorm(n_h, 0, 0.3 * x_h)
+y_hetero <- 2 + 1.5 * x_h + rnorm(n_h, 0, 1.2 * x_h)
 
 ggplot(tibble(x = x_h, y = y_homo), aes(x, y)) +
   geom_point(alpha = 0.6) +
@@ -1245,7 +1249,7 @@ sim_var_long <- sim_var |>
 ggplot(sim_var_long, aes(x = estimate, fill = scenario)) +
   geom_histogram(binwidth = 0.06, alpha = 0.6, position = "identity", color = "white") +
   geom_vline(xintercept = 2, color = "red", linewidth = 1.2, linetype = "dashed") +
-  annotate("text", x = 2, y = 75, label = "True β₁ = 2", color = "red",
+  annotate("text", x = 2, y = 75, label = "True β = 2", color = "red",
            size = 5, fontface = "bold", hjust = -0.1) +
   scale_fill_manual(values = c("steelblue", "coral")) +
   labs(x = expression(hat(beta)[1]), y = "Count", fill = "",
@@ -1293,7 +1297,7 @@ sim_x_long <- sim_x |>
 ggplot(sim_x_long, aes(x = estimate, fill = scenario)) +
   geom_histogram(binwidth = 0.06, alpha = 0.6, position = "identity", color = "white") +
   geom_vline(xintercept = 2, color = "red", linewidth = 1.2, linetype = "dashed") +
-  annotate("text", x = 2, y = 70, label = "True β₁ = 2", color = "red",
+  annotate("text", x = 2, y = 70, label = "True β = 2", color = "red",
            size = 5, fontface = "bold", hjust = -0.1) +
   scale_fill_manual(values = c("coral", "forestgreen")) +
   labs(x = expression(hat(beta)[1]), y = "Count", fill = "",
@@ -1337,7 +1341,7 @@ sim_n_long <- sim_n |>
 ggplot(sim_n_long, aes(x = estimate, fill = scenario)) +
   geom_histogram(binwidth = 0.06, alpha = 0.6, position = "identity", color = "white") +
   geom_vline(xintercept = 2, color = "red", linewidth = 1.2, linetype = "dashed") +
-  annotate("text", x = 2, y = 80, label = "True β₁ = 2", color = "red",
+  annotate("text", x = 2, y = 80, label = "True β = 2", color = "red",
            size = 5, fontface = "bold", hjust = -0.1) +
   scale_fill_manual(values = c("coral", "forestgreen")) +
   labs(x = expression(hat(beta)[1]), y = "Count", fill = "",
@@ -1353,7 +1357,7 @@ ggplot(sim_n_long, aes(x = estimate, fill = scenario)) +
 
 . . .
 
-$$se(\hat{\beta}_1) = \frac{\hat{\sigma}}{\sqrt{SST_x}}$$
+$$se(\hat{\beta}_1) = \sqrt{Var(\hat{\beta}_1)} = \frac{\hat{\sigma}}{\sqrt{SST_x}}$$
 
 . . .
 
