@@ -752,7 +752,9 @@ $$\text{Bias}(\tilde{\beta}_1) = E[\tilde{\beta}_1] - \beta_1$$
 
 ## The OVB Formula {.smaller}
 
-Suppose the **true** model is:
+
+
+We want to estimate $\beta_1$. Suppose the **true** model is:
 
 . . .
 
@@ -768,7 +770,9 @@ $$\tilde{y} = \tilde{\beta}_0 + \tilde{\beta}_1 x_1$$
 
 . . .
 
-Then:
+It turns out there is a simple relation between the true value of our parameter, $\beta_1$, 
+an *unbiased* estimate of our parameter $\hat{\beta}_1$,
+and the *biased* estimate of our parameter $\tilde{\beta}_1$:
 
 . . .
 
@@ -776,7 +780,12 @@ $$\tilde{\beta}_1 = \hat{\beta}_1 + \hat{\beta}_2 \cdot \tilde{\delta}_1$$
 
 . . .
 
-where $\tilde{\delta}_1$ comes from regressing $x_2$ on $x_1$: $\quad x_2 = \tilde{\delta}_0 + \tilde{\delta}_1 x_1$
+where $\tilde{\delta}_1$ comes from regressing $x_2$ on $x_1$: 
+
+. . .
+
+$$\quad x_2 = \tilde{\delta}_0 + \tilde{\delta}_1 x_1$$
+
 
 ## The OVB Formula {.smaller}
 
@@ -825,7 +834,7 @@ n <- 1000
 # True DGP: y = 3 + 2*x1 + 4*x2 + 3*x3 + error
 x2 <- rnorm(n)
 x3 <- rnorm(n)                    # x3 is independent of x1
-x1 <- 0.6 * x2 + rnorm(n)        # x1 and x2 are correlated
+x1 <- 0.1 * x2 + rnorm(n)        # x1 and x2 are correlated
 y <- 3 + 2 * x1 + 4 * x2 + 3 * x3 + rnorm(n)
 
 # Full model (correct)
@@ -850,7 +859,10 @@ Omitting $x_2$ (correlated with $x_1$) biases $\hat{\beta}_1$. Omitting $x_3$ (u
 # Verify: bias from omitting x2 = beta2 * delta1
 beta2 <- 4
 delta1 <- coef(lm(x2 ~ x1))["x1"]
-c("Predicted bias" = beta2 * delta1,
+c(
+  "beta2" = beta2,
+  "delta1" = delta1,
+  "Predicted bias" = beta2 * delta1,
   "Actual bias" = coef(lm(y ~ x1))["x1"] - 2)
 ```
 
@@ -946,25 +958,27 @@ $$\text{Bias} = (-)(+) = \text{Negative}$$
 
 ## Example: Zero Bias — Coffee and Heart Rate {.smaller}
 
-Estimating the effect of coffee consumption on heart rate while omitting shoe size:
+Estimating the effect of coffee consumption on heart rate while omitting height:
 
 $$heart\_rate = \beta_0 + \beta_1(coffee) + \mu$$
 
 . . .
 
-- $\beta_2$ (effect of shoe size on heart rate): **Zero** — shoe size doesn't affect heart rate
+- $\beta_2$ (effect of height on heart rate): 
+- **Negative** — taller people tend to have (slightly) lower resting heart rates
 
 . . .
 
-- $\tilde{\delta}_1$ (correlation of shoe size with coffee): could be anything — doesn't matter!
+- $\tilde{\delta}_1$ (correlation of height with coffee): 
+- **Zero** — how tall you are has nothing to do with how much coffee you drink
 
 . . .
 
-$$\text{Bias} = (0)(\tilde{\delta}_1) = 0$$
+$$\text{Bias} = (-)(0) = 0$$
 
 . . .
 
-> There is **no bias** from omitting shoe size. It fails the first condition: the omitted variable must actually affect $y$. Not every omitted variable is a confounder!
+> There is **no bias** from omitting height. It fails the second condition: the omitted variable must be correlated with the included regressor. Not every omitted variable is a confounder!
 
 
 ## Class Activity: Sign the Bias! {.smaller}
@@ -1006,11 +1020,14 @@ For each scenario, determine the **direction** of the omitted variable bias:
 ```{r}
 #| echo: true
 
-# Add a completely irrelevant variable
-mtcars$random_noise <- rnorm(nrow(mtcars))
+# Add 10 completely irrelevant variables
+set.seed(42)
+noise_data <- mtcars
+for (i in 1:10) noise_data[[paste0("noise", i)]] <- rnorm(nrow(mtcars))
+noise_vars <- paste0("noise", 1:10)
 
-c("R² without noise" = summary(lm(mpg ~ hp + wt, data = mtcars))$r.squared,
-  "R² with noise" = summary(lm(mpg ~ hp + wt + random_noise, data = mtcars))$r.squared)
+c("R² without noise" = summary(lm(mpg ~ hp + wt, data = noise_data))$r.squared,
+  "R² with noise"    = summary(lm(mpg ~ hp + wt + ., data = noise_data[c("mpg","hp","wt",noise_vars)]))$r.squared)
 ```
 
 . . .
@@ -1024,13 +1041,16 @@ The **adjusted R-squared** penalizes for the number of variables:
 
 $$\bar{R}^2 = 1 - \frac{(1 - R^2)(n - 1)}{n - k - 1}$$
 
+- where $n$ = number of observations, $k$ = number of regressors, and $(1 - R^2)$ is the share of variance unexplained. 
+- As $k$ increases, $n - k - 1$ shrinks, making the penalty larger.
+
 . . .
 
 ```{r}
 #| echo: true
 
-c("Adj R² without noise" = summary(lm(mpg ~ hp + wt, data = mtcars))$adj.r.squared,
-  "Adj R² with noise" = summary(lm(mpg ~ hp + wt + random_noise, data = mtcars))$adj.r.squared)
+c("Adj R² without noise" = summary(lm(mpg ~ hp + wt, data = noise_data))$adj.r.squared,
+  "Adj R² with noise"    = summary(lm(mpg ~ hp + wt + ., data = noise_data[c("mpg","hp","wt",noise_vars)]))$adj.r.squared)
 ```
 
 . . .
@@ -1044,6 +1064,73 @@ c("Adj R² without noise" = summary(lm(mpg ~ hp + wt, data = mtcars))$adj.r.squa
 Use **adjusted** $R^2$ when comparing models with different numbers of variables.
 :::
 
+
+# Variance of the Multivariate OLS Estimator
+
+## Extending the Bivariate Result {.smaller}
+
+Recall from the bivariate case:
+
+$$Var(\hat{\beta}_1) = \frac{\sigma^2}{SST_x}$$
+
+. . .
+
+Precision comes from **variation in $x$** — more variation means more information about the effect of $x$ on $y$.
+
+. . .
+
+In the multivariate case, the same idea applies, but with a twist: **not all variation in $x_j$ is useful**.
+
+. . .
+
+- Some variation in $x_j$ is shared with other regressors — OLS can't tell whether that shared variation is driving $y$ through $x_j$ or through the other controls
+- Only the variation in $x_j$ that is **independent of the other regressors** identifies $\hat{\beta}_j$
+
+
+## How Much Independent Variation Does $x_j$ Have? {.smaller}
+
+Let $R_j^2$ be the R-squared from regressing $x_j$ on all other regressors.
+
+. . .
+
+- $R_j^2$ measures how much of $x_j$'s variation is **shared** with the other controls
+- $(1 - R_j^2)$ is the fraction that is **independent** — the part that actually identifies $\hat{\beta}_j$
+
+. . .
+
+So the effective variation available to estimate $\beta_j$ is:
+
+$$SST_j \times (1 - R_j^2)$$
+
+## Variance of $\hat{\beta}_j$: Result {.smaller}
+
+Replacing $SST_x$ with the residual variation $SST_j(1 - R_j^2)$:
+
+. . .
+
+::: {.callout-important}
+## Variance of the Multivariate OLS Estimator
+$$Var(\hat{\beta}_j) = \frac{\sigma^2}{SST_j(1 - R_j^2)}$$
+
+where $\sigma^2$ is the error variance, $SST_j = \sum(x_{ji} - \bar{x}_j)^2$ is the total variation in $x_j$, and $R_j^2$ is the R-squared from regressing $x_j$ on all other regressors.
+:::
+
+. . .
+
+Three things **increase** variance:
+
+. . .
+
+1. **More noise** ($\sigma^2 = Var(\mu)$ ↑) — $y$ is more scattered around the regression line, making every coefficient harder to pin down
+
+. . .
+
+2. **Less variation in $x_j$** ($SST_j$ ↓) — less information about $x_j$'s effect
+
+. . .
+
+3. **Higher correlation among regressors** ($R_j^2$ ↑) — less residual variation left to identify $\beta_j$
+  - the **multicollinearity problem**
 
 # Assumptions and Multicollinearity
 
@@ -1061,7 +1148,7 @@ The multivariate versions:
 
 . . .
 
-3. **No perfect multicollinearity** ← NEW!
+3. **No perfect multicollinearity** ← UPDATED!
 
 . . .
 
@@ -1074,7 +1161,9 @@ The multivariate versions:
 
 ## Perfect Multicollinearity {.smaller}
 
-**Perfect multicollinearity**: one variable is an exact linear function of others
+- New assumption 3 includes both **variation in $x_j$** and **no perfect multicolinearity**
+
+- **Perfect multicollinearity**: one variable is an exact linear function of others
 
 . . .
 
@@ -1082,7 +1171,6 @@ Examples:
 
 - Including `income_dollars` and `income_thousands` (one = other × 1000)
 - Including `parent1_income` + `parent2_income` + `family_income` when family = parent1 + parent2
-- Including dummies for **all** categories plus an intercept
 
 . . .
 
@@ -1097,7 +1185,7 @@ lm(mpg ~ hp + hp_doubled + wt, data = mtcars) |> coef()
 
 . . .
 
-R drops the collinear variable and gives you `NA` — but you should fix the model!
+- R drops the collinear variable and gives you `NA` — but you should fix the model!
 
 
 ## Imperfect Multicollinearity {.smaller}
@@ -1156,7 +1244,7 @@ bind_rows(low_corr, high_corr) |>
        title = "Multicollinearity Inflates Variance",
        subtitle = "Both centered on true value (3), but high correlation → much wider spread",
        fill = "") +
-  annotate("text", x = 3, y = 55, label = "True β₁ = 3", color = "darkred",
+  annotate("text", x = 3, y = 55, label = "True β = 3", color = "darkred",
            hjust = -0.1, fontface = "italic", size = 5) +
   theme_minimal(base_size = 14) +
   theme(legend.position = "bottom")
@@ -1180,6 +1268,13 @@ Adding controls involves a **tradeoff**:
 
 - **Too few controls:** risk bias (omitted variable bias)
 - **Too many controls:** risk inflated variance (imprecise estimates)
+
+. . .
+
+> Because you can never know *for sure* the true population parameter model,
+you can never know *for sure* if a control variable is necessary or not!
+
+
 
 
 ## Seeing the Tradeoff {.smaller}
@@ -1216,20 +1311,20 @@ sim_est <- function(pop, include_x2, n_sims = 500, ss = 100) {
 
 set.seed(42)
 results <- bind_rows(
-  tibble(b1 = sim_est(pop_irr, FALSE), model = "Omit x₂", case = "x₂ irrelevant (β₂ = 0)"),
-  tibble(b1 = sim_est(pop_irr, TRUE), model = "Include x₂", case = "x₂ irrelevant (β₂ = 0)"),
-  tibble(b1 = sim_est(pop_rel, FALSE), model = "Omit x₂", case = "x₂ relevant (β₂ ≠ 0)"),
-  tibble(b1 = sim_est(pop_rel, TRUE), model = "Include x₂", case = "x₂ relevant (β₂ ≠ 0)")
+  tibble(b1 = sim_est(pop_irr, FALSE), model = "Omit x2", case = "x2 irrelevant (b2 = 0)"),
+  tibble(b1 = sim_est(pop_irr, TRUE), model = "Include x2", case = "x2 irrelevant (b2 = 0)"),
+  tibble(b1 = sim_est(pop_rel, FALSE), model = "Omit x2", case = "x2 relevant (b2 != 0)"),
+  tibble(b1 = sim_est(pop_rel, TRUE), model = "Include x2", case = "x2 relevant (b2 != 0)")
 )
 
 ggplot(results, aes(x = b1, fill = model)) +
   geom_histogram(alpha = 0.5, bins = 30, color = "white", position = "identity") +
   geom_vline(xintercept = 2.21, color = "darkred", linewidth = 1.2, linetype = "dashed") +
   facet_wrap(~ case) +
-  scale_fill_manual(values = c("Omit x₂" = "#5D8EE5", "Include x₂" = "#EEB808")) +
+  scale_fill_manual(values = c("Omit x2" = "#5D8EE5", "Include x2" = "#EEB808")) +
   labs(x = expression(hat(beta)[1]), y = "Count",
        title = "The Bias-Variance Tradeoff",
-       subtitle = "Dashed line = true β₁ = 2.21",
+       subtitle = "Dashed line = true b1 = 2.21",
        fill = "Model") +
   theme_minimal(base_size = 13) +
   theme(legend.position = "bottom")
@@ -1277,75 +1372,6 @@ ggplot(results, aes(x = b1, fill = model)) +
 . . .
 
 4. **Check sensitivity** — if adding a control substantially changes your coefficient of interest, it's probably important
-
-
-# Putting It All Together
-
-## Try It: Full Analysis {.smaller}
-
-::: {.callout-note icon=false}
-## 🖥️ Your turn!
-:::
-
-Using the `wage_data` we created, estimate two models and compare:
-
-```{r}
-#| echo: true
-#| output-location: fragment
-
-# Model 1: No controls
-m1 <- lm(wage ~ female, data = wage_data)
-
-# Model 2: Control for occupation
-m2 <- lm(wage ~ female + office, data = wage_data)
-
-# Compare
-tibble(
-  Model = c("No controls", "With occupation control"),
-  `β_female` = c(coef(m1)["female"], coef(m2)["female"]),
-  `R²` = c(summary(m1)$r.squared, summary(m2)$r.squared),
-  `Adj R²` = c(summary(m1)$adj.r.squared, summary(m2)$adj.r.squared)
-) |> knitr::kable(digits = 2)
-```
-
-
-## Interpreting Regression Output {.smaller}
-
-::: {.callout-note icon=false}
-## 🖥️ Practice
-:::
-
-```{r}
-#| echo: true
-
-summary(m2)
-```
-
-
-## Class Activity: OVB Detective {.smaller}
-
-::: {.callout-note icon=false}
-## 🤔 Think-Pair-Share
-:::
-
-A researcher estimates house prices:
-
-| Variable | Coefficient | Std. Error |
-|----------|:-----------:|:----------:|
-| (Intercept) | 50.23 | 12.45 |
-| sqft | 0.15 | 0.02 |
-| bedrooms | -8.72 | 3.21 |
-| bathrooms | 24.56 | 4.89 |
-
-*Dependent variable: price in $1000s. n = 546, Adj R² = 0.68*
-
-. . .
-
-**Questions:**
-
-1. What happens to price if you add 100 sqft? (Holding bedrooms and bathrooms constant)
-2. Why is the bedroom coefficient **negative**? (Hint: we're controlling for sqft!)
-3. What omitted variable might bias the sqft coefficient? What direction?
 
 
 # Summary
