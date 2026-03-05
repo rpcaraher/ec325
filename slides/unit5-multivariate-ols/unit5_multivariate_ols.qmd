@@ -1117,20 +1117,74 @@ where $\sigma^2$ is the error variance, $SST_j = \sum(x_{ji} - \bar{x}_j)^2$ is 
 
 . . .
 
-Three things **increase** variance:
+Three things **increase** variance: **more noise** ($\sigma^2$ ↑), **less variation in $x_j$** ($SST_j$ ↓), **higher collinearity** ($R_j^2$ ↑)
 
-. . .
+## What Increases Variance? Simulation {.smaller}
 
-1. **More noise** ($\sigma^2 = Var(\mu)$ ↑) — $y$ is more scattered around the regression line, making every coefficient harder to pin down
+```{r}
+#| echo: false
+#| fig-height: 5.5
+#| fig-align: center
+#| cache: true
 
-. . .
+set.seed(325)
+n <- 100
+n_sims <- 1000
+true_beta1 <- 2
 
-2. **Less variation in $x_j$** ($SST_j$ ↓) — less information about $x_j$'s effect
+# --- Simulation function ---
+# DGP: y = 1 + 2*x1 + 1*x2 + error
+run_sim <- function(n, sigma, x1_sd, rho, n_sims) {
+  estimates <- numeric(n_sims)
+  for (i in 1:n_sims) {
+    x2 <- rnorm(n)
+    x1 <- rho * x2 + sqrt(1 - rho^2) * rnorm(n, sd = x1_sd)
+    y <- 1 + true_beta1 * x1 + 1 * x2 + rnorm(n, sd = sigma)
+    estimates[i] <- coef(lm(y ~ x1 + x2))["x1"]
+  }
+  estimates
+}
 
-. . .
+# Baseline: sigma = 1, x1_sd = 1, rho = 0.3
+baseline <- run_sim(n, sigma = 1, x1_sd = 1, rho = 0.3, n_sims)
 
-3. **Higher correlation among regressors** ($R_j^2$ ↑) — less residual variation left to identify $\beta_j$
-  - the **multicollinearity problem**
+# 1. More noise: sigma = 3
+high_noise <- run_sim(n, sigma = 3, x1_sd = 1, rho = 0.3, n_sims)
+
+# 2. Less variation in x1: x1_sd = 0.3
+low_var <- run_sim(n, sigma = 1, x1_sd = 0.3, rho = 0.3, n_sims)
+
+# 3. Low collinearity: rho = 0.05
+low_collin <- run_sim(n, sigma = 1, x1_sd = 1, rho = 0.05, n_sims)
+
+df_sims <- bind_rows(
+  tibble(beta_hat = baseline, scenario = "Baseline (σ=1, sd=1, ρ=0.3)"),
+  tibble(beta_hat = high_noise, scenario = "More noise (σ=3)"),
+  tibble(beta_hat = low_var, scenario = "Less variation (sd=0.3)"),
+  tibble(beta_hat = low_collin, scenario = "Low collinearity (ρ≈0)")
+) |>
+  mutate(scenario = factor(scenario, levels = c(
+    "Baseline (σ=1, sd=1, ρ=0.3)",
+    "More noise (σ=3)",
+    "Less variation (sd=0.3)",
+    "Low collinearity (ρ≈0)"
+  )))
+
+ggplot(df_sims, aes(x = beta_hat)) +
+  geom_histogram(bins = 40, fill = "#5D8EE5", color = "white", alpha = 0.8) +
+  geom_vline(xintercept = true_beta1, color = "#E63946", linewidth = 1, linetype = "dashed") +
+  facet_wrap(~ scenario, scales = "free_y", ncol = 2) +
+  labs(
+    x = expression(hat(beta)[1]),
+    y = "Count",
+    caption = paste0("1,000 simulations each | n = ", n, " | True β = ", true_beta1, " (dashed red)")
+  ) +
+  theme_minimal(base_size = 16) +
+  theme(
+    strip.text = element_text(face = "bold", size = 13),
+    panel.grid.minor = element_blank()
+  )
+```
 
 # Assumptions and Multicollinearity
 
