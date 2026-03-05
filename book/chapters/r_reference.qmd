@@ -1168,6 +1168,526 @@ In RStudio, type **Cmd/Ctrl + Shift + M** to insert the pipe operator.
 ---
 
 
+## Statistical Distribution Functions
+
+R has a consistent naming convention for distribution functions. Each distribution has four functions, prefixed by a letter:
+
+- `d` = **density** (the height of the PDF at a given value)
+- `p` = **probability** (the CDF---cumulative probability up to a given value)
+- `q` = **quantile** (the inverse of the CDF---find the value for a given probability)
+- `r` = **random** (generate random draws from the distribution)
+
+For example, for the normal distribution: `dnorm()`, `pnorm()`, `qnorm()`, `rnorm()`.
+
+### `dnorm()` and `dt()`
+
+Compute the probability density function (PDF) for the normal or t-distribution. Useful for plotting distribution curves.
+
+**Arguments:**
+
+- `x`: Value(s) at which to evaluate the density
+- `mean`, `sd`: Parameters of the normal distribution (for `dnorm()`)
+- `df`: Degrees of freedom (for `dt()`)
+
+**Example:**
+```{r}
+# Height of the standard normal PDF at x = 0
+dnorm(0, mean = 0, sd = 1)
+
+# Height of the t-distribution PDF at x = 2 with 30 df
+dt(2, df = 30)
+```
+
+---
+
+### `pt()`
+
+Compute the cumulative distribution function (CDF) for the t-distribution. This gives you the probability that a t-distributed random variable is less than or equal to a given value. Essential for computing p-values.
+
+**Arguments:**
+
+- `q`: The t-value(s) to evaluate
+- `df`: Degrees of freedom
+- `lower.tail`: If `TRUE` (default), returns $P(T \leq q)$; if `FALSE`, returns $P(T > q)$
+
+**Example:**
+```{r}
+# P-value for a two-sided test with t = 2.3 and 100 df
+2 * pt(abs(2.3), df = 100, lower.tail = FALSE)
+```
+
+---
+
+### `qt()`
+
+Compute the quantile function (inverse CDF) for the t-distribution. Given a probability, it returns the corresponding t-value. Used to find critical values for hypothesis tests.
+
+**Arguments:**
+
+- `p`: Probability (between 0 and 1)
+- `df`: Degrees of freedom
+- `lower.tail`: If `TRUE` (default), finds the value where $P(T \leq q) = p$; if `FALSE`, finds the value where $P(T > q) = p$
+
+**Example:**
+```{r}
+# Critical value for a two-sided 5% test with 100 df
+# We want the value that leaves 2.5% in the upper tail
+qt(0.025, df = 100, lower.tail = FALSE)
+```
+
+---
+
+### `qf()`
+
+Compute the quantile function for the F-distribution. Used to find critical values for F-tests.
+
+**Arguments:**
+
+- `p`: Probability
+- `df1`: Numerator degrees of freedom (number of restrictions)
+- `df2`: Denominator degrees of freedom (from the unrestricted model)
+- `lower.tail`: If `FALSE`, returns the value where $P(F > q) = p$
+
+**Example:**
+```{r}
+# Critical value for an F-test with 2 and 494 degrees of freedom at 5%
+qf(0.05, df1 = 2, df2 = 494, lower.tail = FALSE)
+```
+
+---
+
+### `runif()`
+
+Generate random draws from a uniform distribution.
+
+**Arguments:**
+
+- `n`: Number of values to generate
+- `min`: Minimum value (default: 0)
+- `max`: Maximum value (default: 1)
+
+**Example:**
+```{r}
+set.seed(123)
+runif(5, min = 1, max = 10)
+```
+
+---
+
+### `rexp()`
+
+Generate random draws from an exponential distribution.
+
+**Arguments:**
+
+- `n`: Number of values to generate
+- `rate`: Rate parameter $\lambda$ (default: 1). The mean of the distribution is $1/\lambda$.
+
+**Example:**
+```{r}
+set.seed(123)
+rexp(5, rate = 0.5)  # Mean = 1/0.5 = 2
+```
+
+---
+
+### `rbinom()`
+
+Generate random draws from a binomial distribution. Useful for simulating binary outcomes (e.g., treatment assignment).
+
+**Arguments:**
+
+- `n`: Number of values to generate
+- `size`: Number of trials
+- `prob`: Probability of success on each trial
+
+**Example:**
+```{r}
+set.seed(123)
+# Simulate 10 coin flips (1 = heads, 0 = tails)
+rbinom(10, size = 1, prob = 0.5)
+```
+
+---
+
+### `rt()`
+
+Generate random draws from a t-distribution.
+
+**Arguments:**
+
+- `n`: Number of values to generate
+- `df`: Degrees of freedom
+
+**Example:**
+```{r}
+set.seed(123)
+rt(5, df = 30)
+```
+
+---
+
+
+## Model Diagnostic Functions
+
+### `anova()`
+
+Compare nested models using an F-test. Pass the restricted (smaller) model first, then the unrestricted (larger) model. Tests whether the additional variables in the unrestricted model are jointly significant.
+
+**Arguments:**
+
+- `object`: One or more fitted model objects
+
+**Example:**
+```{r}
+reg_small <- lm(mpg ~ hp, data = mtcars)
+reg_large <- lm(mpg ~ hp + wt + cyl, data = mtcars)
+anova(reg_small, reg_large)
+```
+
+---
+
+### `nobs()`
+
+Return the number of observations used to fit a model.
+
+**Arguments:**
+
+- `object`: A fitted model object
+
+**Example:**
+```{r}
+reg <- lm(mpg ~ hp, data = mtcars)
+nobs(reg)
+```
+
+---
+
+### `df.residual()`
+
+Return the residual degrees of freedom ($n - k - 1$) from a fitted model.
+
+**Arguments:**
+
+- `object`: A fitted model object
+
+**Example:**
+```{r}
+reg <- lm(mpg ~ hp + wt, data = mtcars)
+df.residual(reg)  # 32 - 2 - 1 = 29
+```
+
+---
+
+### `resid()`
+
+Extract residuals from a fitted model. Equivalent to `residuals()`.
+
+**Arguments:**
+
+- `object`: A fitted model object
+
+**Example:**
+```{r}
+reg <- lm(mpg ~ hp, data = mtcars)
+head(resid(reg))
+```
+
+---
+
+
+## Additional Data Manipulation Functions
+
+### `tibble()`
+
+Create a data frame (modern version). Works like `data.frame()` but with better defaults: it doesn't convert strings to factors and prints more cleanly.
+
+**Arguments:**
+
+- `...`: Name-value pairs of columns
+
+**Example:**
+```{r}
+tibble(
+  name = c("Alice", "Bob", "Carol"),
+  age = c(25, 30, 35),
+  income = c(50000, 60000, 70000)
+)
+```
+
+---
+
+### `bind_rows()`
+
+Stack data frames on top of each other (by rows).
+
+**Arguments:**
+
+- `...`: Data frames to bind together
+
+**Example:**
+```{r}
+df1 <- tibble(x = 1:3, y = c("a", "b", "c"))
+df2 <- tibble(x = 4:6, y = c("d", "e", "f"))
+bind_rows(df1, df2)
+```
+
+---
+
+### `pivot_longer()`
+
+Reshape data from wide format to long format. Useful for making data "tidy" for ggplot2.
+
+**Arguments:**
+
+- `data`: A data frame
+- `cols`: Columns to pivot into longer format
+- `names_to`: Name of the new column that will contain the old column names
+- `values_to`: Name of the new column that will contain the values
+
+**Example:**
+```{r}
+wide_data <- tibble(
+  id = 1:3,
+  score_2020 = c(80, 90, 85),
+  score_2021 = c(85, 92, 88)
+)
+
+wide_data |>
+  pivot_longer(
+    cols = starts_with("score"),
+    names_to = "year",
+    values_to = "score"
+  )
+```
+
+---
+
+### `slice_sample()`
+
+Randomly sample rows from a data frame.
+
+**Arguments:**
+
+- `.data`: A data frame
+- `n`: Number of rows to sample
+- `replace`: Sample with replacement? (default: `FALSE`)
+
+**Example:**
+```{r}
+set.seed(123)
+mtcars |>
+  slice_sample(n = 5)
+```
+
+---
+
+### `map_dfr()` (purrr)
+
+Apply a function to each element of a list or vector and combine the results into a single data frame by binding rows. Useful for running simulations.
+
+**Arguments:**
+
+- `.x`: A list or vector to iterate over
+- `.f`: A function to apply to each element
+
+**Example:**
+```{r}
+# Run 5 simulations and collect results
+map_dfr(1:5, function(i) {
+  x <- rnorm(50)
+  tibble(sim = i, mean_x = mean(x))
+})
+```
+
+---
+
+
+## Additional ggplot2 Functions
+
+### `annotate()`
+
+Add text, labels, or shapes to a plot at specific coordinates. Unlike `geom_text()`, `annotate()` is for adding single annotations rather than mapping data to text.
+
+**Arguments:**
+
+- `geom`: Type of annotation (e.g., `"text"`, `"rect"`, `"segment"`)
+- `x`, `y`: Position of the annotation
+- `label`: Text to display (for `"text"` geom)
+- `parse`: If `TRUE`, interpret the label as a plotmath expression (default: `FALSE`)
+- `color`, `size`: Styling options
+
+**Example:**
+```{r}
+#| fig-height: 3
+ggplot(mtcars, aes(x = hp, y = mpg)) +
+  geom_point() +
+  annotate("text", x = 300, y = 30,
+           label = "hat(beta)[1] == -0.068",
+           parse = TRUE, color = "red", size = 5)
+```
+
+---
+
+### `stat_function()`
+
+Overlay a mathematical function on a ggplot. Useful for plotting theoretical distributions on top of histograms.
+
+**Arguments:**
+
+- `fun`: The function to plot (e.g., `dnorm`, `dt`)
+- `args`: A list of additional arguments to pass to the function
+- `color`, `linewidth`: Styling options
+
+**Example:**
+```{r}
+#| fig-height: 3
+ggplot(data.frame(x = rnorm(500)), aes(x = x)) +
+  geom_histogram(aes(y = after_stat(density)),
+                 bins = 30, fill = "lightblue", color = "black") +
+  stat_function(fun = dnorm, args = list(mean = 0, sd = 1),
+                color = "red", linewidth = 1.2)
+```
+
+---
+
+### `geom_segment()`
+
+Draw line segments between specified start and end points. Useful for adding arrows, error bars, or connecting points.
+
+**Arguments:**
+
+- `aes(x, y, xend, yend)`: Start and end coordinates
+- `arrow`: Add arrowheads with `arrow()`
+- `color`, `linewidth`, `linetype`: Styling options
+
+**Example:**
+```{r}
+#| fig-height: 3
+ggplot(mtcars, aes(x = hp, y = mpg)) +
+  geom_point() +
+  geom_segment(aes(x = 150, y = 25, xend = 150, yend = 15),
+               arrow = arrow(length = unit(0.2, "cm")),
+               color = "red", linewidth = 1)
+```
+
+---
+
+### `geom_ribbon()` and `geom_area()`
+
+Shade a region between a `ymin` and `ymax`. `geom_area()` is a special case where `ymin = 0`. Useful for shading regions under distribution curves (e.g., p-values, rejection regions).
+
+**Arguments:**
+
+- `aes(x, ymin, ymax)`: Boundaries of the shaded region
+- `fill`: Fill color
+- `alpha`: Transparency
+
+**Example:**
+```{r}
+#| fig-height: 3
+shade_data <- tibble(
+  x = seq(-3, 3, length.out = 200),
+  y = dnorm(x)
+)
+
+ggplot(shade_data, aes(x = x)) +
+  geom_line(aes(y = y)) +
+  geom_ribbon(data = shade_data |> filter(x >= 1.96),
+              aes(ymin = 0, ymax = y),
+              fill = "red", alpha = 0.5)
+```
+
+---
+
+### `geom_errorbar()`
+
+Add error bars to a plot. Can be vertical (default) or horizontal (with `orientation = "y"`). Commonly used for confidence interval plots.
+
+**Arguments:**
+
+- `aes(ymin, ymax)`: Lower and upper bounds (vertical), or `aes(xmin, xmax)` with `orientation = "y"` (horizontal)
+- `width`: Width of the error bar caps
+- `orientation`: Set to `"y"` for horizontal error bars
+
+**Example:**
+```{r}
+#| fig-height: 3
+ci_data <- tibble(
+  variable = c("hp", "wt", "cyl"),
+  estimate = c(-0.03, -3.8, -1.5),
+  lower = c(-0.05, -5.1, -2.8),
+  upper = c(-0.01, -2.5, -0.2)
+)
+
+ggplot(ci_data, aes(y = variable, x = estimate)) +
+  geom_point(size = 3) +
+  geom_errorbar(aes(xmin = lower, xmax = upper),
+                width = 0.2, orientation = "y") +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  theme_minimal()
+```
+
+---
+
+### `geom_density()`
+
+Plot a smoothed density estimate. An alternative to histograms for visualizing distributions.
+
+**Arguments:**
+
+- `fill`: Fill color
+- `alpha`: Transparency
+- `color`: Line color
+
+**Example:**
+```{r}
+#| fig-height: 3
+ggplot(mtcars, aes(x = mpg)) +
+  geom_density(fill = "steelblue", alpha = 0.5)
+```
+
+---
+
+### `scale_color_manual()` and `scale_fill_manual()`
+
+Manually set colors for categorical variables mapped to `color` or `fill`.
+
+**Arguments:**
+
+- `values`: A named vector of colors
+- `labels`: Optional labels for the legend
+
+**Example:**
+```{r}
+#| fig-height: 3
+ggplot(mtcars, aes(x = hp, y = mpg, color = factor(cyl))) +
+  geom_point(size = 2) +
+  scale_color_manual(values = c("4" = "steelblue", "6" = "orange", "8" = "red"))
+```
+
+---
+
+### `coord_cartesian()`
+
+Zoom into a region of the plot without dropping data points (unlike `xlim()`/`ylim()`, which remove data outside the range).
+
+**Arguments:**
+
+- `xlim`: Range for x-axis as `c(min, max)`
+- `ylim`: Range for y-axis as `c(min, max)`
+
+**Example:**
+```{r}
+#| fig-height: 3
+ggplot(mtcars, aes(x = hp, y = mpg)) +
+  geom_point() +
+  coord_cartesian(xlim = c(50, 200), ylim = c(15, 35))
+```
+
+---
+
+
 ## Quick Reference Tables
 
 ### Descriptive Statistics Functions
@@ -1208,11 +1728,30 @@ In RStudio, type **Cmd/Ctrl + Shift + M** to insert the pipe operator.
 | `coef()` | Coefficients | base R |
 | `confint()` | Confidence intervals | base R |
 | `predict()` | Fitted values | base R |
-| `residuals()` | Residuals | base R |
+| `residuals()` / `resid()` | Residuals | base R |
+| `anova()` | F-test (compare models) | base R |
+| `nobs()` | Number of observations | base R |
+| `df.residual()` | Residual degrees of freedom | base R |
 | `feols()` | Fixed effects + robust SE | fixest |
 | `modelsummary()` | Formatted tables | modelsummary |
 
 : Regression functions {#tbl-reg-ref}
+
+### Statistical Distribution Functions
+
+| Function | Purpose | Example |
+|----------|---------|---------|
+| `dnorm()`, `dt()` | Density (PDF height) | `dnorm(0)`, `dt(2, df=30)` |
+| `pt()` | CDF for t-distribution | `pt(2.3, df=100)` |
+| `qt()` | Critical values (t-dist) | `qt(0.025, df=100)` |
+| `qf()` | Critical values (F-dist) | `qf(0.05, df1=2, df2=494)` |
+| `rnorm()` | Random normal draws | `rnorm(100, mean=0, sd=1)` |
+| `runif()` | Random uniform draws | `runif(100, min=0, max=1)` |
+| `rbinom()` | Random binomial draws | `rbinom(100, size=1, prob=0.5)` |
+| `rexp()` | Random exponential draws | `rexp(100, rate=0.5)` |
+| `rt()` | Random t-dist draws | `rt(100, df=30)` |
+
+: Statistical distribution functions {#tbl-dist-ref}
 
 ### ggplot2 Geometries
 
@@ -1221,11 +1760,17 @@ In RStudio, type **Cmd/Ctrl + Shift + M** to insert the pipe operator.
 | `geom_point()` | Scatterplot |
 | `geom_line()` | Line plot |
 | `geom_histogram()` | Histogram |
+| `geom_density()` | Smoothed density |
 | `geom_boxplot()` | Boxplot |
 | `geom_bar()` | Bar chart (counts) |
 | `geom_col()` | Bar chart (values) |
 | `geom_smooth()` | Smoothed line/regression |
+| `geom_segment()` | Line segments/arrows |
+| `geom_ribbon()` / `geom_area()` | Shaded regions |
+| `geom_errorbar()` | Error bars / CIs |
 | `geom_hline()` | Horizontal line |
 | `geom_vline()` | Vertical line |
+| `annotate()` | Text/shape annotations |
+| `stat_function()` | Overlay math functions |
 
 : ggplot2 geometries {#tbl-ggplot-ref}
