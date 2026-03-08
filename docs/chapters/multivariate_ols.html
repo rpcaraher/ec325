@@ -398,7 +398,9 @@ window.Quarto = {
   <li><a href="#variance-in-multivariate-ols" id="toc-variance-in-multivariate-ols" class="nav-link" data-scroll-target="#variance-in-multivariate-ols"><span class="header-section-number">5.10</span> Variance in Multivariate OLS</a>
   <ul class="collapse">
   <li><a href="#what-increases-variance" id="toc-what-increases-variance" class="nav-link" data-scroll-target="#what-increases-variance"><span class="header-section-number">5.10.1</span> What Increases Variance?</a></li>
-  <li><a href="#standard-errors" id="toc-standard-errors" class="nav-link" data-scroll-target="#standard-errors"><span class="header-section-number">5.10.2</span> Standard Errors</a></li>
+  <li><a href="#estimating-sigma2-from-the-data" id="toc-estimating-sigma2-from-the-data" class="nav-link" data-scroll-target="#estimating-sigma2-from-the-data"><span class="header-section-number">5.10.2</span> Estimating <span class="math inline">\(\sigma^2\)</span> from the Data</a></li>
+  <li><a href="#from-hatsigma2-to-the-standard-error" id="toc-from-hatsigma2-to-the-standard-error" class="nav-link" data-scroll-target="#from-hatsigma2-to-the-standard-error"><span class="header-section-number">5.10.3</span> From <span class="math inline">\(\hat{\sigma}^2\)</span> to the Standard Error</a></li>
+  <li><a href="#simulation-does-hatsigma2-actually-work" id="toc-simulation-does-hatsigma2-actually-work" class="nav-link" data-scroll-target="#simulation-does-hatsigma2-actually-work"><span class="header-section-number">5.10.4</span> Simulation: Does <span class="math inline">\(\hat{\sigma}^2\)</span> Actually Work?</a></li>
   </ul></li>
   <li><a href="#the-bias-variance-tradeoff" id="toc-the-bias-variance-tradeoff" class="nav-link" data-scroll-target="#the-bias-variance-tradeoff"><span class="header-section-number">5.11</span> The Bias-Variance Tradeoff</a>
   <ul class="collapse">
@@ -1409,13 +1411,159 @@ Var(\hat{\beta}_j) = \frac{\sigma^2}{SST_j (1 - R_j^2)}
 <p>The third point is crucial: when your variable of interest is highly correlated with control variables, your estimate becomes less precise. This is sometimes called <strong>high multicollinearity</strong> or the <strong>multicollinearity problem</strong>.</p>
 <p>Note this is different from <strong>perfect multicolinearity</strong>, which makes it <em>impossible</em> to get an estimate. Here, we still will be able to estimate our <span class="math inline">\(\beta_j\)</span> successfully, but it will have a high variance and be “noisy”.</p>
 </section>
-<section id="standard-errors" class="level3" data-number="5.10.2">
-<h3 data-number="5.10.2" class="anchored" data-anchor-id="standard-errors"><span class="header-section-number">5.10.2</span> Standard Errors</h3>
-<p>The standard error is estimated as:</p>
+<section id="estimating-sigma2-from-the-data" class="level3" data-number="5.10.2">
+<h3 data-number="5.10.2" class="anchored" data-anchor-id="estimating-sigma2-from-the-data"><span class="header-section-number">5.10.2</span> Estimating <span class="math inline">\(\sigma^2\)</span> from the Data</h3>
+<p>Look carefully at the variance formula above. The denominator contains quantities we can compute directly from our sample: <span class="math inline">\(SST_j\)</span> (the total variation in <span class="math inline">\(x_j\)</span>) and <span class="math inline">\(R^2_j\)</span> (how much of <span class="math inline">\(x_j\)</span> is explained by the other regressors). But the numerator contains <span class="math inline">\(\sigma^2\)</span>—the <strong>variance of the population error term</strong>. This is a population parameter that we cannot observe directly.</p>
+<p>So how do we estimate <span class="math inline">\(\sigma^2\)</span>?</p>
+<p>Recall from the homoskedasticity assumption (GM.5) that <span class="math inline">\(Var(\mu_i | \mathbf{x}_i) = \sigma^2\)</span> for all observations <span class="math inline">\(i\)</span>. Combined with the zero conditional mean assumption (GM.4), which gives us <span class="math inline">\(E[\mu_i | \mathbf{x}_i] = 0\)</span>, we can show that <span class="math inline">\(\sigma^2 = E[\mu_i^2]\)</span>. Let’s work through why.</p>
+<p>From <a href="statsreview.html" class="quarto-xref"><span>Appendix B</span></a>, the definition of variance is <span class="math inline">\(Var(X) = E[(X - \mu)^2]\)</span>—the expected squared deviation from the mean. Applying this to <span class="math inline">\(\mu_i\)</span> and using the fact that <span class="math inline">\(E[\mu_i] = 0\)</span> from GM.4:</p>
+<p><span class="math display">\[Var(\mu_i) = E[(\mu_i - 0)^2] = E[\mu_i^2]\]</span></p>
+<p>And from GM.5, <span class="math inline">\(Var(\mu_i) = \sigma^2\)</span>, giving us:</p>
+<p><span class="math display">\[\sigma^2 = E[\mu_i^2]\]</span></p>
+<p>In other words, <span class="math inline">\(\sigma^2\)</span> is simply the expected value of the squared error terms. If we could observe the true errors <span class="math inline">\(\mu_i\)</span>, we’d just compute their average squared value. But we can’t observe the true errors—they’re the difference between the actual outcome <span class="math inline">\(y_i\)</span> and the <strong>population</strong> regression line, which we don’t know.</p>
+<p>What we <em>can</em> compute are the <strong>residuals</strong>:</p>
+<p><span class="math display">\[\hat{\mu}_i = y_i - \hat{y}_i = y_i - \hat{\beta}_0 - \hat{\beta}_1 x_{1i} - \dots - \hat{\beta}_k x_{ki}\]</span></p>
+<p>The residuals are the sample analog of the population errors. They measure the difference between the actual outcome and the <strong>estimated</strong> regression line. Since the residuals approximate the true errors, we can use them to estimate <span class="math inline">\(\sigma^2\)</span>.</p>
+<p>It turns out that the average squared residual, adjusted for <strong>degrees of freedom</strong>, is an unbiased estimator of <span class="math inline">\(\sigma^2\)</span>:</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Estimating <span class="math inline">\(\sigma^2\)</span>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><span class="math display">\[\hat{\sigma}^2 = \frac{\sum_{i=1}^{n} \hat{\mu}_i^2}{n - k - 1} = \frac{SSR}{n - k - 1}\]</span></p>
+<p>where <span class="math inline">\(SSR = \sum_{i=1}^{n}\hat{\mu}_i^2\)</span> is the sum of squared residuals and <span class="math inline">\(n - k - 1\)</span> is the degrees of freedom (sample size minus the number of estimated parameters).</p>
+</div>
+</div>
+<p>Why do we divide by <span class="math inline">\(n - k - 1\)</span> instead of <span class="math inline">\(n\)</span>? Because we used <span class="math inline">\(k + 1\)</span> estimated coefficients (<span class="math inline">\(\hat{\beta}_0, \hat{\beta}_1, \dots, \hat{\beta}_k\)</span>) to compute the residuals. Each estimated coefficient “uses up” one degree of freedom, so we need to correct for this to get an unbiased estimate. This is the same logic behind the degrees-of-freedom correction in the adjusted <span class="math inline">\(R^2\)</span>.</p>
+<p>The square root <span class="math inline">\(\hat{\sigma} = \sqrt{\hat{\sigma}^2}\)</span> is sometimes called the <strong>standard error of the regression</strong> (SER) or the <strong>root mean squared error</strong> (RMSE). In R output, this appears as <strong>Residual standard error</strong>.</p>
+</section>
+<section id="from-hatsigma2-to-the-standard-error" class="level3" data-number="5.10.3">
+<h3 data-number="5.10.3" class="anchored" data-anchor-id="from-hatsigma2-to-the-standard-error"><span class="header-section-number">5.10.3</span> From <span class="math inline">\(\hat{\sigma}^2\)</span> to the Standard Error</h3>
+<p>Now we can plug our estimate <span class="math inline">\(\hat{\sigma}^2\)</span> into the variance formula. The <strong>standard error</strong> of <span class="math inline">\(\hat{\beta}_j\)</span> is:</p>
 <p><span class="math display">\[
 se(\hat{\beta}_j) = \frac{\hat{\sigma}}{\sqrt{SST_j(1 - R_j^2)}}
 \]</span></p>
-<p>where <span class="math inline">\(\hat{\sigma}^2 = \frac{SSR}{n - k - 1}\)</span> is the estimated error variance, and <span class="math inline">\(n - k - 1\)</span> represents the <strong>degrees of freedom</strong>.</p>
+<p>The standard error is the estimated standard deviation of the sampling distribution of <span class="math inline">\(\hat{\beta}_j\)</span>. It tells us how much our estimate would typically vary across repeated samples. Every time you see <span class="math inline">\(se(\hat{\beta}_j)\)</span> in a regression table, a formula, or R output, this is what’s being computed behind the scenes.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The Big Picture
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><span class="math display">\[Var(\hat{\beta}_j) = \frac{\sigma^2}{SST_j(1-R_j^2)} \xrightarrow{\text{estimate } \sigma^2 \text{ with residuals}} se(\hat{\beta}_j) = \frac{\hat{\sigma}}{\sqrt{SST_j(1-R_j^2)}}\]</span></p>
+<p>We go from a formula involving an unknown population parameter (<span class="math inline">\(\sigma^2\)</span>) to a fully computable <strong>standard error</strong> by replacing <span class="math inline">\(\sigma^2\)</span> with its sample estimate <span class="math inline">\(\hat{\sigma}^2 = SSR/(n-k-1)\)</span>. The standard error is the foundation of statistical inference: t-statistics, p-values, and confidence intervals (covered in the next unit) all depend on it.</p>
+</div>
+</div>
+</section>
+<section id="simulation-does-hatsigma2-actually-work" class="level3" data-number="5.10.4">
+<h3 data-number="5.10.4" class="anchored" data-anchor-id="simulation-does-hatsigma2-actually-work"><span class="header-section-number">5.10.4</span> Simulation: Does <span class="math inline">\(\hat{\sigma}^2\)</span> Actually Work?</h3>
+<p>Let’s verify that <span class="math inline">\(\hat{\sigma}^2 = SSR/(n-k-1)\)</span> is a good estimator of <span class="math inline">\(\sigma^2\)</span> with a simulation. We’ll set up a known population where we <em>choose</em> the true <span class="math inline">\(\sigma^2\)</span>, then check whether our estimator recovers it.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">325</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Population parameters ---</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">100</span>          <span class="co"># sample size</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>true_sigma2 <span class="ot">&lt;-</span> <span class="dv">4</span>  <span class="co"># the TRUE error variance (σ² = 4)</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>n_sims <span class="ot">&lt;-</span> <span class="dv">5000</span>    <span class="co"># number of simulations</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Run the simulation ---</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>sigma2_hat <span class="ot">&lt;-</span> <span class="fu">numeric</span>(n_sims)</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_sims) {</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Generate data from a known DGP: y = 2 + 3*x1 + 1*x2 + μ</span></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>  x1 <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>  x2 <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>  mu <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="fu">sqrt</span>(true_sigma2))  <span class="co"># errors with σ² = 4</span></span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">+</span> <span class="dv">3</span> <span class="sc">*</span> x1 <span class="sc">+</span> <span class="dv">1</span> <span class="sc">*</span> x2 <span class="sc">+</span> mu</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Estimate the model</span></span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>  reg <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> x1 <span class="sc">+</span> x2)</span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Compute σ̂² = SSR / (n - k - 1)</span></span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>  residuals_sq <span class="ot">&lt;-</span> <span class="fu">residuals</span>(reg)<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>  sigma2_hat[i] <span class="ot">&lt;-</span> <span class="fu">sum</span>(residuals_sq) <span class="sc">/</span> (n <span class="sc">-</span> <span class="dv">2</span> <span class="sc">-</span> <span class="dv">1</span>)  <span class="co"># n - k - 1 = 100 - 2 - 1 = 97</span></span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Visualize the results ---</span></span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">tibble</span>(sigma2_hat), <span class="fu">aes</span>(<span class="at">x =</span> sigma2_hat)) <span class="sc">+</span></span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">fill =</span> <span class="st">"steelblue"</span>, <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">bins =</span> <span class="dv">50</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> true_sigma2, <span class="at">color =</span> <span class="st">"darkred"</span>, <span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="fu">mean</span>(sigma2_hat), <span class="at">color =</span> <span class="st">"darkgreen"</span>, <span class="at">linewidth =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
+<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> true_sigma2 <span class="sc">+</span> <span class="fl">0.15</span>, <span class="at">y =</span> <span class="cn">Inf</span>, <span class="at">vjust =</span> <span class="dv">2</span>,</span>
+<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="fu">paste0</span>(<span class="st">"True σ² = "</span>, true_sigma2),</span>
+<span id="cb21-33"><a href="#cb21-33" aria-hidden="true" tabindex="-1"></a>           <span class="at">color =</span> <span class="st">"darkred"</span>, <span class="at">size =</span> <span class="dv">4</span>, <span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">fontface =</span> <span class="st">"italic"</span>) <span class="sc">+</span></span>
+<span id="cb21-34"><a href="#cb21-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="fu">mean</span>(sigma2_hat) <span class="sc">+</span> <span class="fl">0.15</span>, <span class="at">y =</span> <span class="cn">Inf</span>, <span class="at">vjust =</span> <span class="dv">4</span>,</span>
+<span id="cb21-35"><a href="#cb21-35" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="fu">paste0</span>(<span class="st">"Average σ̂² = "</span>, <span class="fu">round</span>(<span class="fu">mean</span>(sigma2_hat), <span class="dv">3</span>)),</span>
+<span id="cb21-36"><a href="#cb21-36" aria-hidden="true" tabindex="-1"></a>           <span class="at">color =</span> <span class="st">"darkgreen"</span>, <span class="at">size =</span> <span class="dv">4</span>, <span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">fontface =</span> <span class="st">"italic"</span>) <span class="sc">+</span></span>
+<span id="cb21-37"><a href="#cb21-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="fu">expression</span>(<span class="fu">hat</span>(sigma)<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb21-38"><a href="#cb21-38" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Frequency"</span>,</span>
+<span id="cb21-39"><a href="#cb21-39" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">"Sampling Distribution of "</span>, <span class="fu">hat</span>(sigma)<span class="sc">^</span><span class="dv">2</span>))) <span class="sc">+</span></span>
+<span id="cb21-40"><a href="#cb21-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-sigma-hat-sim" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-sigma-hat-sim-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.1: Distribution of <span class="math inline">\(\hat{\sigma}^2\)</span> across 5,000 simulated samples. The estimator is centered on the true <span class="math inline">\(\sigma^2 = 4\)</span>, confirming it is unbiased.
+</figcaption>
+<div aria-describedby="fig-sigma-hat-sim-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="multivariate_ols_files/figure-html/fig-sigma-hat-sim-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p>The simulation confirms two important things. First, the average of <span class="math inline">\(\hat{\sigma}^2\)</span> across all 5,000 samples is very close to the true <span class="math inline">\(\sigma^2 = 4\)</span>—this is unbiasedness in action. Second, while any <em>single</em> estimate of <span class="math inline">\(\hat{\sigma}^2\)</span> can be above or below the true value, the distribution is centered in the right place.</p>
+<p>What happens if we divide by <span class="math inline">\(n\)</span> instead of <span class="math inline">\(n - k - 1\)</span>? Let’s check:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the naive (biased) estimator that divides by n</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>sigma2_naive <span class="ot">&lt;-</span> sigma2_hat <span class="sc">*</span> (n <span class="sc">-</span> <span class="dv">2</span> <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">/</span> n  <span class="co"># convert back: multiply by (n-k-1) then divide by n</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">estimate =</span> sigma2_hat, <span class="at">type =</span> <span class="st">"SSR / (n - k - 1)  [unbiased]"</span>),</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">estimate =</span> sigma2_naive, <span class="at">type =</span> <span class="st">"SSR / n  [biased]"</span>)</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> estimate, <span class="at">fill =</span> type)) <span class="sc">+</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">bins =</span> <span class="dv">50</span>, <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">position =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> true_sigma2, <span class="at">color =</span> <span class="st">"darkred"</span>, <span class="at">linewidth =</span> <span class="fl">1.5</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"steelblue"</span>, <span class="st">"orange"</span>)) <span class="sc">+</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> true_sigma2 <span class="sc">+</span> <span class="fl">0.1</span>, <span class="at">y =</span> <span class="cn">Inf</span>, <span class="at">vjust =</span> <span class="dv">2</span>,</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="fu">paste0</span>(<span class="st">"True σ² = "</span>, true_sigma2),</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>           <span class="at">color =</span> <span class="st">"darkred"</span>, <span class="at">size =</span> <span class="dv">4</span>, <span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">fontface =</span> <span class="st">"italic"</span>) <span class="sc">+</span></span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="fu">expression</span>(<span class="fu">hat</span>(sigma)<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Frequency"</span>,</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Estimator"</span>,</span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Why the Degrees-of-Freedom Correction Matters"</span>) <span class="sc">+</span></span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>) <span class="sc">+</span></span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-sigma-hat-biased" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-sigma-hat-biased-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.2: Comparing the unbiased estimator <span class="math inline">\(SSR/(n-k-1)\)</span> to the naive estimator <span class="math inline">\(SSR/n\)</span>. Dividing by <span class="math inline">\(n\)</span> systematically underestimates <span class="math inline">\(\sigma^2\)</span>.
+</figcaption>
+<div aria-describedby="fig-sigma-hat-biased-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="multivariate_ols_files/figure-html/fig-sigma-hat-biased-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p>The orange distribution (dividing by <span class="math inline">\(n\)</span>) is shifted to the left—it systematically <em>underestimates</em> <span class="math inline">\(\sigma^2\)</span>. The degrees-of-freedom correction fixes this bias. The intuition is that the residuals are computed from the <em>estimated</em> regression line, which is already chosen to fit the data as closely as possible. This makes the residuals systematically smaller than the true errors, and dividing by <span class="math inline">\(n - k - 1\)</span> instead of <span class="math inline">\(n\)</span> corrects for this.</p>
 </section>
 </section>
 <section id="the-bias-variance-tradeoff" class="level2" data-number="5.11">
@@ -1481,7 +1629,7 @@ se(\hat{\beta}_j) = \frac{\hat{\sigma}}{\sqrt{SST_j(1 - R_j^2)}}
 <div id="fig-bias-variance" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-bias-variance-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;5.1: The bias-variance tradeoff across all four cases. Each panel shows the sampling distribution of <span class="math inline">\(\hat{\beta}_1\)</span> from 1,000 simulations. The dashed red line marks the true <span class="math inline">\(\beta_1 = 2.21\)</span>.
+Figure&nbsp;5.3: The bias-variance tradeoff across all four cases. Each panel shows the sampling distribution of <span class="math inline">\(\hat{\beta}_1\)</span> from 1,000 simulations. The dashed red line marks the true <span class="math inline">\(\beta_1 = 2.21\)</span>.
 </figcaption>
 <div aria-describedby="fig-bias-variance-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="multivariate_ols_files/figure-html/fig-bias-variance-1.png" class="img-fluid figure-img" style="width:100.0%">
@@ -1726,7 +1874,7 @@ n = 1,200, Adjusted R-squared = 0.23
 </div>
 </div>
 <div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1735,7 +1883,7 @@ Show Explanation
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="i">
 <li><p>In multivariate regression, <span class="math inline">\(\beta_1\)</span> is the partial effect of <span class="math inline">\(x_1\)</span> on <span class="math inline">\(y\)</span>, holding <span class="math inline">\(x_2\)</span> (and all other included variables) constant. This is the ceteris paribus interpretation.</p></li>

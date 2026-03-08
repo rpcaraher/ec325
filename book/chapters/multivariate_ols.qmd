@@ -902,16 +902,148 @@ which makes it *impossible* to get an estimate.
 Here, we still will be able to estimate our $\beta_j$ successfully,
 but it will have a high variance and be "noisy".
 
-### Standard Errors
+### Estimating $\sigma^2$ from the Data
 
-The standard error is estimated as:
+Look carefully at the variance formula above. The denominator contains quantities we can compute directly from our sample: $SST_j$ (the total variation in $x_j$) and $R^2_j$ (how much of $x_j$ is explained by the other regressors). But the numerator contains $\sigma^2$---the **variance of the population error term**. This is a population parameter that we cannot observe directly.
+
+So how do we estimate $\sigma^2$?
+
+Recall from the homoskedasticity assumption (GM.5) that $Var(\mu_i | \mathbf{x}_i) = \sigma^2$ for all observations $i$. Combined with the zero conditional mean assumption (GM.4), which gives us $E[\mu_i | \mathbf{x}_i] = 0$, we can show that $\sigma^2 = E[\mu_i^2]$. Let's work through why.
+
+From @sec-stats-review, the definition of variance is $Var(X) = E[(X - \mu)^2]$---the expected squared deviation from the mean. Applying this to $\mu_i$ and using the fact that $E[\mu_i] = 0$ from GM.4:
+
+$$Var(\mu_i) = E[(\mu_i - 0)^2] = E[\mu_i^2]$$
+
+And from GM.5, $Var(\mu_i) = \sigma^2$, giving us:
+
+$$\sigma^2 = E[\mu_i^2]$$
+
+In other words, $\sigma^2$ is simply the expected value of the squared error terms. If we could observe the true errors $\mu_i$, we'd just compute their average squared value. But we can't observe the true errors---they're the difference between the actual outcome $y_i$ and the **population** regression line, which we don't know.
+
+What we *can* compute are the **residuals**:
+
+$$\hat{\mu}_i = y_i - \hat{y}_i = y_i - \hat{\beta}_0 - \hat{\beta}_1 x_{1i} - \dots - \hat{\beta}_k x_{ki}$$
+
+The residuals are the sample analog of the population errors. They measure the difference between the actual outcome and the **estimated** regression line. Since the residuals approximate the true errors, we can use them to estimate $\sigma^2$.
+
+It turns out that the average squared residual, adjusted for **degrees of freedom**, is an unbiased estimator of $\sigma^2$:
+
+::: {.callout-note}
+## Estimating $\sigma^2$
+
+$$\hat{\sigma}^2 = \frac{\sum_{i=1}^{n} \hat{\mu}_i^2}{n - k - 1} = \frac{SSR}{n - k - 1}$$
+
+where $SSR = \sum_{i=1}^{n}\hat{\mu}_i^2$ is the sum of squared residuals and $n - k - 1$ is the degrees of freedom (sample size minus the number of estimated parameters).
+:::
+
+Why do we divide by $n - k - 1$ instead of $n$? Because we used $k + 1$ estimated coefficients ($\hat{\beta}_0, \hat{\beta}_1, \dots, \hat{\beta}_k$) to compute the residuals. Each estimated coefficient "uses up" one degree of freedom, so we need to correct for this to get an unbiased estimate. This is the same logic behind the degrees-of-freedom correction in the adjusted $R^2$.
+
+The square root $\hat{\sigma} = \sqrt{\hat{\sigma}^2}$ is sometimes called the **standard error of the regression** (SER) or the **root mean squared error** (RMSE). In R output, this appears as **Residual standard error**.
+
+### From $\hat{\sigma}^2$ to the Standard Error
+
+Now we can plug our estimate $\hat{\sigma}^2$ into the variance formula. The **standard error** of $\hat{\beta}_j$ is:
 
 $$
 se(\hat{\beta}_j) = \frac{\hat{\sigma}}{\sqrt{SST_j(1 - R_j^2)}}
 $$
 
-where $\hat{\sigma}^2 = \frac{SSR}{n - k - 1}$ is the estimated error variance,
-and $n - k - 1$ represents the **degrees of freedom**.
+The standard error is the estimated standard deviation of the sampling distribution of $\hat{\beta}_j$. It tells us how much our estimate would typically vary across repeated samples. Every time you see $se(\hat{\beta}_j)$ in a regression table, a formula, or R output, this is what's being computed behind the scenes.
+
+::: {.callout-tip}
+## The Big Picture
+
+$$Var(\hat{\beta}_j) = \frac{\sigma^2}{SST_j(1-R_j^2)} \xrightarrow{\text{estimate } \sigma^2 \text{ with residuals}} se(\hat{\beta}_j) = \frac{\hat{\sigma}}{\sqrt{SST_j(1-R_j^2)}}$$
+
+We go from a formula involving an unknown population parameter ($\sigma^2$) to a fully computable **standard error** by replacing $\sigma^2$ with its sample estimate $\hat{\sigma}^2 = SSR/(n-k-1)$. The standard error is the foundation of statistical inference: t-statistics, p-values, and confidence intervals (covered in the next unit) all depend on it.
+:::
+
+
+### Simulation: Does $\hat{\sigma}^2$ Actually Work?
+
+Let's verify that $\hat{\sigma}^2 = SSR/(n-k-1)$ is a good estimator of $\sigma^2$ with a simulation. We'll set up a known population where we *choose* the true $\sigma^2$, then check whether our estimator recovers it.
+
+```{r}
+#| label: fig-sigma-hat-sim
+#| fig-cap: "Distribution of $\\hat{\\sigma}^2$ across 5,000 simulated samples. The estimator is centered on the true $\\sigma^2 = 4$, confirming it is unbiased."
+#| echo: true
+#| code-fold: true
+
+set.seed(325)
+
+# --- Population parameters ---
+n <- 100          # sample size
+true_sigma2 <- 4  # the TRUE error variance (σ² = 4)
+n_sims <- 5000    # number of simulations
+
+# --- Run the simulation ---
+sigma2_hat <- numeric(n_sims)
+
+for (i in 1:n_sims) {
+  # Generate data from a known DGP: y = 2 + 3*x1 + 1*x2 + μ
+  x1 <- rnorm(n)
+  x2 <- rnorm(n)
+  mu <- rnorm(n, mean = 0, sd = sqrt(true_sigma2))  # errors with σ² = 4
+  y <- 2 + 3 * x1 + 1 * x2 + mu
+
+  # Estimate the model
+  reg <- lm(y ~ x1 + x2)
+
+  # Compute σ̂² = SSR / (n - k - 1)
+  residuals_sq <- residuals(reg)^2
+  sigma2_hat[i] <- sum(residuals_sq) / (n - 2 - 1)  # n - k - 1 = 100 - 2 - 1 = 97
+}
+
+# --- Visualize the results ---
+ggplot(tibble(sigma2_hat), aes(x = sigma2_hat)) +
+  geom_histogram(fill = "steelblue", color = "white", bins = 50, alpha = 0.8) +
+  geom_vline(xintercept = true_sigma2, color = "darkred", linewidth = 1.5, linetype = "dashed") +
+  geom_vline(xintercept = mean(sigma2_hat), color = "darkgreen", linewidth = 1.2) +
+  annotate("text", x = true_sigma2 + 0.15, y = Inf, vjust = 2,
+           label = paste0("True σ² = ", true_sigma2),
+           color = "darkred", size = 4, hjust = 0, fontface = "italic") +
+  annotate("text", x = mean(sigma2_hat) + 0.15, y = Inf, vjust = 4,
+           label = paste0("Average σ̂² = ", round(mean(sigma2_hat), 3)),
+           color = "darkgreen", size = 4, hjust = 0, fontface = "italic") +
+  labs(x = expression(hat(sigma)^2),
+       y = "Frequency",
+       title = expression(paste("Sampling Distribution of ", hat(sigma)^2))) +
+  theme_minimal(base_size = 14)
+```
+
+The simulation confirms two important things. First, the average of $\hat{\sigma}^2$ across all 5,000 samples is very close to the true $\sigma^2 = 4$---this is unbiasedness in action. Second, while any *single* estimate of $\hat{\sigma}^2$ can be above or below the true value, the distribution is centered in the right place.
+
+What happens if we divide by $n$ instead of $n - k - 1$? Let's check:
+
+```{r}
+#| label: fig-sigma-hat-biased
+#| fig-cap: "Comparing the unbiased estimator $SSR/(n-k-1)$ to the naive estimator $SSR/n$. Dividing by $n$ systematically underestimates $\\sigma^2$."
+#| echo: true
+#| code-fold: true
+
+# Compute the naive (biased) estimator that divides by n
+sigma2_naive <- sigma2_hat * (n - 2 - 1) / n  # convert back: multiply by (n-k-1) then divide by n
+
+bind_rows(
+  tibble(estimate = sigma2_hat, type = "SSR / (n - k - 1)  [unbiased]"),
+  tibble(estimate = sigma2_naive, type = "SSR / n  [biased]")
+) |>
+  ggplot(aes(x = estimate, fill = type)) +
+  geom_histogram(alpha = 0.6, bins = 50, color = "white", position = "identity") +
+  geom_vline(xintercept = true_sigma2, color = "darkred", linewidth = 1.5, linetype = "dashed") +
+  scale_fill_manual(values = c("steelblue", "orange")) +
+  annotate("text", x = true_sigma2 + 0.1, y = Inf, vjust = 2,
+           label = paste0("True σ² = ", true_sigma2),
+           color = "darkred", size = 4, hjust = 0, fontface = "italic") +
+  labs(x = expression(hat(sigma)^2),
+       y = "Frequency",
+       fill = "Estimator",
+       title = "Why the Degrees-of-Freedom Correction Matters") +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom")
+```
+
+The orange distribution (dividing by $n$) is shifted to the left---it systematically *underestimates* $\sigma^2$. The degrees-of-freedom correction fixes this bias. The intuition is that the residuals are computed from the *estimated* regression line, which is already chosen to fit the data as closely as possible. This makes the residuals systematically smaller than the true errors, and dividing by $n - k - 1$ instead of $n$ corrects for this.
 
 
 ## The Bias-Variance Tradeoff

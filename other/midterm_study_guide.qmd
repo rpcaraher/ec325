@@ -1,0 +1,291 @@
+---
+title: "Midterm Study Guide"
+subtitle: "EC325: Econometrics | Colby College"
+author: "Prof. Caraher"
+date: "last-modified"
+date-format: "long"
+embed-resources: true
+format:
+  pdf:
+    toc: false
+    colorlinks: true
+  html:
+    toc: true
+---
+
+# Unit 1: Introduction to Econometrics
+
+### What is Econometrics?
+
+- Definition of econometrics and its emphasis on causal inference
+- Examples of causal inference questions (health insurance and health, education and earnings, tariffs and production)
+- Steps of an econometric project: model, data, estimate, interpret
+
+### Correlation vs. Causality
+
+- Why correlation does not imply causation
+- Selection bias (apples-to-oranges comparisons)
+- Ceteris paribus condition: comparing apples-to-apples
+
+# Unit 2: Good Data Practices and R
+
+### Why Good Data Practices Matter
+
+- The Reinhart-Rogoff example: spreadsheet errors led to influential but incorrect policy conclusions
+- Errors were only discovered because a grad student attempted to replicate the results
+- The replication standard: an independent researcher should be able to exactly duplicate results
+
+### Getting to Know Your Data
+
+- Always examine your data before running any analysis
+- Key questions: How many observations? Any missing data? Is the distribution reasonable? Any outliers or impossible values?
+- Tools: descriptive statistics (`mean()`, `sd()`, `min()`, `max()`, `summary()`) and visualizations
+
+### Missing Data
+
+- Use `is.na()` and `sum(is.na())` to detect missing values
+- Use `na.rm = TRUE` to ignore missing values in calculations (e.g., `mean(x, na.rm = TRUE)`)
+- Data can be missing at random or missing systematically — the latter can bias results
+
+### R Basics
+
+- **Objects and assignment:** Store values using `<-` (e.g., `x <- 3`)
+- **Vectors:** Combine values with `c()` (e.g., `ages <- c(19, 20, 21)`)
+- **Functions:** Pre-built operations that take arguments (e.g., `mean(x)`, `seq(from = 1, to = 10, by = 2)`)
+- **Data frames:** Rows = observations, columns = variables; access columns with `$` (e.g., `mtcars$mpg`)
+- **Data types:** numeric, character, logical, factor — functions behave differently depending on type
+- **Packages:** Install once with `install.packages()`, load every session with `library()`
+
+### The Tidyverse and the Pipe
+
+- The `tidyverse` is a collection of R packages for data science (`dplyr`, `ggplot2`, `readr`, etc.)
+- The pipe `|>` passes the result on its left as the first argument to the function on its right — read as "and then"
+
+### Key `dplyr` Functions
+
+You should know what each of these functions does and be able to read/write basic code using them:
+
+- **`filter()`:** Subset rows by a condition (e.g., `filter(mpg > 25)`)
+- **`select()`:** Choose or drop specific columns (e.g., `select(mpg, cyl, wt)`)
+- **`mutate()`:** Create new variables or transform existing ones (e.g., `mutate(kmpl = mpg * 0.425)`)
+- **`summarize()`:** Collapse data into summary statistics (e.g., `summarize(avg = mean(mpg))`)
+- **`group_by()`:** Group data before summarizing — pair with `summarize()` for grouped statistics
+- **`arrange()`:** Sort rows by a column; use `desc()` for descending order
+- **`count()`:** Count rows per unique value — shortcut for `group_by() |> summarize(n = n())`
+- **Chaining:** Multiple verbs can be piped together to build complex operations step-by-step
+
+### Descriptive Statistics Functions
+
+- `mean()`, `sd()`, `median()`, `min()`, `max()`: operate on vectors (columns)
+- `n()`: counts observations (used inside `summarize()`)
+- `summary()`: quick overview of min, quartiles, mean, max for all columns
+- `glimpse()`: shows variable names, types, and first few values
+
+### Visualization with `ggplot2`
+
+- Plots are built layer by layer: data $\rightarrow$ geometry $\rightarrow$ aesthetics $\rightarrow$ labels
+- `ggplot(data)`: initialize the plot
+- `aes(x, y, color)`: map variables to visual properties
+- Key geometries: `geom_point()` (scatterplot), `geom_histogram()` (distribution), `geom_smooth(method = "lm")` (line of best fit), `geom_col()` (bar chart)
+- `labs()`: add title, axis labels, legend titles
+- `theme_minimal()`: clean visual theme
+
+### Good Coding Practices
+
+- Always work in scripts (`.R` files), not the console
+- Use R Projects (`.Rproj`) to set your working directory automatically
+- Comment your code with `#` to explain what it does and why
+- Use descriptive variable names (e.g., `avg_wage_by_state` not `x1`)
+
+# Unit 3: RCTs and the Potential Outcomes Framework
+
+### Randomized Control Trials
+
+- How RCTs work: random assignment to treatment and control groups
+- Why randomization eliminates selection bias
+- The Law of Large Numbers (LLN) and its role in ensuring balanced groups
+
+### The Potential Outcomes Framework
+
+- Notation: $Y_{1i}$ (treated outcome), $Y_{0i}$ (untreated outcome)
+- Causal effect: $\kappa = Y_{1i} - Y_{0i}$
+- The fundamental problem of causal inference: we only observe one potential outcome per unit
+- Decomposition of the simple difference in means into a causal effect and a selection bias term:
+$$
+E[Y_i | D_i = 1] - E[Y_i | D_i = 0] = \kappa + \underbrace{(E[Y_{0i} | D_i = 1] - E[Y_{0i} | D_i = 0])}_{\text{Selection Bias}}
+$$
+- How randomization sets the selection bias term to zero
+- The Oregon Health Insurance Experiment as an applied example
+
+# Unit 4: Bivariate OLS
+
+### Conditional Expectations
+
+- Definition and interpretation of $E[Y | X = x]$
+- Conditional expectations as the foundation of regression
+
+### The Population Regression Model
+
+- Formula: $y = \beta_0 + \beta_1 x + \mu$
+- Definitions: dependent variable ($y$), independent variable ($x$), error term ($\mu$), population parameters ($\beta_0, \beta_1$)
+- Distinction between population parameters and sample estimates
+
+### Deriving the OLS Estimates
+
+- OLS minimizes the Sum of Squared Residuals (SSR): $SSR = \sum_{i=1}^{n}(y_i - \hat{y}_i)^2$
+- Slope formula: $\hat{\beta}_1 = \frac{\sum(x_i - \bar{x})(y_i - \bar{y})}{\sum(x_i - \bar{x})^2} = \frac{Cov(x,y)}{Var(x)}$
+- Intercept formula: $\hat{\beta}_0 = \bar{y} - \hat{\beta}_1\bar{x}$
+- Relationship between $\hat{\beta}_1$ and correlation: $\hat{\beta}_1 = \rho_{xy} \frac{\sigma_y}{\sigma_x}$
+
+### Interpreting OLS Coefficients
+
+- $\hat{\beta}_0$: Predicted $y$ when $x = 0$
+- $\hat{\beta}_1$: Marginal effect — the change in $\hat{y}$ for a one-unit increase in $x$
+
+### Goodness-of-Fit
+
+- Total Sum of Squares (SST): $\sum(y_i - \bar{y})^2$
+- Explained Sum of Squares (SSE): $\sum(\hat{y}_i - \bar{y})^2$
+- $R^2 = SSE/SST = 1 - SSR/SST$
+
+
+### Statistical Assumptions for Unbiasedness (Bivariate)
+
+- **GM 1 (Linearity in Parameters):** The model is linear in $\beta$ — non-linear transformations of data are allowed
+- **GM 2 (Random Sampling):** The sample is randomly drawn from the population
+- **GM 3 (No Perfect Multicollinearity):** The independent variable is not constant
+- **GM 4 (Zero Conditional Mean):** $E[\mu | x] = 0$ — the error is uncorrelated with $x$
+- If GM 1–4 hold, OLS is **unbiased:** $E[\hat{\beta}_j] = \beta_j$
+
+# Unit 5: Multivariate OLS
+
+### Limits of Bivariate OLS
+
+- When bivariate OLS does and does not generate ceteris paribus estimates
+- Susceptibility to omitted variable bias
+
+### The Multivariate OLS Model
+
+- General formula: $y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \dots + \beta_k x_k + \mu$
+- Interpretation: $\hat{\beta}_j$ is the ceteris paribus effect of $x_j$ on $y$, holding all other included variables constant
+- Zero Conditional Mean with $k$ variables: $E[\mu | x_1, x_2, \dots, x_k] = 0$
+- Multivariate OLS as a matching estimator
+
+### Omitted Variable Bias (OVB)
+
+- **Two conditions for OVB:** (1) the omitted variable affects $y$, AND (2) the omitted variable is correlated with an included $x$
+- **OVB formula:** $E[\tilde{\beta}_1] = \beta_1 + \beta_2 \cdot \delta_1$, where $Bias = \beta_2 \cdot \delta_1$
+- $\beta_2$: effect of the omitted variable on $y$
+- $\delta_1$: correlation between the omitted variable and the included variable
+- **Direction of bias:** determined by the signs of $\beta_2$ and $\delta_1$
+
+| $Corr(x_1, x_2)$ | $\beta_2 > 0$ | $\beta_2 < 0$ |
+|:-:|:-:|:-:|
+| $\delta_1 > 0$ | Positive Bias | Negative Bias |
+| $\delta_1 < 0$ | Negative Bias | Positive Bias |
+
+### Goodness-of-Fit in Multivariate Models
+
+- $R^2$ mechanically increases with more variables
+- Adjusted $R^2$ ($\bar{R}^2$) penalizes for additional parameters; always $\leq R^2$
+- $\bar{R}^2$ is preferred in multivariate models
+
+### Gauss-Markov Assumptions (Multivariate)
+
+- GM 1–4 as applied to the multivariate setting
+- GM 3 (No Perfect Multicollinearity): no exact linear relationships among the $x$ variables
+
+### GM Assumption 5 and Properties of the OLS Estimator
+
+### GM Assumption 5: Homoskedasticity
+
+- $Var(\mu | x_1, \dots, x_k) = \sigma^2$ — constant error variance
+- **Heteroskedasticity:** when error variance depends on the $x$ values
+- If GM 1–5 hold, OLS is **BLUE** (Best Linear Unbiased Estimator)
+
+### Variance of the OLS Estimator
+
+- Formula: $Var(\hat{\beta}_j) = \frac{\sigma^2}{SST_j(1 - R_j^2)}$
+- Three drivers of variance:
+  - $\sigma^2$ (error variance): more noise $\rightarrow$ higher variance
+  - $SST_j$ (sample variation in $x_j$): more variation $\rightarrow$ lower variance
+  - $R_j^2$ (multicollinearity): more correlation among $x$'s $\rightarrow$ higher variance
+- Larger sample size increases $SST_j$, reducing variance
+
+### Estimating $\sigma^2$ from the Residuals
+
+The variance formula contains $\sigma^2$, a population parameter we cannot observe. We need to estimate it from sample data. The logic proceeds as follows:
+
+1. From homoskedasticity and zero conditional mean: $Var(\mu_i) = \sigma^2 = E[\mu_i^2]$
+2. So to estimate $\sigma^2$, we need a good estimate of the error terms $\mu_i$
+3. We cannot observe the true errors $\mu_i$, but we can compute the **residuals**: $\hat{\mu}_i = y_i - \hat{y}_i$
+4. The average squared residual (adjusted for degrees of freedom) is an unbiased estimator of $\sigma^2$:
+
+$$\hat{\sigma}^2 = \frac{\sum_{i=1}^{n}\hat{\mu}_i^2}{n - k - 1} = \frac{SSR}{n - k - 1}$$
+
+- We divide by $n - k - 1$ (not $n$) because estimating $k + 1$ parameters uses up $k + 1$ degrees of freedom
+- In the bivariate case ($k=1$), this is $n - 2$
+
+### The Standard Error of $\hat{\beta}_j$
+
+- Plugging $\hat{\sigma}^2$ into the variance formula and taking the square root gives the standard error:
+
+$$se(\hat{\beta}_j) = \frac{\hat{\sigma}}{\sqrt{SST_j(1 - R_j^2)}}$$
+
+- The standard error measures the precision of our estimate — it is the estimated standard deviation of the sampling distribution of $\hat{\beta}_j$
+- **Key chain of logic:** We go from a formula involving an unknown population parameter ($\sigma^2$) to a computable standard error by replacing $\sigma^2$ with its sample estimate from the residuals
+
+### The Bias/Variance Tradeoff
+
+- Including more controls: reduces bias but can inflate variance
+- Omitting controls: lower variance but introduces bias
+- Larger samples reduce variance, making the tradeoff less severe
+
+# Unit 6: Statistical Inference (through Confidence Intervals)
+
+### The Normality Assumption
+
+- $\mu \sim Normal(0, \sigma^2)$
+- Implies: $\hat{\beta}_j \sim Normal[\beta_j, Var(\hat{\beta}_j)]$
+- Allows us to construct the sampling distribution of the estimator
+
+### Hypothesis Testing
+
+- **Null hypothesis:** $H_0: \beta_j = 0$ (no effect)
+- **Alternative hypothesis:** $H_A: \beta_j \neq 0$
+- **Logic:** Assume $H_0$ is true, check whether the observed estimate is likely under this assumption
+
+### The T-Statistic
+
+- $t_{\hat{\beta}_j} = \frac{\hat{\beta}_j}{se(\hat{\beta}_j)}$
+- Measures how many standard errors the estimate is from zero
+- **Rule of thumb (large samples):** $|t| > 2$ implies significance at the 5\% level
+
+### Critical Values and Significance Levels
+
+- **Significance level ($\alpha$):** the threshold probability (commonly 10\%, 5\%, 1\%)
+- **Critical value ($c_\alpha$):** the $t$-value that defines the rejection region
+  - For large samples: $c_{0.10} \approx 1.645$, $c_{0.05} \approx 1.96$, $c_{0.01} \approx 2.576$
+- **Decision rule:** Reject $H_0$ if $|t| > c_\alpha$
+
+### P-Values
+
+- The smallest significance level at which $H_0$ would be rejected
+- Interpretation: the probability of observing a $t$-statistic as extreme as ours, if $H_0$ were true
+- Rejection rule: if p-value $< \alpha$, reject $H_0$
+
+### Statistical Significance
+
+- When the null is not rejected: say "fail to reject $H_0$" — never say "accept the null"
+- **Statistical significance $\neq$ practical significance:** the magnitude of the coefficient determines economic importance
+
+### Confidence Intervals
+
+- Formula: $\hat{\beta}_j \pm c_\alpha \cdot se(\hat{\beta}_j)$
+- **95\% CI interpretation:** "We are 95\% confident that the true population parameter lies between [Lower] and [Upper]"
+- If the CI contains zero, the estimate is not statistically significant at that level
+
+### Equivalence of T-Tests, P-Values, and CIs
+
+- All three methods give the same conclusion for the same significance level:
+  - $|t| > c_\alpha$ $\Leftrightarrow$ p-value $< \alpha$ $\Leftrightarrow$ zero $\notin$ CI

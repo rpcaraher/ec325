@@ -1,0 +1,452 @@
+---
+title: "Statistical Inference"
+subtitle: "EC 325: Econometrics"
+author: "Prof. Caraher"
+institute: "Colby College"
+date: "today"
+date-format: "medium"
+embed-resources: true
+format:
+  revealjs:
+    theme: colby-theme.scss
+    slide-number: true
+    incremental: true
+    footer: "EC325 | Unit 6 | Statistical Inference"
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+#| echo: false
+
+library(tidyverse)
+library(wooldridge)
+library(modelsummary)
+```
+
+
+# From Point Estimates to Uncertainty
+
+## Where We've Been {.smaller}
+
+- We know how to estimate regression parameters using OLS
+
+. . .
+
+- Under the Gauss-Markov assumptions, OLS is **unbiased:** $E[\hat{\beta}_j] = \beta_j$
+
+. . .
+
+- But a single estimate from a single sample is just one draw from a **sampling distribution**
+
+. . .
+
+- **The problem:** How do we know if our estimate reflects a *real* effect or is just due to random chance?
+
+. . .
+
+> Statistical inference gives us the tools to answer this question.
+
+
+## The Sampling Distribution {.smaller}
+
+- If we could draw many samples and estimate $\hat{\beta}_1$ each time, we'd get a **distribution** of estimates
+
+. . .
+
+- Some estimates would be larger, some smaller, but they'd center around $\beta_1$ (by unbiasedness)
+
+. . .
+
+- We already know two properties of this distribution:
+
+. . .
+
+**Mean:** $E[\hat{\beta}_j] = \beta_j$
+
+. . .
+
+**Variance:** $Var(\hat{\beta}_j) = \frac{\sigma^2}{SST_j(1 - R^2_j)}$
+
+. . .
+
+- But we need to know the **shape** of the distribution to do inference
+
+. . .
+
+- Recall from last unit: we estimate $\sigma^2$ with $\hat{\sigma}^2 = SSR/(n-k-1)$, giving us $se(\hat{\beta}_j) = \hat{\sigma}/\sqrt{SST_j(1-R_j^2)}$
+
+
+## Quick Recap: The Standard Error {.smaller}
+
+$$Var(\hat{\beta}_j) = \frac{\sigma^2}{SST_j(1-R_j^2)} \xrightarrow{\text{estimate } \sigma^2 \text{ with residuals}} se(\hat{\beta}_j) = \frac{\hat{\sigma}}{\sqrt{SST_j(1-R_j^2)}}$$
+
+. . .
+
+- The **standard error** tells us how much $\hat{\beta}_j$ would typically vary across repeated samples
+
+. . .
+
+- Now: what **shape** does the sampling distribution have? And how do we use it for inference?
+
+
+# The Normality Assumption and the Sampling Distribution
+
+## The Normality Assumption {.smaller}
+
+To fully characterize the **shape** of the sampling distribution, we add one more assumption:
+
+. . .
+
+::: {.callout-important}
+## CLM Assumption 6: Normality
+
+The population error $\mu$ is independent of the explanatory variables and normally distributed:
+
+$$\mu \sim Normal(0, \sigma^2)$$
+:::
+
+. . .
+
+- This is the final piece of the **Classical Linear Model (CLM)** assumptions
+
+. . .
+
+- CLM = Gauss-Markov assumptions + normality
+
+
+## What Normality Gives Us {.smaller}
+
+Under the CLM assumptions, the OLS estimator is **normally distributed:**
+
+$$\hat{\beta}_j \sim Normal\left(\beta_j, \frac{\sigma^2}{SST_j(1 - R^2_j)}\right)$$
+
+. . .
+
+- Centered on the true value $\beta_j$ (unbiasedness)
+- Spread determined by the variance formula
+- **Shape** is the bell curve
+
+. . .
+
+When we replace $\sigma^2$ with $\hat{\sigma}^2$, we get a **t-distribution** instead of normal:
+
+$$\frac{\hat{\beta}_j - \beta_j}{se(\hat{\beta}_j)} \sim t_{n-k-1}$$
+
+
+# Hypothesis Testing
+
+## The Core Question {.smaller}
+
+- You estimate $\hat{\beta}_1 = 0.065$ for the return to education
+
+. . .
+
+- Is this reflecting a real effect? Or did you just get a noisy sample?
+
+. . .
+
+- **Hypothesis testing** provides a formal framework for answering this
+
+. . .
+
+**Null hypothesis:** $H_0: \beta_j = 0$ (no effect)
+
+**Alternative hypothesis:** $H_1: \beta_j \neq 0$ (some effect)
+
+. . .
+
+> The null hypothesis is the "boring" explanation: any pattern in the data is just due to chance.
+
+
+## The t-Statistic {.smaller}
+
+To test $H_0: \beta_j = 0$, compute the **t-statistic:**
+
+$$t_{\hat{\beta}_j} = \frac{\hat{\beta}_j}{se(\hat{\beta}_j)}$$
+
+. . .
+
+- This is the ratio of our estimate to its standard error
+
+. . .
+
+- **Interpretation:** How many standard errors away from zero is our estimate?
+
+. . .
+
+- Under $H_0$, the t-stat follows a $t_{n-k-1}$ distribution
+
+
+## Properties of the t-Statistic {.smaller}
+
+1. **Same sign as the estimate:** Since $se(\hat{\beta}_j) > 0$, the t-stat has the same sign as $\hat{\beta}_j$
+
+. . .
+
+2. **Magnitude matters:** Larger $|\hat{\beta}_j|$ relative to $se(\hat{\beta}_j)$ $\rightarrow$ larger $|t|$
+
+. . .
+
+3. **Signal-to-noise ratio:** How large is our estimate relative to the noise (uncertainty) in our data?
+
+. . .
+
+- **Large |t|:** Evidence against $H_0$ --- our estimate is unlikely if there were truly no effect
+
+- **Small |t|:** Consistent with $H_0$ --- we can't rule out that the true effect is zero
+
+
+## Example: Returns to Education {.smaller}
+
+```{r}
+#| echo: true
+data(wage1, package = "wooldridge")
+reg <- lm(lwage ~ educ + exper + tenure, data = wage1)
+coef_table <- summary(reg)$coefficients
+round(coef_table, 4)
+```
+
+. . .
+
+- $\hat{\beta}_{educ} = `r round(coef(reg)["educ"], 4)`$ with $se = `r round(coef_table["educ", "Std. Error"], 4)`$
+
+. . .
+
+- $t = `r round(coef_table["educ", "t value"], 2)`$ --- the estimate is about `r round(abs(coef_table["educ", "t value"]), 0)` standard errors from zero
+
+. . .
+
+- This is strong evidence that education has a real effect on wages
+
+
+## Critical Values and Rejection Regions {.smaller}
+
+- We **reject $H_0$** if $|t_{\hat{\beta}_j}|$ exceeds a **critical value** $c_\alpha$
+
+. . .
+
+- The critical value depends on:
+  - The **significance level** $\alpha$ (usually 5%)
+  - The **degrees of freedom** $n - k - 1$
+
+. . .
+
+- At the 5% significance level with a two-sided test:
+  - Reject $H_0$ if $|t_{\hat{\beta}_j}| > c_{0.05}$
+  - Fail to reject $H_0$ if $|t_{\hat{\beta}_j}| \leq c_{0.05}$
+
+
+## The "Rule of 2" {.smaller}
+
+::: {.callout-tip}
+## Quick Rule of Thumb
+
+With reasonably large samples ($n > 30$ or so), the critical value at the 5% level is approximately **2**.
+
+So: **reject $H_0$ at the 5% level if $|t| > 2$**
+:::
+
+. . .
+
+- This is because the $t$-distribution approaches the standard normal as $n$ grows
+
+. . .
+
+- For the standard normal: $P(|Z| > 1.96) = 0.05$
+
+. . .
+
+- $1.96 \approx 2$ --- hence the rule of thumb
+
+
+# P-Values
+
+## What is a P-Value? {.smaller}
+
+::: {.callout-note}
+## Definition
+
+The **p-value** is the probability of observing a t-statistic at least as extreme as the one we calculated, *assuming the null hypothesis is true.*
+:::
+
+. . .
+
+- Small p-value $\rightarrow$ our result would be very unlikely under $H_0$ $\rightarrow$ evidence against $H_0$
+
+. . .
+
+- Large p-value $\rightarrow$ our result is plausible under $H_0$ $\rightarrow$ we can't reject $H_0$
+
+. . .
+
+- **Decision rule:** Reject $H_0$ if $p < \alpha$ (typically $\alpha = 0.05$)
+
+
+## Interpreting P-Values {.smaller}
+
+**Common (mis)interpretation:** "The p-value is the probability that $H_0$ is true."
+
+. . .
+
+**Correct interpretation:** "The p-value is the probability of getting data this extreme *if* $H_0$ were true."
+
+. . .
+
+Think of it like a legal trial:
+
+- $H_0$: The defendant is innocent
+- Small p-value: The evidence would be very surprising if the defendant were innocent
+- We reject $H_0$ = "guilty beyond reasonable doubt"
+
+. . .
+
+- Failing to reject $H_0$ $\neq$ proving $H_0$ is true (just like "not guilty" $\neq$ "innocent")
+
+
+## Statistical vs. Practical Significance {.smaller}
+
+::: {.callout-warning}
+## Important Distinction
+
+**Statistical significance** ($p < 0.05$) tells you the estimate is unlikely due to chance.
+
+**Practical significance** tells you the effect is large enough to matter.
+:::
+
+. . .
+
+- With a huge sample, even a *tiny* effect can be statistically significant
+
+. . .
+
+- Example: An extra year of education raises wages by 0.1%
+  - With $n = 1{,}000{,}000$, this might have $p < 0.001$
+  - But is 0.1% economically meaningful?
+
+. . .
+
+- **Always report and discuss the magnitude of the coefficient, not just whether it's "significant"**
+
+
+# Confidence Intervals
+
+## From Point Estimates to Intervals {.smaller}
+
+- A point estimate $\hat{\beta}_j$ gives our single best guess of $\beta_j$
+
+. . .
+
+- But we know there's uncertainty --- the standard error tells us how much
+
+. . .
+
+- A **confidence interval** provides a range of plausible values for $\beta_j$
+
+. . .
+
+$$\hat{\beta}_j \pm c_\alpha \cdot se(\hat{\beta}_j)$$
+
+. . .
+
+- For a **95% confidence interval** (with large $n$): $c_\alpha \approx 1.96 \approx 2$
+
+
+## Interpreting Confidence Intervals {.smaller}
+
+::: {.callout-note}
+## What a 95% CI Means
+
+If we were to draw many samples and compute a 95% CI each time, about **95% of those intervals would contain the true parameter** $\beta_j$.
+:::
+
+. . .
+
+- It is **not** "there is a 95% probability that $\beta_j$ is in this interval"
+  - The true $\beta_j$ is fixed --- it's either in the interval or it's not
+
+. . .
+
+- Instead: our *procedure* captures the truth 95% of the time
+
+. . .
+
+- **Connection to hypothesis testing:** If zero is outside the 95% CI, we reject $H_0: \beta_j = 0$ at the 5% level
+
+
+## Example: Confidence Intervals in R {.smaller}
+
+```{r}
+#| echo: true
+data(wage1, package = "wooldridge")
+reg <- lm(lwage ~ educ + exper + tenure, data = wage1)
+
+# 95% confidence intervals
+confint(reg)
+```
+
+. . .
+
+- The CI for `educ` is entirely above zero --- we're confident education has a positive effect on wages
+
+. . .
+
+- The width of the interval reflects our uncertainty
+
+
+## CIs, T-Tests, and P-Values {.smaller}
+
+These three approaches to inference are **equivalent** --- they always give the same answer:
+
+. . .
+
+| Method | Reject $H_0: \beta_j = 0$ when... |
+|:-------|:-----------------------------------|
+| **t-test** | $|t_{\hat{\beta}_j}| > c_\alpha$ |
+| **p-value** | $p < \alpha$ |
+| **CI** | Zero is outside the $100(1-\alpha)\%$ CI |
+
+. . .
+
+> You'll often see all three reported in regression output and published research. They tell the same story in different ways.
+
+
+# Summary
+
+## Key Formulas {.smaller}
+
+| Formula | What It Is |
+|:--------|:-----------|
+| $Var(\hat{\beta}_j) = \frac{\sigma^2}{SST_j(1-R_j^2)}$ | Variance of the estimator |
+| $\hat{\sigma}^2 = \frac{SSR}{n-k-1}$ | Estimated error variance (Unit 5) |
+| $se(\hat{\beta}_j) = \frac{\hat{\sigma}}{\sqrt{SST_j(1-R_j^2)}}$ | Standard error (Unit 5) |
+| $t_{\hat{\beta}_j} = \frac{\hat{\beta}_j}{se(\hat{\beta}_j)}$ | t-statistic |
+| $\hat{\beta}_j \pm c_\alpha \cdot se(\hat{\beta}_j)$ | Confidence interval |
+
+
+## Key Concepts {.smaller}
+
+1. The **normality assumption** + Gauss-Markov = the Classical Linear Model (CLM)
+
+. . .
+
+2. The **t-statistic** measures how many standard errors an estimate is from zero
+
+. . .
+
+3. The **p-value** is the probability of seeing data this extreme under $H_0$
+
+. . .
+
+4. A **confidence interval** gives a range of plausible values for the true parameter
+
+. . .
+
+5. **Statistical significance** ($p < 0.05$) is not the same as **practical significance**
+
+. . .
+
+6. t-tests, p-values, and CIs are **three equivalent ways** of doing inference

@@ -1305,6 +1305,198 @@ bind_rows(low_corr, high_corr) |>
 ```
 
 
+# Estimating $\sigma^2$ and the Standard Error
+
+## The Problem: $\sigma^2$ is Unknown {.smaller}
+
+- The variance formula contains $\sigma^2$ — the **population error variance**
+
+. . .
+
+$$Var(\hat{\beta}_j) = \frac{\sigma^2}{SST_j(1 - R^2_j)}$$
+
+. . .
+
+- We can compute $SST_j$ and $R^2_j$ from our data
+
+. . .
+
+- But $\sigma^2 = Var(\mu | x)$ is a **population parameter** we cannot observe
+
+. . .
+
+- **We need to estimate $\sigma^2$ from our sample**
+
+
+## Why Does $\sigma^2 = E[\mu_i^2]$? {.smaller}
+
+From the Gauss-Markov assumptions:
+
+- **GM.4:** $E[\mu_i] = 0$ &nbsp;&nbsp;&nbsp; **GM.5:** $Var(\mu_i) = \sigma^2$
+
+. . .
+
+From the stats review, the definition of variance is $Var(X) = E[(X - \mu)^2]$. Apply this to $\mu_i$, using $E[\mu_i] = 0$:
+
+. . .
+
+$$\sigma^2 = Var(\mu_i) = E[(\mu_i - 0)^2] = E[\mu_i^2]$$
+
+
+## The Problem: We Can't Observe $\mu_i$ {.smaller}
+
+- The true error is $\mu_i = y_i - \beta_0 - \beta_1 x_{1i} - \dots - \beta_k x_{ki}$
+
+. . .
+
+- This requires knowing the **population** parameters $\beta_0, \beta_1, \dots, \beta_k$
+
+. . .
+
+- We don't know those — that's the whole reason we're running a regression!
+
+. . .
+
+- **Solution:** Use the **residuals** as a proxy for the true errors
+
+
+## Step 4: Residuals as Proxies for Errors {.smaller}
+
+The **residuals** use our *estimated* coefficients instead of the true ones:
+
+$$\hat{\mu}_i = y_i - \hat{\beta}_0 - \hat{\beta}_1 x_{1i} - \dots - \hat{\beta}_k x_{ki}$$
+
+. . .
+
+How do residuals relate to the true errors?
+
+. . .
+
+- True error: $\mu_i = y_i - (\beta_0 + \beta_1 x_{1i} + \dots + \beta_k x_{ki})$
+
+. . .
+
+- Residual: $\hat{\mu}_i = y_i - (\hat{\beta}_0 + \hat{\beta}_1 x_{1i} + \dots + \hat{\beta}_k x_{ki})$
+
+. . .
+
+- The residuals approximate the true errors, but they're **systematically smaller**
+- Why? Because OLS *chooses* $\hat{\beta}_0, \dots, \hat{\beta}_k$ to make the residuals as small as possible
+
+
+## Step 5: The Degrees-of-Freedom Correction {.smaller}
+
+Since residuals are systematically smaller than the true errors:
+
+$$\frac{1}{n}\sum_{i=1}^{n}\hat{\mu}_i^2 < \sigma^2 \quad \text{(on average)}$$
+
+. . .
+
+Dividing by $n$ would **underestimate** $\sigma^2$.
+
+. . .
+
+The fix: divide by $n - k - 1$ instead:
+
+. . .
+
+$$\hat{\sigma}^2 = \frac{\sum_{i=1}^{n}\hat{\mu}_i^2}{n - k - 1} = \frac{SSR}{n - k - 1}$$
+
+. . .
+
+- We estimated $k + 1$ parameters ($\hat{\beta}_0, \hat{\beta}_1, \dots, \hat{\beta}_k$) to get the residuals
+- Each parameter "uses up" one degree of freedom
+- Correcting for this gives us an **unbiased** estimator: $E[\hat{\sigma}^2] = \sigma^2$
+
+
+## Step 6: Putting It All Together {.smaller}
+
+The full chain of logic:
+
+. . .
+
+1. $\sigma^2 = E[\mu_i^2]$ (from GM.4 + GM.5 + variance identity)
+
+. . .
+
+2. We can't observe $\mu_i$, so use residuals $\hat{\mu}_i$ instead
+
+. . .
+
+3. Residuals are systematically too small, so correct with degrees of freedom
+
+. . .
+
+4. Result: $\hat{\sigma}^2 = \frac{SSR}{n - k - 1}$ is an **unbiased estimator** of $\sigma^2$
+
+. . .
+
+::: {.callout-note}
+$\hat{\sigma} = \sqrt{\hat{\sigma}^2}$ is what R reports as **"Residual standard error"**
+:::
+
+
+## From $\hat{\sigma}^2$ to the Standard Error {.smaller}
+
+Now plug $\hat{\sigma}^2$ into the variance formula and take the square root:
+
+. . .
+
+$$se(\hat{\beta}_j) = \frac{\hat{\sigma}}{\sqrt{SST_j(1 - R_j^2)}}$$
+
+. . .
+
+- The **standard error** is the estimated standard deviation of the sampling distribution of $\hat{\beta}_j$
+
+. . .
+
+- It tells us: *how much would our estimate typically vary across repeated samples?*
+
+. . .
+
+- Every time you see $se(\hat{\beta}_j)$ in a regression table or R output, this is what's being computed
+
+
+## The Big Picture {.smaller}
+
+$$Var(\hat{\beta}_j) = \frac{\sigma^2}{SST_j(1-R_j^2)} \xrightarrow{\text{estimate } \sigma^2 \text{ with residuals}} se(\hat{\beta}_j) = \frac{\hat{\sigma}}{\sqrt{SST_j(1-R_j^2)}}$$
+
+. . .
+
+We go from a formula involving an **unknown population parameter** ($\sigma^2$) to a fully computable **standard error** by:
+
+. . .
+
+1. Recognizing that $\sigma^2 = E[\mu_i^2]$ (variance identity + GM.4)
+
+. . .
+
+2. Using residuals $\hat{\mu}_i$ as proxies for the unobservable errors $\mu_i$
+
+. . .
+
+3. Applying the degrees-of-freedom correction: $\hat{\sigma}^2 = SSR/(n-k-1)$
+
+. . .
+
+> This standard error is the foundation of everything in the next unit: **t-statistics, p-values, and confidence intervals** all depend on it.
+
+
+## Seeing It in R {.smaller}
+
+```{r}
+#| echo: true
+data(wage1, package = "wooldridge")
+reg <- lm(lwage ~ educ + exper + tenure, data = wage1)
+summary(reg)
+```
+
+. . .
+
+- **Residual standard error** = $\hat{\sigma}$ (the estimated error standard deviation)
+- **Std. Error** column = $se(\hat{\beta}_j)$ for each coefficient
+
+
 # The Bias-Variance Tradeoff
 
 ## Should You Include That Variable? {.smaller}
