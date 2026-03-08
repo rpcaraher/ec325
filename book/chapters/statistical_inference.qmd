@@ -242,22 +242,28 @@ ggplot(sim_results, aes(x = b1_hat)) +
   annotate("text", x = avg_estimate + 0.003, y = 85,
            label = "Average",
            color = "darkgreen", size = 4, hjust = 0) +
-  annotate("text", x = avg_estimate + 0.019, y = 50,
+  annotate("text", x = avg_estimate + 0.0145, y = 50,
            label = "Or here?",
            color = "red", size = 4, hjust = -0.1) +
   labs(x = expression(hat(beta)[1]), y = "Frequency") +
   theme_minimal()
 ```
 
-If your estimate falls in the middle of the distribution where $\beta_1 = 0$, it's consistent with the null hypothesis of no effect.
-But if your estimate falls way out in the tails, it suggests that maybe the true $\beta_1$ isn't zero after all---because getting such an extreme estimate would be very unlikely if $\beta_1$ really were zero.
+Remember, when you are out in the wild running regressions,
+you won't actually be able to observe the full distribution of estimates since you have only one sample.
+Sure, the *unbiasedness* property will tell us that *on average* our estimate will be correct,
+but that only tells us about the *center of our distribution*,
+not where any specific estimate lays along the *entire* distribution.
+If your specific estimate from your one sample falls in the middle of the distribution where $\beta_1 = 0$, it's consistent with the null hypothesis of no effect.
+But if your estimate falls way out in the tails, 
+it suggests that maybe the true $\beta_1$ isn't zero after all---because getting such an extreme estimate would be very unlikely if $\beta_1$ really were zero.
 
 The tools of statistical inference formalize this intuition.
 
 
 ## The Sampling Distribution of $\hat{\beta}_j$
 
-To conduct statistical inference, we need to know the *shape* of the sampling distribution.
+To conduct statistical inference, we need to make a few assumptions.
 We've already established two key properties of our OLS estimator (under the Gauss-Markov assumptions):
 
 **Expected Value (Unbiasedness):**
@@ -325,18 +331,17 @@ ggplot(normal_data, aes(x = values)) +
 
 At first glance, the normality assumption seems quite strong.
 For many economic variables---like wages, which are bounded below by zero and have a right skew---the distribution is clearly not normal.
-However, there's good news: as long as our sample size is large enough, the sampling distribution of $\hat{\beta}_j$ will be approximately normal *even if the errors aren't normally distributed*.
+However, there's good news: as long as our sample size is large enough, the *sampling distribution of $\hat{\beta}_j$* will be approximately normal *even if the errors themselves aren't normally distributed*.
 This result is called **asymptotic normality** and follows from the Central Limit Theorem.
 
 
 ### The Normal Sampling Distribution
 
-Under the normality assumption (or with large samples via asymptotic normality), our OLS estimator follows a normal distribution:
+Under the classical linear model (CLM) assumptions---that is, the Gauss-Markov assumptions plus the normality assumption---the normality of the error term directly gives us:
 
 $$\hat{\beta}_j \sim Normal\left[\beta_j, Var(\hat{\beta}_j)\right]$$
 
-Let's verify this with a simulation.
-We'll draw many samples and show that the distribution of estimates indeed looks normal:
+We already showed above that the sampling distribution of $\hat{\beta}_1$ from our simulation looks like a bell curve. Let's overlay the theoretical normal density to confirm:
 
 ```{r}
 #| label: fig-normal-sampling
@@ -350,14 +355,14 @@ ggplot(sim_results, aes(x = b1_hat)) +
                  fill = "lightgrey", color = "black", bins = 40) +
   stat_function(
     fun = dnorm,
-    args = list(mean = mean(sim_results$b1_hat), 
+    args = list(mean = mean(sim_results$b1_hat),
                 sd = sd(sim_results$b1_hat)),
     color = "darkred",
     linewidth = 1.2
   ) +
   geom_vline(xintercept = 0, color = "darkgreen", linewidth = 1.2, linetype = "dashed") +
   annotate("text", x = 0.012, y = 55,
-           label = "True β₁ = 0", color = "darkgreen", size = 4) +
+           label = "True~beta == 0", parse = TRUE, color = "darkgreen", size = 4) +
   labs(
     x = expression(hat(beta)[1]),
     y = "Density"
@@ -365,7 +370,148 @@ ggplot(sim_results, aes(x = b1_hat)) +
   theme_minimal()
 ```
 
-The histogram of our 1,000 simulated estimates matches the theoretical normal curve almost perfectly!
+The histogram of our 1,000 simulated estimates matches the theoretical normal curve almost perfectly. But in that simulation, the errors were drawn from a normal distribution. What if they aren't?
+
+### Asymptotic Normality: Why It Still Works with Non-Normal Errors
+
+In practice, we rarely believe the error term is truly normal. Wages are right-skewed. Health expenditures have a long right tail. Test scores may be bimodal. But here is the good news: by the **Central Limit Theorem**, as $n \to \infty$, the sampling distribution of $\hat{\beta}_j$ converges to a normal distribution *regardless of the distribution of $u$*, provided the Guass-Markov assumptions hold and a few regularity conditions are satisfied. Formally:
+
+$$\frac{\hat{\beta}_j - \beta_j}{se(\hat{\beta}_j)} \xrightarrow{d} Normal(0, 1)$$
+
+The intuition is straightforward: $\hat{\beta}_j$ is a weighted average of the $y_i$ values, and by extension a weighted average of the $u_i$. The CLT tells us that averages of independent random variables become approximately normal, even when the underlying variables are far from normal themselves.
+
+To see this in action, let's compare two data generating processes: one where the errors are well-behaved (normal), and one where they are heavily skewed---as we might expect when modeling something like wages.
+
+#### Model 1: Normal Errors
+
+Our first DGP uses the classic setup with normally distributed errors:
+
+$$y_i = 2 + 3x_i + u_i, \qquad u_i \sim Normal(0, 4)$$
+
+```{r}
+#| label: sim-normal-errors
+#| echo: true
+#| code-fold: true
+
+set.seed(42)
+n_obs <- 50          # modest sample size
+n_sims_asym <- 2000
+beta0_true <- 2
+beta1_true <- 3
+
+# Store estimates
+sim_normal <- tibble(b1_hat = numeric(n_sims_asym))
+
+for (s in 1:n_sims_asym) {
+  x <- runif(n_obs, 1, 10)
+  u <- rnorm(n_obs, mean = 0, sd = 2)        # normal errors
+  y <- beta0_true + beta1_true * x + u
+  fit <- lm(y ~ x)
+  sim_normal$b1_hat[s] <- coef(fit)["x"]
+}
+```
+
+#### Model 2: Skewed Errors (Wage-Like)
+
+Now consider a model that looks more like a wage equation. Wages are right-skewed: most workers earn moderate amounts, but a long tail stretches toward high earners. We can capture this by drawing errors from a shifted exponential distribution, which is decidedly non-normal:
+
+$$wage_i = 2 + 3 \cdot educ_i + u_i, \qquad u_i \sim Exponential(\lambda = 0.5) - 2$$
+
+The errors here have a mean of zero (we shift the exponential so it's centered), but they are heavily right-skewed with a skewness of 2---very far from the symmetric bell curve.
+
+```{r}
+#| label: sim-skewed-errors
+#| echo: true
+#| code-fold: true
+
+sim_skewed <- tibble(b1_hat = numeric(n_sims_asym))
+
+lambda_rate <- 0.5
+error_mean <- 1 / lambda_rate   # mean of Exp(0.5) is 2
+
+for (s in 1:n_sims_asym) {
+  x <- runif(n_obs, 1, 10)
+  u <- rexp(n_obs, rate = lambda_rate) - error_mean   # shifted so E[u] = 0, skewness = 2
+  y <- beta0_true + beta1_true * x + u
+  fit <- lm(y ~ x)
+  sim_skewed$b1_hat[s] <- coef(fit)["x"]
+}
+```
+
+#### Comparing the Error Distributions
+
+Before looking at the sampling distributions, let's see what a single draw of errors looks like in each case. The contrast is stark:
+
+```{r}
+#| label: fig-error-distributions
+#| fig-cap: "A single draw of errors from each DGP. The normal errors (left) are symmetric; the exponential errors (right) are heavily right-skewed."
+#| echo: true
+#| code-fold: true
+
+set.seed(42)
+errors_df <- tibble(
+  Normal = rnorm(500, 0, 2),
+  `Shifted Exponential` = rexp(500, rate = lambda_rate) - error_mean
+) |>
+  pivot_longer(everything(), names_to = "Distribution", values_to = "u")
+
+ggplot(errors_df, aes(x = u)) +
+  geom_histogram(aes(y = after_stat(density)),
+                 fill = "lightgrey", color = "black", bins = 40) +
+  facet_wrap(~Distribution, scales = "free") +
+  labs(x = "Error (u)", y = "Density") +
+  theme_minimal()
+```
+
+#### The Punchline: Both Sampling Distributions Are Normal
+
+Despite the dramatic difference in error distributions, the sampling distribution of $\hat{\beta}_1$ is approximately normal in *both* cases:
+
+```{r}
+#| label: fig-asymptotic-normality
+#| fig-cap: "Sampling distributions of β̂₁ from 2,000 replications. Despite skewed errors in Model 2, both distributions are well-approximated by the normal curve (red)."
+#| echo: true
+#| code-fold: true
+
+combined <- bind_rows(
+  sim_normal |> mutate(DGP = "Model 1: Normal Errors"),
+  sim_skewed |> mutate(DGP = "Model 2: Skewed Errors")
+)
+
+ggplot(combined, aes(x = b1_hat)) +
+  geom_histogram(aes(y = after_stat(density)),
+                 fill = "lightgrey", color = "black", bins = 40) +
+  stat_function(
+    data = combined |> filter(DGP == "Model 1: Normal Errors"),
+    fun = dnorm,
+    args = list(mean = mean(sim_normal$b1_hat), sd = sd(sim_normal$b1_hat)),
+    color = "darkred", linewidth = 1.2
+  ) +
+  stat_function(
+    data = combined |> filter(DGP == "Model 2: Skewed Errors"),
+    fun = dnorm,
+    args = list(mean = mean(sim_skewed$b1_hat), sd = sd(sim_skewed$b1_hat)),
+    color = "darkred", linewidth = 1.2
+  ) +
+  geom_vline(xintercept = beta1_true, color = "darkgreen", linewidth = 1.2, linetype = "dashed") +
+  annotate("text", x = beta1_true + 0.07, y = max(
+    dnorm(mean(sim_normal$b1_hat), mean(sim_normal$b1_hat), sd(sim_normal$b1_hat)),
+    dnorm(mean(sim_skewed$b1_hat), mean(sim_skewed$b1_hat), sd(sim_skewed$b1_hat))
+  ) * 0.9,
+  label = paste0("True~beta[1] == ", beta1_true), parse = TRUE, color = "darkgreen", size = 3.5, hjust = 0) +
+  facet_wrap(~DGP) +
+  labs(x = expression(hat(beta)[1]), y = "Density") +
+  theme_minimal()
+```
+
+The normal curve fits both histograms remarkably well. Even with $n = 50$ and a heavily skewed error distribution, the CLT does its work. Both sampling distributions are centered on the true value $\beta_1 = 3$ (unbiasedness), and both are well-approximated by a normal density.
+
+This is why asymptotic normality is so powerful for applied econometrics: we don't need to believe that wages, test scores, or health expenditures are normally distributed. We only need a large enough sample for the CLT to kick in---and in practice, $n = 50$ is often sufficient.
+
+::: {.callout-note}
+## Practical Implication
+This result justifies our use of $t$-statistics and confidence intervals even when the dependent variable (and hence the errors) is clearly non-normal. When you estimate a wage equation and `summary(lm(...))` reports $p$-values based on the $t$-distribution, it's asymptotic normality doing the heavy lifting.
+:::
 
 
 :::: {.content-visible when-format="html"}
@@ -418,6 +564,8 @@ The histogram of our 1,000 simulated estimates matches the theoretical normal cu
 Now that we understand the sampling distribution, we can use it to make inferences about population parameters.
 The key idea is **hypothesis testing**: we hypothesize about the value of $\beta_j$ in the population, then use our sample estimate to evaluate whether the hypothesis is plausible.
 
+Here's the roadmap: first, we'll state the hypothesis. Then we'll ask, "If the null hypothesis were true, what would the world look like?" Once we have that picture in mind, we'll introduce the tool---the t-statistic---that lets us locate our estimate in that picture. Finally, we'll formalize a decision rule.
+
 
 ### The Null and Alternative Hypotheses
 
@@ -441,42 +589,15 @@ $$wage = \beta_0 + \beta_1(educ) + \beta_2(experience) + \beta_3(tenure) + \mu$$
 The null hypothesis $H_0: \beta_2 = 0$ states that, after controlling for education and tenure, experience has no effect on wages.
 
 
-### The t-Statistic
+### Step 1: What Does the World Look Like Under the Null Hypothesis?
 
-To test our hypothesis, we use the **t-statistic**.
-Under the null hypothesis, the following quantity follows a t-distribution:
+Before we get to any formulas, let's think about what the null hypothesis *implies*. If $H_0: \beta_j = 0$ is true---that is, if the variable truly has no effect---then our non-zero estimate $\hat{\beta}_j$ is just picking up random noise from sampling variation. Sometimes it'll be a little positive, sometimes a little negative, but it should hover around zero.
 
-$$\frac{\hat{\beta}_j - \beta_j}{se(\hat{\beta}_j)} \sim t_{n-k-1}$$
-
-where $n - k - 1$ are the degrees of freedom (sample size minus the number of parameters).
-
-When testing $H_0: \beta_j = 0$, the t-statistic simplifies to:
-
-$$t_{\hat{\beta}_j} = \frac{\hat{\beta}_j}{se(\hat{\beta}_j)}$$
-
-This is simply the ratio of our estimate to its standard error.
-The t-stat tells us: *how many standard errors away from zero is our estimate?*
-
-
-### Properties of the t-Statistic
-
-The t-statistic has several useful properties:
-
-1. **Same sign as the estimate:** Since $se(\hat{\beta}_j) > 0$, the t-stat has the same sign as $\hat{\beta}_j$
-
-2. **Magnitude matters:** As $\hat{\beta}_j$ grows in magnitude, so does $t_{\hat{\beta}_j}$
-
-3. **Signal-to-noise ratio:** The t-stat measures how large our estimate is *relative to the noise* (uncertainty) in our data
-
-
-### Visualizing the Hypothesis Test
-
-Let's visualize what the t-test is doing.
-Under the null hypothesis $H_0: \beta_j = 0$, we assume that the distribution of possible estimates is centered on zero:
+We already saw this in our simulation earlier: when the true $\beta_1 = 0$, repeated sampling produced a bell-shaped distribution of estimates centered on zero. Under the null, the *standardized* version of our estimator follows a t-distribution:
 
 ```{r}
 #| label: fig-t-dist-null
-#| fig-cap: "The t-distribution under the null hypothesis H₀: βⱼ = 0. Most estimates will fall near zero."
+#| fig-cap: "The t-distribution under the null hypothesis H₀: βⱼ = 0. If the null is true, most standardized estimates will fall near zero."
 #| echo: true
 #| code-fold: true
 
@@ -497,16 +618,50 @@ ggplot(t_sample, aes(x = t_value)) +
                 color = "darkred",
                 linewidth = 1.2) +
   geom_vline(xintercept = 0, color = "darkgreen", linewidth = 1.2) +
-  annotate("text", x = 1.5, y = 0.35,
-           label = "Distribution under H₀",
+  annotate("text", x = 1.75, y = 0.35,
+           label = "Distribution~under~H[0]", parse = TRUE,
            color = "darkgreen", size = 5) +
   labs(x = "t-values", y = "Density") +
   coord_cartesian(xlim = c(-4, 4)) +
   theme_minimal()
 ```
 
-Now suppose we get a t-statistic from our sample.
-Is it close to zero (consistent with $H_0$) or far from zero (evidence against $H_0$)?
+This is the world we're assuming when we conduct a hypothesis test. Most values cluster near zero, and values far from zero are rare. The question becomes: *does our estimate look like it belongs in this distribution, or does it look like an outlier?*
+
+
+### Step 2: The t-Statistic---Placing Our Estimate on the Distribution
+
+Now we need a tool for locating where our particular estimate falls on that distribution. We can't just use $\hat{\beta}_j$ directly, because the scale depends on the units of measurement and the amount of noise in the data. Instead, we *standardize* the estimate by dividing by its **standard error**.
+
+Recall that the standard error $se(\hat{\beta}_j)$ measures the standard deviation of the sampling distribution of $\hat{\beta}_j$---it tells us how much our estimate would typically vary across repeated samples. A large standard error means there's a lot of noise in our estimate; a small standard error means our estimate is relatively precise. When you run `summary()` on an `lm()` object in R, the standard error is reported in the `Std. Error` column right next to each coefficient.
+
+We standardize by dividing our estimate by the standard error:
+
+$$t_{\hat{\beta}_j} = \frac{\hat{\beta}_j}{se(\hat{\beta}_j)}$$
+
+This is the **t-statistic**. It tells us: *how many standard errors away from zero is our estimate?* Under the null hypothesis, this quantity follows a t-distribution with $n - k - 1$ degrees of freedom:
+
+$$\frac{\hat{\beta}_j - \beta_j}{se(\hat{\beta}_j)} \sim t_{n-k-1}$$
+
+where $\beta_j$ is the assumed value of the true population parameter under the null hypothesis,
+$\hat{\beta}_j$ is the estimate,
+$se(\hat{\beta}_j)$ is the standard error of the estimate, and
+$n - k - 1$ are the degrees of freedom (sample size minus the number of parameters minus 1).
+
+When testing $H_0: \beta_j = 0$, the $\beta_j$ in the numerator drops out, giving us the simple formula above.
+
+The t-statistic has several useful properties:
+
+1. **Same sign as the estimate:** Since $se(\hat{\beta}_j) > 0$, the t-stat has the same sign as $\hat{\beta}_j$
+
+2. **Magnitude matters:** As $\hat{\beta}_j$ grows in magnitude, so does $t_{\hat{\beta}_j}$
+
+3. **Signal-to-noise ratio:** The t-stat measures how large our estimate is *relative to the noise* (uncertainty) in our data
+
+
+### Step 3: How Far is "Too Far"?
+
+Now we can put it all together. We have our imagined distribution of possible estimates under the null, and we have a t-statistic that tells us where our estimate falls on it. The question is: *is our t-statistic close enough to zero to be consistent with the null, or is it so far out in the tails that we should doubt the null?*
 
 ```{r}
 #| label: fig-t-test-comparison
@@ -520,8 +675,8 @@ p_close <- ggplot(t_sample, aes(x = t_value)) +
   stat_function(fun = dt, args = list(df = df_value),
                 color = "darkred", linewidth = 1.2) +
   geom_vline(xintercept = 0.85, color = "blue", linewidth = 1.5) +
-  annotate("text", x = 0.85, y = 0.42, label = "t = 0.85",
-           color = "blue", size = 4, hjust = -0.1) +
+  annotate("text", x = 0.85, y = 0.42, label = "t == 0.85",
+           parse = TRUE, color = "blue", size = 4, hjust = -0.1) +
   labs(x = "t-values", y = "Density", 
        title = "t-stat close to zero") +
   coord_cartesian(xlim = c(-4, 4)) +
@@ -533,8 +688,8 @@ p_far <- ggplot(t_sample, aes(x = t_value)) +
   stat_function(fun = dt, args = list(df = df_value),
                 color = "darkred", linewidth = 1.2) +
   geom_vline(xintercept = 2.8, color = "red", linewidth = 1.5) +
-  annotate("text", x = 2.8, y = 0.15, label = "t = 2.8",
-           color = "red", size = 4, hjust = -0.1) +
+  annotate("text", x = 2.8, y = 0.15, label = "t == 2.8",
+           parse = TRUE, color = "red", size = 4, hjust = -0.1) +
   labs(x = "t-values", y = "Density",
        title = "t-stat in the tail") +
   coord_cartesian(xlim = c(-4, 4)) +
@@ -543,19 +698,19 @@ p_far <- ggplot(t_sample, aes(x = t_value)) +
 p_close + p_far
 ```
 
-A t-statistic of 0.85 falls well within the "body" of the distribution---values like this occur frequently when $H_0$ is true.
-But a t-statistic of 2.8 is out in the tail---such extreme values are rare when $H_0$ is true.
+A t-statistic of 0.85 falls well within the "body" of the distribution---values like this occur frequently when $H_0$ is true. We'd have no reason to doubt the null.
+But a t-statistic of 2.8 is out in the tail---such extreme values are rare when $H_0$ is true. This is evidence that the null may not be correct.
 
 
 ### Critical Values and Rejection Regions
 
-To formalize our decision rule, we need to define:
+So we have a way to measure whether our estimate is "far" from zero (the t-statistic), and we can see from the comparison above that values of $t$ far out in the tails seem inconsistent with the null. But how far is far enough to *reject* the null? We need a formal decision rule.
 
-1. **Significance level ($\alpha$):** The probability of rejecting $H_0$ when it's actually true (Type I error). Common choices: 10%, 5%, or 1%.
+The key concern is that we might make a mistake. Even when $H_0$ is true, we could get an unlucky sample that produces a large t-statistic, leading us to reject a null that is actually correct. This is called a **Type I error** (a "false positive"). We want to control how often this happens.
 
-2. **Critical value ($c$):** The threshold value of the t-statistic beyond which we reject $H_0$.
+The **significance level** $\alpha$ is the probability of committing a Type I error---the probability of rejecting $H_0$ when it is in fact true. By choosing $\alpha$ before we look at the data, we set our tolerance for false positives. Common choices are 10%, 5%, and 1%.
 
-For a two-sided test at the 5% level, we reject $H_0$ if $|t_{\hat{\beta}_j}| > c$, where $c$ is the critical value that leaves 2.5% of the distribution in each tail.
+With the significance level in hand, we can define a **critical value** $c$: the threshold on the t-distribution beyond which we reject $H_0$. For a two-sided test at the 5% level, we reject $H_0$ if $|t_{\hat{\beta}_j}| > c$, where $c$ is the value that leaves 2.5% of the distribution in each tail (so the total probability of being in either tail is 5%).
 
 ```{r}
 #| label: fig-critical-values
@@ -565,7 +720,7 @@ For a two-sided test at the 5% level, we reject $H_0$ if $|t_{\hat{\beta}_j}| > 
 
 # Calculate critical value for 5% significance, two-sided
 alpha <- 0.05
-c_val <- qt(alpha/2, df = df_value, lower.tail = FALSE)
+c_val <- 1.96
 
 # Create shading data for rejection regions
 t_grid <- seq(-4, 4, length.out = 500)
@@ -573,39 +728,47 @@ t_dens <- dt(t_grid, df = df_value)
 
 shade_data <- tibble(t_value = t_grid, density = t_dens) |>
   mutate(
-    rejection = t_value < -c_val | t_value > c_val
+    region = case_when(
+      t_value < -c_val ~ "reject",
+      t_value > c_val ~ "reject",
+      TRUE ~ "fail_to_reject"
+    )
   )
 
 ggplot() +
-  # Full distribution
-  geom_area(data = shade_data |> filter(!rejection),
-            aes(x = t_value, y = density),
-            fill = "lightblue", alpha = 0.7) +
-  # Rejection regions
-  geom_area(data = shade_data |> filter(rejection),
-            aes(x = t_value, y = density),
-            fill = "red", alpha = 0.5) +
+  # Fail to reject region (blue)
+  geom_ribbon(data = shade_data |> filter(region == "fail_to_reject"),
+              aes(x = t_value, ymin = 0, ymax = density),
+              fill = "lightblue", alpha = 0.7) +
+  # Left rejection region (red)
+  geom_ribbon(data = shade_data |> filter(t_value <= -c_val),
+              aes(x = t_value, ymin = 0, ymax = density),
+              fill = "red", alpha = 0.5) +
+  # Right rejection region (red)
+  geom_ribbon(data = shade_data |> filter(t_value >= c_val),
+              aes(x = t_value, ymin = 0, ymax = density),
+              fill = "red", alpha = 0.5) +
   # Distribution curve
   stat_function(fun = dt, args = list(df = df_value),
                 color = "darkblue", linewidth = 1.2) +
   # Critical value lines
-  geom_vline(xintercept = c(-c_val, c_val), 
+  geom_vline(xintercept = c(-c_val, c_val),
              color = "darkgoldenrod", linewidth = 1.2, linetype = "dashed") +
   # Annotations
-  annotate("text", x = -c_val, y = 0.42, 
+  annotate("text", x = -c_val, y = 0.42,
            label = paste0("-", round(c_val, 2)),
            color = "darkgoldenrod", size = 4, hjust = 1.1) +
-  annotate("text", x = c_val, y = 0.42, 
+  annotate("text", x = c_val, y = 0.42,
            label = paste0("+", round(c_val, 2)),
            color = "darkgoldenrod", size = 4, hjust = -0.1) +
   annotate("text", x = 0, y = 0.2,
-           label = "Fail to reject H₀\n(95%)",
+           label = "atop('Fail to reject'~H[0], '(95%)')", parse = TRUE,
            color = "darkblue", size = 4) +
   annotate("text", x = 3.2, y = 0.05,
-           label = "Reject H₀\n(2.5%)",
+           label = "atop('Reject'~H[0], '(2.5%)')", parse = TRUE,
            color = "red", size = 3) +
   annotate("text", x = -3.2, y = 0.05,
-           label = "Reject H₀\n(2.5%)",
+           label = "atop('Reject'~H[0], '(2.5%)')", parse = TRUE,
            color = "red", size = 3) +
   labs(x = "t-values", y = "Density") +
   coord_cartesian(xlim = c(-4, 4)) +
@@ -645,7 +808,7 @@ reg_housing <- lm(sale_price ~ lot_area + pool_area + garage_area +
 summary(reg_housing)
 ```
 
-To test $H_0: \beta_1 = 0$ (lot area has no effect):
+To test $H_0: \beta_1 = 0$ (lot area has no effect), we extract the coefficient and standard error, compute the t-statistic, and compare it to a critical value. To find the critical value in R, we use the `qt()` function, which is R's **quantile function** for the t-distribution. It returns the t-value that leaves a given probability in the tail. For a two-sided 5% test, we pass `0.025` (half of 0.05) to get the value that leaves 2.5% in each tail:
 
 ```{r}
 #| echo: true
@@ -670,7 +833,7 @@ cat("Estimate:", round(b1_hat, 4), "\n")
 cat("Standard Error:", round(se_b1, 4), "\n")
 cat("t-statistic:", round(t_stat, 2), "\n")
 cat("Critical value (5%):", round(t_crit, 2), "\n")
-cat("Reject H₀?", abs(t_stat) > t_crit, "\n")
+cat("Reject H0?", abs(t_stat) > t_crit, "\n")
 ```
 
 Since $|t_{\hat{\beta}_1}|$ exceeds the critical value of approximately 1.96, we **reject the null hypothesis** that lot area has no effect on sale price.
@@ -699,7 +862,11 @@ While the t-test with a fixed significance level is useful, it has limitations.
 Saying an estimate is "significant at 5%" doesn't tell us *how strongly* we reject the null.
 Was it a narrow rejection or a "knock out"?
 
-The **p-value** answers this question:
+The **p-value** answers this question.
+
+Put differently, in the critical value approach, *we* pick a significance level (say 5%) and then ask whether our t-statistic exceeds the corresponding cutoff. The p-value flips this around. Instead of fixing the significance level and checking if we reject, the p-value asks: *what is the smallest significance level at which we would still reject?* If that number is very small (like 0.001), it means we'd reject even with an extremely strict threshold---strong evidence against the null. If it's large (like 0.45), it means we'd need a very loose threshold to reject---weak or no evidence against the null.
+
+More concretely, the p-value is the probability of observing a t-statistic as extreme (or more extreme) as the one we calculated, *assuming the null hypothesis is true*. It measures how "surprising" our data are under the null. A small p-value means the data would be very unlikely if $H_0$ were true, which casts doubt on $H_0$.
 
 ::: {.callout-important}
 ## Definition: P-Value
@@ -708,11 +875,18 @@ The p-value is the smallest significance level at which we would reject the null
 Equivalently: the p-value is the probability of observing a t-statistic as extreme (or more extreme) as the one we calculated, *if the null hypothesis were true*.
 :::
 
+::: {.callout-warning}
+## Common Misconception
+The p-value is **not** the probability that the null hypothesis is true. It is the probability of seeing data as extreme as ours *if* the null were true. This is a subtle but critical distinction. Saying "there's a 3% chance that $\beta_j = 0$" is incorrect. The correct interpretation is: "if $\beta_j$ really were zero, there's only a 3% chance we'd observe an estimate this far from zero."
+:::
+
 ### Visualizing P-Values
+
+Let's make this concrete. Suppose we run a regression and get a t-statistic of 2.3. To compute the p-value, we ask: "Under the null, what fraction of the t-distribution lies beyond $\pm 2.3$?" The red shaded area in the figure below is exactly that probability. We shade *both* tails because, for a two-sided test, an estimate of $-2.3$ would be just as much evidence against the null as $+2.3$. The total red area---the sum of both tails---is the p-value.
 
 ```{r}
 #| label: fig-pvalue-viz
-#| fig-cap: "The p-value is the total shaded area in both tails beyond the observed t-statistic."
+#| fig-cap: "The p-value is the total shaded area in both tails beyond the observed t-statistic. Here, the observed t = 2.3, and the combined red area gives p ≈ 0.022."
 #| echo: true
 #| code-fold: true
 
@@ -748,11 +922,11 @@ ggplot() +
              color = "darkgreen", linewidth = 1, linetype = "dashed") +
   # Annotations
   annotate("text", x = observed_t + 0.3, y = 0.05,
-           label = paste0("Observed t = ", observed_t),
-           color = "darkgreen", size = 4, hjust = 0) +
+           label = paste0("'Observed'~t == ", observed_t),
+           parse = TRUE, color = "darkgreen", size = 4, hjust = 0) +
   annotate("text", x = 0, y = 0.2,
-           label = paste0("P-value = ", round(p_val, 4)),
-           color = "red", size = 5) +
+           label = paste0("'P-value' == ", round(p_val, 4)),
+           parse = TRUE, color = "red", size = 5) +
   labs(
     title = "P-Value Visualization",
     subtitle = paste0("df = ", df_viz, ", Observed t = ", observed_t),
@@ -894,8 +1068,13 @@ upper <- b1_hat + 1.96 * se_b1
 
 cat("Point estimate:", round(b1_hat, 4), "\n")
 cat("95% CI: [", round(lower, 4), ",", round(upper, 4), "]\n")
+```
 
-# Or use confint() function
+In practice, you don't need to compute confidence intervals by hand. R's `confint()` function does it for you. The first argument is the fitted model, the second specifies which coefficient (or omit it to get CIs for all coefficients), and `level` sets the confidence level (0.95 for a 95% CI):
+
+```{r}
+#| echo: true
+
 confint(reg_housing, "lot_area", level = 0.95)
 ```
 
@@ -904,79 +1083,77 @@ confint(reg_housing, "lot_area", level = 0.95)
 
 > "We are 95% confident that the true effect of lot area on sale price is between $`r round(lower, 2)` and $`r round(upper, 2)` per square foot."
 
-More precisely: if we drew 100 different samples and computed 100 different confidence intervals, about 95 of them would contain the true $\beta_j$.
+What does "95% confident" actually mean? It does *not* mean there's a 95% probability that the true $\beta_j$ falls in this particular interval. The true $\beta_j$ is a fixed number---it's either in the interval or it isn't. Rather, the "95%" refers to the *procedure*: if we drew 100 different samples from the same population and computed a 95% confidence interval from each one, about 95 of those intervals would contain the true $\beta_j$, and about 5 would miss it. Any single interval is one draw from this process, and we don't know whether ours is one of the lucky 95 or the unlucky 5.
 
-**Key insight:** If the confidence interval includes zero, the estimate is *not* statistically significant at that level.
+This is why confidence intervals are so useful in practice: they give us a range of *plausible* values for the population parameter, not just a single point estimate. A narrow confidence interval means our estimate is precise; a wide one means there's still a lot of uncertainty.
+
+**Key insight:** There is a direct connection between confidence intervals and hypothesis testing. If the 95% confidence interval includes zero, then we *cannot* reject $H_0: \beta_j = 0$ at the 5% level. Conversely, if the interval excludes zero, we *can* reject. This makes confidence intervals a handy visual shortcut: just check whether zero is inside or outside the interval.
 
 
 ### Simulation: Understanding Confidence Intervals
 
-Let's run a simulation to see what "95% confidence" really means:
+Let's run a simulation to see what "95% confidence" really means. We'll use a simple DGP with enough noise that some intervals will miss the true value---exactly as the theory predicts:
 
 ```{r}
 #| label: fig-ci-simulation
-#| fig-cap: "Twenty 95% confidence intervals from different samples. The true β₁ = 1.50 (dashed line). About 95% of intervals capture the true value."
+#| fig-cap: "Fifty 95% confidence intervals from different samples. The true β₁ = 3 (dashed line). Blue intervals contain the true value; red intervals miss it. About 95% of intervals should capture the truth."
 #| echo: true
 #| code-fold: true
 
-set.seed(456)
+set.seed(321)
 
-# True parameter value
-true_beta1 <- 1.50
-
-# Generate 20 samples and compute CIs
-n_samples <- 20
+# Simple DGP: y = 5 + 3x + u, with enough noise to get some misses
+true_b0 <- 5
+true_b1_ci <- 3
+n_per_sample <- 30     # small samples = wider CIs = more misses
+n_samples <- 50
 
 ci_data <- map_dfr(1:n_samples, function(i) {
-  # Generate new sample
-  sample_data <- tibble(
-    lot_area = runif(500, 5000, 20000),
-    pool_area = rbinom(500, 1, 0.15) * runif(500, 200, 600),
-    garage_area = runif(500, 200, 800),
-    year_built = sample(1960:2020, 500, replace = TRUE),
-    year_remod = pmax(year_built, sample(1980:2023, 500, replace = TRUE)),
-    sale_price = -2500000 + true_beta1 * lot_area + 80 * pool_area + 
-                 150 * garage_area + 500 * year_built + 
-                 900 * year_remod + rnorm(500, 0, 50000)
-  )
-  
-  # Fit model
-  reg <- lm(sale_price ~ lot_area + pool_area + garage_area + 
-              year_built + year_remod, data = sample_data)
-  
-  # Get CI
-  ci <- confint(reg, "lot_area", level = 0.95)
-  
+  x <- runif(n_per_sample, 0, 10)
+  u <- rnorm(n_per_sample, 0, 8)    # substantial noise
+  y <- true_b0 + true_b1_ci * x + u
+
+  reg <- lm(y ~ x)
+  ci <- confint(reg, "x", level = 0.95)
+
   tibble(
     sample = i,
-    estimate = coef(reg)["lot_area"],
+    estimate = coef(reg)["x"],
     lower = ci[1],
     upper = ci[2],
-    covers_true = lower <= true_beta1 & upper >= true_beta1
+    covers_true = lower <= true_b1_ci & upper >= true_b1_ci
   )
 })
 
-ggplot(ci_data, aes(y = sample)) +
-  geom_vline(xintercept = true_beta1, linetype = "dashed", 
+# Count coverage
+n_covered <- sum(ci_data$covers_true)
+
+ggplot(ci_data, aes(y = reorder(factor(sample), sample))) +
+  geom_vline(xintercept = true_b1_ci, linetype = "dashed",
              color = "darkgreen", linewidth = 1) +
-  geom_errorbarh(aes(xmin = lower, xmax = upper, 
-                     color = covers_true),
-                 height = 0.3, linewidth = 0.8) +
-  geom_point(aes(x = estimate, color = covers_true), size = 2) +
+  geom_errorbar(aes(xmin = lower, xmax = upper,
+                    color = covers_true),
+                width = 0.3, linewidth = 0.6, orientation = "y") +
+  geom_point(aes(x = estimate, color = covers_true), size = 1.5) +
   scale_color_manual(values = c("TRUE" = "steelblue", "FALSE" = "red"),
                      labels = c("TRUE" = "Contains true value",
                                 "FALSE" = "Misses true value")) +
-  annotate("text", x = true_beta1 + 0.05, y = 21,
-           label = paste0("True β₁ = ", true_beta1),
-           color = "darkgreen", size = 4, hjust = 0) +
+  annotate("text", x = max(ci_data$upper) - 0.5 + 1, y = 5,
+           label = paste0(n_covered, " of ", n_samples, " intervals\ncontain the true value"),
+           color = "grey30", size = 3.5, hjust = 1) +
   labs(
     x = expression(hat(beta)[1]),
     y = "Sample",
     color = NULL
   ) +
   theme_minimal() +
-  theme(legend.position = "bottom")
+  theme(
+    legend.position = "bottom",
+    axis.text.y = element_text(size = 6)
+  )
 ```
+
+Notice the red intervals: these are the roughly 5% of samples where the confidence interval happened to miss the true value. This is *not* a failure of the method---it's exactly what "95% confidence" means. The procedure works correctly 95% of the time, but any individual interval might be one of the unlucky ones. This is why we say we are "95% confident" rather than "100% certain."
 
 
 ## T-Tests, P-Values, and CIs: A Comparison
@@ -996,14 +1173,141 @@ All three are mathematically connected:
 - If the 95% CI excludes zero, then p < 0.05 and $|t| > 1.96$
 
 
+## F-Tests: Testing Multiple Hypotheses
+
+So far, all of our inference tools---t-tests, p-values, confidence intervals---have focused on testing *one* coefficient at a time. But in practice, we often want to ask broader questions. For instance, suppose you're estimating a wage equation with education, experience, tenure, and age. You might want to know: "Do experience and tenure *jointly* matter for wages?" That's not a question about a single $\beta_j$---it's a question about multiple coefficients at once.
+
+You might be tempted to just look at the individual t-tests for experience and tenure separately. But this approach has problems.
+
+
+### Why Not Just Use Multiple t-Tests?
+
+There are two issues with testing each coefficient individually:
+
+1. **No restrictions on other parameters:** A t-test on $\beta_2$ puts no restrictions on $\beta_3$. If the variables are correlated, this can be misleading. You could find that neither is individually significant, yet they jointly explain a lot of variation in the outcome.
+
+2. **Multiple comparisons problem:** If you run many tests at the 5% level, you'll reject *some* true null hypotheses just by chance. With 20 tests, you'd expect about 1 false rejection even if all nulls are true!
+
+The **F-test** solves both problems by testing multiple coefficients simultaneously.
+
+
+### Setting Up the F-Test
+
+Consider the wage model:
+
+$$\log(wage) = \beta_0 + \beta_1(education) + \beta_2(experience) + \beta_3(tenure) + \beta_4(age) + \mu$$
+
+Suppose we want to test whether on-the-job training variables (experience and tenure) matter at all:
+
+$$H_0: \beta_2 = \beta_3 = 0$$
+$$H_1: H_0 \text{ is not true}$$
+
+The alternative is satisfied if *either* $\beta_2 \neq 0$ or $\beta_3 \neq 0$ (or both).
+
+
+### Computing the F-Statistic
+
+The F-test compares two models:
+
+**Unrestricted Model:** The full model with all variables
+$$UR: \widehat{\log(wage)} = \hat{\beta}_0 + \hat{\beta}_1(educ) + \hat{\beta}_2(exper) + \hat{\beta}_3(tenure) + \hat{\beta}_4(age)$$
+
+**Restricted Model:** The model assuming the null is true (dropping the restricted variables)
+$$R: \widehat{\log(wage)} = \hat{\beta}_0 + \hat{\beta}_1(educ) + \hat{\beta}_4(age)$$
+
+The F-statistic is:
+
+$$F = \frac{(SSR_R - SSR_{UR})/q}{SSR_{UR}/df_{UR}}$$
+
+where:
+
+- $SSR_R$ = Sum of squared residuals from restricted model
+- $SSR_{UR}$ = Sum of squared residuals from unrestricted model
+- $q$ = Number of restrictions (variables dropped)
+- $df_{UR}$ = Degrees of freedom in unrestricted model ($n - k - 1$)
+
+The intuition: if the restricted variables actually matter, then dropping them should make the model fit *worse*---that is, $SSR_R$ should be much larger than $SSR_{UR}$. The F-statistic captures how much worse the fit gets, scaled by the noise in the data.
+
+
+### F-Test Example
+
+Let's test whether year built and year remodeled jointly affect home prices:
+
+```{r}
+#| echo: true
+
+# Unrestricted model (full model)
+reg_unrestricted <- lm(sale_price ~ lot_area + pool_area + garage_area +
+                         year_built + year_remod,
+                       data = housing_data)
+
+# Restricted model (dropping year variables)
+reg_restricted <- lm(sale_price ~ lot_area + pool_area + garage_area,
+                     data = housing_data)
+
+# Compute F-statistic manually
+ssr_r <- sum(resid(reg_restricted)^2)
+ssr_ur <- sum(resid(reg_unrestricted)^2)
+df_ur <- df.residual(reg_unrestricted)
+q <- 2  # number of restrictions
+
+f_numerator <- (ssr_r - ssr_ur) / q
+f_denominator <- ssr_ur / df_ur
+f_stat <- f_numerator / f_denominator
+
+# Critical value at 5% significance
+f_crit <- qf(0.05, df1 = q, df2 = df_ur, lower.tail = FALSE)
+
+cat("F-statistic:", round(f_stat, 2), "\n")
+cat("Critical value (5%):", round(f_crit, 2), "\n")
+cat("Reject H0?", f_stat > f_crit, "\n")
+```
+
+Since the F-statistic exceeds the critical value, we **reject the null hypothesis**.
+Year built and year remodeled are **jointly statistically significant**---they collectively improve the model's fit.
+
+
+### Using R's anova() Function
+
+In practice, you'll use R's `anova()` function to perform F-tests. Pass it the restricted model first, then the unrestricted model:
+
+```{r}
+#| echo: true
+
+anova(reg_restricted, reg_unrestricted)
+```
+
+The output shows the F-statistic, degrees of freedom, and p-value directly.
+
+
+### The F-Statistic in Terms of R²
+
+The F-statistic can also be written in terms of R-squared values:
+
+$$F = \frac{(R^2_{UR} - R^2_R)/q}{(1 - R^2_{UR})/df_{UR}}$$
+
+This shows that the F-test is essentially asking: *Does the unrestricted model fit the data significantly better than the restricted model?*
+
+If $R^2_{UR}$ is much larger than $R^2_R$, the F-statistic will be large, and we'll reject the null.
+
+
+::: {.callout-note}
+## Properties of the F-Test
+
+- The F-statistic is always non-negative, so F-tests are always **one-sided**
+- If the null is rejected, we say the variables are **jointly statistically significant**
+- We cannot determine *which* individual variable is significant---only that at least one is
+- If variables are jointly insignificant, it provides justification for dropping them from the model
+:::
+
+
 ## Reading Regression Tables
 
-Now that we understand statistical inference, we can properly interpret the regression tables you'll encounter in academic papers.
+Now that we have the full toolkit of statistical inference---t-tests, p-values, confidence intervals, and F-tests---we can properly interpret the regression tables you'll encounter in academic papers.
 
-### From R Output to Publication Format
+### Decoding R's `summary()` Output
 
-When you run `summary()` on a regression in R, you get detailed but messy output.
-Academic papers present this information in a standardized, clean format using tables.
+Let's start with what you already know: the output from `summary()` in R. It packs a lot of information into one screen, and now that we've covered t-statistics, p-values, and confidence intervals, we can decode every piece of it.
 
 ```{r}
 #| echo: true
@@ -1012,7 +1316,41 @@ Academic papers present this information in a standardized, clean format using t
 summary(reg_housing)
 ```
 
-In a publication, this same information would appear as:
+The output has several blocks. Let's walk through them.
+
+**The Coefficients Table** is the most important part. It has four columns:
+
+- **`Estimate`**: You know this one. It is the OLS point estimates $\hat{\beta}_j$. For lot area, this is the estimated effect of one additional square foot of lot area on sale price.
+
+- **`Std. Error`**: The standard error $se(\hat{\beta}_j)$ (i.e., the square root of the variance) of each estimate. This measures the precision of our estimate---how much it would typically vary across repeated samples. Smaller standard errors mean more precise estimates.
+
+- **`t value`**: The t-statistic based on a null hypothesis where $H_0 = 0$, computed as `Estimate / Std. Error`. This is exactly the calculation we did by hand earlier. It tells us how many standard errors our estimate is from zero.
+
+- **`Pr(>|t|)`**: The **p-value** for the two-sided test $H_0: \beta_j = 0$. Smaller numbers mean stronger evidence against the null. A value below 0.05 means the estimate is statistically significant at the 5% level.
+
+**Significance Stars** appear to the right of the p-values as a quick visual guide:
+
+- No star: not significant at the 10% level ($p \geq 0.10$)
+- `.` : significant at 10% but not 5% ($0.05 \leq p < 0.10$)
+- `*` : significant at 5% but not 1% ($0.01 \leq p < 0.05$)
+- `**` : significant at 1% but not 0.1% ($0.001 \leq p < 0.01$)
+- `***` : significant at 0.1% ($p < 0.001$)
+
+More stars = stronger evidence against the null. But remember: statistical significance is not the same as practical significance!
+
+**Residual standard error** ($\hat{\sigma}$) is an estimate of the standard deviation of the error term $u$. It tells you the typical size of the prediction error in the units of $y$. The degrees of freedom ($n - k - 1$) appear next to it.
+This is not something that is useful on its own,
+so we won't refer to it very often.
+
+**Multiple R-squared** ($R^2$) is the fraction of variation in $y$ explained by the model. **Adjusted R-squared** penalizes for adding more variables and is generally preferred for comparing models with different numbers of regressors,
+as discussed in @sec-multivariate.
+
+**F-statistic** at the bottom tests the joint null hypothesis that *all* slope coefficients are zero: $H_0: \beta_1 = \beta_2 = \cdots = \beta_k = 0$. This asks: "Does this model explain anything at all?" A large F-statistic (or small p-value) means the model as a whole is statistically significant. We covered F-tests earlier in this chapter.
+
+
+### From R Output to Publication Format
+
+While `summary()` gives us everything we need, academic papers present this information in a standardized, cleaner format. In a publication, the same regression would appear as:
 
 ```{r}
 #| echo: false
@@ -1030,7 +1368,7 @@ modelsummary(
     "year_remod" = "Year Remodeled"
   ),
   gof_map = c("nobs", "r.squared", "adj.r.squared"),
-  notes = "Standard errors in parentheses. * p < 0.1, ** p < 0.05, *** p < 0.01"
+  notes = "Standard errors in parentheses."
 )
 ```
 
@@ -1083,7 +1421,7 @@ modelsummary(
     "year_remod" = "Year Remodeled"
   ),
   gof_map = c("nobs", "r.squared", "adj.r.squared"),
-  notes = "Standard errors in parentheses. * p < 0.1, ** p < 0.05, *** p < 0.01"
+  notes = "Standard errors in parentheses."
 )
 ```
 
@@ -1174,135 +1512,6 @@ modelsummary(
 </div>
 </div>
 
-:::
-
-
-## F-Tests: Testing Multiple Hypotheses
-
-Sometimes we want to test hypotheses about *multiple* coefficients simultaneously.
-For example: "Do experience AND tenure jointly affect wages?"
-
-The **F-test** allows us to test such joint hypotheses.
-
-
-### Why Not Just Use Multiple t-Tests?
-
-You might think: "Why not just run separate t-tests on each coefficient?"
-
-There are two problems:
-
-1. **No restrictions on other parameters:** A t-test on $\beta_2$ puts no restrictions on $\beta_3$. If the variables are correlated, this can be misleading.
-
-2. **Multiple comparisons problem:** If you run many tests at the 5% level, you'll reject *some* true null hypotheses just by chance. With 20 tests, you'd expect about 1 false rejection even if all nulls are true!
-
-The F-test controls for these issues.
-
-
-### Setting Up the F-Test
-
-Consider the wage model:
-
-$$\log(wage) = \beta_0 + \beta_1(education) + \beta_2(experience) + \beta_3(tenure) + \beta_4(age) + \mu$$
-
-Suppose we want to test whether on-the-job training variables (experience and tenure) matter at all:
-
-$$H_0: \beta_2 = \beta_3 = 0$$
-$$H_1: H_0 \text{ is not true}$$
-
-The alternative is satisfied if *either* $\beta_2 \neq 0$ or $\beta_3 \neq 0$ (or both).
-
-
-### Computing the F-Statistic
-
-The F-test compares two models:
-
-**Unrestricted Model:** The full model with all variables
-$$UR: \widehat{\log(wage)} = \hat{\beta}_0 + \hat{\beta}_1(educ) + \hat{\beta}_2(exper) + \hat{\beta}_3(tenure) + \hat{\beta}_4(age)$$
-
-**Restricted Model:** The model assuming the null is true (dropping the restricted variables)
-$$R: \widehat{\log(wage)} = \hat{\beta}_0 + \hat{\beta}_1(educ) + \hat{\beta}_4(age)$$
-
-The F-statistic is:
-
-$$F = \frac{(SSR_R - SSR_{UR})/q}{SSR_{UR}/df_{UR}}$$
-
-where:
-
-- $SSR_R$ = Sum of squared residuals from restricted model
-- $SSR_{UR}$ = Sum of squared residuals from unrestricted model
-- $q$ = Number of restrictions (variables dropped)
-- $df_{UR}$ = Degrees of freedom in unrestricted model ($n - k - 1$)
-
-
-### F-Test Example
-
-Let's test whether year built and year remodeled jointly affect home prices:
-
-```{r}
-#| echo: true
-
-# Unrestricted model (full model)
-reg_unrestricted <- lm(sale_price ~ lot_area + pool_area + garage_area + 
-                         year_built + year_remod, 
-                       data = housing_data)
-
-# Restricted model (dropping year variables)
-reg_restricted <- lm(sale_price ~ lot_area + pool_area + garage_area,
-                     data = housing_data)
-
-# Compute F-statistic manually
-ssr_r <- sum(resid(reg_restricted)^2)
-ssr_ur <- sum(resid(reg_unrestricted)^2)
-df_ur <- df.residual(reg_unrestricted)
-q <- 2  # number of restrictions
-
-f_numerator <- (ssr_r - ssr_ur) / q
-f_denominator <- ssr_ur / df_ur
-f_stat <- f_numerator / f_denominator
-
-# Critical value at 5% significance
-f_crit <- qf(0.05, df1 = q, df2 = df_ur, lower.tail = FALSE)
-
-cat("F-statistic:", round(f_stat, 2), "\n")
-cat("Critical value (5%):", round(f_crit, 2), "\n")
-cat("Reject H₀?", f_stat > f_crit, "\n")
-```
-
-Since the F-statistic exceeds the critical value, we **reject the null hypothesis**.
-Year built and year remodeled are **jointly statistically significant**---they collectively improve the model's fit.
-
-
-### Using R's anova() Function
-
-In practice, you'll use R's `anova()` function to perform F-tests:
-
-```{r}
-#| echo: true
-
-anova(reg_restricted, reg_unrestricted)
-```
-
-The output shows the F-statistic, degrees of freedom, and p-value directly.
-
-
-### The F-Statistic in Terms of R²
-
-The F-statistic can also be written in terms of R-squared values:
-
-$$F = \frac{(R^2_{UR} - R^2_R)/q}{(1 - R^2_{UR})/df_{UR}}$$
-
-This shows that the F-test is essentially asking: *Does the unrestricted model fit the data significantly better than the restricted model?*
-
-If $R^2_{UR}$ is much larger than $R^2_R$, the F-statistic will be large, and we'll reject the null.
-
-
-::: {.callout-note}
-## Properties of the F-Test
-
-- The F-statistic is always non-negative, so F-tests are always **one-sided**
-- If the null is rejected, we say the variables are **jointly statistically significant**
-- We cannot determine *which* individual variable is significant---only that at least one is
-- If variables are jointly insignificant, it provides justification for dropping them from the model
 :::
 
 
@@ -1418,7 +1627,7 @@ If $R^2_{UR}$ is much larger than $R^2_R$, the F-statistic will be large, and we
 </div>
 
 <div class="answer-row">
-    <label>vii. With p = 0.001, we can reject H₀ at which significance levels? </label>
+    <label>vii. With p = 0.001, we can reject H0 at which significance levels? </label>
     <select onchange="checkAnswer(this, 'd')">
         <option value="">-- Select Answer --</option>
         <option value="a">Only the 10% level</option>
