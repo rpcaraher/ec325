@@ -241,19 +241,35 @@ $$se(\hat{\beta}_j) = \frac{\hat{\sigma}}{\sqrt{SST_j(1 - R_j^2)}}$$
 - Omitting controls: lower variance but introduces bias
 - Larger samples reduce variance, making the tradeoff less severe
 
-# Unit 6: Statistical Inference (through Confidence Intervals)
+# Unit 6: Statistical Inference (through P-Values)
 
-### The Normality Assumption
+### The Sampling Distribution
 
-- $\mu \sim Normal(0, \sigma^2)$
+- To do inference, we need three things about $\hat{\beta}_j$: its **center**, **spread**, and **shape**
+- From Gauss-Markov we already know the center (unbiasedness: $E[\hat{\beta}_j] = \beta_j$) and spread (standard error)
+- The missing piece is the shape — which is what the normality assumption and the CLT provide
+
+### The Normality Assumption (MLR.6)
+
+- $\mu \mid x_1, \ldots, x_k \sim Normal(0, \sigma^2)$
+- Conditional on the $x$'s, the error term follows a bell curve centered at zero
 - Implies: $\hat{\beta}_j \sim Normal[\beta_j, Var(\hat{\beta}_j)]$
-- Allows us to construct the sampling distribution of the estimator
+- Combined with Gauss-Markov, this gives us the full sampling distribution of $\hat{\beta}_j$
+
+### The Central Limit Theorem (CLT)
+
+- Even if errors are **not** normally distributed, the CLT tells us that $\hat{\beta}_j$ is **approximately** normal in large samples:
+$$\frac{\hat{\beta}_j - \beta_j}{se(\hat{\beta}_j)} \xrightarrow{d} Normal(0, 1) \quad \text{as } n \to \infty$$
+- This works because $\hat{\beta}_j$ is a weighted average of the $y_i$'s, and averages become normal
+- **Asymptotic normality:** we don't need the normality assumption to hold exactly — just a large enough $n$
+- This is important in practice because many economic variables are skewed (wages, health spending, etc.)
 
 ### Hypothesis Testing
 
 - **Null hypothesis:** $H_0: \beta_j = 0$ (no effect)
 - **Alternative hypothesis:** $H_A: \beta_j \neq 0$
 - **Logic:** Assume $H_0$ is true, check whether the observed estimate is likely under this assumption
+- **Key insight:** Under $H_0$, we know the entire sampling distribution of $\hat{\beta}_j$ — it is centered at zero (unbiasedness + null), has a known spread (SE), and is bell-shaped (CLT/CLM). We know what "no effect" looks like.
 
 ### The T-Statistic
 
@@ -261,9 +277,10 @@ $$se(\hat{\beta}_j) = \frac{\hat{\sigma}}{\sqrt{SST_j(1 - R_j^2)}}$$
 - Measures how many standard errors the estimate is from zero
 - **Rule of thumb (large samples):** $|t| > 2$ implies significance at the 5\% level
 
-### Critical Values and Significance Levels
+### Type I Error and Significance Levels
 
-- **Significance level ($\alpha$):** the threshold probability (commonly 10\%, 5\%, 1\%)
+- **Type I error** ("false positive"): rejecting $H_0$ when it's actually true
+- **Significance level ($\alpha$):** our tolerance for this mistake (commonly 10\%, 5\%, 1\%)
 - **Critical value ($c_\alpha$):** the $t$-value that defines the rejection region
   - For large samples: $c_{0.10} \approx 1.645$, $c_{0.05} \approx 1.96$, $c_{0.01} \approx 2.576$
 - **Decision rule:** Reject $H_0$ if $|t| > c_\alpha$
@@ -272,20 +289,13 @@ $$se(\hat{\beta}_j) = \frac{\hat{\sigma}}{\sqrt{SST_j(1 - R_j^2)}}$$
 
 - The smallest significance level at which $H_0$ would be rejected
 - Interpretation: the probability of observing a $t$-statistic as extreme as ours, if $H_0$ were true
+- **Not** the probability that $H_0$ is true
 - Rejection rule: if p-value $< \alpha$, reject $H_0$
 
-### Statistical Significance
+### Reading a Regression Table
 
-- When the null is not rejected: say "fail to reject $H_0$" — never say "accept the null"
-- **Statistical significance $\neq$ practical significance:** the magnitude of the coefficient determines economic importance
-
-### Confidence Intervals
-
-- Formula: $\hat{\beta}_j \pm c_\alpha \cdot se(\hat{\beta}_j)$
-- **95\% CI interpretation:** "We are 95\% confident that the true population parameter lies between [Lower] and [Upper]"
-- If the CI contains zero, the estimate is not statistically significant at that level
-
-### Equivalence of T-Tests, P-Values, and CIs
-
-- All three methods give the same conclusion for the same significance level:
-  - $|t| > c_\alpha$ $\Leftrightarrow$ p-value $< \alpha$ $\Leftrightarrow$ zero $\notin$ CI
+- **Rows:** Each row corresponds to one regressor ($x_j$); the top number is $\hat{\beta}_j$ and the number in parentheses below is $se(\hat{\beta}_j)$
+- **Columns:** Each column is a different regression specification (e.g., bivariate, then progressively adding controls); placing them side-by-side shows how coefficients change as controls are added
+- **Stars:** Indicate statistical significance, but the thresholds vary — always check the notes at the bottom for the convention
+- **Bottom rows:** Summary statistics such as $N$, $R^2$, and adjusted $R^2$
+- **Common mistakes:** The parentheses contain standard errors (not $t$-statistics, not confidence intervals); stars tell you about statistical significance but not practical importance
