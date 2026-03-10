@@ -23,83 +23,6 @@ execute:
 #| echo: false
 
 library(tidyverse)
-<<<<<<< HEAD
-library(wooldridge)
-library(modelsummary)
-```
-
-
-# From Point Estimates to Uncertainty
-
-## Where We've Been {.smaller}
-
-- We know how to estimate regression parameters using OLS
-
-. . .
-
-- Under the Gauss-Markov assumptions, OLS is **unbiased:** $E[\hat{\beta}_j] = \beta_j$
-
-. . .
-
-- But a single estimate from a single sample is just one draw from a **sampling distribution**
-
-. . .
-
-- **The problem:** How do we know if our estimate reflects a *real* effect or is just due to random chance?
-
-. . .
-
-> Statistical inference gives us the tools to answer this question.
-
-
-## The Sampling Distribution {.smaller}
-
-- If we could draw many samples and estimate $\hat{\beta}_1$ each time, we'd get a **distribution** of estimates
-
-. . .
-
-- Some estimates would be larger, some smaller, but they'd center around $\beta_1$ (by unbiasedness)
-
-. . .
-
-- We already know two properties of this distribution:
-
-. . .
-
-**Mean:** $E[\hat{\beta}_j] = \beta_j$
-
-. . .
-
-**Variance:** $Var(\hat{\beta}_j) = \frac{\sigma^2}{SST_j(1 - R^2_j)}$
-
-. . .
-
-- But we need to know the **shape** of the distribution to do inference
-
-. . .
-
-- Recall from last unit: we estimate $\sigma^2$ with $\hat{\sigma}^2 = SSR/(n-k-1)$, giving us $se(\hat{\beta}_j) = \hat{\sigma}/\sqrt{SST_j(1-R_j^2)}$
-
-
-## Quick Recap: The Standard Error {.smaller}
-
-$$Var(\hat{\beta}_j) = \frac{\sigma^2}{SST_j(1-R_j^2)} \xrightarrow{\text{estimate } \sigma^2 \text{ with residuals}} se(\hat{\beta}_j) = \frac{\hat{\sigma}}{\sqrt{SST_j(1-R_j^2)}}$$
-
-. . .
-
-- The **standard error** tells us how much $\hat{\beta}_j$ would typically vary across repeated samples
-
-. . .
-
-- Now: what **shape** does the sampling distribution have? And how do we use it for inference?
-
-
-# The Normality Assumption and the Sampling Distribution
-
-## The Normality Assumption {.smaller}
-
-To fully characterize the **shape** of the sampling distribution, we add one more assumption:
-=======
 library(patchwork)
 library(modelsummary)
 options(scipen = 999)
@@ -119,46 +42,10 @@ options(scipen = 999)
 . . .
 
 - But every estimate comes from *one sample* — a different sample gives a different $\hat{\beta}_j$
->>>>>>> 19de0831900ec22b7b1fa5ab3a06accbcb11dddb
 
 . . .
 
 ::: {.callout-important}
-<<<<<<< HEAD
-## CLM Assumption 6: Normality
-
-The population error $\mu$ is independent of the explanatory variables and normally distributed:
-
-$$\mu \sim Normal(0, \sigma^2)$$
-:::
-
-. . .
-
-- This is the final piece of the **Classical Linear Model (CLM)** assumptions
-
-. . .
-
-- CLM = Gauss-Markov assumptions + normality
-
-
-## What Normality Gives Us {.smaller}
-
-Under the CLM assumptions, the OLS estimator is **normally distributed:**
-
-$$\hat{\beta}_j \sim Normal\left(\beta_j, \frac{\sigma^2}{SST_j(1 - R^2_j)}\right)$$
-
-. . .
-
-- Centered on the true value $\beta_j$ (unbiasedness)
-- Spread determined by the variance formula
-- **Shape** is the bell curve
-
-. . .
-
-When we replace $\sigma^2$ with $\hat{\sigma}^2$, we get a **t-distribution** instead of normal:
-
-$$\frac{\hat{\beta}_j - \beta_j}{se(\hat{\beta}_j)} \sim t_{n-k-1}$$
-=======
 ## The Big Question Today
 How do we know if our estimate reflects a **real** relationship — or just **noise** from sampling?
 :::
@@ -186,6 +73,114 @@ Today we build four tools for answering that question:
 
 
 # The Sampling Distribution
+
+## Why Does the Sampling Distribution Matter? {.smaller}
+
+We've established that $\hat{\beta}_j$ varies from sample to sample — it's a **random variable**.
+
+. . .
+
+If we want to say anything about whether an estimate reflects a **real** relationship or just **noise**, we need to know what the sampling distribution looks like.
+
+. . .
+
+::: {.callout-important}
+## The Key Insight
+To do inference, we need to know **three things** about the sampling distribution of $\hat{\beta}_j$:
+
+1. **Center** — where is it centered?
+2. **Spread** — how much does it vary?
+3. **Shape** — what distribution does it follow?
+:::
+
+
+## What We Already Know {.smaller}
+
+From Gauss-Markov, we've already established two of the three:
+
+. . .
+
+**1. Center: Unbiasedness**
+
+- $E[\hat{\beta}_j] = \beta_j$ — the sampling distribution is centered on the truth
+
+. . .
+
+**2. Spread: The Standard Error**
+
+- The **standard error** $se(\hat{\beta}_j)$ is the standard deviation of the sampling distribution
+- It measures **how precise** our estimate is
+
+. . .
+
+| Scenario | Standard Error | Meaning |
+|----------|----------------|---------|
+| Small SE | 0.02 | Estimates barely vary — very precise |
+| Large SE | 2.50 | Estimates vary a lot — imprecise |
+
+. . .
+
+- SE depends on: sample size ($n$), variation in $x$, and noise ($\sigma^2$)
+- You see the SE in the `Std. Error` column of `summary()` output
+
+
+## The Missing Piece: Shape {.smaller}
+
+We know the center and the spread — but that's not enough.
+
+. . .
+
+Lots of distributions can have the same mean and standard deviation but look **very different**:
+
+```{r}
+#| echo: false
+#| fig-height: 3
+#| fig-align: center
+
+set.seed(42)
+shape_df <- tibble(
+  Normal = rnorm(5000, 0, 1),
+  Uniform = runif(5000, -sqrt(3), sqrt(3)),
+  `Bimodal` = c(rnorm(2500, -1, 0.5), rnorm(2500, 1, 0.5))
+) |>
+  pivot_longer(everything(), names_to = "Distribution", values_to = "value")
+
+ggplot(shape_df, aes(x = value)) +
+  geom_histogram(aes(y = after_stat(density)),
+                 fill = "lightblue", color = "black", bins = 40) +
+  facet_wrap(~Distribution, scales = "free_y") +
+  labs(x = "Value", y = "Density",
+       title = "Same mean and (approx.) same SD — very different shapes") +
+  theme_minimal(base_size = 14)
+```
+
+. . .
+
+To know what's "surprising" vs. "expected" — to do hypothesis tests and build confidence intervals — we need to know the **shape**.
+
+
+## The Normality Assumption (MLR.6) {.smaller}
+
+The **Classical Linear Model (CLM)** adds one assumption beyond Gauss-Markov — that the errors are **normally distributed**:
+
+. . .
+
+$$\mu \mid x_1, x_2, \ldots, x_k \sim Normal(0, \sigma^2)$$
+
+. . .
+
+What does this mean?
+
+- Conditional on the $x$'s, the unobservable factors affecting $y$ follow a **bell curve** centered at zero
+- Most observations have small errors; large errors (positive or negative) are increasingly rare
+
+. . .
+
+::: {.callout-tip}
+## Why This Matters
+If the errors are normal, then $\hat{\beta}_j$ — which is a linear function of the $y_i$'s — is **also normally distributed**. This gives us the shape we need.
+:::
+
 
 ## One Sample, One Estimate {.smaller}
 
@@ -252,10 +247,10 @@ ggplot(sim_results, aes(x = b1_hat)) +
   theme_minimal(base_size = 16)
 ```
 
-This is the **sampling distribution** — it shows how $\hat{\beta}_1$ varies across repeated samples.
+This is the **sampling distribution** — and look at its shape! It's a **bell curve**.
 
 
-## Key Properties {.smaller}
+## Normality of $\hat{\beta}_j$ {.smaller}
 
 ```{r}
 #| echo: false
@@ -276,44 +271,22 @@ ggplot(sim_results, aes(x = b1_hat)) +
 
 . . .
 
-1. **Centered on the truth** — the average estimate $\approx \beta_1 = 0$ (unbiasedness!)
+Under the **CLM assumptions** (Gauss-Markov + MLR.6):
+
+$$\hat{\beta}_j \sim Normal\left(\beta_j, \; [se(\hat{\beta}_j)]^2\right)$$
 
 . . .
 
-2. **Bell-shaped** — follows a normal distribution
+The simulation confirms what the theory predicts — the normal curve fits the histogram perfectly.
 
 . . .
 
-3. **The spread** is the **standard error** — how much estimates typically vary
+Now we have all three pieces: center ($\beta_j$), spread ($se$), and **shape** (normal).
 
 
-## What Is the Standard Error? {.smaller}
+## But Do We Really Need Normal Errors? {.smaller}
 
-- The **standard error** $se(\hat{\beta}_j)$ is the standard deviation of the sampling distribution
-
-. . .
-
-- It measures **how precise** our estimate is
-
-. . .
-
-| Scenario | Standard Error | Meaning |
-|----------|----------------|---------|
-| Small SE | 0.02 | Estimates barely vary — very precise |
-| Large SE | 2.50 | Estimates vary a lot — imprecise |
-
-. . .
-
-- You see the SE in the `Std. Error` column of `summary()` output
-
-. . .
-
-- SE depends on: sample size ($n$), variation in $x$, and noise ($\sigma^2$)
-
-
-## Asymptotic Normality: Why It Works {.smaller}
-
-Under the CLM assumptions (GM + normality), $\hat{\beta}_j$ is exactly normal.
+Under the CLM assumptions (GM + normality of errors), $\hat{\beta}_j$ is exactly normal.
 
 . . .
 
@@ -418,69 +391,8 @@ The normal curve fits **both** — even with $n = 50$ and skewed errors!
 This is **asymptotic normality** at work.
 
 
-## Review: Sampling Distribution {.smaller}
-
-::: {.callout-note icon=false}
-## ✅ Check your understanding
-:::
-
-**True or False:**
-
-1. If we draw many samples and compute $\hat{\beta}_1$ from each, the average will equal $\beta_1$.
-
-. . .
-
-> **True** — this is unbiasedness.
-
-. . .
-
-2. The standard error tells us how far our estimate is from the true value.
-
-. . .
-
-> **False** — it tells us how much estimates *typically vary* across samples. Any single estimate could be close or far.
-
-. . .
-
-3. Asymptotic normality requires that the error term is normally distributed.
-
-. . .
-
-> **False** — that's the whole point! The CLT makes $\hat{\beta}_j$ approximately normal even with non-normal errors.
->>>>>>> 19de0831900ec22b7b1fa5ab3a06accbcb11dddb
-
-
 # Hypothesis Testing
 
-<<<<<<< HEAD
-## The Core Question {.smaller}
-
-- You estimate $\hat{\beta}_1 = 0.065$ for the return to education
-
-. . .
-
-- Is this reflecting a real effect? Or did you just get a noisy sample?
-
-. . .
-
-- **Hypothesis testing** provides a formal framework for answering this
-
-. . .
-
-**Null hypothesis:** $H_0: \beta_j = 0$ (no effect)
-
-**Alternative hypothesis:** $H_1: \beta_j \neq 0$ (some effect)
-
-. . .
-
-> The null hypothesis is the "boring" explanation: any pattern in the data is just due to chance.
-
-
-## The t-Statistic {.smaller}
-
-To test $H_0: \beta_j = 0$, compute the **t-statistic:**
-
-=======
 ## The Logic of the Test
 
 We want to know: **does $x_j$ actually affect $y$?**
@@ -503,7 +415,25 @@ We formalize this as:
 :::
 
 
-## Step 1: What Does the World Look Like Under $H_0$? {.smaller}
+## Step 1: Under the Null, We Know What to Expect {.smaller}
+
+Here's the payoff of everything we just established. If $H_0: \beta_j = 0$ is true, then from our assumptions we know the **entire sampling distribution** of $\hat{\beta}_j$:
+
+. . .
+
+- **Center:** $E[\hat{\beta}_j] = 0$ (unbiasedness + the null)
+- **Spread:** measured by $se(\hat{\beta}_j)$ (from the data)
+- **Shape:** approximately normal (CLT / CLM assumptions)
+
+. . .
+
+::: {.callout-important}
+## Putting It Together
+Under $H_0$, the sampling distribution of $\hat{\beta}_j$ is centered at zero, has a known spread, and is bell-shaped. We know **exactly** what "no effect" should look like — so we can ask whether our estimate looks like it came from that world.
+:::
+
+
+## Visualizing the Null Distribution {.smaller}
 
 If $\beta_j = 0$, our estimate is just **noise** — it should hover around zero:
 
@@ -542,51 +472,12 @@ We need to **standardize** our estimate so we can place it on that distribution:
 
 . . .
 
->>>>>>> 19de0831900ec22b7b1fa5ab3a06accbcb11dddb
-$$t_{\hat{\beta}_j} = \frac{\hat{\beta}_j}{se(\hat{\beta}_j)}$$
+$$
+t_{\hat{\beta}_j} = \frac{\hat{\beta}_j}{se(\hat{\beta}_j)}
+$$
 
 . . .
 
-<<<<<<< HEAD
-- This is the ratio of our estimate to its standard error
-
-. . .
-
-- **Interpretation:** How many standard errors away from zero is our estimate?
-
-. . .
-
-- Under $H_0$, the t-stat follows a $t_{n-k-1}$ distribution
-
-
-## Properties of the t-Statistic {.smaller}
-
-1. **Same sign as the estimate:** Since $se(\hat{\beta}_j) > 0$, the t-stat has the same sign as $\hat{\beta}_j$
-
-. . .
-
-2. **Magnitude matters:** Larger $|\hat{\beta}_j|$ relative to $se(\hat{\beta}_j)$ $\rightarrow$ larger $|t|$
-
-. . .
-
-3. **Signal-to-noise ratio:** How large is our estimate relative to the noise (uncertainty) in our data?
-
-. . .
-
-- **Large |t|:** Evidence against $H_0$ --- our estimate is unlikely if there were truly no effect
-
-- **Small |t|:** Consistent with $H_0$ --- we can't rule out that the true effect is zero
-
-
-## Example: Returns to Education {.smaller}
-
-```{r}
-#| echo: true
-data(wage1, package = "wooldridge")
-reg <- lm(lwage ~ educ + exper + tenure, data = wage1)
-coef_table <- summary(reg)$coefficients
-round(coef_table, 4)
-=======
 - This tells us: **how many standard errors away from zero** is our estimate?
 
 . . .
@@ -618,7 +509,7 @@ p_close <- ggplot(t_sample, aes(x = t_value)) +
   geom_vline(xintercept = 0.85, color = "#002169", linewidth = 1.5) +
   annotate("text", x = 0.85, y = 0.42, label = "t = 0.85",
            color = "#002169", size = 4, hjust = -0.1) +
-  labs(x = "t-values", y = "Density", title = expression("Consistent with " * H[0])) +
+  labs(x = "t-values", y = "Density") +
   coord_cartesian(xlim = c(-4, 4)) +
   theme_minimal(base_size = 14)
 
@@ -630,38 +521,43 @@ p_far <- ggplot(t_sample, aes(x = t_value)) +
   geom_vline(xintercept = 2.8, color = "#E63946", linewidth = 1.5) +
   annotate("text", x = 2.8, y = 0.15, label = "t = 2.8",
            color = "#E63946", size = 4, hjust = -0.1) +
-  labs(x = "t-values", y = "Density", title = expression("Evidence against " * H[0])) +
+  labs(x = "t-values", y = "Density") +
   coord_cartesian(xlim = c(-4, 4)) +
   theme_minimal(base_size = 14)
 
 p_close + p_far
->>>>>>> 19de0831900ec22b7b1fa5ab3a06accbcb11dddb
 ```
 
 . . .
 
-<<<<<<< HEAD
-- $\hat{\beta}_{educ} = `r round(coef(reg)["educ"], 4)`$ with $se = `r round(coef_table["educ", "Std. Error"], 4)`$
-
-. . .
-
-- $t = `r round(coef_table["educ", "t value"], 2)`$ --- the estimate is about `r round(abs(coef_table["educ", "t value"]), 0)` standard errors from zero
-
-. . .
-
-- This is strong evidence that education has a real effect on wages
-=======
 - $t = 0.85$: well within the body — no reason to doubt $H_0$
 - $t = 2.8$: out in the tail — this would be **rare** if $H_0$ were true
 
 
-## Type I Error and the Significance Level {.smaller}
+## But We Need a Decision Rule {.smaller}
 
-Even when $H_0$ is true, we might get an unlucky sample with a large $t$-stat.
+We can see that $t = 0.85$ feels "fine" and $t = 2.8$ feels "surprising" — but where exactly do we draw the line?
 
 . . .
 
-- **Type I error** ("false positive"): rejecting $H_0$ when it's actually true
+We need a **threshold** — and choosing one forces us to confront a tradeoff:
+
+. . .
+
+- Set the bar **too low** → we'll reject $H_0$ too often, even when it's true (lots of false alarms)
+- Set the bar **too high** → we'll miss real effects (too cautious)
+
+. . .
+
+::: {.callout-important}
+## The Core Problem
+Even when $H_0$ is true, sampling variability means we'll sometimes get a large $t$-stat **by chance**. We can't eliminate this risk — but we can **control** it.
+:::
+
+
+## Type I Error and the Significance Level {.smaller}
+
+Rejecting $H_0$ when it's actually true is called a **Type I error** (a "false positive").
 
 . . .
 
@@ -673,177 +569,13 @@ Even when $H_0$ is true, we might get an unlucky sample with a large $t$-stat.
 . . .
 
 - The **critical value** $c$ is the threshold: reject if $|t| > c$
->>>>>>> 19de0831900ec22b7b1fa5ab3a06accbcb11dddb
 
 
 ## Critical Values and Rejection Regions {.smaller}
 
-<<<<<<< HEAD
-- We **reject $H_0$** if $|t_{\hat{\beta}_j}|$ exceeds a **critical value** $c_\alpha$
-
-. . .
-
-- The critical value depends on:
-  - The **significance level** $\alpha$ (usually 5%)
-  - The **degrees of freedom** $n - k - 1$
-
-. . .
-
-- At the 5% significance level with a two-sided test:
-  - Reject $H_0$ if $|t_{\hat{\beta}_j}| > c_{0.05}$
-  - Fail to reject $H_0$ if $|t_{\hat{\beta}_j}| \leq c_{0.05}$
-
-
-## The "Rule of 2" {.smaller}
-
-::: {.callout-tip}
-## Quick Rule of Thumb
-
-With reasonably large samples ($n > 30$ or so), the critical value at the 5% level is approximately **2**.
-
-So: **reject $H_0$ at the 5% level if $|t| > 2$**
-:::
-
-. . .
-
-- This is because the $t$-distribution approaches the standard normal as $n$ grows
-
-. . .
-
-- For the standard normal: $P(|Z| > 1.96) = 0.05$
-
-. . .
-
-- $1.96 \approx 2$ --- hence the rule of thumb
-
-
-# P-Values
-
-## What is a P-Value? {.smaller}
-
-::: {.callout-note}
-## Definition
-
-The **p-value** is the probability of observing a t-statistic at least as extreme as the one we calculated, *assuming the null hypothesis is true.*
-:::
-
-. . .
-
-- Small p-value $\rightarrow$ our result would be very unlikely under $H_0$ $\rightarrow$ evidence against $H_0$
-
-. . .
-
-- Large p-value $\rightarrow$ our result is plausible under $H_0$ $\rightarrow$ we can't reject $H_0$
-
-. . .
-
-- **Decision rule:** Reject $H_0$ if $p < \alpha$ (typically $\alpha = 0.05$)
-
-
-## Interpreting P-Values {.smaller}
-
-**Common (mis)interpretation:** "The p-value is the probability that $H_0$ is true."
-
-. . .
-
-**Correct interpretation:** "The p-value is the probability of getting data this extreme *if* $H_0$ were true."
-
-. . .
-
-Think of it like a legal trial:
-
-- $H_0$: The defendant is innocent
-- Small p-value: The evidence would be very surprising if the defendant were innocent
-- We reject $H_0$ = "guilty beyond reasonable doubt"
-
-. . .
-
-- Failing to reject $H_0$ $\neq$ proving $H_0$ is true (just like "not guilty" $\neq$ "innocent")
-
-
-## Statistical vs. Practical Significance {.smaller}
-
-::: {.callout-warning}
-## Important Distinction
-
-**Statistical significance** ($p < 0.05$) tells you the estimate is unlikely due to chance.
-
-**Practical significance** tells you the effect is large enough to matter.
-:::
-
-. . .
-
-- With a huge sample, even a *tiny* effect can be statistically significant
-
-. . .
-
-- Example: An extra year of education raises wages by 0.1%
-  - With $n = 1{,}000{,}000$, this might have $p < 0.001$
-  - But is 0.1% economically meaningful?
-
-. . .
-
-- **Always report and discuss the magnitude of the coefficient, not just whether it's "significant"**
-
-
-# Confidence Intervals
-
-## From Point Estimates to Intervals {.smaller}
-
-- A point estimate $\hat{\beta}_j$ gives our single best guess of $\beta_j$
-
-. . .
-
-- But we know there's uncertainty --- the standard error tells us how much
-
-. . .
-
-- A **confidence interval** provides a range of plausible values for $\beta_j$
-
-. . .
-
-$$\hat{\beta}_j \pm c_\alpha \cdot se(\hat{\beta}_j)$$
-
-. . .
-
-- For a **95% confidence interval** (with large $n$): $c_\alpha \approx 1.96 \approx 2$
-
-
-## Interpreting Confidence Intervals {.smaller}
-
-::: {.callout-note}
-## What a 95% CI Means
-
-If we were to draw many samples and compute a 95% CI each time, about **95% of those intervals would contain the true parameter** $\beta_j$.
-:::
-
-. . .
-
-- It is **not** "there is a 95% probability that $\beta_j$ is in this interval"
-  - The true $\beta_j$ is fixed --- it's either in the interval or it's not
-
-. . .
-
-- Instead: our *procedure* captures the truth 95% of the time
-
-. . .
-
-- **Connection to hypothesis testing:** If zero is outside the 95% CI, we reject $H_0: \beta_j = 0$ at the 5% level
-
-
-## Example: Confidence Intervals in R {.smaller}
-
-```{r}
-#| echo: true
-data(wage1, package = "wooldridge")
-reg <- lm(lwage ~ educ + exper + tenure, data = wage1)
-
-# 95% confidence intervals
-confint(reg)
-=======
 ```{r}
 #| echo: false
-#| fig-height: 3.5
+#| fig-height: 4.2
 #| fig-align: center
 
 c_val <- 1.96
@@ -872,89 +604,44 @@ ggplot() +
                 color = "#002169", linewidth = 1.2) +
   geom_vline(xintercept = c(-c_val, c_val),
              color = "#EEB808", linewidth = 1.2, linetype = "dashed") +
+  # Label the "fail to reject" region
   annotate("text", x = 0, y = 0.22,
            label = "'Fail to reject' ~ H[0]", parse = TRUE, color = "#002169", size = 4) +
   annotate("text", x = 0, y = 0.17,
-           label = "(95%)", color = "#002169", size = 3.5) +
-  annotate("text", x = 3.2, y = 0.05,
-           label = "Reject\n(2.5%)", color = "#E63946", size = 3) +
-  annotate("text", x = -3.2, y = 0.05,
-           label = "Reject\n(2.5%)", color = "#E63946", size = 3) +
-  annotate("text", x = -c_val, y = 0.42, label = "-1.96",
-           color = "#EEB808", size = 4, hjust = 1.1) +
-  annotate("text", x = c_val, y = 0.42, label = "+1.96",
-           color = "#EEB808", size = 4, hjust = -0.1) +
-  labs(x = "t-values", y = "Density") +
-  coord_cartesian(xlim = c(-4, 4)) +
+           label = paste0("(", 100 * (1 - 0.05), "% of the distribution)"),
+           color = "#002169", size = 3.5) +
+  # Label the rejection regions with Type I error connection
+  annotate("text", x = 3.3, y = 0.08,
+           label = "Rejection\nregion", color = "#E63946", size = 3, fontface = "bold") +
+  annotate("text", x = 3.3, y = 0.035,
+           label = paste0("(", 100 * 0.05/2, "% = \u03b1/2)"),
+           color = "#E63946", size = 2.8) +
+  annotate("text", x = -3.3, y = 0.08,
+           label = "Rejection\nregion", color = "#E63946", size = 3, fontface = "bold") +
+  annotate("text", x = -3.3, y = 0.035,
+           label = paste0("(", 100 * 0.05/2, "% = \u03b1/2)"),
+           color = "#E63946", size = 2.8) +
+  # Label the critical values
+  annotate("text", x = -c_val, y = 0.42,
+           label = "paste(c == -1.96, ' (critical value)')",
+           parse = TRUE, color = "#EEB808", size = 3.5, hjust = 1.05) +
+  annotate("text", x = c_val, y = 0.42,
+           label = "paste(c == +1.96, ' (critical value)')",
+           parse = TRUE, color = "#EEB808", size = 3.5, hjust = -0.05) +
+  # Label the overall curve
+  annotate("text", x = 0, y = 0.41,
+           label = "paste('Sampling distribution under ', H[0])",
+           parse = TRUE, color = "#002169", size = 3.5) +
+  labs(x = "t-statistic", y = "Density") +
+  coord_cartesian(xlim = c(-4.5, 4.5)) +
   theme_minimal(base_size = 16)
->>>>>>> 19de0831900ec22b7b1fa5ab3a06accbcb11dddb
 ```
 
 . . .
 
-<<<<<<< HEAD
-- The CI for `educ` is entirely above zero --- we're confident education has a positive effect on wages
-
-. . .
-
-- The width of the interval reflects our uncertainty
-
-
-## CIs, T-Tests, and P-Values {.smaller}
-
-These three approaches to inference are **equivalent** --- they always give the same answer:
-
-. . .
-
-| Method | Reject $H_0: \beta_j = 0$ when... |
-|:-------|:-----------------------------------|
-| **t-test** | $|t_{\hat{\beta}_j}| > c_\alpha$ |
-| **p-value** | $p < \alpha$ |
-| **CI** | Zero is outside the $100(1-\alpha)\%$ CI |
-
-. . .
-
-> You'll often see all three reported in regression output and published research. They tell the same story in different ways.
-
-
-# Summary
-
-## Key Formulas {.smaller}
-
-| Formula | What It Is |
-|:--------|:-----------|
-| $Var(\hat{\beta}_j) = \frac{\sigma^2}{SST_j(1-R_j^2)}$ | Variance of the estimator |
-| $\hat{\sigma}^2 = \frac{SSR}{n-k-1}$ | Estimated error variance (Unit 5) |
-| $se(\hat{\beta}_j) = \frac{\hat{\sigma}}{\sqrt{SST_j(1-R_j^2)}}$ | Standard error (Unit 5) |
-| $t_{\hat{\beta}_j} = \frac{\hat{\beta}_j}{se(\hat{\beta}_j)}$ | t-statistic |
-| $\hat{\beta}_j \pm c_\alpha \cdot se(\hat{\beta}_j)$ | Confidence interval |
-
-
-## Key Concepts {.smaller}
-
-1. The **normality assumption** + Gauss-Markov = the Classical Linear Model (CLM)
-
-. . .
-
-2. The **t-statistic** measures how many standard errors an estimate is from zero
-
-. . .
-
-3. The **p-value** is the probability of seeing data this extreme under $H_0$
-
-. . .
-
-4. A **confidence interval** gives a range of plausible values for the true parameter
-
-. . .
-
-5. **Statistical significance** ($p < 0.05$) is not the same as **practical significance**
-
-. . .
-
-6. t-tests, p-values, and CIs are **three equivalent ways** of doing inference
-=======
-For a two-sided 5% test: reject $H_0$ if $|t| > 1.96$
+- The **red areas** combined = $\alpha = 5\%$ — the probability of a Type I error (rejecting when $H_0$ is true)
+- The **dashed lines** at $\pm 1.96$ are the **critical values** — our decision boundary
+- **Decision rule:** reject $H_0$ if $|t| > 1.96$
 
 
 ## The Rule of 2 {.smaller}
@@ -975,81 +662,6 @@ In other words: if the estimate is more than **twice** its standard error.
 . . .
 
 - This is a handy shortcut when scanning regression output
-
-
-## Example: Housing Prices {.smaller}
-
-```{r}
-#| echo: true
-
-set.seed(2025)
-n <- 500
-housing_data <- tibble(
-  lot_area = runif(n, 5000, 20000),
-  pool_area = rbinom(n, 1, 0.15) * runif(n, 200, 600),
-  garage_area = runif(n, 200, 800),
-  year_built = sample(1960:2020, n, replace = TRUE),
-  year_remod = pmax(year_built, sample(1980:2023, n, replace = TRUE)),
-  sale_price = -2500000 + 1.50 * lot_area + 80 * pool_area +
-               150 * garage_area + 500 * year_built +
-               900 * year_remod + rnorm(n, 0, 50000)
-)
-
-reg_housing <- lm(sale_price ~ lot_area + pool_area + garage_area +
-                    year_built + year_remod, data = housing_data)
-```
-
-
-## Reading the Output {.smaller}
-
-```{r}
-#| echo: true
-summary(reg_housing)
-```
-
-
-## Decoding `summary()` {.smaller}
-
-The **Coefficients table** has four columns:
-
-| Column | What it shows |
-|--------|--------------|
-| `Estimate` | $\hat{\beta}_j$ — the point estimate |
-| `Std. Error` | $se(\hat{\beta}_j)$ — how precise the estimate is |
-| `t value` | $\hat{\beta}_j / se(\hat{\beta}_j)$ — the t-statistic |
-| `Pr(>|t|)` | The p-value (more on this next!) |
-
-. . .
-
-**Significance stars:**
-
-| Stars | Meaning |
-|-------|---------|
-| (none) | $p \geq 0.10$ |
-| `.` | $p < 0.10$ |
-| `*` | $p < 0.05$ |
-| `**` | $p < 0.01$ |
-| `***` | $p < 0.001$ |
-
-
-## Try It: Manual t-Test {.smaller}
-
-::: {.callout-note icon=false}
-## 🖥️ Your turn!
-:::
-
-Using the housing regression, compute the t-statistic for `lot_area` **by hand** (using `coef()` and the standard error from `summary()`). Does it match the `t value` in the output?
-
-. . .
-
-```{r}
-#| echo: true
-b1 <- coef(reg_housing)["lot_area"]
-se1 <- summary(reg_housing)$coefficients["lot_area", "Std. Error"]
-t_manual <- b1 / se1
-cat("Manual t-stat:", round(t_manual, 2), "\n")
-cat("From summary: ", round(summary(reg_housing)$coefficients["lot_area", "t value"], 2))
-```
 
 
 # P-Values
@@ -1076,7 +688,11 @@ Equivalently: the **smallest significance level** at which we would reject $H_0$
 
 ## Visualizing the P-Value {.smaller}
 
-For $t = 2.3$: what fraction of the t-distribution lies beyond $\pm 2.3$?
+Think back to the rejection region plot. Instead of asking "is my t-stat past the critical value?", the p-value asks: **how much of the distribution is more extreme than my t-stat?**
+
+. . .
+
+Suppose we observe $t = 2.3$. What fraction of the distribution under $H_0$ lies beyond $\pm 2.3$?
 
 ```{r}
 #| echo: false
@@ -1138,28 +754,6 @@ It's the probability of **seeing data this extreme** if $H_0$ *were* true. Big d
 :::
 
 
-## Statistical vs. Practical Significance {.smaller}
-
-::: {.callout-important}
-## Key Distinction
-A **statistically significant** result ($p < 0.05$) is not necessarily **practically important**.
-:::
-
-. . .
-
-- With a large enough sample, even **tiny** effects become significant
-
-. . .
-
-- Example: A drug lowers blood pressure by 0.1 mmHg ($p = 0.001$)
-  - Statistically significant? ✅
-  - Clinically meaningful? ❌
-
-. . .
-
-- **Always** look at the **magnitude** of $\hat{\beta}_j$, not just the p-value!
-
-
 ## Review: Hypothesis Testing & P-Values {.smaller}
 
 ::: {.callout-note icon=false}
@@ -1191,13 +785,140 @@ You estimate $\hat{\beta}_1 = 4.5$ with $se(\hat{\beta}_1) = 2.0$.
 > Under $H_0$, there's an 85% chance of seeing an estimate this extreme. Very consistent with $H_0$ — no evidence of an effect.
 
 
+# Applying It All in R
+
+## Example: Housing Prices {.smaller}
+
+Now we have the full toolkit — t-statistics, p-values, and the logic connecting them. Let's see how all of these show up in R's regression output.
+
+. . .
+
+```{r}
+#| echo: true
+
+set.seed(2025)
+n <- 500
+housing_data <- tibble(
+  sqft = runif(n, 800, 3500),
+  bedrooms = sample(1:5, n, replace = TRUE),
+  age = sample(0:60, n, replace = TRUE),
+  sale_price = 50000 + 100 * sqft + 8000 * bedrooms -
+               500 * age + rnorm(n, 0, 40000)
+)
+
+# Three specifications: bivariate → add a control → full model
+reg1 <- lm(sale_price ~ sqft, data = housing_data)
+reg2 <- lm(sale_price ~ sqft + bedrooms, data = housing_data)
+reg3 <- lm(sale_price ~ sqft + bedrooms + age, data = housing_data)
+```
+
+
+## Reading the Output {.smaller}
+
+```{r}
+#| echo: true
+summary(reg3)
+```
+
+
+## Decoding `summary()` {.smaller}
+
+The **Coefficients table** has four columns:
+
+| Column | What it shows |
+|--------|--------------|
+| `Estimate` | $\hat{\beta}_j$ — the point estimate |
+| `Std. Error` | $se(\hat{\beta}_j)$ — how precise the estimate is |
+| `t value` | $\hat{\beta}_j / se(\hat{\beta}_j)$ — the t-statistic |
+| `Pr(>|t|)` | The p-value |
+
+. . .
+
+**Significance stars:**
+
+| Stars | Meaning |
+|-------|---------|
+| (none) | $p \geq 0.10$ |
+| `.` | $p < 0.10$ |
+| `*` | $p < 0.05$ |
+| `**` | $p < 0.01$ |
+| `***` | $p < 0.001$ |
+
+
+## Reading a Regression Table {.smaller}
+
+In published research (and in your problem sets!), you won't see raw `summary()` output. Instead, results are presented in a **regression table** using packages like `modelsummary`:
+
+```{r}
+#| echo: false
+#| label: tbl-housing-final
+
+modelsummary(
+  list("(1)" = reg1, "(2)" = reg2, "(3)" = reg3),
+  stars = c('*' = 0.1, '**' = 0.05, '***' = 0.01),
+  coef_rename = c(
+    "sqft" = "Square Feet",
+    "bedrooms" = "Bedrooms",
+    "age" = "House Age"
+  ),
+  gof_map = c("nobs", "r.squared", "adj.r.squared"),
+  notes = "Standard errors in parentheses. * p < 0.1, ** p < 0.05, *** p < 0.01"
+)
+```
+
+
+## Anatomy of a Regression Table {.smaller}
+
+**Rows:** Each row is one regressor ($x_j$). The top number is $\hat{\beta}_j$; the number in parentheses below it is $se(\hat{\beta}_j)$.
+
+. . .
+
+**Columns:** Each column is a different regression specification. Here, (1) is bivariate, (2) adds bedrooms, and (3) adds house age. Placing them side-by-side lets you see how coefficients change as controls are added — this is how researchers show their results are (or aren't) robust.
+
+. . .
+
+**Stars:** Indicate statistical significance — but the thresholds vary by paper! Always check the **notes at the bottom** for the convention (e.g., `* p < 0.1, ** p < 0.05, *** p < 0.01`).
+
+. . .
+
+**Bottom rows:** Summary statistics — typically $N$, $R^2$, adjusted $R^2$.
+
+. . .
+
+::: {.callout-warning}
+## Common Mistakes When Reading Tables
+- The parentheses contain **standard errors** — not t-statistics, not confidence intervals!
+- Stars don't tell you about practical significance — always look at the **magnitude** of $\hat{\beta}_j$
+:::
+
+
+## Try It: Manual t-Test {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Your turn!
+:::
+
+Using the full housing regression (`reg3`), compute the t-statistic for `sqft` **by hand** (using `coef()` and the standard error from `summary()`). Does it match the `t value` in the output?
+
+. . .
+
+```{r}
+#| echo: true
+b1 <- coef(reg3)["sqft"]
+se1 <- summary(reg3)$coefficients["sqft", "Std. Error"]
+t_manual <- b1 / se1
+cat("Manual t-stat:", round(t_manual, 2), "\n")
+cat("From summary: ", round(summary(reg3)$coefficients["sqft", "t value"], 2))
+```
+
+
 ## Try It: P-Values in R {.smaller}
 
 ::: {.callout-note icon=false}
 ## 🖥️ Your turn!
 :::
 
-Using our housing regression, compute the p-value for `lot_area` by hand:
+Using `reg3`, compute the p-value for `sqft` by hand:
 
 . . .
 
@@ -1208,7 +929,7 @@ Using our housing regression, compute the p-value for `lot_area` by hand:
 t_stat <- b1 / se1
 
 # Degrees of freedom
-df <- nobs(reg_housing) - length(coef(reg_housing))
+df <- nobs(reg3) - length(coef(reg3))
 
 # Two-sided p-value using pt()
 # pt() gives P(T ≤ t). We want the probability in BOTH tails.
@@ -1217,6 +938,30 @@ p_manual <- 2 * pt(abs(t_stat), df = df, lower.tail = FALSE)
 cat("t-statistic:", round(t_stat, 4), "\n")
 cat("p-value:    ", format(p_manual, scientific = TRUE), "\n")
 ```
+
+# Statistical vs. Practical Significance
+
+
+## Statistical vs. Practical Significance {.smaller}
+
+::: {.callout-important}
+## Key Distinction
+A **statistically significant** result ($p < 0.05$) is not necessarily **practically important**.
+:::
+
+. . .
+
+- With a large enough sample, even **tiny** effects become significant
+
+. . .
+
+- Example: A drug lowers blood pressure by 0.1 mmHg ($p = 0.001$)
+  - Statistically significant? ✅
+  - Clinically meaningful? ❌
+
+. . .
+
+- **Always** look at the **magnitude** of $\hat{\beta}_j$, not just the p-value!
 
 
 # Confidence Intervals
@@ -1264,7 +1009,7 @@ Or use R's `confint()` function:
 
 # confint() computes CIs directly
 # First arg = model, second = which coefficient, level = confidence level
-confint(reg_housing, "lot_area", level = 0.95)
+confint(reg3, "sqft", level = 0.95)
 ```
 
 
@@ -1407,34 +1152,6 @@ All three are mathematically connected:
 - If the 95% CI excludes zero, then $p < 0.05$ and $|t| > 1.96$
 
 
-## Reading a Regression Table {.smaller}
-
-```{r}
-#| echo: false
-#| label: tbl-housing-final
-
-modelsummary(
-  list("Sale Price" = reg_housing),
-  stars = c('*' = 0.1, '**' = 0.05, '***' = 0.01),
-  coef_rename = c(
-    "lot_area" = "Lot Area (sq ft)",
-    "pool_area" = "Pool Area",
-    "garage_area" = "Garage Area",
-    "year_built" = "Year Built",
-    "year_remod" = "Year Remodeled"
-  ),
-  gof_map = c("nobs", "r.squared", "adj.r.squared"),
-  notes = "Standard errors in parentheses. * p < 0.1, ** p < 0.05, *** p < 0.01"
-)
-```
-
-. . .
-
-- Numbers in parentheses are **standard errors** (not t-stats, not CIs!)
-- Stars tell you significance at a glance
-- Always check the **notes** at the bottom for the star convention
-
-
 ## Try It: Full Inference Workflow {.smaller}
 
 ::: {.callout-note icon=false}
@@ -1488,4 +1205,3 @@ confint(reg_mtcars, "wt", level = 0.95)
 . . .
 
 - **Robust standard errors:** Inference that works even when assumptions fail
->>>>>>> 19de0831900ec22b7b1fa5ab3a06accbcb11dddb
