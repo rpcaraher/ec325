@@ -1,0 +1,796 @@
+---
+title: "Dummy Variables and Non-Linear Models"
+subtitle: "EC 325: Econometrics"
+author: "Prof. Caraher"
+institute: "Colby College"
+date: "today"
+date-format: "medium"
+embed-resources: true
+format:
+  revealjs:
+    theme: colby-theme.scss
+    slide-number: true
+    incremental: true
+    footer: "EC325 | Unit 7 | Dummy Variables and Non-Linear Models"
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+#| echo: false
+
+library(tidyverse)
+library(wooldridge)
+library(modelsummary)
+library(palmerpenguins)
+options(scipen = 999)
+```
+
+
+# Dummy Variables
+
+## What Are Dummy Variables? {.smaller}
+
+- So far we've used **quantitative** regressors: wages, education, experience...
+
+- But many important variables are **qualitative**: race, gender, region, program participation
+
+
+- A **dummy variable** (aka indicator or binary variable) translates **qualitative info into numbers**:
+
+. . .
+
+$$
+D = \begin{cases} 1 & \text{if the characteristic is present} \\ 0 & \text{otherwise} \end{cases}
+$$
+
+. . .
+
+- Examples: $female = 1$ if female, $south = 1$ if in the South, $treated = 1$ if in treatment group
+
+
+## What Does a Dummy Look Like? {.smaller}
+
+- Suppose we want to know the effect of completing calculus in high school on college Economics test grades
+
+- We might have data that looks like this:
+
+. . .
+
+```{r}
+#| echo: false
+
+econmath_data <- wooldridge::econmath |>
+  mutate(hs_math_level = case_when(calculus == 1 ~ "calculus",
+    calculus == 0 ~ "algebra")) |>
+  select(score, hsgpa, hs_math_level)
+
+head(econmath_data, 6)
+
+
+```
+
+- We can't directly estimate a model using the `hs_math_level` variable
+- But we *can* recode this qualitative information into quantitative form using a dummy variable
+
+## Creating a Dummy Variable {.smaller}
+
+- Define a new dummy variable called $calculus$ where:
+
+. . .
+
+$$
+Calculus_i = \begin{cases} 1 & \text{if student $i$ took calculus in high school} \\ 0 & \text{otherwise} \end{cases}
+$$
+
+
+## Creating a Dummy Variable with `case_when()` {.smaller}
+
+- In R, `case_when()` is useful for creating new variables (like dummies) based on conditions from existing variables
+
+- The syntax is as follows:
+
+```r
+case_when(
+  condition1 ~ value1,
+  condition2 ~ value2,
+  TRUE       ~ default_value   # catch-all for everything else
+)
+```
+
+- Each line is a **condition ~ value** pair — R checks conditions top-to-bottom and assigns the first match
+- `TRUE ~ ...` acts as an "else" — it catches anything not matched above
+
+## Creating a Dummy Variable with `case_when()` {.smaller}
+
+
+```{r}
+#| echo: true
+
+econmath_data <- econmath_data |>
+  mutate(calculus = case_when(
+      hs_math_level == "calculus" ~ 1,
+      hs_math_level == "algebra" ~ 0,
+      TRUE ~ 0
+  ))
+
+head(econmath_data, 6)
+```
+
+
+## Interpreting Dummy Coefficients {.smaller}
+
+- Say we want to estimate the following regression:
+
+$$score = \beta_0 + \beta_1(hsgpa) + \beta_2(calculus) + \mu$$
+
+- We simply include the dummy variable on the RHS!
+
+. . .
+
+```{r}
+#| echo: true
+
+lm1 <- lm(score ~ hsgpa + calculus, data = wooldridge::econmath)
+summary(lm1)
+```
+
+. . .
+
+- But how do we interpret this?
+
+## Interpreting Dummy Coefficients {.smaller}
+
+- $\hat{\beta}_2 \approx 5.8$: Students who took calculus score **5.8 points higher** on average *relative to those who didn't*, *holding GPA constant*
+
+- But what is actually going on "under-the-hood" when we estimate a regression with dummy variables?
+
+## What Dummies Do: Two Regression Lines {.smaller}
+
+- Start with our model: $\widehat{score} = \hat{\beta}_0 + \hat{\beta}_1(hsgpa) + \hat{\beta}_2(calculus)$
+
+- **Plug in** $calculus = 0$ (no calculus):
+
+. . .
+
+$$\widehat{score} = \hat{\beta}_0 + \hat{\beta}_1(hsgpa) + \hat{\beta}_2(0) = \hat{\beta}_0 + \hat{\beta}_1(hsgpa)$$
+
+. . .
+
+- **Plug in** $calculus = 1$ (took calculus):
+
+. . .
+
+$$\widehat{score} = \hat{\beta}_0 + \hat{\beta}_1(hsgpa) + \hat{\beta}_2(1) = \underbrace{(\hat{\beta}_0 + \hat{\beta}_2)}_{\text{new intercept}} + \hat{\beta}_1(hsgpa)$$
+
+. . .
+
+::: {.callout-important}
+## The Key
+Both groups have the **same slope** ($\hat{\beta}_1$) — the effect of GPA is the same for both. But the calculus group's line is shifted **up** by exactly $\hat{\beta}_2$.
+:::
+
+## What Dummies Do: A Picture {.smaller}
+
+- Dummy variables essentially allow for a *separate intercept* for each value of your qualitative variables (i.e., each group!)
+
+```{r}
+#| echo: false
+#| fig-width: 9
+#| fig-height: 5
+
+b <- coef(lm1)
+
+ggplot(wooldridge::econmath, aes(x = hsgpa, y = score)) +
+  geom_point(aes(color = factor(calculus)), alpha = 0.3, size = 1.5) +
+  geom_abline(intercept = b[1], slope = b[2],
+              color = "#D55E00", linewidth = 1.2) +
+  geom_abline(intercept = b[1] + b[3], slope = b[2],
+              color = "#0072B2", linewidth = 1.2) +
+  annotate("segment", x = 4.2, xend = 4.2,
+           y = b[1] + b[2]*4.2,
+           yend = b[1] + b[3] + b[2]*4.2,
+           arrow = arrow(ends = "both", length = unit(0.15, "inches")),
+           linewidth = 0.8) +
+  annotate("text", x = 4.35,
+           y = b[1] + b[3]/2 + b[2]*4.2,
+           label = paste0("β₂ ≈ ", round(b[3], 1)),
+           fontface = "bold", size = 5) +
+  scale_color_manual(values = c("0" = "#D55E00", "1" = "#0072B2"),
+                     labels = c("No Calculus", "Took Calculus")) +
+  coord_cartesian(xlim = c(2, 4.5), ylim = c(30, 95)) +
+  labs(x = "High School GPA", y = "Econ Score", color = NULL) +
+  theme_minimal(base_size = 16) +
+  theme(legend.position = "bottom")
+```
+
+
+## The Dummy Variable Trap {.smaller}
+
+Why not include dummies for **both** groups?
+
+$$score = \beta_0 + \beta_2(calculus) + \beta_3(no\_calculus) + \mu$$
+
+. . .
+
+- For every observation: $calculus + no\_calculus = 1$
+
+. . .
+
+- This is **perfect multicollinearity** — OLS cannot solve it!
+
+. . .
+
+::: {.callout-important}
+## The Rule
+With $g$ categories, include $g - 1$ dummy variables. The omitted category is the **baseline** (reference group).
+:::
+
+
+## Multiple Categories {.smaller}
+
+::: columns
+::: {.column width="55%"}
+Three penguin species → **two** dummies:
+
+```{r}
+#| echo: true
+
+lm_pen <- lm(flipper_length_mm ~ body_mass_g +
+              species, data = penguins)
+coef(lm_pen) |> round(3)
+```
+
+:::
+::: {.column width="45%"}
+
+```{r}
+#| echo: false
+#| fig-width: 5
+#| fig-height: 5
+
+ggplot(penguins |> drop_na(),
+       aes(x = body_mass_g, y = flipper_length_mm, color = species)) +
+  geom_point(alpha = 0.5, size = 2) +
+  geom_smooth(method = "lm", se = FALSE, linewidth = 1) +
+  scale_color_manual(values = c("#D55E00", "#009E73", "#0072B2")) +
+  labs(x = "Body Mass (g)", y = "Flipper Length (mm)", color = NULL) +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom")
+```
+
+:::
+:::
+
+. . .
+
+- Baseline = Adelie. Chinstrap flippers are ~5.6 mm longer; Gentoo ~15.7 mm longer (same body mass)
+
+
+## But How Do We Encode Multiple Categories? {.smaller}
+
+R's `factor()` handles this behind the scenes — but what is it actually doing?
+
+With $g$ categories, we create $g - 1$ dummies using `case_when()`:
+
+```{r}
+#| echo: true
+
+set.seed(42)
+pen_sample <- penguins |>
+  drop_na() |>
+  select(species, flipper_length_mm) |>
+  slice_sample(n = 6) |>
+  mutate(
+    chinstrap = case_when(species == "Chinstrap" ~ 1, TRUE ~ 0),
+    gentoo    = case_when(species == "Gentoo"    ~ 1, TRUE ~ 0)
+  )
+
+knitr::kable(pen_sample)
+```
+
+. . .
+
+- Adelie → both dummies = 0 (the **baseline**)
+- Each observation gets exactly **one** dummy = 1 (or none, if baseline)
+
+
+## Interpreting: Everything Is Relative to the Baseline {.smaller}
+
+Back to our penguin regression (baseline = **Adelie**):
+
+```{r}
+#| echo: false
+
+coef(lm_pen) |> round(3)
+```
+
+. . .
+
+- $\hat{\beta}_{Chinstrap} \approx 5.59$: Chinstraps have flippers **5.6 mm longer than Adelie**, holding body mass constant
+
+. . .
+
+- $\hat{\beta}_{Gentoo} \approx 15.68$: Gentoos have flippers **15.7 mm longer than Adelie**, holding body mass constant
+
+. . .
+
+- What about Chinstrap vs. Gentoo? We can **subtract**: $15.68 - 5.59 \approx 10.1$ mm
+
+. . .
+
+::: {.callout-important}
+## Key Insight
+Every dummy coefficient is a **comparison to the omitted baseline**. To compare two non-baseline groups, subtract their coefficients.
+:::
+
+
+## What Happens When We Change the Baseline? {.smaller}
+
+::: columns
+::: {.column width="50%"}
+**Baseline = Adelie**
+```{r}
+#| echo: true
+
+lm_a <- lm(flipper_length_mm ~
+  body_mass_g + species,
+  data = penguins)
+coef(lm_a) |> round(3)
+```
+:::
+::: {.column width="50%"}
+**Baseline = Gentoo**
+```{r}
+#| echo: true
+
+pen2 <- penguins |>
+  mutate(species = relevel(
+    species, ref = "Gentoo"))
+lm_g <- lm(flipper_length_mm ~
+  body_mass_g + species,
+  data = pen2)
+coef(lm_g) |> round(3)
+```
+:::
+:::
+
+. . .
+
+- The **body mass** coefficient is identical in both → changing the baseline doesn't affect other variables!
+- The dummy coefficients change sign/magnitude because the reference point changed
+
+
+## When Does the Baseline Matter? {.smaller}
+
+**It doesn't matter** when you only care about the coefficient on another variable (e.g., body mass):
+
+- The estimate, standard error, and p-value are all **identical** regardless of baseline
+
+. . .
+
+**It matters** when you want to directly interpret or test a dummy coefficient:
+
+- "Are Chinstrap flippers significantly different from **Adelie**?" → make Adelie the baseline
+- "Are Chinstrap flippers significantly different from **Gentoo**?" → make Gentoo the baseline
+
+. . .
+
+::: {.callout-tip}
+## Practical Advice
+Choose a baseline that makes your comparisons natural. For studying the gender wage gap, use male as the baseline so the female coefficient directly measures the gap.
+:::
+
+
+## Factor Variables in R
+
+- Creating dummies manually is tedious — R does it automatically with **factors**:
+
+```{r}
+#| echo: true
+#| eval: false
+
+# R picks first alphabetical category as baseline:
+lm(y ~ x + factor(region), data = df)
+
+# Use relevel() to choose your own baseline:
+lm(y ~ x + relevel(factor(region), ref = "South"), data = df)
+```
+
+. . .
+
+- R omits the first alphabetical category by default
+
+- Use `relevel()` to choose a different baseline
+
+
+# Non-Linear Models: Quadratics
+
+## Why Non-Linear? {.smaller}
+
+- Linear models assume a **constant** marginal effect — every extra year of experience raises wages by the same amount
+
+. . .
+
+- But many relationships curve:
+  - Experience → wages: rises fast early, flattens later
+  - Pollution → health: gets worse at an increasing rate
+  - Advertising → sales: diminishing returns
+
+. . .
+
+- We can capture this with a **quadratic** (polynomial) model:
+
+$$Y = \beta_0 + \beta_1 X + \beta_2 X^2 + \mu$$
+
+
+## Quadratic: The Shape {.smaller}
+
+```{r}
+#| echo: false
+#| fig-width: 9
+#| fig-height: 5.5
+
+tibble(x = seq(0, 50, 0.5)) |>
+  mutate(
+    `β₂ < 0 (inverted U)` = 3.7 + 0.30*x - 0.006*x^2,
+    `β₂ > 0 (U-shape)` = 15 - 0.50*x + 0.01*x^2
+  ) |>
+  pivot_longer(-x, names_to = "Shape", values_to = "Y") |>
+  ggplot(aes(x = x, y = Y, color = Shape)) +
+  geom_line(linewidth = 1.5) +
+  scale_color_manual(values = c("#D55E00", "#0072B2")) +
+  labs(x = "X", y = "Y", color = NULL,
+       title = "The Sign of β₂ Determines the Curve") +
+  theme_minimal(base_size = 16) +
+  theme(legend.position = "bottom")
+```
+
+- $\beta_2 < 0$: inverted-U (wages & experience)
+- $\beta_2 > 0$: U-shape (cost curves)
+
+
+## Estimating a Quadratic {.smaller}
+
+$$wage = \beta_0 + \beta_1(exper) + \beta_2(exper^2) + \mu$$
+
+```{r}
+#| echo: true
+
+wage_data <- wage1 |> mutate(exper2 = exper^2)
+lm_quad <- lm(wage ~ exper + exper2, data = wage_data)
+coef(lm_quad) |> round(4)
+```
+
+. . .
+
+- $\hat{\beta}_1 > 0$ and $\hat{\beta}_2 < 0$ → inverted-U confirmed!
+
+
+## Visualizing the Quadratic Fit {.smaller}
+
+```{r}
+#| echo: false
+#| fig-width: 9
+#| fig-height: 5.5
+
+ggplot(wage1, aes(x = exper, y = wage)) +
+  geom_point(alpha = 0.3, color = "gray50", size = 1.5) +
+  geom_smooth(method = "lm", formula = y ~ x,
+              aes(color = "Linear"), se = FALSE, linewidth = 1.2) +
+  geom_smooth(method = "lm", formula = y ~ x + I(x^2),
+              aes(color = "Quadratic"), se = FALSE, linewidth = 1.2) +
+  scale_color_manual(values = c("Linear" = "#0072B2", "Quadratic" = "#D55E00")) +
+  labs(x = "Experience (years)", y = "Hourly Wage ($)", color = "Model",
+       title = "Quadratic Captures the Curvature") +
+  theme_minimal(base_size = 16) +
+  theme(legend.position = "bottom")
+```
+
+
+## Interpreting Quadratics {.smaller}
+
+The marginal effect of $X$ on $Y$ is **not constant** — it depends on $X$:
+
+$$\frac{\partial Y}{\partial X} = \beta_1 + 2\beta_2 X$$
+
+. . .
+
+With $\hat{\beta}_1 \approx 0.298$ and $\hat{\beta}_2 \approx -0.006$:
+
+| Experience | Marginal Effect | Interpretation |
+|:----------:|:---------------:|:---------------|
+| 5 years | $0.298 + 2(-0.006)(5) = 0.24$ | +\$0.24/hr per extra year |
+| 25 years | $0.298 + 2(-0.006)(25) ≈ 0.00$ | Near the peak! |
+| 40 years | $0.298 + 2(-0.006)(40) = -0.18$ | −\$0.18/hr per extra year |
+
+. . .
+
+**Peak:** $x^* = -\frac{\beta_1}{2\beta_2} = -\frac{0.298}{2(-0.006)} \approx 25$ years
+
+
+## Marginal Effect Across Experience {.smaller}
+
+```{r}
+#| echo: false
+#| fig-width: 9
+#| fig-height: 5
+
+b <- coef(lm_quad)
+
+tibble(exper = 0:50) |>
+  mutate(marginal_effect = b["exper"] + 2 * b["exper2"] * exper) |>
+  ggplot(aes(x = exper, y = marginal_effect)) +
+  geom_line(color = "#0072B2", linewidth = 1.5) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray40") +
+  geom_vline(xintercept = -b["exper"] / (2 * b["exper2"]),
+             linetype = "dotted", color = "#D55E00", linewidth = 1) +
+  annotate("text", x = -b["exper"]/(2*b["exper2"]) + 3, y = 0.05,
+           label = paste0("Peak ≈ ", round(-b["exper"]/(2*b["exper2"]), 0), " yrs"),
+           color = "#D55E00", fontface = "bold", size = 5) +
+  labs(x = "Experience (years)",
+       y = "Marginal Effect on Wage ($/hr)",
+       title = "The Marginal Effect Declines with Experience") +
+  theme_minimal(base_size = 16)
+```
+
+
+# Logarithmic Transformations
+
+## Why Use Logs? {.smaller}
+
+- Many economic variables (wages, income, prices) are **right-skewed**
+
+```{r}
+#| echo: false
+#| fig-width: 9
+#| fig-height: 4
+
+p1 <- ggplot(wage1, aes(x = wage)) +
+  geom_histogram(fill = "#0072B2", color = "white", bins = 40) +
+  labs(x = "Wage ($/hr)", y = "Count", title = "Wages (in Levels)") +
+  theme_minimal(base_size = 14)
+
+p2 <- ggplot(wage1, aes(x = log(wage))) +
+  geom_histogram(fill = "#D55E00", color = "white", bins = 40) +
+  labs(x = "ln(Wage)", y = "Count", title = "Wages (Logged)") +
+  theme_minimal(base_size = 14)
+
+gridExtra::grid.arrange(p1, p2, ncol = 2)
+```
+
+. . .
+
+- Logging compresses the right tail → more symmetric distribution
+
+- More importantly: logs let us talk about **percentage changes**
+
+
+## The Key Property of Logs {.smaller}
+
+The reason logs work for percentages:
+
+$$\ln(Y_1) - \ln(Y_0) = \ln\!\left(\frac{Y_1}{Y_0}\right) \approx \frac{Y_1 - Y_0}{Y_0}$$
+
+. . .
+
+A **difference in logs** ≈ the **proportional change** (for small changes)
+
+. . .
+
+| Wage Change | Proportional Change | Difference in Logs |
+|:----------:|:-------------------:|:-----------------:|
+| \$20 → \$21 | $1/20 = 0.050$ | $\ln(21)-\ln(20) = 0.049$ |
+| \$20 → \$22 | $2/20 = 0.100$ | $\ln(22)-\ln(20) = 0.095$ |
+| \$20 → \$25 | $5/20 = 0.250$ | $\ln(25)-\ln(20) = 0.223$ |
+
+. . .
+
+Works great for small changes; for larger ones, use exact formula: $100 \times (e^{\beta} - 1)$%
+
+
+## Log-Linear: The Derivation {.smaller}
+
+The most common log model in applied economics:
+
+$$\ln(Y) = \beta_0 + \beta_1 X + \mu$$
+
+. . .
+
+**Step 1:** Increase $X$ by one unit (from $X_0$ to $X_0 + 1$):
+
+$$\ln(Y_1) = \beta_0 + \beta_1(X_0 + 1)$$
+$$\ln(Y_0) = \beta_0 + \beta_1 X_0$$
+
+. . .
+
+**Step 2:** Subtract:
+
+$$\ln(Y_1) - \ln(Y_0) = \beta_1$$
+
+
+## Log-Linear: The Derivation (cont.) {.smaller}
+
+**Step 3:** Use our approximation $\ln(Y_1) - \ln(Y_0) \approx \frac{Y_1 - Y_0}{Y_0}$:
+
+$$\frac{Y_1 - Y_0}{Y_0} \approx \beta_1$$
+
+. . .
+
+**Step 4:** Multiply by 100 to get percent:
+
+$$\text{% change in } Y \approx 100 \times \beta_1$$
+
+. . .
+
+::: {.callout-important}
+## Log-Linear Interpretation
+A **one-unit** increase in $X$ → approximately $100 \times \beta_1$ **percent** change in $Y$
+:::
+
+
+## Log-Linear: Example {.smaller}
+
+```{r}
+#| echo: true
+
+lm_loglin <- lm(log(wage) ~ educ, data = wage1)
+coef(lm_loglin) |> round(4)
+```
+
+. . .
+
+- $\hat{\beta}_1 \approx 0.083$ → one more year of education is associated with ≈ **8.3% higher wages**
+
+```{r}
+#| echo: false
+#| fig-width: 9
+#| fig-height: 4
+
+ggplot(wage1, aes(x = educ, y = wage)) +
+  geom_point(alpha = 0.3, color = "gray50", size = 1.5) +
+  geom_smooth(method = "lm", formula = y ~ x,
+              aes(color = "Level-Level"), se = FALSE, linewidth = 1.2) +
+  stat_function(fun = function(x) exp(coef(lm_loglin)[1] + coef(lm_loglin)[2]*x),
+                aes(color = "Log-Level"), linewidth = 1.2) +
+  scale_color_manual(values = c("Level-Level" = "#0072B2", "Log-Level" = "#D55E00")) +
+  labs(x = "Education (years)", y = "Hourly Wage ($)", color = "Model") +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom")
+```
+
+
+## Other Log Models {.smaller}
+
+| Model | Equation | $X$ changes by... | $Y$ changes by... |
+|:------|:---------|:------------------:|:------------------:|
+| **Level-Level** | $Y = \beta_0 + \beta_1 X$ | 1 unit | $\beta_1$ units |
+| **Log-Level** | $\ln(Y) = \beta_0 + \beta_1 X$ | 1 unit | $(100\beta_1)$% |
+| **Level-Log** | $Y = \beta_0 + \beta_1\ln(X)$ | 1% | $\beta_1/100$ units |
+| **Log-Log** | $\ln(Y) = \beta_0 + \beta_1\ln(X)$ | 1% | $\beta_1$% |
+
+. . .
+
+::: {.callout-tip}
+## Quick Rule
+- **Logged** variable → think in **percents**
+- **Level** variable → think in **units**
+:::
+
+
+## Log Models: Examples {.smaller}
+
+::: columns
+::: {.column width="50%"}
+
+**Level-Log**
+
+$bwght = 116.1 + 2.47 \cdot \ln(faminc)$
+
+A 1% increase in family income → $2.47/100 = 0.025$ ounce increase in birthweight
+
+:::
+::: {.column width="50%"}
+
+**Log-Log** (Elasticity)
+
+$\ln(wage) = -0.02 + 0.83 \cdot \ln(educ)$
+
+A 1% increase in education → ≈ 0.83% increase in wages
+
+$\beta_1$ is the **elasticity** — a unit-free measure of responsiveness
+
+:::
+:::
+
+. . .
+
+```{r}
+#| echo: false
+#| fig-width: 9
+#| fig-height: 3.5
+
+bw_data <- bwght |> filter(faminc > 0)
+lm_ll <- lm(bwght ~ log(faminc), data = bw_data)
+
+p1 <- ggplot(bw_data, aes(x = faminc, y = bwght)) +
+  geom_point(alpha = 0.2, color = "gray50", size = 1) +
+  geom_smooth(method = "lm", formula = y ~ log(x),
+              color = "#009E73", se = FALSE, linewidth = 1.2) +
+  labs(x = "Family Income ($1000s)", y = "Birthweight (oz)",
+       title = "Level-Log") +
+  theme_minimal(base_size = 12)
+
+we_data <- wage1 |> filter(educ > 0)
+lm_loglog <- lm(log(wage) ~ log(educ), data = we_data)
+
+p2 <- ggplot(we_data, aes(x = educ, y = wage)) +
+  geom_point(alpha = 0.2, color = "gray50", size = 1) +
+  stat_function(fun = function(x) exp(coef(lm_loglog)[1] + coef(lm_loglog)[2]*log(x)),
+                color = "#D55E00", linewidth = 1.2) +
+  labs(x = "Education (years)", y = "Hourly Wage ($)",
+       title = "Log-Log") +
+  theme_minimal(base_size = 12)
+
+gridExtra::grid.arrange(p1, p2, ncol = 2)
+```
+
+
+## When to Use Logs? {.smaller}
+
+**Commonly logged:**
+
+- Wages, income, prices, population, firm revenue, expenditures
+- Positive, right-skewed, where % changes are more meaningful
+
+. . .
+
+**Typically NOT logged:**
+
+- Education (years), age, rates/percentages, dummy variables
+- Variables that can be zero or negative ($\ln(0)$ is undefined!)
+
+. . .
+
+::: {.callout-warning}
+## Watch Out
+The "$100 \times \beta_1$%" approximation works for small $\beta_1$ (roughly $|\beta_1| < 0.20$).
+
+For larger coefficients, use the **exact** formula: $100 \times (e^{\beta_1} - 1)$%
+:::
+
+
+# Putting It All Together
+
+
+## The Big Reference Table {.smaller}
+
+| Model | Equation | Interpretation of $\hat{\beta}_1$ |
+|:------|:---------|:----------------------------------|
+| **Level-Level** | $Y = \beta_0 + \beta_1 X$ | 1-unit ↑ $X$ → $\beta_1$-unit Δ $Y$ |
+| **Log-Level** | $\ln(Y) = \beta_0 + \beta_1 X$ | 1-unit ↑ $X$ → $(100\beta_1)$% Δ $Y$ |
+| **Level-Log** | $Y = \beta_0 + \beta_1 \ln(X)$ | 1% ↑ $X$ → $\beta_1/100$ unit Δ $Y$ |
+| **Log-Log** | $\ln(Y) = \beta_0 + \beta_1 \ln(X)$ | 1% ↑ $X$ → $\beta_1$% Δ $Y$ |
+| **Quadratic** | $Y = \beta_0 + \beta_1 X + \beta_2 X^2$ | Marginal effect = $\beta_1 + 2\beta_2 X$ |
+| **Dummy** | $Y = \beta_0 + \beta_1 D$ | Diff. between $D=1$ and baseline |
+| **Dummy (log)** | $\ln(Y) = \beta_0 + \beta_1 D$ | ≈ $(100\beta_1)$% diff. from baseline |
+
+
+## Key Takeaways
+
+1. **Dummy variables** let us include qualitative information — the coefficient is the difference in intercepts between groups
+
+. . .
+
+2. **Quadratic models** capture non-linear relationships — the marginal effect depends on $X$
+
+. . .
+
+3. **Logging** a variable means we interpret its changes in **percent** terms
+
+. . .
+
+4. Always ask: **is the dependent variable logged? Is $X$ logged?** That tells you the interpretation.
