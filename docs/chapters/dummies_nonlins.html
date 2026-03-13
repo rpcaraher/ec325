@@ -362,14 +362,16 @@ window.Quarto = {
   </ul></li>
   <li><a href="#logarithmic-transformations" id="toc-logarithmic-transformations" class="nav-link" data-scroll-target="#logarithmic-transformations"><span class="header-section-number">7.6</span> Logarithmic Transformations</a>
   <ul class="collapse">
-  <li><a href="#log-linear-models" id="toc-log-linear-models" class="nav-link" data-scroll-target="#log-linear-models"><span class="header-section-number">7.6.1</span> Log-Linear Models</a></li>
-  <li><a href="#linear-log-models" id="toc-linear-log-models" class="nav-link" data-scroll-target="#linear-log-models"><span class="header-section-number">7.6.2</span> Linear-Log Models</a></li>
-  <li><a href="#log-log-models-elasticities" id="toc-log-log-models-elasticities" class="nav-link" data-scroll-target="#log-log-models-elasticities"><span class="header-section-number">7.6.3</span> Log-Log Models (Elasticities)</a></li>
-  <li><a href="#summary-table" id="toc-summary-table" class="nav-link" data-scroll-target="#summary-table"><span class="header-section-number">7.6.4</span> Summary Table</a></li>
+  <li><a href="#quick-review-what-is-a-logarithm" id="toc-quick-review-what-is-a-logarithm" class="nav-link" data-scroll-target="#quick-review-what-is-a-logarithm"><span class="header-section-number">7.6.1</span> Quick Review: What Is a Logarithm?</a></li>
+  <li><a href="#log-linear-models" id="toc-log-linear-models" class="nav-link" data-scroll-target="#log-linear-models"><span class="header-section-number">7.6.2</span> Log-Linear Models</a></li>
+  <li><a href="#linear-log-models" id="toc-linear-log-models" class="nav-link" data-scroll-target="#linear-log-models"><span class="header-section-number">7.6.3</span> Linear-Log Models</a></li>
+  <li><a href="#log-log-models-elasticities" id="toc-log-log-models-elasticities" class="nav-link" data-scroll-target="#log-log-models-elasticities"><span class="header-section-number">7.6.4</span> Log-Log Models (Elasticities)</a></li>
+  <li><a href="#when-to-use-logs" id="toc-when-to-use-logs" class="nav-link" data-scroll-target="#when-to-use-logs"><span class="header-section-number">7.6.5</span> When to Use Logs</a></li>
   </ul></li>
   <li><a href="#application-policy-evaluation-with-dummy-variables" id="toc-application-policy-evaluation-with-dummy-variables" class="nav-link" data-scroll-target="#application-policy-evaluation-with-dummy-variables"><span class="header-section-number">7.7</span> Application: Policy Evaluation with Dummy Variables</a></li>
-  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">7.8</span> Summary</a></li>
-  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">7.9</span> Check Your Understanding</a></li>
+  <li><a href="#functional-form-interpretation-reference" id="toc-functional-form-interpretation-reference" class="nav-link" data-scroll-target="#functional-form-interpretation-reference"><span class="header-section-number">7.8</span> Functional Form Interpretation Reference</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">7.9</span> Summary</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">7.10</span> Check Your Understanding</a></li>
   </ul>
 </nav>
     </div>
@@ -1001,13 +1003,18 @@ F-statistic: 659.4 on 3 and 338 DF,  p-value: &lt; 0.00000000000000022</code></p
 <section id="non-linear-relationships-polynomial-models" class="level2" data-number="7.5">
 <h2 data-number="7.5" class="anchored" data-anchor-id="non-linear-relationships-polynomial-models"><span class="header-section-number">7.5</span> Non-Linear Relationships: Polynomial Models</h2>
 <p>So far we’ve assumed linear relationships between variables. But many economic relationships are non-linear. Consider the effect of work experience on wages: at low experience levels, additional experience substantially increases productivity and wages; but at very high experience levels, workers may become less productive as they age.</p>
-<p>This suggests a <strong>quadratic</strong> relationship—wages increase with experience at first, then eventually decrease:</p>
+<p>This suggests a <strong>quadratic</strong> relationship—wages increase with experience at first, then eventually decrease. A quadratic model takes the general form:</p>
+<p><span class="math display">\[
+Y = \beta_0 + \beta_1 X + \beta_2 X^2 + \mu
+\]</span></p>
+<p>This is called a “quadratic” because it includes <span class="math inline">\(X\)</span> raised to the second power (<span class="math inline">\(X^2\)</span>). Recall from algebra that the graph of a quadratic function is a <strong>parabola</strong>—a U-shape or an inverted-U shape. The sign of <span class="math inline">\(\beta_2\)</span> determines the shape: if <span class="math inline">\(\beta_2 &gt; 0\)</span>, the parabola opens upward (U-shaped); if <span class="math inline">\(\beta_2 &lt; 0\)</span>, the parabola opens downward (inverted-U or “hump” shaped).</p>
+<p>For the experience-wage relationship, we would expect <span class="math inline">\(\beta_2 &lt; 0\)</span>: wages rise with experience early in a career but eventually level off or decline. Let’s see how a quadratic compares to a simple linear model:</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-quadratic" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-quadratic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;7.2: A quadratic model (orange) often fits experience-wage data better than a linear model (blue).
+Figure&nbsp;7.2: A quadratic model (orange) captures the curvature in the experience-wage relationship that a linear model (blue) misses.
 </figcaption>
 <div aria-describedby="fig-quadratic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="dummies_nonlins_files/figure-html/fig-quadratic-1.png" class="img-fluid figure-img" width="672">
@@ -1016,57 +1023,62 @@ Figure&nbsp;7.2: A quadratic model (orange) often fits experience-wage data bett
 </div>
 </div>
 </div>
+<p>Notice in <a href="#fig-quadratic" class="quarto-xref">Figure&nbsp;<span>7.2</span></a> that the linear model predicts a constant increase in wages for every additional year of experience. The quadratic model, by contrast, curves—it captures the fact that wages rise steeply at first and then flatten out. This is a much more realistic representation of the data.</p>
 <section id="estimating-quadratic-models" class="level3" data-number="7.5.1">
 <h3 data-number="7.5.1" class="anchored" data-anchor-id="estimating-quadratic-models"><span class="header-section-number">7.5.1</span> Estimating Quadratic Models</h3>
-<p>To estimate a quadratic model, we simply include both the variable and its square:</p>
+<p>To estimate a quadratic model, we simply include both the variable and its square as regressors. For our wage-experience example, the model is:</p>
 <p><span class="math display">\[
-log(wage) = \beta_0 + \beta_1(exper) + \beta_2(exper^2) + \mu
+wage = \beta_0 + \beta_1(exper) + \beta_2(exper^2) + \mu
 \]</span></p>
+<p>In R, we create the squared term and include it as an additional variable:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>wage_data <span class="ot">&lt;-</span> wooldridge<span class="sc">::</span>wage1 <span class="sc">|&gt;</span> </span>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>wage_data <span class="ot">&lt;-</span> wooldridge<span class="sc">::</span>wage1 <span class="sc">|&gt;</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">exper2 =</span> exper<span class="sc">^</span><span class="dv">2</span>)</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>lm_quad <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(wage) <span class="sc">~</span> exper <span class="sc">+</span> exper2, <span class="at">data =</span> wage_data)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>lm_quad <span class="ot">&lt;-</span> <span class="fu">lm</span>(wage <span class="sc">~</span> exper <span class="sc">+</span> exper2, <span class="at">data =</span> wage_data)</span>
 <span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm_quad)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
-lm(formula = log(wage) ~ exper + exper2, data = wage_data)
+lm(formula = wage ~ exper + exper2, data = wage_data)
 
 Residuals:
-     Min       1Q   Median       3Q      Max 
--2.05828 -0.33126 -0.05044  0.31806  1.47493 
+    Min      1Q  Median      3Q     Max 
+-5.5916 -2.1440 -0.8603  1.1801 17.7649 
 
 Coefficients:
               Estimate Std. Error t value             Pr(&gt;|t|)    
-(Intercept)  1.2952908  0.0494812  26.177 &lt; 0.0000000000000002 ***
-exper        0.0455341  0.0058595   7.771   0.0000000000000415 ***
-exper2      -0.0009439  0.0001291  -7.312   0.0000000000009933 ***
+(Intercept)  3.7254058  0.3459392  10.769 &lt; 0.0000000000000002 ***
+exper        0.2981001  0.0409655   7.277     0.00000000000126 ***
+exper2      -0.0061299  0.0009025  -6.792     0.00000000003015 ***
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-Residual standard error: 0.5041 on 523 degrees of freedom
-Multiple R-squared:  0.104, Adjusted R-squared:  0.1006 
-F-statistic: 30.35 on 2 and 523 DF,  p-value: 0.0000000000003377</code></pre>
+Residual standard error: 3.524 on 523 degrees of freedom
+Multiple R-squared:  0.09277,   Adjusted R-squared:  0.0893 
+F-statistic: 26.74 on 2 and 523 DF,  p-value: 0.000000000008774</code></pre>
 </div>
 </div>
+<p>Notice that both <code>exper</code> and <code>exper2</code> appear in the model. The positive coefficient on <code>exper</code> and the negative coefficient on <code>exper2</code> confirm the inverted-U shape we saw in the figure: wages increase with experience at first, but at a decreasing rate.</p>
 </section>
 <section id="interpreting-quadratic-models" class="level3" data-number="7.5.2">
 <h3 data-number="7.5.2" class="anchored" data-anchor-id="interpreting-quadratic-models"><span class="header-section-number">7.5.2</span> Interpreting Quadratic Models</h3>
-<p>With a quadratic term, the marginal effect of <span class="math inline">\(x\)</span> on <span class="math inline">\(y\)</span> is no longer constant. Taking the derivative:</p>
+<p>With a quadratic term, the marginal effect of <span class="math inline">\(X\)</span> on <span class="math inline">\(Y\)</span> is <strong>no longer constant</strong>—it changes depending on the current value of <span class="math inline">\(X\)</span>. This is the key difference from a linear model, where the marginal effect is always <span class="math inline">\(\beta_1\)</span> regardless of where you are.</p>
+<p>To find the marginal effect in a quadratic model, we take the derivative of <span class="math inline">\(Y\)</span> with respect to <span class="math inline">\(X\)</span>:</p>
 <p><span class="math display">\[
-\frac{\partial y}{\partial x} = \beta_1 + 2\beta_2 x
+\frac{\partial Y}{\partial X} = \beta_1 + 2\beta_2 X
 \]</span></p>
-<p>The effect of experience <strong>depends on your current level of experience</strong>.</p>
-<p>With our estimates (<span class="math inline">\(\hat{\beta}_1 \approx 0.046\)</span>, <span class="math inline">\(\hat{\beta}_2 \approx -0.0009\)</span>):</p>
-<p>For a worker with <strong>10 years</strong> of experience: <span class="math display">\[
-0.046 + 2(-0.0009)(10) = 0.028 \approx 2.8\%
-\]</span></p>
-<p>An additional year of experience increases wages by about 2.8%.</p>
-<p>For a worker with <strong>45 years</strong> of experience: <span class="math display">\[
-0.046 + 2(-0.0009)(45) = -0.035 \approx -3.5\%
-\]</span></p>
-<p>An additional year actually <em>decreases</em> wages—the worker is past the peak of the experience-wage relationship.</p>
+<p>The effect of one more year of experience <strong>depends on how much experience you already have</strong>.</p>
+<p>Using our estimates (<span class="math inline">\(\hat{\beta}_1 \approx 0.298\)</span>, <span class="math inline">\(\hat{\beta}_2 \approx -0.006\)</span>):</p>
+<p>For a worker with <strong>5 years</strong> of experience: <span class="math display">\[
+0.298 + 2(-0.006)(5) = 0.298 - 0.06 = 0.238
+\]</span> An additional year of experience is associated with a $0.24 increase in hourly wages.</p>
+<p>For a worker with <strong>25 years</strong> of experience: <span class="math display">\[
+0.298 + 2(-0.006)(25) = 0.298 - 0.30 = -0.002
+\]</span> An additional year of experience has essentially zero effect on wages—this worker is near the peak.</p>
+<p>For a worker with <strong>40 years</strong> of experience: <span class="math display">\[
+0.298 + 2(-0.006)(40) = 0.298 - 0.48 = -0.182
+\]</span> An additional year actually <em>decreases</em> wages by about $0.18—the worker is past the peak of the experience-wage relationship.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1080,88 +1092,231 @@ Finding the Peak
 <p>The experience level where wages are maximized occurs where the marginal effect equals zero: <span class="math display">\[
 \beta_1 + 2\beta_2 x^* = 0 \implies x^* = -\frac{\beta_1}{2\beta_2}
 \]</span></p>
-<p>With our estimates: <span class="math inline">\(x^* = -\frac{0.046}{2(-0.0009)} \approx 25.6\)</span> years.</p>
+<p>With our estimates: <span class="math inline">\(x^* = -\frac{0.298}{2(-0.006)} \approx 24.8\)</span> years. This tells us that, according to our model, wages peak at about 25 years of experience.</p>
+<p>We can verify this in R:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>peak_exper <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">coef</span>(lm_quad)[<span class="st">"exper"</span>] <span class="sc">/</span> (<span class="dv">2</span> <span class="sc">*</span> <span class="fu">coef</span>(lm_quad)[<span class="st">"exper2"</span>])</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Estimated peak experience:"</span>, <span class="fu">round</span>(peak_exper, <span class="dv">1</span>), <span class="st">"years</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Estimated peak experience: 24.3 years</code></pre>
+</div>
+</div>
 </div>
 </div>
 </section>
 </section>
 <section id="logarithmic-transformations" class="level2" data-number="7.6">
 <h2 data-number="7.6" class="anchored" data-anchor-id="logarithmic-transformations"><span class="header-section-number">7.6</span> Logarithmic Transformations</h2>
-<p>We’ve already seen that taking the log of the dependent variable changes how we interpret coefficients. Let’s review the different cases systematically.</p>
-<section id="log-linear-models" class="level3" data-number="7.6.1">
-<h3 data-number="7.6.1" class="anchored" data-anchor-id="log-linear-models"><span class="header-section-number">7.6.1</span> Log-Linear Models</h3>
-<p>When the dependent variable is logged but independent variables are not: <span class="math display">\[
+<p>Up to this point, all of our regression models have used variables in their original units—dollars, years, grams, and so on. But economists very frequently use the <strong>natural logarithm</strong> (denoted <span class="math inline">\(\ln\)</span> or <span class="math inline">\(\log\)</span>) to transform variables before putting them into a regression. Why would we do this?</p>
+<p>There are two main motivations. First, many economic variables—like wages, income, prices, and population—are <strong>right-skewed</strong>: most observations cluster at lower values, but a long tail stretches to the right. Taking the log “compresses” this tail and makes the distribution more symmetric, which often produces a better-fitting model. Second, and more importantly for interpretation, using logs lets us talk about <strong>percentage changes</strong> rather than absolute changes, which is often more economically meaningful. A $1 raise means very different things to someone earning $10/hour versus $100/hour, but a 10% raise is comparable across both.</p>
+<section id="quick-review-what-is-a-logarithm" class="level3" data-number="7.6.1">
+<h3 data-number="7.6.1" class="anchored" data-anchor-id="quick-review-what-is-a-logarithm"><span class="header-section-number">7.6.1</span> Quick Review: What Is a Logarithm?</h3>
+<p>Recall that the natural logarithm is the inverse of the exponential function. If <span class="math inline">\(e^a = b\)</span>, then <span class="math inline">\(\ln(b) = a\)</span>, where <span class="math inline">\(e \approx 2.718\)</span>.</p>
+<p>A key property that makes logs so useful in regression is:</p>
+<p><span class="math display">\[
+\ln(Y_1) - \ln(Y_0) = \ln\left(\frac{Y_1}{Y_0}\right)
+\]</span></p>
+<p>This means that the <strong>difference in logs</strong> is closely related to the <strong>percentage change</strong>. Specifically, for small changes:</p>
+<p><span class="math display">\[
+\ln(Y_1) - \ln(Y_0) \approx \frac{Y_1 - Y_0}{Y_0} = \text{proportional change in } Y
+\]</span></p>
+<p>This approximation works because of a calculus result: the derivative of <span class="math inline">\(\ln(Y)\)</span> with respect to <span class="math inline">\(Y\)</span> is <span class="math inline">\(1/Y\)</span>, so <span class="math inline">\(d\ln(Y) = dY/Y\)</span>—a small change in the log of <span class="math inline">\(Y\)</span> equals the proportional change in <span class="math inline">\(Y\)</span> itself. Multiplying by 100 gives us the <strong>percent change</strong>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Why This Approximation Works
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Consider a wage increase from $20 to $21. The proportional change is <span class="math inline">\((21-20)/20 = 0.05\)</span>, or 5%. The difference in logs is <span class="math inline">\(\ln(21) - \ln(20) = 3.045 - 2.996 = 0.049\)</span>, which is very close to 0.05.</p>
+<p>But for larger changes the approximation gets worse. A change from $20 to $30 is a 50% increase, but <span class="math inline">\(\ln(30) - \ln(20) = 0.405\)</span>, not 0.50. We’ll discuss what to do about larger changes below.</p>
+</div>
+</div>
+</section>
+<section id="log-linear-models" class="level3" data-number="7.6.2">
+<h3 data-number="7.6.2" class="anchored" data-anchor-id="log-linear-models"><span class="header-section-number">7.6.2</span> Log-Linear Models</h3>
+<p>The most common log transformation in applied economics is to log only the dependent variable. This gives us the <strong>log-linear</strong> model:</p>
+<p><span class="math display">\[
 \ln(Y) = \beta_0 + \beta_1 X + \mu
 \]</span></p>
-<p>Interpretation: A <strong>one-unit</strong> increase in <span class="math inline">\(X\)</span> is associated with a <strong><span class="math inline">\(100 \times \beta_1\)</span> percent</strong> change in <span class="math inline">\(Y\)</span>.</p>
-<p>This works because <span class="math inline">\(\ln(Y_1) - \ln(Y_0) = \ln(Y_1/Y_0) \approx (Y_1 - Y_0)/Y_0\)</span> for small changes.</p>
+<p>Here the left-hand side is in logs but the right-hand side variable <span class="math inline">\(X\)</span> is in its original units (levels).</p>
+<p><strong>Deriving the interpretation.</strong> To see why logs change the interpretation, suppose <span class="math inline">\(X\)</span> increases by one unit (from <span class="math inline">\(X_0\)</span> to <span class="math inline">\(X_0 + 1\)</span>), holding everything else constant. Then:</p>
+<p><span class="math display">\[
+\ln(Y_1) = \beta_0 + \beta_1(X_0 + 1)
+\]</span> <span class="math display">\[
+\ln(Y_0) = \beta_0 + \beta_1(X_0)
+\]</span></p>
+<p>Subtracting:</p>
+<p><span class="math display">\[
+\ln(Y_1) - \ln(Y_0) = \beta_1
+\]</span></p>
+<p>Now recall that <span class="math inline">\(\ln(Y_1) - \ln(Y_0) \approx (Y_1 - Y_0)/Y_0\)</span> for small changes. So:</p>
+<p><span class="math display">\[
+\frac{Y_1 - Y_0}{Y_0} \approx \beta_1
+\]</span></p>
+<p>Multiplying both sides by 100:</p>
+<p><span class="math display">\[
+\text{Percent change in } Y \approx 100 \times \beta_1
+\]</span></p>
+<p><strong>Interpretation:</strong> A one-unit increase in <span class="math inline">\(X\)</span> is associated with an approximately <span class="math inline">\(100 \times \beta_1\)</span> percent change in <span class="math inline">\(Y\)</span>.</p>
+<p>Let’s see this in action with our wage data. We’ll estimate a model with log wages as the dependent variable and education as the independent variable:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>lm_loglin <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(wage) <span class="sc">~</span> educ, <span class="at">data =</span> wooldridge<span class="sc">::</span>wage1)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm_loglin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = log(wage) ~ educ, data = wooldridge::wage1)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-2.21158 -0.36393 -0.07263  0.29712  1.52339 
+
+Coefficients:
+            Estimate Std. Error t value             Pr(&gt;|t|)    
+(Intercept) 0.583773   0.097336   5.998        0.00000000374 ***
+educ        0.082744   0.007567  10.935 &lt; 0.0000000000000002 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.4801 on 524 degrees of freedom
+Multiple R-squared:  0.1858,    Adjusted R-squared:  0.1843 
+F-statistic: 119.6 on 1 and 524 DF,  p-value: &lt; 0.00000000000000022</code></pre>
+</div>
+</div>
+<p>The coefficient on <code>educ</code> is approximately 0.083. Multiplying by 100 gives 8.3. So we interpret this as: <em>an additional year of education is associated with approximately an 8.3% increase in hourly wages</em>.</p>
+<p>Notice how different this is from a level-level model, where we would say “an additional year of education is associated with a $X increase in wages.” The percentage interpretation is arguably more natural for wages, since a $1 raise means different things at different wage levels.</p>
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Approximation Warning
+When the Approximation Breaks Down
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The “multiply by 100” interpretation is an approximation that works well when <span class="math inline">\(\beta_1\)</span> is small (less than about 0.2 in absolute value). For larger coefficients, use the exact formula: percent change = <span class="math inline">\(100 \times (e^{\beta_1} - 1)\)</span>.</p>
+<p>The “<span class="math inline">\(100 \times \beta_1\)</span> percent” interpretation is an approximation that works well when <span class="math inline">\(\beta_1\)</span> is small—roughly when <span class="math inline">\(|\beta_1| &lt; 0.20\)</span>.</p>
+<p>For larger coefficients, the approximation becomes inaccurate. In those cases, use the <strong>exact</strong> formula:</p>
+<p><span class="math display">\[
+\text{Exact percent change} = 100 \times (e^{\beta_1} - 1)
+\]</span></p>
+<p>For example, if <span class="math inline">\(\hat{\beta}_1 = 0.40\)</span>, the approximate interpretation would be a 40% change, but the exact calculation gives <span class="math inline">\(100 \times (e^{0.40} - 1) = 100 \times (1.492 - 1) = 49.2\%\)</span>. That’s a meaningful difference!</p>
+<p>This exact formula is particularly important when interpreting dummy variable coefficients in log-linear models, since those coefficients are often large enough for the approximation to be poor.</p>
 </div>
 </div>
 </section>
-<section id="linear-log-models" class="level3" data-number="7.6.2">
-<h3 data-number="7.6.2" class="anchored" data-anchor-id="linear-log-models"><span class="header-section-number">7.6.2</span> Linear-Log Models</h3>
-<p>When independent variables are logged but the dependent variable is not: <span class="math display">\[
+<section id="linear-log-models" class="level3" data-number="7.6.3">
+<h3 data-number="7.6.3" class="anchored" data-anchor-id="linear-log-models"><span class="header-section-number">7.6.3</span> Linear-Log Models</h3>
+<p>We can also log an independent variable while keeping the dependent variable in levels:</p>
+<p><span class="math display">\[
 Y = \beta_0 + \beta_1 \ln(X) + \mu
 \]</span></p>
-<p>Interpretation: A <strong>1 percent</strong> increase in <span class="math inline">\(X\)</span> is associated with a <strong><span class="math inline">\(\beta_1/100\)</span> unit</strong> change in <span class="math inline">\(Y\)</span>.</p>
+<p><strong>Deriving the interpretation.</strong> Now suppose <span class="math inline">\(X\)</span> increases by 1% (i.e., <span class="math inline">\(X\)</span> goes from <span class="math inline">\(X_0\)</span> to <span class="math inline">\(1.01 \times X_0\)</span>). The change in <span class="math inline">\(\ln(X)\)</span> is:</p>
+<p><span class="math display">\[
+\ln(1.01 \times X_0) - \ln(X_0) = \ln(1.01) \approx 0.01
+\]</span></p>
+<p>So a 1% change in <span class="math inline">\(X\)</span> changes <span class="math inline">\(\ln(X)\)</span> by approximately 0.01. The resulting change in <span class="math inline">\(Y\)</span> is:</p>
+<p><span class="math display">\[
+\Delta Y = \beta_1 \times 0.01 = \frac{\beta_1}{100}
+\]</span></p>
+<p><strong>Interpretation:</strong> A 1% increase in <span class="math inline">\(X\)</span> is associated with a <span class="math inline">\(\beta_1 / 100\)</span> unit change in <span class="math inline">\(Y\)</span>.</p>
+<p>This functional form is useful when <span class="math inline">\(X\)</span> varies over a wide range and we believe that proportional changes in <span class="math inline">\(X\)</span> matter more than absolute changes. For instance, if we regress birthweight in grams on the log of family income, a 1% increase in income might be associated with a <span class="math inline">\(\beta_1/100\)</span>-gram increase in birthweight—regardless of whether the family earns $20,000 or $200,000.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>bwght_data <span class="ot">&lt;-</span> wooldridge<span class="sc">::</span>bwght <span class="sc">|&gt;</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(faminc <span class="sc">&gt;</span> <span class="dv">0</span>)  <span class="co"># drop zeros since log(0) is undefined</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>lm_linlog <span class="ot">&lt;-</span> <span class="fu">lm</span>(bwght <span class="sc">~</span> <span class="fu">log</span>(faminc), <span class="at">data =</span> bwght_data)</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm_linlog)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = bwght ~ log(faminc), data = bwght_data)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-95.799 -11.799   0.621  13.014 150.708 
+
+Coefficients:
+            Estimate Std. Error t value             Pr(&gt;|t|)    
+(Intercept) 111.4881     1.8982  58.735 &lt; 0.0000000000000002 ***
+log(faminc)   2.3481     0.5922   3.965            0.0000771 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 20.25 on 1386 degrees of freedom
+Multiple R-squared:  0.01122,   Adjusted R-squared:  0.0105 
+F-statistic: 15.72 on 1 and 1386 DF,  p-value: 0.00007708</code></pre>
+</div>
+</div>
+<p>The coefficient on <code>log(faminc)</code> is approximately 2.47. This means a 1% increase in family income is associated with a <span class="math inline">\(2.47/100 = 0.025\)</span> ounce increase in birthweight. Or equivalently, a 10% increase in family income is associated with about a 0.25 ounce increase in birthweight.</p>
 </section>
-<section id="log-log-models-elasticities" class="level3" data-number="7.6.3">
-<h3 data-number="7.6.3" class="anchored" data-anchor-id="log-log-models-elasticities"><span class="header-section-number">7.6.3</span> Log-Log Models (Elasticities)</h3>
-<p>When both sides are logged: <span class="math display">\[
+<section id="log-log-models-elasticities" class="level3" data-number="7.6.4">
+<h3 data-number="7.6.4" class="anchored" data-anchor-id="log-log-models-elasticities"><span class="header-section-number">7.6.4</span> Log-Log Models (Elasticities)</h3>
+<p>When both sides are logged:</p>
+<p><span class="math display">\[
 \ln(Y) = \beta_0 + \beta_1 \ln(X) + \mu
 \]</span></p>
-<p>Interpretation: A <strong>1 percent</strong> increase in <span class="math inline">\(X\)</span> is associated with a <strong><span class="math inline">\(\beta_1\)</span> percent</strong> change in <span class="math inline">\(Y\)</span>.</p>
-<p>This is the <strong>elasticity</strong> of <span class="math inline">\(Y\)</span> with respect to <span class="math inline">\(X\)</span>—a unit-free measure of responsiveness.</p>
+<p><strong>Deriving the interpretation.</strong> A 1% increase in <span class="math inline">\(X\)</span> changes <span class="math inline">\(\ln(X)\)</span> by approximately 0.01 (as we derived above). The change in <span class="math inline">\(\ln(Y)\)</span> is then:</p>
+<p><span class="math display">\[
+\Delta \ln(Y) = \beta_1 \times 0.01
+\]</span></p>
+<p>Since <span class="math inline">\(\Delta \ln(Y) \approx\)</span> proportional change in <span class="math inline">\(Y\)</span>, multiplying by 100:</p>
+<p><span class="math display">\[
+\text{Percent change in } Y \approx \beta_1 \times 0.01 \times 100 = \beta_1 \times 1\%
+\]</span></p>
+<p>So: a 1% increase in <span class="math inline">\(X\)</span> is associated with a <span class="math inline">\(\beta_1\)</span>% change in <span class="math inline">\(Y\)</span>.</p>
+<p><strong>Interpretation:</strong> <span class="math inline">\(\beta_1\)</span> is the <strong>elasticity</strong> of <span class="math inline">\(Y\)</span> with respect to <span class="math inline">\(X\)</span>—a unit-free measure of how responsive <span class="math inline">\(Y\)</span> is to changes in <span class="math inline">\(X\)</span>. Elasticities are a cornerstone of economics. If <span class="math inline">\(\beta_1 = -0.5\)</span>, for example, we would say that <span class="math inline">\(Y\)</span> is “inelastic” with respect to <span class="math inline">\(X\)</span>—a 1% increase in <span class="math inline">\(X\)</span> leads to only a 0.5% decrease in <span class="math inline">\(Y\)</span>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>wage_educ <span class="ot">&lt;-</span> wooldridge<span class="sc">::</span>wage1 <span class="sc">|&gt;</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(educ <span class="sc">&gt;</span> <span class="dv">0</span>)  <span class="co"># drop zeros since log(0) is undefined</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>lm_loglog <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(wage) <span class="sc">~</span> <span class="fu">log</span>(educ), <span class="at">data =</span> wage_educ)</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm_loglog)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = log(wage) ~ log(educ), data = wage_educ)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-2.24076 -0.38426 -0.05421  0.32273  1.49421 
+
+Coefficients:
+            Estimate Std. Error t value            Pr(&gt;|t|)    
+(Intercept) -0.44468    0.21785  -2.041              0.0417 *  
+log(educ)    0.82521    0.08645   9.546 &lt;0.0000000000000002 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.4913 on 522 degrees of freedom
+Multiple R-squared:  0.1486,    Adjusted R-squared:  0.147 
+F-statistic: 91.12 on 1 and 522 DF,  p-value: &lt; 0.00000000000000022</code></pre>
+</div>
+</div>
+<p>The coefficient is approximately 0.825, meaning a 1% increase in education is associated with approximately a 0.825% increase in wages. Education and wages are inelastic in this specification—a 1% increase in education corresponds to less than a 1% increase in wages.</p>
 </section>
-<section id="summary-table" class="level3" data-number="7.6.4">
-<h3 data-number="7.6.4" class="anchored" data-anchor-id="summary-table"><span class="header-section-number">7.6.4</span> Summary Table</h3>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 15%">
-<col style="width: 21%">
-<col style="width: 63%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Model</th>
-<th style="text-align: left;">Equation</th>
-<th style="text-align: left;">Interpretation of <span class="math inline">\(\beta_1\)</span></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;"><strong>Linear-Linear</strong></td>
-<td style="text-align: left;"><span class="math inline">\(Y = \beta_0 + \beta_1 X\)</span></td>
-<td style="text-align: left;">1-unit ↑ in <span class="math inline">\(X\)</span> → <span class="math inline">\(\beta_1\)</span>-unit change in <span class="math inline">\(Y\)</span></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><strong>Log-Linear</strong></td>
-<td style="text-align: left;"><span class="math inline">\(\ln(Y) = \beta_0 + \beta_1 X\)</span></td>
-<td style="text-align: left;">1-unit ↑ in <span class="math inline">\(X\)</span> → <span class="math inline">\((100 \times \beta_1)\%\)</span> change in <span class="math inline">\(Y\)</span></td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"><strong>Linear-Log</strong></td>
-<td style="text-align: left;"><span class="math inline">\(Y = \beta_0 + \beta_1 \ln(X)\)</span></td>
-<td style="text-align: left;">1% ↑ in <span class="math inline">\(X\)</span> → <span class="math inline">\(\beta_1/100\)</span> unit change in <span class="math inline">\(Y\)</span></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><strong>Log-Log</strong></td>
-<td style="text-align: left;"><span class="math inline">\(\ln(Y) = \beta_0 + \beta_1 \ln(X)\)</span></td>
-<td style="text-align: left;">1% ↑ in <span class="math inline">\(X\)</span> → <span class="math inline">\(\beta_1\%\)</span> change in <span class="math inline">\(Y\)</span> (elasticity)</td>
-</tr>
-</tbody>
-</table>
+<section id="when-to-use-logs" class="level3" data-number="7.6.5">
+<h3 data-number="7.6.5" class="anchored" data-anchor-id="when-to-use-logs"><span class="header-section-number">7.6.5</span> When to Use Logs</h3>
+<p>There are no hard-and-fast rules, but here are some practical guidelines:</p>
+<p>Variables that are commonly logged include wages, income, prices, population, firm size (revenue, employees), and expenditures. These tend to be strictly positive, right-skewed, and best thought of in percentage terms.</p>
+<p>Variables that are typically <strong>not</strong> logged include years of education, age, percentages or rates (unemployment rate, graduation rate), dummy variables, and variables that can take zero or negative values (since the log of zero or a negative number is undefined).</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Practical Advice
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>When in doubt, try plotting the variable. If its distribution is right-skewed and the variable is strictly positive, logging it is often a good idea. You can also compare the <span class="math inline">\(R^2\)</span> of models with and without the log transformation—though model fit alone shouldn’t be the sole criterion. The most important consideration is whether the interpretation makes economic sense.</p>
+</div>
+</div>
 </section>
 </section>
 <section id="application-policy-evaluation-with-dummy-variables" class="level2" data-number="7.7">
@@ -1171,18 +1326,104 @@ Y = \beta_0 + \beta_1 \ln(X) + \mu
 \ln(wage) = \beta_0 + \beta_1(training) + \beta_2(educ) + \beta_3(exper) + \mu
 \]</span></p>
 <p>where <code>training</code> equals 1 if the person participated in the program and 0 otherwise.</p>
-<p>The coefficient <span class="math inline">\(\beta_1\)</span> measures the <strong>treatment effect</strong>—the percentage difference in wages between program participants and non-participants, controlling for education and experience.</p>
+<p>The coefficient <span class="math inline">\(\beta_1\)</span> measures the <strong>treatment effect</strong>—the percentage difference in wages between program participants and non-participants, controlling for education and experience. Since the dependent variable is logged, we multiply <span class="math inline">\(\beta_1\)</span> by 100 to get the approximate percentage effect (or use the exact formula <span class="math inline">\(100 \times (e^{\beta_1} - 1)\)</span> for larger coefficients).</p>
 <p>This is essentially a regression-based version of comparing treatment and control groups, where the control variables help us account for differences between those who did and didn’t participate.</p>
 </section>
-<section id="summary" class="level2" data-number="7.8">
-<h2 data-number="7.8" class="anchored" data-anchor-id="summary"><span class="header-section-number">7.8</span> Summary</h2>
+<section id="functional-form-interpretation-reference" class="level2" data-number="7.8">
+<h2 data-number="7.8" class="anchored" data-anchor-id="functional-form-interpretation-reference"><span class="header-section-number">7.8</span> Functional Form Interpretation Reference</h2>
+<p>The table below summarizes how to interpret <span class="math inline">\(\beta_1\)</span> under each functional form we have covered. This is one of the most important references in the course—you should be able to quickly identify the correct interpretation for any model you encounter.</p>
+<div id="tbl-functional-forms" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-functional-forms-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;7.1: Functional Form Interpretation Guide
+</figcaption>
+<div aria-describedby="tbl-functional-forms-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 11%">
+<col style="width: 16%">
+<col style="width: 57%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Model</th>
+<th style="text-align: left;">Equation</th>
+<th style="text-align: left;">Interpretation of <span class="math inline">\(\hat{\beta}_1\)</span></th>
+<th style="text-align: left;">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>Level-Level</strong></td>
+<td style="text-align: left;"><span class="math inline">\(Y = \beta_0 + \beta_1 X\)</span></td>
+<td style="text-align: left;">A 1-unit increase in <span class="math inline">\(X\)</span> → <span class="math inline">\(\beta_1\)</span>-unit change in <span class="math inline">\(Y\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(wage = 2.1 + 0.54 \cdot educ\)</span>: one more year of education → $0.54 higher wages</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Log-Level</strong></td>
+<td style="text-align: left;"><span class="math inline">\(\ln(Y) = \beta_0 + \beta_1 X\)</span></td>
+<td style="text-align: left;">A 1-unit increase in <span class="math inline">\(X\)</span> → <span class="math inline">\((100 \times \beta_1)\)</span>% change in <span class="math inline">\(Y\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\ln(wage) = 0.58 + 0.083 \cdot educ\)</span>: one more year of education → ≈ 8.3% higher wages</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Level-Log</strong></td>
+<td style="text-align: left;"><span class="math inline">\(Y = \beta_0 + \beta_1 \ln(X)\)</span></td>
+<td style="text-align: left;">A 1% increase in <span class="math inline">\(X\)</span> → <span class="math inline">\(\beta_1 / 100\)</span> unit change in <span class="math inline">\(Y\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(bwght = 116.1 + 2.47 \cdot \ln(faminc)\)</span>: 1% higher income → 0.025 oz higher birthweight</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Log-Log</strong></td>
+<td style="text-align: left;"><span class="math inline">\(\ln(Y) = \beta_0 + \beta_1 \ln(X)\)</span></td>
+<td style="text-align: left;">A 1% increase in <span class="math inline">\(X\)</span> → <span class="math inline">\(\beta_1\)</span>% change in <span class="math inline">\(Y\)</span> (elasticity)</td>
+<td style="text-align: left;"><span class="math inline">\(\ln(wage) = -0.02 + 0.83 \cdot \ln(educ)\)</span>: 1% more education → ≈ 0.83% higher wages</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Quadratic</strong></td>
+<td style="text-align: left;"><span class="math inline">\(Y = \beta_0 + \beta_1 X + \beta_2 X^2\)</span></td>
+<td style="text-align: left;">Marginal effect is <span class="math inline">\(\beta_1 + 2\beta_2 X\)</span> (depends on <span class="math inline">\(X\)</span>)</td>
+<td style="text-align: left;"><span class="math inline">\(wage = 3.73 + 0.30 \cdot exper - 0.006 \cdot exper^2\)</span>: at 10 yrs → +$0.18; at 30 yrs → −$0.06</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Dummy</strong></td>
+<td style="text-align: left;"><span class="math inline">\(Y = \beta_0 + \beta_1 D\)</span></td>
+<td style="text-align: left;">Difference in <span class="math inline">\(Y\)</span> between <span class="math inline">\(D=1\)</span> group and baseline</td>
+<td style="text-align: left;"><span class="math inline">\(score = 24.5 + 5.8 \cdot calculus\)</span>: calculus-takers score 5.8 pts higher</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Dummy in Log</strong></td>
+<td style="text-align: left;"><span class="math inline">\(\ln(Y) = \beta_0 + \beta_1 D\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(D=1\)</span> group has ≈ <span class="math inline">\((100 \times \beta_1)\)</span>% different <span class="math inline">\(Y\)</span>. Exact: <span class="math inline">\(100(e^{\beta_1}-1)\)</span>%</td>
+<td style="text-align: left;"><span class="math inline">\(\ln(wage) = 1.0 - 0.15 \cdot female\)</span>: women earn ≈ 15% less (exact: −13.9%)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+How to Use This Table
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>When you encounter a regression in a paper or problem set, the first thing to check is: <strong>is the dependent variable logged? Is the independent variable logged?</strong> Your answers determine which row of the table applies. Then use the interpretation column to state the result in plain English.</p>
+</div>
+</div>
+</section>
+<section id="summary" class="level2" data-number="7.9">
+<h2 data-number="7.9" class="anchored" data-anchor-id="summary"><span class="header-section-number">7.9</span> Summary</h2>
 <p>This chapter introduced two powerful extensions to basic regression: categorical variables and non-linear functional forms.</p>
 <p><strong>Dummy variables</strong> allow us to include qualitative information in regression models. The coefficient on a dummy variable represents the difference in intercepts between groups—the effect of having a particular characteristic relative to the baseline category. When a categorical variable has <span class="math inline">\(g\)</span> categories, we include <span class="math inline">\(g - 1\)</span> dummy variables to avoid perfect multicollinearity (the dummy variable trap).</p>
 <p><strong>Polynomial models</strong> capture non-linear relationships by including squared or higher-order terms. With quadratic models, the marginal effect of <span class="math inline">\(x\)</span> on <span class="math inline">\(y\)</span> depends on the current level of <span class="math inline">\(x\)</span>, allowing us to model relationships that increase and then decrease (or vice versa).</p>
-<p><strong>Logarithmic transformations</strong> change the interpretation of coefficients: log-linear models give percentage changes, linear-log models give the effect of percentage changes, and log-log models give elasticities. These transformations are especially useful when dealing with variables like wages or prices that are right-skewed and where percentage changes are more meaningful than absolute changes.</p>
+<p><strong>Logarithmic transformations</strong> change the interpretation of coefficients. The key insight is that a change in a logged variable approximates a proportional (percentage) change. Log-linear models give the percentage change in <span class="math inline">\(Y\)</span> for a one-unit change in <span class="math inline">\(X\)</span>; linear-log models give the unit change in <span class="math inline">\(Y\)</span> for a one-percent change in <span class="math inline">\(X\)</span>; and log-log models give elasticities—the percentage change in <span class="math inline">\(Y\)</span> for a one-percent change in <span class="math inline">\(X\)</span>. These transformations are especially useful when dealing with variables like wages or prices that are right-skewed and where percentage changes are more meaningful than absolute changes. See <a href="#tbl-functional-forms" class="quarto-xref">Table&nbsp;<span>7.1</span></a> for a complete reference.</p>
 </section>
-<section id="check-your-understanding" class="level2" data-number="7.9">
-<h2 data-number="7.9" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">7.9</span> Check Your Understanding</h2>
+<section id="check-your-understanding" class="level2" data-number="7.10">
+<h2 data-number="7.10" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">7.10</span> Check Your Understanding</h2>
 <p>For each question below, select the best answer from the dropdown menu. The dropdown will turn green if correct and red if incorrect.</p>
 <div class="question">
 <div class="answer-row">
@@ -1208,7 +1449,7 @@ Y = \beta_0 + \beta_1 \ln(X) + \mu
 </div>
 
 <div class="answer-row">
-    <label>iii. In the model log(wage) = β₀ + β₁(exper) + β₂(exper²), what does a negative β₂ imply? </label>
+    <label>iii. In the model wage = β₀ + β₁(exper) + β₂(exper²), what does a negative β₂ imply? </label>
     <select onchange="checkAnswer(this, 'a')">
         <option value="">-- Select Answer --</option>
         <option value="a">The wage-experience relationship is concave (wages increase at a decreasing rate, then may decline)</option>
@@ -1241,7 +1482,7 @@ Y = \beta_0 + \beta_1 \ln(X) + \mu
 </div>
 
 <div class="answer-row">
-    <label>vi. <strong>(Challenge)</strong> In the quadratic model log(wage) = 1.2 + 0.04(exper) - 0.0008(exper²), at what experience level are wages maximized? </label>
+    <label>vi. <strong>(Challenge)</strong> In the quadratic model wage = 3.5 + 0.30(exper) - 0.006(exper²), at what experience level are wages maximized? </label>
     <select onchange="checkAnswer(this, 'c')">
         <option value="">-- Select Answer --</option>
         <option value="a">10 years</option>
@@ -1253,7 +1494,7 @@ Y = \beta_0 + \beta_1 \ln(X) + \mu
 </div>
 
 <div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1262,7 +1503,7 @@ Show Explanation
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="i">
 <li><p>With a log-linear model (log on the left side only), we multiply the coefficient by 100 to get the percentage interpretation. A coefficient of -0.15 means women earn approximately 15% less than men (the baseline category), holding other variables constant.</p></li>
@@ -1270,7 +1511,7 @@ Show Explanation
 <li><p>A negative coefficient on the squared term means the parabola opens downward. Combined with a positive coefficient on the linear term, this creates an inverted-U shape: wages increase with experience initially, but at a decreasing rate, and eventually begin to decline.</p></li>
 <li><p>In a log-log model, both variables are in logs, so the coefficient is an elasticity. It tells us the percentage change in Y for a 1% change in X. Here, a 1% increase in X is associated with a 0.5% increase in Y.</p></li>
 <li><p>Changing the baseline category changes how the dummy coefficients are interpreted (they become relative to a different group), but it doesn’t affect coefficients on other variables in the model. The model’s predictions and fit remain identical.</p></li>
-<li><p>The experience level that maximizes wages is found by setting the derivative equal to zero: 0.04 + 2(-0.0008)(exper) = 0. Solving: exper = 0.04/(2 × 0.0008) = 0.04/0.0016 = 25 years.</p></li>
+<li><p>The experience level that maximizes wages is found by setting the derivative equal to zero: 0.30 + 2(-0.006)(exper) = 0. Solving: exper = 0.30/(2 × 0.006) = 0.30/0.012 = 25 years.</p></li>
 </ol>
 </div>
 </div>

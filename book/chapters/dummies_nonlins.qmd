@@ -464,14 +464,30 @@ but at very high experience levels,
 workers may become less productive as they age.
 
 This suggests a **quadratic** relationship---wages increase with experience at first,
-then eventually decrease:
+then eventually decrease.
+A quadratic model takes the general form:
+
+$$
+Y = \beta_0 + \beta_1 X + \beta_2 X^2 + \mu
+$$
+
+This is called a "quadratic" because it includes $X$ raised to the second power ($X^2$).
+Recall from algebra that the graph of a quadratic function is a **parabola**---a U-shape or an inverted-U shape.
+The sign of $\beta_2$ determines the shape:
+if $\beta_2 > 0$, the parabola opens upward (U-shaped);
+if $\beta_2 < 0$, the parabola opens downward (inverted-U or "hump" shaped).
+
+For the experience-wage relationship,
+we would expect $\beta_2 < 0$:
+wages rise with experience early in a career but eventually level off or decline.
+Let's see how a quadratic compares to a simple linear model:
 
 ```{r}
 #| echo: false
 #| message: false
 #| warning: false
 #| label: fig-quadratic
-#| fig-cap: "A quadratic model (orange) often fits experience-wage data better than a linear model (blue)."
+#| fig-cap: "A quadratic model (orange) captures the curvature in the experience-wage relationship that a linear model (blue) misses."
 
 ggplot(wooldridge::wage1, aes(x = exper, y = wage)) +
   geom_point(alpha = 0.4, color = "gray50") +
@@ -488,54 +504,78 @@ ggplot(wooldridge::wage1, aes(x = exper, y = wage)) +
   theme(legend.position = "bottom")
 ```
 
+Notice in @fig-quadratic that the linear model predicts a constant increase in wages for every additional year of experience.
+The quadratic model,
+by contrast,
+curves---it captures the fact that wages rise steeply at first and then flatten out.
+This is a much more realistic representation of the data.
+
 ### Estimating Quadratic Models
 
 To estimate a quadratic model,
-we simply include both the variable and its square:
+we simply include both the variable and its square as regressors.
+For our wage-experience example,
+the model is:
 
 $$
-log(wage) = \beta_0 + \beta_1(exper) + \beta_2(exper^2) + \mu
+wage = \beta_0 + \beta_1(exper) + \beta_2(exper^2) + \mu
 $$
+
+In R,
+we create the squared term and include it as an additional variable:
 
 ```{r}
 #| echo: true
 #| message: false
 #| warning: false
 
-wage_data <- wooldridge::wage1 |> 
+wage_data <- wooldridge::wage1 |>
     mutate(exper2 = exper^2)
 
-lm_quad <- lm(log(wage) ~ exper + exper2, data = wage_data)
+lm_quad <- lm(wage ~ exper + exper2, data = wage_data)
 summary(lm_quad)
 ```
+
+Notice that both `exper` and `exper2` appear in the model.
+The positive coefficient on `exper` and the negative coefficient on `exper2` confirm the inverted-U shape we saw in the figure:
+wages increase with experience at first,
+but at a decreasing rate.
 
 ### Interpreting Quadratic Models
 
 With a quadratic term,
-the marginal effect of $x$ on $y$ is no longer constant.
-Taking the derivative:
+the marginal effect of $X$ on $Y$ is **no longer constant**---it changes depending on the current value of $X$.
+This is the key difference from a linear model,
+where the marginal effect is always $\beta_1$ regardless of where you are.
+
+To find the marginal effect in a quadratic model,
+we take the derivative of $Y$ with respect to $X$:
 
 $$
-\frac{\partial y}{\partial x} = \beta_1 + 2\beta_2 x
+\frac{\partial Y}{\partial X} = \beta_1 + 2\beta_2 X
 $$
 
-The effect of experience **depends on your current level of experience**.
+The effect of one more year of experience **depends on how much experience you already have**.
 
-With our estimates ($\hat{\beta}_1 \approx 0.046$, $\hat{\beta}_2 \approx -0.0009$):
+Using our estimates ($\hat{\beta}_1 \approx 0.298$, $\hat{\beta}_2 \approx -0.006$):
 
-For a worker with **10 years** of experience:
+For a worker with **5 years** of experience:
 $$
-0.046 + 2(-0.0009)(10) = 0.028 \approx 2.8\%
+0.298 + 2(-0.006)(5) = 0.298 - 0.06 = 0.238
 $$
+An additional year of experience is associated with a \$0.24 increase in hourly wages.
 
-An additional year of experience increases wages by about 2.8%.
-
-For a worker with **45 years** of experience:
+For a worker with **25 years** of experience:
 $$
-0.046 + 2(-0.0009)(45) = -0.035 \approx -3.5\%
+0.298 + 2(-0.006)(25) = 0.298 - 0.30 = -0.002
 $$
+An additional year of experience has essentially zero effect on wages---this worker is near the peak.
 
-An additional year actually *decreases* wages---the worker is past the peak of the experience-wage relationship.
+For a worker with **40 years** of experience:
+$$
+0.298 + 2(-0.006)(40) = 0.298 - 0.48 = -0.182
+$$
+An additional year actually *decreases* wages by about \$0.18---the worker is past the peak of the experience-wage relationship.
 
 ::: {.callout-note}
 ## Finding the Peak
@@ -544,61 +584,282 @@ $$
 \beta_1 + 2\beta_2 x^* = 0 \implies x^* = -\frac{\beta_1}{2\beta_2}
 $$
 
-With our estimates: $x^* = -\frac{0.046}{2(-0.0009)} \approx 25.6$ years.
+With our estimates: $x^* = -\frac{0.298}{2(-0.006)} \approx 24.8$ years.
+This tells us that,
+according to our model,
+wages peak at about 25 years of experience.
+
+We can verify this in R:
+
+```{r}
+#| echo: true
+peak_exper <- -coef(lm_quad)["exper"] / (2 * coef(lm_quad)["exper2"])
+cat("Estimated peak experience:", round(peak_exper, 1), "years\n")
+```
+
 :::
 
 
 ## Logarithmic Transformations
 
-We've already seen that taking the log of the dependent variable changes how we interpret coefficients.
-Let's review the different cases systematically.
+Up to this point,
+all of our regression models have used variables in their original units---dollars, years, grams, and so on.
+But economists very frequently use the **natural logarithm** (denoted $\ln$ or $\log$) to transform variables before putting them into a regression.
+Why would we do this?
+
+There are two main motivations.
+First,
+many economic variables---like wages,
+income,
+prices,
+and population---are **right-skewed**:
+most observations cluster at lower values,
+but a long tail stretches to the right.
+Taking the log "compresses" this tail and makes the distribution more symmetric,
+which often produces a better-fitting model.
+Second,
+and more importantly for interpretation,
+using logs lets us talk about **percentage changes** rather than absolute changes,
+which is often more economically meaningful.
+A \$1 raise means very different things to someone earning \$10/hour versus \$100/hour,
+but a 10% raise is comparable across both.
+
+### Quick Review: What Is a Logarithm?
+
+Recall that the natural logarithm is the inverse of the exponential function.
+If $e^a = b$, then $\ln(b) = a$, where $e \approx 2.718$.
+
+A key property that makes logs so useful in regression is:
+
+$$
+\ln(Y_1) - \ln(Y_0) = \ln\left(\frac{Y_1}{Y_0}\right)
+$$
+
+This means that the **difference in logs** is closely related to the **percentage change**.
+Specifically,
+for small changes:
+
+$$
+\ln(Y_1) - \ln(Y_0) \approx \frac{Y_1 - Y_0}{Y_0} = \text{proportional change in } Y
+$$
+
+This approximation works because of a calculus result:
+the derivative of $\ln(Y)$ with respect to $Y$ is $1/Y$,
+so $d\ln(Y) = dY/Y$---a small change in the log of $Y$ equals the proportional change in $Y$ itself.
+Multiplying by 100 gives us the **percent change**.
+
+::: {.callout-note}
+## Why This Approximation Works
+Consider a wage increase from \$20 to \$21.
+The proportional change is $(21-20)/20 = 0.05$, or 5%.
+The difference in logs is $\ln(21) - \ln(20) = 3.045 - 2.996 = 0.049$, which is very close to 0.05.
+
+But for larger changes the approximation gets worse.
+A change from \$20 to \$30 is a 50% increase,
+but $\ln(30) - \ln(20) = 0.405$, not 0.50.
+We'll discuss what to do about larger changes below.
+:::
 
 ### Log-Linear Models
 
-When the dependent variable is logged but independent variables are not:
+The most common log transformation in applied economics is to log only the dependent variable.
+This gives us the **log-linear** model:
+
 $$
 \ln(Y) = \beta_0 + \beta_1 X + \mu
 $$
 
-Interpretation: A **one-unit** increase in $X$ is associated with a **$100 \times \beta_1$ percent** change in $Y$.
+Here the left-hand side is in logs but the right-hand side variable $X$ is in its original units (levels).
 
-This works because $\ln(Y_1) - \ln(Y_0) = \ln(Y_1/Y_0) \approx (Y_1 - Y_0)/Y_0$ for small changes.
+**Deriving the interpretation.**
+To see why logs change the interpretation,
+suppose $X$ increases by one unit (from $X_0$ to $X_0 + 1$), holding everything else constant.
+Then:
+
+$$
+\ln(Y_1) = \beta_0 + \beta_1(X_0 + 1)
+$$
+$$
+\ln(Y_0) = \beta_0 + \beta_1(X_0)
+$$
+
+Subtracting:
+
+$$
+\ln(Y_1) - \ln(Y_0) = \beta_1
+$$
+
+Now recall that $\ln(Y_1) - \ln(Y_0) \approx (Y_1 - Y_0)/Y_0$ for small changes.
+So:
+
+$$
+\frac{Y_1 - Y_0}{Y_0} \approx \beta_1
+$$
+
+Multiplying both sides by 100:
+
+$$
+\text{Percent change in } Y \approx 100 \times \beta_1
+$$
+
+**Interpretation:** A one-unit increase in $X$ is associated with an approximately $100 \times \beta_1$ percent change in $Y$.
+
+Let's see this in action with our wage data.
+We'll estimate a model with log wages as the dependent variable and education as the independent variable:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+lm_loglin <- lm(log(wage) ~ educ, data = wooldridge::wage1)
+summary(lm_loglin)
+```
+
+The coefficient on `educ` is approximately 0.083.
+Multiplying by 100 gives 8.3.
+So we interpret this as:
+*an additional year of education is associated with approximately an 8.3% increase in hourly wages*.
+
+Notice how different this is from a level-level model,
+where we would say "an additional year of education is associated with a \$X increase in wages."
+The percentage interpretation is arguably more natural for wages,
+since a \$1 raise means different things at different wage levels.
 
 ::: {.callout-warning}
-## Approximation Warning
-The "multiply by 100" interpretation is an approximation that works well when $\beta_1$ is small (less than about 0.2 in absolute value).
+## When the Approximation Breaks Down
+The "$100 \times \beta_1$ percent" interpretation is an approximation that works well when $\beta_1$ is small---roughly when $|\beta_1| < 0.20$.
+
 For larger coefficients,
-use the exact formula: percent change = $100 \times (e^{\beta_1} - 1)$.
+the approximation becomes inaccurate.
+In those cases,
+use the **exact** formula:
+
+$$
+\text{Exact percent change} = 100 \times (e^{\beta_1} - 1)
+$$
+
+For example,
+if $\hat{\beta}_1 = 0.40$,
+the approximate interpretation would be a 40% change,
+but the exact calculation gives $100 \times (e^{0.40} - 1) = 100 \times (1.492 - 1) = 49.2\%$.
+That's a meaningful difference!
+
+This exact formula is particularly important when interpreting dummy variable coefficients in log-linear models,
+since those coefficients are often large enough for the approximation to be poor.
 :::
 
 ### Linear-Log Models
 
-When independent variables are logged but the dependent variable is not:
+We can also log an independent variable while keeping the dependent variable in levels:
+
 $$
 Y = \beta_0 + \beta_1 \ln(X) + \mu
 $$
 
-Interpretation: A **1 percent** increase in $X$ is associated with a **$\beta_1/100$ unit** change in $Y$.
+**Deriving the interpretation.**
+Now suppose $X$ increases by 1% (i.e., $X$ goes from $X_0$ to $1.01 \times X_0$).
+The change in $\ln(X)$ is:
+
+$$
+\ln(1.01 \times X_0) - \ln(X_0) = \ln(1.01) \approx 0.01
+$$
+
+So a 1% change in $X$ changes $\ln(X)$ by approximately 0.01.
+The resulting change in $Y$ is:
+
+$$
+\Delta Y = \beta_1 \times 0.01 = \frac{\beta_1}{100}
+$$
+
+**Interpretation:** A 1% increase in $X$ is associated with a $\beta_1 / 100$ unit change in $Y$.
+
+This functional form is useful when $X$ varies over a wide range and we believe that proportional changes in $X$ matter more than absolute changes.
+For instance,
+if we regress birthweight in grams on the log of family income,
+a 1% increase in income might be associated with a $\beta_1/100$-gram increase in birthweight---regardless of whether the family earns \$20,000 or \$200,000.
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+bwght_data <- wooldridge::bwght |>
+    filter(faminc > 0)  # drop zeros since log(0) is undefined
+
+lm_linlog <- lm(bwght ~ log(faminc), data = bwght_data)
+summary(lm_linlog)
+```
+
+The coefficient on `log(faminc)` is approximately 2.47.
+This means a 1% increase in family income is associated with a $2.47/100 = 0.025$ ounce increase in birthweight.
+Or equivalently,
+a 10% increase in family income is associated with about a 0.25 ounce increase in birthweight.
 
 ### Log-Log Models (Elasticities)
 
 When both sides are logged:
+
 $$
 \ln(Y) = \beta_0 + \beta_1 \ln(X) + \mu
 $$
 
-Interpretation: A **1 percent** increase in $X$ is associated with a **$\beta_1$ percent** change in $Y$.
+**Deriving the interpretation.**
+A 1% increase in $X$ changes $\ln(X)$ by approximately 0.01 (as we derived above).
+The change in $\ln(Y)$ is then:
 
-This is the **elasticity** of $Y$ with respect to $X$---a unit-free measure of responsiveness.
+$$
+\Delta \ln(Y) = \beta_1 \times 0.01
+$$
 
-### Summary Table
+Since $\Delta \ln(Y) \approx$ proportional change in $Y$,
+multiplying by 100:
 
-| Model | Equation | Interpretation of $\beta_1$ |
-|:------|:---------|:----------------------------|
-| **Linear-Linear** | $Y = \beta_0 + \beta_1 X$ | 1-unit ↑ in $X$ → $\beta_1$-unit change in $Y$ |
-| **Log-Linear** | $\ln(Y) = \beta_0 + \beta_1 X$ | 1-unit ↑ in $X$ → $(100 \times \beta_1)\%$ change in $Y$ |
-| **Linear-Log** | $Y = \beta_0 + \beta_1 \ln(X)$ | 1% ↑ in $X$ → $\beta_1/100$ unit change in $Y$ |
-| **Log-Log** | $\ln(Y) = \beta_0 + \beta_1 \ln(X)$ | 1% ↑ in $X$ → $\beta_1\%$ change in $Y$ (elasticity) |
+$$
+\text{Percent change in } Y \approx \beta_1 \times 0.01 \times 100 = \beta_1 \times 1\%
+$$
+
+So: a 1% increase in $X$ is associated with a $\beta_1$% change in $Y$.
+
+**Interpretation:** $\beta_1$ is the **elasticity** of $Y$ with respect to $X$---a unit-free measure of how responsive $Y$ is to changes in $X$.
+Elasticities are a cornerstone of economics.
+If $\beta_1 = -0.5$, for example,
+we would say that $Y$ is "inelastic" with respect to $X$---a 1% increase in $X$ leads to only a 0.5% decrease in $Y$.
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+wage_educ <- wooldridge::wage1 |>
+    filter(educ > 0)  # drop zeros since log(0) is undefined
+
+lm_loglog <- lm(log(wage) ~ log(educ), data = wage_educ)
+summary(lm_loglog)
+```
+
+The coefficient is approximately 0.825,
+meaning a 1% increase in education is associated with approximately a 0.825% increase in wages.
+Education and wages are inelastic in this specification---a 1% increase in education corresponds to less than a 1% increase in wages.
+
+### When to Use Logs
+
+There are no hard-and-fast rules,
+but here are some practical guidelines:
+
+Variables that are commonly logged include wages, income, prices, population, firm size (revenue, employees), and expenditures. These tend to be strictly positive, right-skewed, and best thought of in percentage terms.
+
+Variables that are typically **not** logged include years of education, age, percentages or rates (unemployment rate, graduation rate), dummy variables, and variables that can take zero or negative values (since the log of zero or a negative number is undefined).
+
+::: {.callout-tip}
+## Practical Advice
+When in doubt,
+try plotting the variable.
+If its distribution is right-skewed and the variable is strictly positive,
+logging it is often a good idea.
+You can also compare the $R^2$ of models with and without the log transformation---though model fit alone shouldn't be the sole criterion.
+The most important consideration is whether the interpretation makes economic sense.
+:::
 
 
 ## Application: Policy Evaluation with Dummy Variables
@@ -614,9 +875,38 @@ where `training` equals 1 if the person participated in the program and 0 otherw
 
 The coefficient $\beta_1$ measures the **treatment effect**---the percentage difference in wages between program participants and non-participants,
 controlling for education and experience.
+Since the dependent variable is logged,
+we multiply $\beta_1$ by 100 to get the approximate percentage effect (or use the exact formula $100 \times (e^{\beta_1} - 1)$ for larger coefficients).
 
 This is essentially a regression-based version of comparing treatment and control groups,
 where the control variables help us account for differences between those who did and didn't participate.
+
+
+## Functional Form Interpretation Reference
+
+The table below summarizes how to interpret $\beta_1$ under each functional form we have covered.
+This is one of the most important references in the course---you should be able to quickly identify the correct interpretation for any model you encounter.
+
+| Model | Equation | Interpretation of $\hat{\beta}_1$ | Example |
+|:------|:---------|:----------------------------------|:--------|
+| **Level-Level** | $Y = \beta_0 + \beta_1 X$ | A 1-unit increase in $X$ → $\beta_1$-unit change in $Y$ | $wage = 2.1 + 0.54 \cdot educ$: one more year of education → \$0.54 higher wages |
+| **Log-Level** | $\ln(Y) = \beta_0 + \beta_1 X$ | A 1-unit increase in $X$ → $(100 \times \beta_1)$% change in $Y$ | $\ln(wage) = 0.58 + 0.083 \cdot educ$: one more year of education → ≈ 8.3% higher wages |
+| **Level-Log** | $Y = \beta_0 + \beta_1 \ln(X)$ | A 1% increase in $X$ → $\beta_1 / 100$ unit change in $Y$ | $bwght = 116.1 + 2.47 \cdot \ln(faminc)$: 1% higher income → 0.025 oz higher birthweight |
+| **Log-Log** | $\ln(Y) = \beta_0 + \beta_1 \ln(X)$ | A 1% increase in $X$ → $\beta_1$% change in $Y$ (elasticity) | $\ln(wage) = -0.02 + 0.83 \cdot \ln(educ)$: 1% more education → ≈ 0.83% higher wages |
+| **Quadratic** | $Y = \beta_0 + \beta_1 X + \beta_2 X^2$ | Marginal effect is $\beta_1 + 2\beta_2 X$ (depends on $X$) | $wage = 3.73 + 0.30 \cdot exper - 0.006 \cdot exper^2$: at 10 yrs → +\$0.18; at 30 yrs → −\$0.06 |
+| **Dummy** | $Y = \beta_0 + \beta_1 D$ | Difference in $Y$ between $D=1$ group and baseline | $score = 24.5 + 5.8 \cdot calculus$: calculus-takers score 5.8 pts higher |
+| **Dummy in Log** | $\ln(Y) = \beta_0 + \beta_1 D$ | $D=1$ group has ≈ $(100 \times \beta_1)$% different $Y$. Exact: $100(e^{\beta_1}-1)$% | $\ln(wage) = 1.0 - 0.15 \cdot female$: women earn ≈ 15% less (exact: −13.9%) |
+
+: Functional Form Interpretation Guide {#tbl-functional-forms}
+
+::: {.callout-tip}
+## How to Use This Table
+When you encounter a regression in a paper or problem set,
+the first thing to check is:
+**is the dependent variable logged? Is the independent variable logged?**
+Your answers determine which row of the table applies.
+Then use the interpretation column to state the result in plain English.
+:::
 
 
 ## Summary
@@ -634,11 +924,13 @@ With quadratic models,
 the marginal effect of $x$ on $y$ depends on the current level of $x$,
 allowing us to model relationships that increase and then decrease (or vice versa).
 
-**Logarithmic transformations** change the interpretation of coefficients:
-log-linear models give percentage changes,
-linear-log models give the effect of percentage changes,
-and log-log models give elasticities.
+**Logarithmic transformations** change the interpretation of coefficients.
+The key insight is that a change in a logged variable approximates a proportional (percentage) change.
+Log-linear models give the percentage change in $Y$ for a one-unit change in $X$;
+linear-log models give the unit change in $Y$ for a one-percent change in $X$;
+and log-log models give elasticities---the percentage change in $Y$ for a one-percent change in $X$.
 These transformations are especially useful when dealing with variables like wages or prices that are right-skewed and where percentage changes are more meaningful than absolute changes.
+See @tbl-functional-forms for a complete reference.
 
 
 ## Check Your Understanding
@@ -674,7 +966,7 @@ The dropdown will turn green if correct and red if incorrect.
 </div>
 
 <div class="answer-row">
-    <label>iii. In the model log(wage) = β₀ + β₁(exper) + β₂(exper²), what does a negative β₂ imply? </label>
+    <label>iii. In the model wage = β₀ + β₁(exper) + β₂(exper²), what does a negative β₂ imply? </label>
     <select onchange="checkAnswer(this, 'a')">
         <option value="">-- Select Answer --</option>
         <option value="a">The wage-experience relationship is concave (wages increase at a decreasing rate, then may decline)</option>
@@ -707,7 +999,7 @@ The dropdown will turn green if correct and red if incorrect.
 </div>
 
 <div class="answer-row">
-    <label>vi. <strong>(Challenge)</strong> In the quadratic model log(wage) = 1.2 + 0.04(exper) - 0.0008(exper²), at what experience level are wages maximized? </label>
+    <label>vi. <strong>(Challenge)</strong> In the quadratic model wage = 3.5 + 0.30(exper) - 0.006(exper²), at what experience level are wages maximized? </label>
     <select onchange="checkAnswer(this, 'c')">
         <option value="">-- Select Answer --</option>
         <option value="a">10 years</option>
@@ -733,7 +1025,7 @@ iv. In a log-log model, both variables are in logs, so the coefficient is an ela
 
 v. Changing the baseline category changes how the dummy coefficients are interpreted (they become relative to a different group), but it doesn't affect coefficients on other variables in the model. The model's predictions and fit remain identical.
 
-vi. The experience level that maximizes wages is found by setting the derivative equal to zero: 0.04 + 2(-0.0008)(exper) = 0. Solving: exper = 0.04/(2 × 0.0008) = 0.04/0.0016 = 25 years.
+vi. The experience level that maximizes wages is found by setting the derivative equal to zero: 0.30 + 2(-0.006)(exper) = 0. Solving: exper = 0.30/(2 × 0.006) = 0.30/0.012 = 25 years.
 
 :::
 
