@@ -1,4 +1,4 @@
-# Interaction Effects {#sec-interactions}
+# Binary Outcomes {#sec-binary-outcomes}
 
 ```{r}
 #| echo: false
@@ -101,425 +101,1133 @@ function checkAnswer(selectElement, correctValue) {
 
 ::: {.callout-tip collapse="true"}
 ## **Key Questions**
-- What happens when the effect of one variable depends on the value of another?
-- How do we include and interpret interaction terms in regression?
-- What's the difference between interacting two dummy variables versus a dummy and a continuous variable?
-- How do interactions allow for different slopes across groups?
+- What happens when our dependent variable is binary (0 or 1) rather than continuous?
+- How do we interpret OLS coefficients in the linear probability model?
+- What problems arise when we use OLS with a binary outcome?
+- What is logistic regression and how does it differ from OLS?
+- How do we interpret logistic regression coefficients using log-odds, odds ratios, and marginal effects?
+- When should we use the LPM versus logistic regression?
 :::
 
 ::: {.callout-note collapse="true"}
 ## **Suggested Readings**
-- @wooldridge_introductory_2019, Ch. 7.4
-- @bailey_real_2020, Ch. 5.4
+- @wooldridge_introductory_2019, Ch. 7.5, 17.1
+- @bailey_real_2020, Ch. 12
 :::
 
 
-In the previous chapter,
-we saw how dummy variables allow different groups to have different intercepts---the regression lines for different groups are parallel but shifted up or down.
-But what if the *effect* of a variable differs across groups?
-What if the returns to education are higher for men than for women,
-or the effect of experience on wages depends on whether someone has a college degree?
+Up until now,
+all of our dependent variables have been **quantitative** outcomes:
+wages,
+prices,
+birthweight,
+exam scores,
+and so on.
+But many important questions in economics---and especially in health economics and policy evaluation---involve **qualitative** outcomes.
+Did a patient survive?
+Did a worker find a job?
+Did a student graduate?
+Did a family enroll in a public program?
 
-**Interaction terms** allow us to model these situations.
-When we include an interaction between two variables,
-we allow the effect of one variable to depend on the value of another.
+In the simplest case,
+we can represent these outcomes as **binary variables** that take the value 1 if the event occurred and 0 otherwise.
+This chapter explores how to model binary outcomes using regression,
+starting with the straightforward linear probability model
+and then introducing logistic regression as an alternative.
 
 
-## Why Interactions Matter
+## From Continuous to Binary Outcomes
 
-Consider the gender wage gap.
-We might estimate:
+To make the shift from continuous to binary outcomes concrete,
+let's look at some data.
+The `mroz` dataset in the `wooldridge` package contains information on 753 married women in 1975.
+The variable `inlf` equals 1 if a woman is in the labor force and 0 otherwise.
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| label: fig-binary-dist
+#| fig-cap: "The distribution of a binary outcome: women's labor force participation. Unlike a continuous variable, the outcome can only take two values."
+
+lf_data <- wooldridge::mroz
+
+ggplot(lf_data, aes(x = factor(inlf), fill = factor(inlf))) +
+    geom_bar(width = 0.5) +
+    geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.5, size = 4.5) +
+    scale_fill_manual(values = c("0" = "#D55E00", "1" = "#0072B2"),
+                      labels = c("Not in LF", "In LF")) +
+    scale_x_discrete(labels = c("0" = "Not in Labor Force (y = 0)",
+                                "1" = "In Labor Force (y = 1)")) +
+    labs(x = NULL,
+         y = "Number of Women",
+         title = "Labor Force Participation Among Married Women (1975)") +
+    theme_minimal() +
+    theme(legend.position = "none",
+          plot.title = element_text(hjust = 0.5))
+```
+
+As @fig-binary-dist shows,
+about 57% of the women in the sample are in the labor force and 43% are not.
+This is fundamentally different from the continuous outcomes we have worked with before.
+There are no "in-between" values---a woman is either in the labor force or she isn't.
+
+So what happens if we try to use OLS to model this outcome?
+The answer leads us to the **linear probability model**.
+
+
+## The Linear Probability Model
+
+### Why $E(y | \mathbf{x}) = P(y = 1 | \mathbf{x})$
+
+When our dependent variable $y$ is binary,
+something interesting happens to the standard OLS regression.
+Consider the model:
 
 $$
-\ln(wage) = \beta_0 + \beta_1(female) + \beta_2(educ) + \mu
+y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots + \beta_k x_k + \mu
 $$
 
-This model assumes that the effect of education on wages ($\beta_2$) is the same for men and women.
-The only difference is the intercept---women's wage line is shifted down by $\beta_1$.
-
-But what if education has different effects for men and women?
-Perhaps discrimination means women receive lower returns to their education,
-or perhaps women are overrepresented in fields where education is particularly valuable.
-To test this,
-we need to allow the *slope* on education to differ by gender.
-
-This is exactly what interaction terms do.
-
-
-## Interactions Between Two Dummy Variables
-
-Let's start with the simplest case:
-interacting two dummy variables.
-Suppose we want to understand how being female and being married jointly affect wages.
-
-We create an **interaction term** by multiplying the two dummy variables:
+Recall that in OLS,
+the predicted value $\hat{y}$ estimates the conditional expectation $E(y | \mathbf{x})$.
+When $y$ can only be 0 or 1,
+this conditional expectation has a special meaning.
+By the definition of expected value:
 
 $$
-\ln(wage) = \beta_0 + \beta_1(female) + \beta_2(married) + \beta_3(female \times married) + \mu
+E(y | \mathbf{x}) = 1 \times P(y = 1 | \mathbf{x}) + 0 \times P(y = 0 | \mathbf{x}) = P(y = 1 | \mathbf{x})
 $$
 
-The interaction term $female \times married$ equals 1 only for married women and 0 for everyone else.
+In other words,
+the predicted value from our regression is the **probability** that the event occurs,
+given the values of the explanatory variables.
+This is a powerful result:
+even though we're running plain OLS,
+the output has a probabilistic interpretation.
+
+This means we cannot interpret $\beta_j$ in the usual way---as the change in $y$ when $x_j$ increases by one unit---because $y$ doesn't change continuously.
+Instead,
+we interpret $\beta_j$ as the change in the **probability** that $y = 1$ when $x_j$ increases by one unit,
+holding all other variables constant.
+
+This is why OLS applied to a binary outcome is called the **linear probability model** (LPM).
+
+::: {.callout-note}
+## The LPM Interpretation Rule
+In the linear probability model,
+$\hat{\beta}_j$ tells us the **change in probability** (not percentage change!) of the event occurring for a one-unit increase in $x_j$.
+If $\hat{\beta}_j = -0.15$,
+the probability decreases by 0.15,
+or equivalently by 15 **percentage points**.
+Be careful with language:
+"15 percentage points" and "15 percent" are not the same thing!
+:::
+
+
+## LPM Example: Women's Labor Force Participation
+
+To see how the LPM works in practice,
+let's examine a classic question in labor economics:
+what factors affect whether married women participate in the labor force?
+
+We estimate the following model:
+
+$$
+inlf = \beta_0 + \beta_1(kidslt6) + \beta_2(kidsge6) + \beta_3(nwifeinc) + \beta_4(motheduc) + \mu
+$$
+
+where `kidslt6` is the number of children under age 6,
+`kidsge6` is the number of children aged 6--18,
+`nwifeinc` is the wife's non-labor income (in thousands of dollars),
+and `motheduc` is the mother's years of education.
+
+Before estimating the model,
+let's visualize the raw relationship between our key variable of interest---young children---and labor force participation:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| label: fig-raw-relationship
+#| fig-cap: "Women with more young children are less likely to participate in the labor force. Each bar shows the share of women in each group who are working."
+
+lf_data |>
+    group_by(kidslt6) |>
+    summarise(pct_inlf = mean(inlf),
+              n = n()) |>
+    ggplot(aes(x = factor(kidslt6), y = pct_inlf)) +
+    geom_col(fill = "#0072B2", width = 0.5) +
+    geom_text(aes(label = paste0(round(pct_inlf * 100, 1), "%\n(n=", n, ")")),
+              vjust = -0.3, size = 3.5) +
+    scale_y_continuous(labels = scales::percent_format(), limits = c(0, 0.8)) +
+    labs(x = "Number of Children Under Age 6",
+         y = "Share in Labor Force",
+         title = "Labor Force Participation by Number of Young Children") +
+    theme_minimal() +
+    theme(plot.title = element_text(hjust = 0.5))
+```
+
+@fig-raw-relationship makes the pattern clear even before we run any regressions:
+women with no young children have the highest labor force participation rate,
+and the rate drops sharply with each additional young child.
+Now let's see what OLS tells us after controlling for other factors:
 
 ```{r}
 #| echo: true
 #| message: false
 #| warning: false
 
-wage_data <- wooldridge::wage1 |> 
-    mutate(female_married = female * married)
-
-lm1 <- lm(log(wage) ~ female + married + female_married, data = wage_data)
-summary(lm1)
+reg <- lm(inlf ~ kidslt6 + kidsge6 + nwifeinc + motheduc, data = lf_data)
+summary(reg)
 ```
 
-### Interpreting the Interaction
+### Interpreting the LPM Coefficients
 
-To understand what each coefficient means,
-let's work through the predicted wages for each group:
+Let's walk through each coefficient carefully.
 
-| Group | female | married | female × married | Predicted ln(wage) |
-|:------|:------:|:-------:|:----------------:|:-------------------|
-| Unmarried men | 0 | 0 | 0 | $\beta_0$ |
-| Unmarried women | 1 | 0 | 0 | $\beta_0 + \beta_1$ |
-| Married men | 0 | 1 | 0 | $\beta_0 + \beta_2$ |
-| Married women | 1 | 1 | 1 | $\beta_0 + \beta_1 + \beta_2 + \beta_3$ |
+The coefficient on `kidslt6` ($\hat{\beta}_1 \approx -0.21$) tells us that each additional child under age 6 **decreases the probability** of being in the labor force by about 21 percentage points,
+holding all else constant.
+This is a large and statistically significant effect.
+To put this in perspective,
+going from 0 to 1 young child reduces the predicted probability of working by roughly one-fifth.
 
-From our estimates:
+The coefficient on `kidsge6` ($\hat{\beta}_2 \approx 0.01$) suggests that children aged 6 and older have essentially no effect on labor force participation---the coefficient is small and not statistically significant.
+This makes intuitive sense:
+school-age children require less constant supervision than young children,
+so they impose fewer constraints on a mother's ability to work outside the home.
 
-- **Unmarried men** (baseline): $\ln(wage) = 1.57$
-- **Unmarried women**: The coefficient on `female` ($\hat{\beta}_1 \approx -0.13$) tells us unmarried women earn about 13% less than unmarried men.
-- **Married men**: The coefficient on `married` ($\hat{\beta}_2 \approx 0.42$) tells us married men earn about 42% more than unmarried men---a large "marriage premium."
-- **Married women**: We need to add all applicable coefficients: $-0.13 + 0.42 + (-0.38) = -0.09$, so married women earn about 9% less than unmarried men.
+The coefficient on `nwifeinc` ($\hat{\beta}_3 \approx -0.005$) indicates that higher non-labor income is associated with a slightly lower probability of working.
+Each additional thousand dollars of non-labor income reduces the probability by about half a percentage point.
+This is consistent with basic labor supply theory:
+when a household has more non-labor income (e.g., from a higher-earning husband),
+the wife has less financial pressure to enter the labor force.
 
-::: {.callout-important}
-## The Interaction Effect
-The coefficient on the interaction term ($\hat{\beta}_3 \approx -0.38$) tells us that the marriage premium is **different** for women than for men.
-While married men earn 42% more than unmarried men,
-the marriage "premium" for women is only $0.42 + (-0.38) = 0.04$,
-or about 4%---much smaller.
-
-Equivalently,
-the gender wage gap is larger for married workers than for unmarried workers.
-:::
+The coefficient on `motheduc` ($\hat{\beta}_4 \approx 0.02$) suggests that women whose mothers had more education are slightly more likely to participate in the labor force.
+Each additional year of the mother's education is associated with about a 2 percentage point increase in the probability of working.
 
 
-## Interactions Between Dummies and Continuous Variables
+## Problems with the Linear Probability Model
 
-Perhaps more powerful is interacting a dummy variable with a continuous variable.
-This allows the **slope**---not just the intercept---to differ across groups.
+While the LPM is simple and intuitive,
+it has some important drawbacks that we need to understand.
 
-Suppose we want to test whether men and women have different returns to education:
+### Problem 1: Predictions Outside [0, 1]
 
-$$
-\ln(wage) = \beta_0 + \beta_1(female) + \beta_2(educ) + \beta_3(female \times educ) + \mu
-$$
+The most obvious problem is that the LPM can produce predicted probabilities that are **less than 0 or greater than 1**.
+Since probabilities must lie between 0 and 1,
+this is nonsensical.
 
-The interaction term $female \times educ$ equals 0 for all men (since $female = 0$) and equals the education level for women.
+To see why this happens,
+recall that the LPM is just a straight line.
+A straight line extends infinitely in both directions,
+so for extreme enough values of $x$,
+the predicted value will inevitably cross the 0 or 1 boundary.
+
+Let's see this concretely.
+Consider a woman with 2 children under 6,
+0 older children,
+non-labor income of $30{,}000$,
+and a mother with 9 years of education.
+Using our estimates,
+her predicted probability of being in the labor force is:
 
 ```{r}
 #| echo: true
 #| message: false
 #| warning: false
 
-wage_data <- wooldridge::wage1 |> 
-    mutate(female_educ = female * educ)
-
-lm2 <- lm(log(wage) ~ female + educ + female_educ, data = wage_data)
-summary(lm2)
+# Predicted probability for a specific woman
+example_pred <- predict(reg, newdata = data.frame(
+    kidslt6 = 2, kidsge6 = 0, nwifeinc = 30, motheduc = 9
+))
+cat("Predicted probability:", round(example_pred, 4), "\n")
 ```
 
-### Different Slopes for Different Groups
+A *negative* probability---obviously impossible!
 
-Let's write out the predicted wage equations for each group:
+We can see how widespread this problem is by looking at the full distribution of predicted probabilities from our model:
 
-**For men** ($female = 0$):
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| label: fig-lpm-oob
+#| fig-cap: "Distribution of LPM predicted probabilities. The dashed red lines mark the valid [0, 1] range. Some predictions fall below zero."
+
+lf_data <- lf_data |>
+    mutate(pred = predict(reg, type = "response"))
+
+ggplot(data = lf_data, aes(x = pred)) +
+    geom_histogram(binwidth = 0.05, fill = "#0072B2", color = "white", alpha = 0.8) +
+    geom_vline(xintercept = 0, linetype = "dashed", color = "red", linewidth = 0.8) +
+    geom_vline(xintercept = 1, linetype = "dashed", color = "red", linewidth = 0.8) +
+    labs(x = "Predicted Probability (LPM)",
+         y = "Number of Observations",
+         title = "Distribution of LPM Predicted Probabilities") +
+    theme_minimal() +
+    theme(plot.title = element_text(hjust = 0.5))
+```
+
+We can also see this by plotting the predicted probabilities against the number of young children:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| label: fig-lpm-scatter
+#| fig-cap: "LPM predicted probabilities by number of young children. Some predictions fall below zero, violating the basic rules of probability."
+
+ggplot(data = lf_data) +
+    geom_jitter(aes(x = kidslt6, y = pred), alpha = 0.3, width = 0.15, color = "#0072B2") +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "red", linewidth = 0.8) +
+    geom_hline(yintercept = 1, linetype = "dashed", color = "red", linewidth = 0.8) +
+    annotate("rect", xmin = -0.5, xmax = 3.5, ymin = -0.35, ymax = 0,
+             alpha = 0.15, fill = "red") +
+    annotate("text", x = 2.8, y = -0.15, label = "Impossible\nregion",
+             color = "red", fontface = "italic", size = 3.5) +
+    coord_cartesian(ylim = c(-0.35, 1.1)) +
+    labs(x = "Number of Children Under Age 6",
+         y = "Predicted Probability of Labor Force Participation") +
+    theme_minimal()
+```
+
+As @fig-lpm-scatter shows,
+some predicted probabilities fall below zero---particularly for women with multiple young children.
+The LPM simply cannot respect the fact that probabilities are bounded.
+
+### Problem 2: Heteroskedasticity
+
+A second,
+more subtle problem is that the LPM **always** exhibits **heteroskedasticity**.
+Recall that one of the Gauss-Markov assumptions (GM5) requires that the variance of the error term be constant across observations.
+When $y$ is binary,
+this assumption is necessarily violated.
+
+To see why,
+think about what the error term looks like in the LPM.
+When $y$ is 0 or 1,
+the error $\mu = y - E(y|\mathbf{x})$ can only take two possible values for any given $\mathbf{x}$:
+
+- If $y = 1$: $\mu = 1 - p(\mathbf{x})$, which happens with probability $p(\mathbf{x})$
+- If $y = 0$: $\mu = 0 - p(\mathbf{x}) = -p(\mathbf{x})$, which happens with probability $1 - p(\mathbf{x})$
+
+where $p(\mathbf{x}) = E(y|\mathbf{x})$ is the predicted probability.
+The variance of this error is:
+
 $$
-\ln(wage) = \beta_0 + \beta_2(educ) = 0.389 + 0.082(educ)
+\text{Var}(\mu | \mathbf{x}) = p(\mathbf{x}) \times (1 - p(\mathbf{x}))
 $$
 
-**For women** ($female = 1$):
-$$
-\ln(wage) = (\beta_0 + \beta_1) + (\beta_2 + \beta_3)(educ) = (0.389 - 0.227) + (0.082 + 0.006)(educ)
-$$
-$$
-= 0.162 + 0.088(educ)
-$$
+This variance depends on $p(\mathbf{x})$,
+which depends on $\mathbf{x}$.
+The variance is largest when $p = 0.5$ (maximum uncertainty about the outcome) and smallest when $p$ is near 0 or 1 (the outcome is nearly certain).
 
-Now we can see:
-
-- **Men** start with a higher intercept (0.389 vs 0.162)
-- **Women** have a slightly higher return to education (8.8% vs 8.2% per year)
-
-The interaction coefficient ($\hat{\beta}_3 \approx 0.006$) is not statistically significant here,
-suggesting we cannot reject that men and women have the same returns to education.
-But the approach illustrates how interactions allow different slopes.
+Let's visualize this:
 
 ```{r}
 #| echo: false
 #| message: false
 #| warning: false
-#| label: fig-interaction-slopes
-#| fig-cap: "With an interaction term, men and women can have different slopes (returns to education), not just different intercepts."
+#| label: fig-heterosk
+#| fig-cap: "The variance of the error term in a binary outcome model depends on the predicted probability. Variance is maximized at p = 0.5 and falls toward zero as p approaches 0 or 1."
 
-# Calculate predictions
-wage_data <- wage_data |> 
-    mutate(pred_men = 0.389 + 0.082 * educ,
-           pred_women = 0.162 + 0.088 * educ)
+p_seq <- seq(0.01, 0.99, by = 0.01)
+var_seq <- p_seq * (1 - p_seq)
 
-# Reshape to long format
-wage_data_long <- wage_data |>
-    select(educ, pred_men, pred_women) |> 
-    pivot_longer(
-        cols = c(pred_men, pred_women),
-        names_to = "gender",
-        values_to = "predicted_wage"
-    )
-
-# Create the plot
-ggplot(wage_data_long, aes(x = educ, y = predicted_wage, color = gender)) +
-    geom_line(linewidth = 1) +
-    labs(
-        title = "Effect of Education on Log Wages by Gender",
-        x = "Years of Education",
-        y = "Predicted Log Wage",
-        color = "Gender"
-    ) +
-    scale_color_manual(
-        labels = c("Men", "Women"),
-        values = c("pred_men" = "#0072B2", "pred_women" = "#D55E00")
-    ) +
+ggplot(data.frame(p = p_seq, variance = var_seq), aes(x = p, y = variance)) +
+    geom_line(color = "#0072B2", linewidth = 1.2) +
+    geom_vline(xintercept = 0.5, linetype = "dashed", color = "gray50") +
+    geom_point(data = data.frame(p = 0.5, variance = 0.25),
+               aes(x = p, y = variance), color = "#D55E00", size = 3) +
+    annotate("text", x = 0.55, y = 0.255, label = "Max variance\nat p = 0.5",
+             hjust = 0, color = "#D55E00", size = 3.5) +
+    labs(x = "Predicted Probability p(x)",
+         y = "Var(error) = p(1 - p)",
+         title = "Error Variance in the Linear Probability Model") +
     theme_minimal() +
-    theme(legend.position = "bottom")
+    theme(plot.title = element_text(hjust = 0.5))
 ```
 
-::: {.callout-note}
-## Dummy Variables vs. Interactions: A Summary
-- **Dummy variable alone**: Different intercepts, same slopes (parallel lines)
-- **Interaction with continuous variable**: Different intercepts AND different slopes
+Because of this built-in heteroskedasticity,
+the OLS estimator in the LPM is **not BLUE**---it is unbiased,
+but not the most efficient linear estimator.
+The practical consequence is that our standard errors will be incorrect unless we use **robust standard errors**,
+as we discussed in the chapter on heteroskedasticity.
+
+::: {.callout-important}
+## LPM: Use with Caution
+Despite these problems,
+the LPM remains widely used in economics because of its simplicity and because the coefficient estimates are often very similar to those from more sophisticated models.
+The key is to be aware of its limitations:
+always use robust standard errors to address heteroskedasticity,
+and be cautious about interpreting predicted probabilities near the boundaries.
 :::
 
 
-## Computing Effects with Interactions
+## An Alternative: Logistic Regression
 
-When interactions are present,
-computing the effect of a variable requires care.
-The effect of one variable depends on the value of the other variable in the interaction.
+Given the issues with the LPM,
+researchers sometimes turn to alternative estimators that are specifically designed for binary outcomes.
+The most common of these is the **logit** (or **logistic regression**) model.
 
-From our model:
-$$
-\ln(wage) = \beta_0 + \beta_1(female) + \beta_2(educ) + \beta_3(female \times educ)
-$$
-
-The effect of education on wages is:
-$$
-\frac{\partial \ln(wage)}{\partial educ} = \beta_2 + \beta_3(female)
-$$
-
-- For men ($female = 0$): Effect = $\beta_2 = 0.082$ (8.2% per year)
-- For women ($female = 1$): Effect = $\beta_2 + \beta_3 = 0.082 + 0.006 = 0.088$ (8.8% per year)
-
-Similarly,
-the effect of being female depends on education level:
-$$
-\frac{\partial \ln(wage)}{\partial female} = \beta_1 + \beta_3(educ)
-$$
-
-At 12 years of education: Effect = $-0.227 + 0.006(12) = -0.155$ (-15.5%)
-
-At 16 years of education: Effect = $-0.227 + 0.006(16) = -0.131$ (-13.1%)
-
-The gender wage gap **narrows** as education increases (though the interaction isn't statistically significant in this example).
-
-
-## Interactions Between Two Continuous Variables
-
-We can also interact two continuous variables.
-For example,
-perhaps the effect of experience on wages depends on education level---more educated workers might have steeper experience-wage profiles because they're in careers with more room for advancement.
+The key idea is to replace the linear function with a non-linear function that is guaranteed to produce predictions between 0 and 1.
+Instead of modeling the probability directly as a linear function of $\mathbf{x}$,
+we write:
 
 $$
-\ln(wage) = \beta_0 + \beta_1(educ) + \beta_2(exper) + \beta_3(educ \times exper) + \mu
+P(y = 1 | \mathbf{x}) = G(\beta_0 + \beta_1 x_1 + \cdots + \beta_k x_k)
 $$
+
+where $G(\cdot)$ is a function that maps any real number into the interval $(0, 1)$.
+
+
+### The Logistic Function
+
+In logit regression,
+we specifically define $G(\cdot)$ to be the **logistic function**:
+
+$$
+G(z) = \frac{\exp(z)}{1 + \exp(z)}
+$$
+
+This function has an S-shaped (sigmoid) curve that is worth studying carefully:
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-logistic-function
+#| fig-cap: "The logistic function maps any real number to the (0, 1) interval. It is nearly linear in the middle but curves at the extremes, ensuring predicted probabilities always stay between 0 and 1."
+
+z_seq <- seq(-6, 6, by = 0.1)
+g_seq <- plogis(z_seq)
+
+ggplot(data.frame(z = z_seq, G = g_seq), aes(x = z, y = G)) +
+    geom_line(color = "#0072B2", linewidth = 1.2) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "gray70") +
+    geom_hline(yintercept = 1, linetype = "dashed", color = "gray70") +
+    geom_hline(yintercept = 0.5, linetype = "dotted", color = "gray50") +
+    geom_point(data = data.frame(z = 0, G = 0.5),
+               aes(x = z, y = G), color = "#D55E00", size = 3) +
+    annotate("text", x = 0.5, y = 0.53, label = "G(0) = 0.5",
+             hjust = 0, color = "#D55E00", size = 3.5) +
+    annotate("segment", x = -6, xend = -3.5, y = 0.05, yend = 0.05,
+             arrow = arrow(length = unit(0.2, "cm")), color = "gray50") +
+    annotate("text", x = -4.8, y = 0.12, label = "Approaches 0\nbut never reaches it",
+             color = "gray40", size = 3, fontface = "italic") +
+    annotate("segment", x = 6, xend = 3.5, y = 0.95, yend = 0.95,
+             arrow = arrow(length = unit(0.2, "cm")), color = "gray50") +
+    annotate("text", x = 4.8, y = 0.88, label = "Approaches 1\nbut never reaches it",
+             color = "gray40", size = 3, fontface = "italic") +
+    labs(x = "z (the linear predictor)",
+         y = "G(z) = exp(z) / (1 + exp(z))",
+         title = "The Logistic (Sigmoid) Function") +
+    theme_minimal() +
+    theme(plot.title = element_text(hjust = 0.5))
+```
+
+Several features of @fig-logistic-function are worth noting.
+When $z$ is very negative,
+$G(z)$ is close to 0;
+when $z$ is very positive,
+$G(z)$ is close to 1;
+and at $z = 0$,
+$G(z) = 0.5$.
+Crucially,
+$G(z)$ is **strictly** between 0 and 1 for all values of $z$---so the logit model can never produce impossible predicted probabilities.
+
+Notice also that the logistic function is **nearly linear in the middle** of its range (roughly between $z = -2$ and $z = 2$) but curves toward the boundaries at the extremes.
+This will be important later when we compare the LPM and logit results.
+
+### Comparing the LPM and Logit Visually
+
+To build intuition for why the logistic function matters,
+let's compare what the LPM and logit model look like when fit to the same data.
+Using our full model with all four explanatory variables,
+we can compute a single "index" for each woman---the linear combination $\hat{\beta}_0 + \hat{\beta}_1 x_1 + \cdots + \hat{\beta}_k x_k$---and then plot how each model translates that index into a predicted probability.
+This is the clearest way to see the difference between the two approaches:
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-lpm-vs-logit-fit
+#| fig-cap: "The LPM (blue, dashed) predicts probability as a straight line that can exceed [0, 1]. The logit (orange, solid) wraps the same linear index through the S-shaped logistic function, keeping predictions in bounds. Each gray point is one woman in the data, plotted at y = 0 or y = 1."
+
+# Estimate the logit model here so it's available for the figure
+# (it will also be shown to students in the "Estimating Logistic Regression in R" section)
+logit_reg <- glm(inlf ~ kidslt6 + kidsge6 + nwifeinc + motheduc,
+    family = binomial(link = "logit"),
+    data = lf_data)
+
+# Compute the linear index from the logit model for each observation
+lf_data <- lf_data |>
+    mutate(linear_index = predict(logit_reg, type = "link"))
+
+# Create a smooth grid over the range of the linear index
+index_grid <- data.frame(
+    linear_index = seq(min(lf_data$linear_index) - 1,
+                       max(lf_data$linear_index) + 1,
+                       by = 0.05)
+)
+
+# Logit: apply the logistic function to the index
+index_grid$logit_pred <- plogis(index_grid$linear_index)
+
+# LPM: fit a linear relationship between the logit index and LPM predictions
+# This shows how LPM would map the same index to a straight line
+lpm_on_index <- lm(pred ~ linear_index, data = lf_data)
+index_grid$lpm_pred <- predict(lpm_on_index, newdata = index_grid)
+
+pred_long <- index_grid |>
+    pivot_longer(cols = c(lpm_pred, logit_pred),
+                 names_to = "model",
+                 values_to = "predicted")
+
+ggplot() +
+    geom_jitter(data = lf_data, aes(x = linear_index, y = inlf),
+                alpha = 0.12, height = 0.03, color = "gray50", size = 0.8) +
+    geom_line(data = pred_long |> filter(model == "lpm_pred"),
+              aes(x = linear_index, y = predicted, color = "LPM"),
+              linewidth = 1, linetype = "dashed") +
+    geom_line(data = pred_long |> filter(model == "logit_pred"),
+              aes(x = linear_index, y = predicted, color = "Logit"),
+              linewidth = 1) +
+    geom_hline(yintercept = 0, linetype = "dotted", color = "red", alpha = 0.5) +
+    geom_hline(yintercept = 1, linetype = "dotted", color = "red", alpha = 0.5) +
+    scale_color_manual(values = c("LPM" = "#0072B2", "Logit" = "#D55E00")) +
+    coord_cartesian(ylim = c(-0.3, 1.3)) +
+    labs(x = expression("Linear Index (" * hat(beta)[0] + hat(beta)[1]*x[1] + cdots + hat(beta)[k]*x[k] * ")"),
+         y = "Predicted Probability",
+         color = "Model",
+         title = "LPM vs. Logit: How Each Model Maps the Index to a Probability") +
+    theme_minimal() +
+    theme(legend.position = "bottom",
+          plot.title = element_text(hjust = 0.5))
+```
+
+In @fig-lpm-vs-logit-fit,
+the gray points show the actual data---all at $y = 0$ or $y = 1$.
+The x-axis is the linear index,
+which combines all the explanatory variables into a single score for each woman.
+Women with low index values have characteristics that predict low labor force participation (e.g., many young children, high non-labor income);
+women with high index values have characteristics that predict high participation.
+
+The LPM maps this index to a predicted probability using a straight line,
+which inevitably extends beyond the [0, 1] bounds at the extremes.
+The logit wraps the same index through the S-shaped logistic function,
+keeping all predictions between 0 and 1.
+In the middle range---where most of the data sits---the two models agree closely.
+They diverge mainly at the tails,
+which is exactly where the LPM's out-of-bounds problem arises.
+
+
+### Maximum Likelihood Estimation
+
+How do we estimate the logit model if we can't use OLS?
+The answer is **Maximum Likelihood Estimation (MLE)**.
+The intuition behind MLE is straightforward,
+even if the mathematical details are complex.
+
+Think of it this way.
+For any set of $\beta$ coefficients,
+the logistic function gives us a predicted probability $\hat{p}_i$ for each observation $i$.
+If $y_i = 1$ (the event occurred),
+we want $\hat{p}_i$ to be high---close to 1.
+If $y_i = 0$ (the event did not occur),
+we want $\hat{p}_i$ to be low---close to 0.
+
+The **likelihood** is a measure of how well the model's predicted probabilities match the actual outcomes.
+MLE finds the set of $\beta$ coefficients that maximizes this likelihood---that is,
+the coefficients that make the observed data most probable.
+
+The process works iteratively:
+
+1. Start with initial guesses for the $\beta$ coefficients.
+2. Plug these $\beta$s into the logistic function to calculate predicted probabilities.
+3. Compute the total likelihood of observing the actual 0s and 1s given those predictions.
+4. Adjust the $\beta$s to increase the likelihood.
+5. Repeat until the likelihood can't be improved further.
+
+The details of how MLE works are beyond the scope of this course,
+but it is useful to know what is happening under the hood.
+The key takeaway is that MLE finds the coefficients that make the observed data most likely,
+rather than minimizing the sum of squared residuals like OLS does.
+
+::: {.callout-note}
+## OLS vs. MLE: Two Different Objectives
+OLS minimizes $\sum(y_i - \hat{y}_i)^2$---the sum of squared residuals.
+MLE maximizes the probability of observing the actual data given the model.
+For linear regression with normal errors,
+these two approaches give the same answer.
+For logistic regression,
+MLE is the appropriate method because the errors are not normal.
+:::
+
+
+## Estimating Logistic Regression in R
+
+Estimating logistic regression in R is straightforward.
+We use `glm()` (generalized linear model) instead of `lm()`,
+and specify `family = binomial(link = "logit")`:
 
 ```{r}
 #| echo: true
 #| message: false
 #| warning: false
 
-wage_data <- wooldridge::wage1 |> 
-    mutate(educ_exper = educ * exper)
+logit_reg <- glm(inlf ~ kidslt6 + kidsge6 + nwifeinc + motheduc,
+    family = binomial(link = "logit"),
+    data = lf_data)
 
-lm3 <- lm(log(wage) ~ educ + exper + educ_exper, data = wage_data)
-summary(lm3)
+summary(logit_reg)
 ```
 
-The interaction coefficient ($\hat{\beta}_3 \approx 0.0003$) is small but positive and marginally significant.
-This suggests that the returns to experience are slightly higher for more educated workers.
+Notice that the signs of the coefficients match the LPM:
+more young children reduce the probability of labor force participation,
+higher non-labor income reduces it,
+and more maternal education increases it.
+But the magnitudes look very different---the logit coefficients are not directly comparable to the LPM coefficients.
+We will discuss interpretation in detail below.
 
-The effect of experience is:
+
+### Comparing the Models Side by Side
+
+Let's put the LPM and logit results next to each other using `modelsummary`:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| label: tbl-lpm-logit
+#| tbl-cap: "Comparison of LPM and Logistic Regression estimates for women's labor force participation."
+
+models <- list(
+    "LPM (OLS)" = reg,
+    "Logit" = logit_reg
+)
+
+modelsummary(models,
+             stars = c('*' = 0.1, '**' = 0.05, '***' = 0.01),
+             gof_map = c("nobs", "r.squared", "logLik", "aic"),
+             title = "LPM vs. Logit: Women's Labor Force Participation")
+```
+
+The key things to notice in @tbl-lpm-logit are that the signs are the same across both models (both agree on the direction of each effect),
+but the magnitudes are different because the logit coefficients represent something different (changes in log-odds rather than changes in probability).
+
+
+### Predicted Probabilities Stay In Bounds
+
+A major advantage of the logit model is that its predicted probabilities are always between 0 and 1.
+Let's compare the distributions of predicted probabilities from both models:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| label: fig-pred-comparison
+#| fig-cap: "Comparing predicted probability distributions from the LPM (left) and logit (right) models. The LPM produces some predictions below 0, while the logit keeps all predictions within the valid range."
+
+lf_data <- lf_data |>
+    mutate(logit_pred = predict(logit_reg, type = "response"))
+
+pred_long <- lf_data |>
+    select(pred, logit_pred) |>
+    pivot_longer(cols = everything(),
+                 names_to = "model",
+                 values_to = "predicted") |>
+    mutate(model = case_when(
+        model == "pred" ~ "LPM (OLS)",
+        model == "logit_pred" ~ "Logit"
+    ))
+
+ggplot(pred_long, aes(x = predicted, fill = model)) +
+    geom_histogram(binwidth = 0.05, color = "white", alpha = 0.8) +
+    geom_vline(xintercept = 0, linetype = "dashed", color = "red", linewidth = 0.6) +
+    geom_vline(xintercept = 1, linetype = "dashed", color = "red", linewidth = 0.6) +
+    facet_wrap(~ model) +
+    scale_fill_manual(values = c("LPM (OLS)" = "#0072B2", "Logit" = "#D55E00")) +
+    labs(x = "Predicted Probability",
+         y = "Count") +
+    theme_minimal() +
+    theme(legend.position = "none",
+          strip.text = element_text(face = "bold", size = 12))
+```
+
+@fig-pred-comparison clearly shows the advantage of logistic regression:
+all predictions are squeezed into the valid [0, 1] range.
+
+
+## Interpreting Logistic Regression
+
+The biggest challenge with logistic regression is that the coefficients are **not directly interpretable** in the same way as OLS coefficients.
+In the LPM,
+a one-unit increase in $x_j$ changes the probability of $y = 1$ by exactly $\beta_j$ percentage points---always,
+regardless of where you start.
+In logistic regression,
+the relationship between $x$ and the probability is non-linear,
+so the effect of a one-unit change in $x$ depends on where you start.
+
+There are three common ways to interpret logit coefficients,
+each with different strengths.
+
+
+### Interpretation 1: Log-Odds
+
+Technically,
+the logit coefficients represent the change in the **log-odds** of the outcome.
+Let's unpack what this means.
+
+The **odds** of an event are defined as the probability of the event occurring divided by the probability of it not occurring:
+
 $$
-\frac{\partial \ln(wage)}{\partial exper} = \beta_2 + \beta_3(educ)
+\text{Odds} = \frac{P(y = 1)}{P(y = 0)} = \frac{P(y = 1)}{1 - P(y = 1)}
 $$
 
-For someone with 12 years of education: $0.019 + 0.0003(12) = 0.023$ (2.3% per year)
+For example,
+if the probability of being in the labor force is 0.75,
+the odds are $0.75 / 0.25 = 3$.
+We would say "the odds are 3 to 1 in favor of being in the labor force."
 
-For someone with 16 years of education: $0.019 + 0.0003(16) = 0.024$ (2.4% per year)
-
-
-## Application: Decomposing the Gender Wage Gap
-
-Economists have long sought to understand why women earn less than men on average.
-A classic approach uses regression with interactions to **decompose** the wage gap into:
-
-1. **Explained differences**: Gaps due to differences in education, experience, occupation, etc.
-2. **Unexplained differences**: Gaps that remain after controlling for observable characteristics (potentially reflecting discrimination)
-
-Consider a comprehensive model:
+The **log-odds** (also called the "logit") is simply the natural log of the odds:
 
 $$
-\ln(wage) = \beta_0 + \beta_1(female) + \sum_{j} \beta_j(HumanCapital_j) + \sum_{k} \beta_k(Occupation_k) + \mu
+\text{Log-odds} = \ln\left(\frac{P(y = 1)}{1 - P(y = 1)}\right)
 $$
 
-- The human capital variables (education, experience) capture differences in worker productivity
-- The occupation dummies capture sorting into different types of jobs
-- The coefficient $\beta_1$ on `female` represents the **unexplained** gap---the wage difference that remains after accounting for these factors
+In the logistic regression model,
+the log-odds is a linear function of the $x$ variables:
 
-Research by Blau and Kahn (2017) uses this approach with rich panel data.
-They find that while the raw gender wage gap has narrowed considerably since 1980,
-a substantial unexplained gap remains.
-Human capital differences explain less of the gap over time (as women have caught up in education and experience),
-but occupational and industry segregation continues to be important.
-
-
-## Best Practices for Using Interactions
-
-### Always Include Main Effects
-
-When including an interaction term,
-always include the main effects too:
-
-**Correct:**
 $$
-y = \beta_0 + \beta_1(A) + \beta_2(B) + \beta_3(A \times B)
+\ln\left(\frac{P(y = 1 | \mathbf{x})}{1 - P(y = 1 | \mathbf{x})}\right) = \beta_0 + \beta_1 x_1 + \cdots + \beta_k x_k
 $$
 
-**Incorrect:**
-$$
-y = \beta_0 + \beta_3(A \times B)
-$$
+So a one-unit increase in $x_j$ changes the log-odds by $\beta_j$.
+This is mathematically clean but not very intuitive---most people don't think in terms of log-odds.
 
-Omitting main effects forces the interaction to capture both the main effects and the interaction,
-leading to misleading coefficients.
+The main practical use of the log-odds interpretation is to determine **direction**:
+positive coefficients increase the probability of the event,
+and negative coefficients decrease it.
 
-### Center Continuous Variables
 
-When interacting continuous variables,
-centering them (subtracting the mean) can make coefficients more interpretable.
-After centering,
-the main effect coefficient gives the effect at the mean of the other variable,
-rather than at zero.
+### Interpretation 2: Odds Ratios
 
-### Test Whether Interactions Are Needed
+A more intuitive interpretation comes from exponentiating the coefficients.
+Since the log-odds changes by $\beta_j$ for a one-unit increase in $x_j$,
+the **odds** are multiplied by $\exp(\beta_j)$.
+This quantity $\exp(\beta_j)$ is called the **odds ratio**.
 
-Not every model needs interactions.
-Test whether the interaction coefficient is statistically significant before interpreting it substantively.
-You can also use F-tests to jointly test multiple interaction terms.
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| label: fig-odds-ratios
+#| fig-cap: "Odds ratios from the logistic regression. Values below 1 (to the left of the dashed line) decrease the odds of labor force participation; values above 1 increase them."
+
+or_data <- data.frame(
+    variable = c("Kids < 6", "Kids 6-18", "Non-wife Income", "Mother's Educ"),
+    odds_ratio = exp(coef(logit_reg)[-1]),
+    lower = exp(confint.default(logit_reg)[-1, 1]),
+    upper = exp(confint.default(logit_reg)[-1, 2])
+)
+
+ggplot(or_data, aes(x = odds_ratio, y = reorder(variable, odds_ratio))) +
+    geom_vline(xintercept = 1, linetype = "dashed", color = "gray50") +
+    geom_pointrange(aes(xmin = lower, xmax = upper), color = "#0072B2", size = 0.8) +
+    labs(x = "Odds Ratio (with 95% CI)",
+         y = NULL,
+         title = "Odds Ratios for Labor Force Participation") +
+    theme_minimal() +
+    theme(plot.title = element_text(hjust = 0.5))
+```
+
+@fig-odds-ratios shows the odds ratios with 95% confidence intervals.
+Here's how to read them:
+
+- **Kids < 6**: The odds ratio is about $\exp(-0.87) \approx 0.42$. Each additional child under 6 **multiplies** the odds of working by 0.42---reducing them by 58%. This is a large effect.
+- **Mother's Educ**: The odds ratio is about $\exp(0.10) \approx 1.10$. Each additional year of mother's education multiplies the odds of working by 1.10---increasing them by 10%.
+- If the confidence interval includes 1 (crosses the dashed line), the effect is not statistically significant.
+
+::: {.callout-note}
+## Understanding Odds Ratios
+An odds ratio of 1 means no effect. An odds ratio of 2 means the odds are doubled. An odds ratio of 0.5 means the odds are halved. Odds ratios are always positive---they can never be negative or zero.
+
+Be careful not to confuse odds ratios with probability ratios. An odds ratio of 2 does *not* mean the probability doubles. The relationship between odds and probability is non-linear.
+:::
+
+
+### Interpretation 3: Marginal Effects at the Mean
+
+The most practical way to compare logit estimates to LPM estimates is to compute **marginal effects**---the change in predicted probability for a one-unit change in $x$,
+evaluated at specific values of the other variables.
+The most common approach is to evaluate at the **mean** of all explanatory variables.
+
+Let's compute this for the effect of one additional young child:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# Create a hypothetical person with average values for all RHS variables
+mean_vals <- lf_data |>
+    summarise(across(all_of(c("kidslt6", "kidsge6", "nwifeinc", "motheduc")),
+    \(x) mean(x, na.rm = TRUE)
+    ))
+
+mean_vals <- mean_vals |>
+    slice(1) |>
+    unlist()
+mean_vals
+
+# Predicted probability at the mean
+log_pred_mean <- sum(c(1, mean_vals) * coefficients(logit_reg))
+prob_mean <- plogis(log_pred_mean)
+cat("Predicted probability at the mean:", round(prob_mean, 4), "\n")
+
+# Predicted probability with 1 more kid under 6
+mean_vals_1morekid <- mean_vals + c(1, 0, 0, 0)
+log_pred_1morekid <- sum(c(1, mean_vals_1morekid) * coefficients(logit_reg))
+prob_1morekid <- plogis(log_pred_1morekid)
+cat("Predicted probability with 1 more kid:", round(prob_1morekid, 4), "\n")
+
+# Marginal effect
+marginal_effect <- prob_1morekid - prob_mean
+cat("Marginal effect of 1 more kid (logit):", round(marginal_effect, 4), "\n")
+cat("LPM coefficient on kidslt6:", round(coef(reg)["kidslt6"], 4), "\n")
+```
+
+The marginal effect of one additional young child at the mean is approximately $-0.20$---very close to the LPM estimate of $-0.21$.
+This illustrates a common and important finding:
+for observations near the middle of the probability distribution,
+the LPM and logit model often give very similar results.
+
+But the marginal effect from the logit model **changes** depending on where you evaluate it.
+Let's see how the marginal effect of one more young child varies across the distribution:
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-marginal-effects
+#| fig-cap: "The marginal effect of one additional young child on labor force participation probability, computed at different values of non-wife income. Unlike the constant LPM effect (dashed line), the logit marginal effect varies---it is largest where the predicted probability is near 0.5."
+
+# Compute marginal effects at different values of nwifeinc
+nwifeinc_grid <- seq(0, 80, by = 1)
+me_data <- data.frame(nwifeinc = nwifeinc_grid)
+
+me_data$me_logit <- sapply(nwifeinc_grid, function(nwi) {
+    base <- c(1, mean(lf_data$kidslt6), mean(lf_data$kidsge6), nwi, mean(lf_data$motheduc))
+    plus1 <- c(1, mean(lf_data$kidslt6) + 1, mean(lf_data$kidsge6), nwi, mean(lf_data$motheduc))
+    plogis(sum(base * coef(logit_reg))) - plogis(sum(plus1 * coef(logit_reg)))
+})
+
+lpm_effect <- abs(coef(reg)["kidslt6"])
+
+ggplot(me_data, aes(x = nwifeinc, y = me_logit)) +
+    geom_line(aes(color = "Logit marginal effect"), linewidth = 1) +
+    geom_hline(aes(yintercept = lpm_effect, color = "LPM coefficient"),
+               linetype = "dashed", linewidth = 0.8) +
+    scale_color_manual(values = c("Logit marginal effect" = "#D55E00",
+                                  "LPM coefficient" = "#0072B2")) +
+    labs(x = "Non-Wife Income (thousands of $)",
+         y = "Decrease in P(in labor force)\nfrom 1 more young child",
+         color = NULL,
+         title = "Marginal Effect of One More Young Child") +
+    theme_minimal() +
+    theme(legend.position = "bottom",
+          plot.title = element_text(hjust = 0.5))
+```
+
+@fig-marginal-effects reveals a key property of the logit model:
+the marginal effect is not constant.
+The LPM assumes the same effect everywhere (the dashed line),
+but the logit marginal effect varies depending on the starting probability.
+The effect is largest when the predicted probability is near 0.5 (where the logistic curve is steepest) and smaller when the probability is near 0 or 1 (where the curve flattens out).
+
+::: {.callout-note}
+## The `plogis()` Function
+In R,
+the `plogis()` function converts log-odds to probabilities.
+It applies the logistic function: `plogis(z)` $= \exp(z) / (1 + \exp(z))$.
+This is the inverse of the `qlogis()` function,
+which converts probabilities to log-odds.
+:::
+
+
+## Application: Low Birthweight and Maternal Smoking
+
+To see binary outcome models in a health economics context,
+let's examine the relationship between maternal smoking and low birthweight.
+Using the `bwght` dataset from the `wooldridge` package,
+we define low birthweight as a birthweight below 88 ounces (approximately 2,500 grams---the standard clinical threshold):
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+bw_data <- wooldridge::bwght |>
+    mutate(low_bwght = ifelse(bwght < 88, 1, 0))
+
+cat("Prevalence of low birthweight:", round(mean(bw_data$low_bwght) * 100, 1), "%\n")
+```
+
+Now let's estimate both an LPM and a logit model:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| label: tbl-bwght-models
+#| tbl-cap: "LPM and Logit estimates for the probability of low birthweight."
+
+lpm_bw <- lm(low_bwght ~ cigs + faminc + motheduc + male, data = bw_data)
+
+logit_bw <- glm(low_bwght ~ cigs + faminc + motheduc + male,
+                family = binomial(link = "logit"),
+                data = bw_data)
+
+models_bw <- list("LPM" = lpm_bw, "Logit" = logit_bw)
+modelsummary(models_bw,
+             stars = c('*' = 0.1, '**' = 0.05, '***' = 0.01),
+             gof_map = c("nobs", "r.squared", "logLik", "aic"),
+             title = "Determinants of Low Birthweight")
+```
+
+The LPM tells us that each additional cigarette smoked per day during pregnancy increases the probability of low birthweight by about 0.4 percentage points.
+The logit coefficients point in the same direction but are on the log-odds scale.
+
+Let's visualize the predicted probability of low birthweight as a function of maternal smoking,
+comparing both models:
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-smoking-bwght
+#| fig-cap: "Predicted probability of low birthweight by number of cigarettes smoked per day, from both the LPM and logit models. The models agree closely in the range of the data but diverge at extremes."
+
+cigs_grid <- data.frame(
+    cigs = 0:50,
+    faminc = mean(bw_data$faminc, na.rm = TRUE),
+    motheduc = mean(bw_data$motheduc, na.rm = TRUE),
+    male = 0.5
+)
+
+cigs_grid$lpm_pred <- predict(lpm_bw, newdata = cigs_grid)
+cigs_grid$logit_pred <- predict(logit_bw, newdata = cigs_grid, type = "response")
+
+cigs_long <- cigs_grid |>
+    select(cigs, lpm_pred, logit_pred) |>
+    pivot_longer(cols = c(lpm_pred, logit_pred),
+                 names_to = "model",
+                 values_to = "predicted") |>
+    mutate(model = case_when(
+        model == "lpm_pred" ~ "LPM",
+        model == "logit_pred" ~ "Logit"
+    ))
+
+ggplot(cigs_long, aes(x = cigs, y = predicted, color = model)) +
+    geom_line(linewidth = 1) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "red", alpha = 0.5) +
+    geom_hline(yintercept = 1, linetype = "dashed", color = "red", alpha = 0.5) +
+    geom_rug(data = bw_data |> filter(cigs > 0),
+             aes(x = cigs, y = NULL), inherit.aes = FALSE,
+             alpha = 0.1, sides = "b") +
+    scale_color_manual(values = c("LPM" = "#0072B2", "Logit" = "#D55E00")) +
+    coord_cartesian(ylim = c(-0.05, 0.5)) +
+    labs(x = "Cigarettes Smoked Per Day",
+         y = "Predicted Probability of Low Birthweight",
+         color = "Model",
+         title = "Smoking and Low Birthweight Risk") +
+    theme_minimal() +
+    theme(legend.position = "bottom",
+          plot.title = element_text(hjust = 0.5))
+```
+
+@fig-smoking-bwght illustrates several important points.
+For moderate levels of smoking (roughly 0--20 cigarettes per day,
+where most of the data lives),
+the two models give very similar predictions.
+At high levels of smoking,
+the LPM continues in a straight line---eventually predicting impossibly high probabilities---while the logit curve flattens out as it approaches 1.
+This is exactly the kind of situation where the logit model's bounded predictions are an advantage.
+
+
+## LPM vs. Logistic Regression: When to Use Which?
+
+As we have seen repeatedly,
+the marginal effects from the logistic regression are often quite similar to the LPM coefficients,
+at least for observations with characteristics near the center of the distribution.
+So should we bother with logistic regression at all?
+
+The answer depends on the context and the discipline.
+
+In **economics**,
+many researchers prefer the LPM for its simplicity and ease of interpretation.
+The out-of-bounds prediction problem can often be managed by using robust standard errors to handle heteroskedasticity and by being careful about extrapolation.
+Most applied microeconomics papers use the LPM as their primary specification,
+sometimes reporting logit results as a robustness check.
+
+In **health sciences and epidemiology**,
+logistic regression is the standard approach.
+Researchers in these fields tend to report odds ratios,
+and the logit framework integrates naturally with other methods common in biostatistics.
+If you are reading a paper in a health or medical journal,
+you will almost certainly encounter logistic regression.
+
+One area where both camps agree is **prediction**.
+If the goal is to predict outcomes---rather than to estimate causal effects---logistic regression generally outperforms the LPM.
+Its predictions are guaranteed to be valid probabilities,
+which matters for applications like machine learning,
+clinical risk scores,
+and forecasting.
+
+| | LPM | Logistic Regression |
+|:---|:---|:---|
+| **Estimation** | OLS | Maximum Likelihood |
+| **Coefficients** | Change in probability | Change in log-odds |
+| **Interpretation** | Direct and intuitive | Requires conversion (odds ratios or marginal effects) |
+| **Predictions** | Can fall outside [0, 1] | Always in (0, 1) |
+| **Heteroskedasticity** | Always present | Handled by MLE |
+| **Common in** | Economics | Health sciences, epidemiology |
+| **Best for** | Causal inference with easy interpretation | Prediction; settings where valid probabilities matter |
+
+: LPM vs. Logistic Regression Comparison {#tbl-comparison}
+
+::: {.callout-tip}
+## Practical Advice
+For this course,
+you should be comfortable with both approaches.
+The LPM is typically sufficient for causal inference questions,
+and its coefficients are immediately interpretable.
+Use logistic regression when you need predictions that are guaranteed to be valid probabilities,
+and when the prediction itself (rather than the coefficients) are most important.
+We will see an example use-case of this in @sec-advanced-did.
+:::
 
 
 ## Summary
 
-Interaction terms extend the flexibility of regression models by allowing the effect of one variable to depend on another.
+When the dependent variable is binary (0 or 1),
+we need to think carefully about how to model it.
 
-**Interactions between dummy variables** allow us to estimate separate effects for groups defined by multiple categories.
-The interaction coefficient captures the additional effect of belonging to both categories beyond what we'd expect from adding the individual effects.
+The **linear probability model** applies OLS to a binary outcome.
+Its coefficients are easy to interpret:
+$\beta_j$ is the change in the probability of $y = 1$ for a one-unit increase in $x_j$.
+However,
+the LPM can produce predicted probabilities outside the [0, 1] range and inherently suffers from heteroskedasticity.
 
-**Interactions between dummies and continuous variables** allow different slopes for different groups.
-Without interactions,
-a dummy variable only shifts the intercept (parallel lines).
-With interactions,
-each group can have its own slope.
+**Logistic regression** addresses the out-of-bounds problem by wrapping the linear prediction inside the logistic function,
+which maps any value to the (0, 1) interval.
+It is estimated using maximum likelihood rather than OLS.
+Logit coefficients represent changes in the log-odds and are harder to interpret directly,
+but they can be converted to odds ratios or marginal effects for more intuitive interpretation.
+Marginal effects computed at the mean are often similar to LPM coefficients.
 
-**Interactions between continuous variables** allow the marginal effect of one variable to vary with the level of another.
-This is useful when economic theory suggests complementarities or diminishing returns.
-
-When interactions are present,
-interpreting coefficients requires care.
-The effect of a variable involved in an interaction depends on the value of the other variable(s) in the interaction.
-Always compute effects at meaningful values (like means or specific policy-relevant points).
+In practice,
+the choice between LPM and logistic regression often comes down to disciplinary convention and the specific goals of the analysis.
+Economists tend to favor the LPM for its simplicity;
+health researchers tend to favor the logit for its theoretical properties.
+When the two approaches give similar results---as they often do for marginal effects near the center of the distribution---the choice matters less than getting the research question right.
 
 
 ## Check Your Understanding
 
 :::: {.content-visible when-format="html"}
 
-For each question below, 
-select the best answer from the dropdown menu. 
+For each question below,
+select the best answer from the dropdown menu.
 
 ```{=html}
 <div class="question">
 <div class="answer-row">
-    <label>i. In the model ln(wage) = β₀ + β₁(female) + β₂(educ) + β₃(female × educ), what does β₃ represent? </label>
+    <label>i. In a linear probability model, how do we interpret the coefficient β₁ on an explanatory variable x₁? </label>
     <select onchange="checkAnswer(this, 'c')">
         <option value="">-- Select Answer --</option>
-        <option value="a">The effect of education on wages</option>
-        <option value="b">The effect of being female on wages</option>
-        <option value="c">How much the effect of education differs for women compared to men</option>
-        <option value="d">The average wage of women with no education</option>
+        <option value="a">A one-unit increase in x₁ leads to a β₁ unit increase in y</option>
+        <option value="b">A one-unit increase in x₁ leads to a β₁% increase in y</option>
+        <option value="c">A one-unit increase in x₁ changes the probability of y = 1 by β₁ (i.e., 100 × β₁ percentage points)</option>
+        <option value="d">A one-unit increase in x₁ multiplies the odds of y = 1 by β₁</option>
     </select>
 </div>
 
 <div class="answer-row">
-    <label>ii. In the same model, what is the effect of education on wages for women? </label>
+    <label>ii. What is the main advantage of logistic regression over the linear probability model? </label>
     <select onchange="checkAnswer(this, 'b')">
         <option value="">-- Select Answer --</option>
-        <option value="a">β₂</option>
-        <option value="b">β₂ + β₃</option>
-        <option value="c">β₁ + β₃</option>
-        <option value="d">β₃</option>
+        <option value="a">Logistic regression always has higher R-squared</option>
+        <option value="b">Logistic regression predictions are always between 0 and 1</option>
+        <option value="c">Logistic regression coefficients are easier to interpret</option>
+        <option value="d">Logistic regression does not require any assumptions</option>
     </select>
 </div>
 
 <div class="answer-row">
-    <label>iii. We estimate: ln(wage) = 1.5 + (-0.20)(female) + (0.30)(married) + (-0.25)(female × married). What are predicted log wages for married women? </label>
-    <select onchange="checkAnswer(this, 'd')">
-        <option value="">-- Select Answer --</option>
-        <option value="a">1.5</option>
-        <option value="b">1.30</option>
-        <option value="c">1.55</option>
-        <option value="d">1.35</option>
-    </select>
-</div>
-
-<div class="answer-row">
-    <label>iv. In that same model, what is the "marriage premium" (effect of being married) for women? </label>
+    <label>iii. In our LPM example, the coefficient on kidslt6 was approximately -0.21. What does this mean? </label>
     <select onchange="checkAnswer(this, 'a')">
         <option value="">-- Select Answer --</option>
-        <option value="a">0.05 (about 5%)</option>
-        <option value="b">0.30 (about 30%)</option>
-        <option value="c">-0.25 (about -25%)</option>
-        <option value="d">-0.20 (about -20%)</option>
+        <option value="a">Each additional child under 6 decreases the probability of labor force participation by about 21 percentage points</option>
+        <option value="b">Women with kids under 6 earn 21% less</option>
+        <option value="c">21% of women with young children are in the labor force</option>
+        <option value="d">Having children under 6 reduces wages by $0.21 per hour</option>
     </select>
 </div>
 
 <div class="answer-row">
-    <label>v. Why should we always include main effects when we include an interaction term? </label>
+    <label>iv. Why does the LPM always exhibit heteroskedasticity? </label>
+    <select onchange="checkAnswer(this, 'd')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Because the sample size is too small</option>
+        <option value="b">Because the explanatory variables are correlated</option>
+        <option value="c">Because the intercept is too large</option>
+        <option value="d">Because the variance of the error depends on the predicted probability, which varies with x</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>v. If the logit odds ratio for a variable is 0.42, what does this mean? </label>
     <select onchange="checkAnswer(this, 'c')">
         <option value="">-- Select Answer --</option>
-        <option value="a">R will give an error otherwise</option>
-        <option value="b">It increases the R-squared</option>
-        <option value="c">Omitting them forces the interaction to capture both main effects and interaction, leading to misleading coefficients</option>
-        <option value="d">Main effects are always statistically significant</option>
+        <option value="a">The probability decreases by 42%</option>
+        <option value="b">The probability increases by 42%</option>
+        <option value="c">A one-unit increase in the variable multiplies the odds of the event by 0.42, reducing them by 58%</option>
+        <option value="d">The variable has no significant effect</option>
     </select>
 </div>
 
 <div class="answer-row">
-    <label>vi. <strong>(Challenge)</strong> In the model y = β₀ + β₁x₁ + β₂x₂ + β₃(x₁ × x₂), what is ∂y/∂x₁? </label>
+    <label>vi. In logistic regression, what does a coefficient of β₁ = -0.80 on a variable x₁ directly represent? </label>
     <select onchange="checkAnswer(this, 'b')">
         <option value="">-- Select Answer --</option>
-        <option value="a">β₁</option>
-        <option value="b">β₁ + β₃x₂</option>
-        <option value="c">β₁ + β₂ + β₃</option>
-        <option value="d">β₃</option>
+        <option value="a">A one-unit increase in x₁ decreases the probability of y = 1 by 0.80</option>
+        <option value="b">A one-unit increase in x₁ decreases the log-odds of y = 1 by 0.80</option>
+        <option value="c">A one-unit increase in x₁ decreases wages by 80%</option>
+        <option value="d">A one-unit increase in x₁ multiplies the probability by 0.80</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>vii. <strong>(Challenge)</strong> Why are marginal effects from the logit model often similar to LPM coefficients for observations near the center of the distribution? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Because logistic regression is just a special case of OLS</option>
+        <option value="b">Because MLE and OLS always give the same answer</option>
+        <option value="c">Because the logistic function is approximately linear in the middle of its range, so the linear and nonlinear models closely agree there</option>
+        <option value="d">Because the logistic function always equals the identity function</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>viii. <strong>(Challenge)</strong> A researcher estimates a logit model and finds that the coefficient on "smoking" is 0.35. The predicted probability for a non-smoker with average characteristics is 0.10. Approximately what is the predicted probability for an otherwise identical smoker? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">0.45 (just add 0.35)</option>
+        <option value="b">About 0.14 (convert to log-odds, add 0.35, convert back)</option>
+        <option value="c">0.35</option>
+        <option value="d">About 0.50</option>
     </select>
 </div>
 </div>
@@ -529,17 +1237,21 @@ select the best answer from the dropdown menu.
 ::: {.callout-tip collapse="true"}
 ## Show Explanation
 
-i. The interaction coefficient β₃ captures how the effect of education *differs* between groups. It tells us how much more (or less) each year of education affects wages for women compared to men.
+i. In the LPM, the dependent variable is a probability (since $y$ is 0 or 1, $E(y|\mathbf{x}) = P(y=1|\mathbf{x})$). So $\beta_1$ represents the change in the probability that $y = 1$ when $x_1$ increases by one unit, holding everything else constant.
 
-ii. For women (female = 1), the effect of education is the derivative with respect to educ: β₂ + β₃(female) = β₂ + β₃(1) = β₂ + β₃. The interaction term adds to (or subtracts from) the baseline effect.
+ii. The logistic function $G(z) = \exp(z)/(1 + \exp(z))$ is strictly between 0 and 1 for all values of $z$. This means predicted probabilities from the logit model can never be negative or greater than 1, unlike the LPM which can produce impossible predictions.
 
-iii. For married women, female = 1, married = 1, and female × married = 1. The predicted log wage is: 1.5 + (-0.20)(1) + (0.30)(1) + (-0.25)(1) = 1.5 - 0.20 + 0.30 - 0.25 = 1.35.
+iii. The LPM coefficient on `kidslt6` tells us the change in probability of labor force participation for each additional child under age 6. A coefficient of -0.21 means each young child reduces the probability by about 21 percentage points---a substantial effect.
 
-iv. The marriage premium for women is β₂ + β₃ = 0.30 + (-0.25) = 0.05. The interaction term reduces the marriage premium for women compared to men (who have a premium of just β₂ = 0.30).
+iv. When $y$ is binary, the error $\mu = y - E(y|\mathbf{x})$ can only take two values. Its variance is $p(\mathbf{x})(1-p(\mathbf{x}))$, which depends on the predicted probability $p(\mathbf{x})$. Since $p(\mathbf{x})$ is a function of $\mathbf{x}$, the error variance changes with $\mathbf{x}$---the definition of heteroskedasticity.
 
-v. When we include an interaction A × B without the main effects A and B, the interaction term is forced to capture all variation associated with both A and B, not just their interaction. This leads to coefficients that are difficult to interpret and often misleading.
+v. An odds ratio of 0.42 means that a one-unit increase in the variable multiplies the odds by 0.42. Since $0.42 < 1$, the odds decrease. Specifically, the odds are reduced by $1 - 0.42 = 0.58$, or 58%. This is different from saying the probability decreases by 58%---odds and probabilities are related but different quantities.
 
-vi. Taking the partial derivative of y with respect to x₁, treating x₂ as constant: ∂y/∂x₁ = β₁ + β₃x₂. The effect of x₁ depends on the level of x₂---this is the defining feature of an interaction.
+vi. Logit coefficients are changes in log-odds, not changes in probability. The log-odds of $y = 1$ is $\ln(P(y=1)/P(y=0))$. A coefficient of $-0.80$ means a one-unit increase in $x_1$ decreases this log-odds by 0.80. To get the effect on probability, we need to compute marginal effects.
+
+vii. The logistic function has an S-shape that is nearly linear in the middle (around $p = 0.5$) and curves at the extremes (near 0 and 1). For observations where the predicted probability is near 0.5, the slope of the logistic function is close to constant, so the linear approximation (the LPM) works well. The two models diverge more for observations with very high or very low predicted probabilities.
+
+viii. For the non-smoker: $p = 0.10$, so odds = $0.10/0.90 = 0.111$, and log-odds = $\ln(0.111) = -2.197$. Adding the smoking coefficient: $-2.197 + 0.35 = -1.847$. Converting back: $p = \exp(-1.847)/(1 + \exp(-1.847)) = 0.158/(1.158) \approx 0.136$. So the probability increases from 10% to about 14%---not 45%! This illustrates why we cannot simply add logit coefficients to probabilities.
 
 :::
 

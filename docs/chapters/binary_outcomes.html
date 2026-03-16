@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>9&nbsp; Interaction Effects – EC325 Lecture Notes</title>
+<title>9&nbsp; Binary Outcomes – EC325 Lecture Notes</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -164,7 +164,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/binary_outcomes.html"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Interaction Effects</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/binary_outcomes.html"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Binary Outcomes</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -265,7 +265,7 @@ window.Quarto = {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/binary_outcomes.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Interaction Effects</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Binary Outcomes</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -343,26 +343,41 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#why-interactions-matter" id="toc-why-interactions-matter" class="nav-link active" data-scroll-target="#why-interactions-matter"><span class="header-section-number">9.1</span> Why Interactions Matter</a></li>
-  <li><a href="#interactions-between-two-dummy-variables" id="toc-interactions-between-two-dummy-variables" class="nav-link" data-scroll-target="#interactions-between-two-dummy-variables"><span class="header-section-number">9.2</span> Interactions Between Two Dummy Variables</a>
+  <li><a href="#from-continuous-to-binary-outcomes" id="toc-from-continuous-to-binary-outcomes" class="nav-link active" data-scroll-target="#from-continuous-to-binary-outcomes"><span class="header-section-number">9.1</span> From Continuous to Binary Outcomes</a></li>
+  <li><a href="#the-linear-probability-model" id="toc-the-linear-probability-model" class="nav-link" data-scroll-target="#the-linear-probability-model"><span class="header-section-number">9.2</span> The Linear Probability Model</a>
   <ul class="collapse">
-  <li><a href="#interpreting-the-interaction" id="toc-interpreting-the-interaction" class="nav-link" data-scroll-target="#interpreting-the-interaction"><span class="header-section-number">9.2.1</span> Interpreting the Interaction</a></li>
+  <li><a href="#why-ey-mathbfx-py-1-mathbfx" id="toc-why-ey-mathbfx-py-1-mathbfx" class="nav-link" data-scroll-target="#why-ey-mathbfx-py-1-mathbfx"><span class="header-section-number">9.2.1</span> Why <span class="math inline">\(E(y | \mathbf{x}) = P(y = 1 | \mathbf{x})\)</span></a></li>
   </ul></li>
-  <li><a href="#interactions-between-dummies-and-continuous-variables" id="toc-interactions-between-dummies-and-continuous-variables" class="nav-link" data-scroll-target="#interactions-between-dummies-and-continuous-variables"><span class="header-section-number">9.3</span> Interactions Between Dummies and Continuous Variables</a>
+  <li><a href="#lpm-example-womens-labor-force-participation" id="toc-lpm-example-womens-labor-force-participation" class="nav-link" data-scroll-target="#lpm-example-womens-labor-force-participation"><span class="header-section-number">9.3</span> LPM Example: Women’s Labor Force Participation</a>
   <ul class="collapse">
-  <li><a href="#different-slopes-for-different-groups" id="toc-different-slopes-for-different-groups" class="nav-link" data-scroll-target="#different-slopes-for-different-groups"><span class="header-section-number">9.3.1</span> Different Slopes for Different Groups</a></li>
+  <li><a href="#interpreting-the-lpm-coefficients" id="toc-interpreting-the-lpm-coefficients" class="nav-link" data-scroll-target="#interpreting-the-lpm-coefficients"><span class="header-section-number">9.3.1</span> Interpreting the LPM Coefficients</a></li>
   </ul></li>
-  <li><a href="#computing-effects-with-interactions" id="toc-computing-effects-with-interactions" class="nav-link" data-scroll-target="#computing-effects-with-interactions"><span class="header-section-number">9.4</span> Computing Effects with Interactions</a></li>
-  <li><a href="#interactions-between-two-continuous-variables" id="toc-interactions-between-two-continuous-variables" class="nav-link" data-scroll-target="#interactions-between-two-continuous-variables"><span class="header-section-number">9.5</span> Interactions Between Two Continuous Variables</a></li>
-  <li><a href="#application-decomposing-the-gender-wage-gap" id="toc-application-decomposing-the-gender-wage-gap" class="nav-link" data-scroll-target="#application-decomposing-the-gender-wage-gap"><span class="header-section-number">9.6</span> Application: Decomposing the Gender Wage Gap</a></li>
-  <li><a href="#best-practices-for-using-interactions" id="toc-best-practices-for-using-interactions" class="nav-link" data-scroll-target="#best-practices-for-using-interactions"><span class="header-section-number">9.7</span> Best Practices for Using Interactions</a>
+  <li><a href="#problems-with-the-linear-probability-model" id="toc-problems-with-the-linear-probability-model" class="nav-link" data-scroll-target="#problems-with-the-linear-probability-model"><span class="header-section-number">9.4</span> Problems with the Linear Probability Model</a>
   <ul class="collapse">
-  <li><a href="#always-include-main-effects" id="toc-always-include-main-effects" class="nav-link" data-scroll-target="#always-include-main-effects"><span class="header-section-number">9.7.1</span> Always Include Main Effects</a></li>
-  <li><a href="#center-continuous-variables" id="toc-center-continuous-variables" class="nav-link" data-scroll-target="#center-continuous-variables"><span class="header-section-number">9.7.2</span> Center Continuous Variables</a></li>
-  <li><a href="#test-whether-interactions-are-needed" id="toc-test-whether-interactions-are-needed" class="nav-link" data-scroll-target="#test-whether-interactions-are-needed"><span class="header-section-number">9.7.3</span> Test Whether Interactions Are Needed</a></li>
+  <li><a href="#problem-1-predictions-outside-0-1" id="toc-problem-1-predictions-outside-0-1" class="nav-link" data-scroll-target="#problem-1-predictions-outside-0-1"><span class="header-section-number">9.4.1</span> Problem 1: Predictions Outside [0, 1]</a></li>
+  <li><a href="#problem-2-heteroskedasticity" id="toc-problem-2-heteroskedasticity" class="nav-link" data-scroll-target="#problem-2-heteroskedasticity"><span class="header-section-number">9.4.2</span> Problem 2: Heteroskedasticity</a></li>
   </ul></li>
-  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">9.8</span> Summary</a></li>
-  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">9.9</span> Check Your Understanding</a></li>
+  <li><a href="#an-alternative-logistic-regression" id="toc-an-alternative-logistic-regression" class="nav-link" data-scroll-target="#an-alternative-logistic-regression"><span class="header-section-number">9.5</span> An Alternative: Logistic Regression</a>
+  <ul class="collapse">
+  <li><a href="#the-logistic-function" id="toc-the-logistic-function" class="nav-link" data-scroll-target="#the-logistic-function"><span class="header-section-number">9.5.1</span> The Logistic Function</a></li>
+  <li><a href="#comparing-the-lpm-and-logit-visually" id="toc-comparing-the-lpm-and-logit-visually" class="nav-link" data-scroll-target="#comparing-the-lpm-and-logit-visually"><span class="header-section-number">9.5.2</span> Comparing the LPM and Logit Visually</a></li>
+  <li><a href="#maximum-likelihood-estimation" id="toc-maximum-likelihood-estimation" class="nav-link" data-scroll-target="#maximum-likelihood-estimation"><span class="header-section-number">9.5.3</span> Maximum Likelihood Estimation</a></li>
+  </ul></li>
+  <li><a href="#estimating-logistic-regression-in-r" id="toc-estimating-logistic-regression-in-r" class="nav-link" data-scroll-target="#estimating-logistic-regression-in-r"><span class="header-section-number">9.6</span> Estimating Logistic Regression in R</a>
+  <ul class="collapse">
+  <li><a href="#comparing-the-models-side-by-side" id="toc-comparing-the-models-side-by-side" class="nav-link" data-scroll-target="#comparing-the-models-side-by-side"><span class="header-section-number">9.6.1</span> Comparing the Models Side by Side</a></li>
+  <li><a href="#predicted-probabilities-stay-in-bounds" id="toc-predicted-probabilities-stay-in-bounds" class="nav-link" data-scroll-target="#predicted-probabilities-stay-in-bounds"><span class="header-section-number">9.6.2</span> Predicted Probabilities Stay In Bounds</a></li>
+  </ul></li>
+  <li><a href="#interpreting-logistic-regression" id="toc-interpreting-logistic-regression" class="nav-link" data-scroll-target="#interpreting-logistic-regression"><span class="header-section-number">9.7</span> Interpreting Logistic Regression</a>
+  <ul class="collapse">
+  <li><a href="#interpretation-1-log-odds" id="toc-interpretation-1-log-odds" class="nav-link" data-scroll-target="#interpretation-1-log-odds"><span class="header-section-number">9.7.1</span> Interpretation 1: Log-Odds</a></li>
+  <li><a href="#interpretation-2-odds-ratios" id="toc-interpretation-2-odds-ratios" class="nav-link" data-scroll-target="#interpretation-2-odds-ratios"><span class="header-section-number">9.7.2</span> Interpretation 2: Odds Ratios</a></li>
+  <li><a href="#interpretation-3-marginal-effects-at-the-mean" id="toc-interpretation-3-marginal-effects-at-the-mean" class="nav-link" data-scroll-target="#interpretation-3-marginal-effects-at-the-mean"><span class="header-section-number">9.7.3</span> Interpretation 3: Marginal Effects at the Mean</a></li>
+  </ul></li>
+  <li><a href="#application-low-birthweight-and-maternal-smoking" id="toc-application-low-birthweight-and-maternal-smoking" class="nav-link" data-scroll-target="#application-low-birthweight-and-maternal-smoking"><span class="header-section-number">9.8</span> Application: Low Birthweight and Maternal Smoking</a></li>
+  <li><a href="#lpm-vs.-logistic-regression-when-to-use-which" id="toc-lpm-vs.-logistic-regression-when-to-use-which" class="nav-link" data-scroll-target="#lpm-vs.-logistic-regression-when-to-use-which"><span class="header-section-number">9.9</span> LPM vs.&nbsp;Logistic Regression: When to Use Which?</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">9.10</span> Summary</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">9.11</span> Check Your Understanding</a></li>
   </ul>
 </nav>
     </div>
@@ -371,7 +386,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span id="sec-interactions" class="quarto-section-identifier"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Interaction Effects</span></span></h1>
+<h1 class="title"><span id="sec-binary-outcomes" class="quarto-section-identifier"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Binary Outcomes</span></span></h1>
 </div>
 
 
@@ -482,10 +497,12 @@ function checkAnswer(selectElement, correctValue) {
 <div id="callout-1" class="callout-1-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ul>
-<li>What happens when the effect of one variable depends on the value of another?</li>
-<li>How do we include and interpret interaction terms in regression?</li>
-<li>What’s the difference between interacting two dummy variables versus a dummy and a continuous variable?</li>
-<li>How do interactions allow for different slopes across groups?</li>
+<li>What happens when our dependent variable is binary (0 or 1) rather than continuous?</li>
+<li>How do we interpret OLS coefficients in the linear probability model?</li>
+<li>What problems arise when we use OLS with a binary outcome?</li>
+<li>What is logistic regression and how does it differ from OLS?</li>
+<li>How do we interpret logistic regression coefficients using log-odds, odds ratios, and marginal effects?</li>
+<li>When should we use the LPM versus logistic regression?</li>
 </ul>
 </div>
 </div>
@@ -503,397 +520,1107 @@ function checkAnswer(selectElement, correctValue) {
 <div id="callout-2" class="callout-2-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ul>
-<li><span class="citation" data-cites="wooldridge_introductory_2019">Wooldridge (<a href="references.html#ref-wooldridge_introductory_2019" role="doc-biblioref">2019</a>)</span>, Ch. 7.4</li>
-<li><span class="citation" data-cites="bailey_real_2020">Bailey (<a href="references.html#ref-bailey_real_2020" role="doc-biblioref">2020</a>)</span>, Ch. 5.4</li>
+<li><span class="citation" data-cites="wooldridge_introductory_2019">Wooldridge (<a href="references.html#ref-wooldridge_introductory_2019" role="doc-biblioref">2019</a>)</span>, Ch. 7.5, 17.1</li>
+<li><span class="citation" data-cites="bailey_real_2020">Bailey (<a href="references.html#ref-bailey_real_2020" role="doc-biblioref">2020</a>)</span>, Ch. 12</li>
 </ul>
 </div>
 </div>
 </div>
-<p>In the previous chapter, we saw how dummy variables allow different groups to have different intercepts—the regression lines for different groups are parallel but shifted up or down. But what if the <em>effect</em> of a variable differs across groups? What if the returns to education are higher for men than for women, or the effect of experience on wages depends on whether someone has a college degree?</p>
-<p><strong>Interaction terms</strong> allow us to model these situations. When we include an interaction between two variables, we allow the effect of one variable to depend on the value of another.</p>
-<section id="why-interactions-matter" class="level2" data-number="9.1">
-<h2 data-number="9.1" class="anchored" data-anchor-id="why-interactions-matter"><span class="header-section-number">9.1</span> Why Interactions Matter</h2>
-<p>Consider the gender wage gap. We might estimate:</p>
-<p><span class="math display">\[
-\ln(wage) = \beta_0 + \beta_1(female) + \beta_2(educ) + \mu
-\]</span></p>
-<p>This model assumes that the effect of education on wages (<span class="math inline">\(\beta_2\)</span>) is the same for men and women. The only difference is the intercept—women’s wage line is shifted down by <span class="math inline">\(\beta_1\)</span>.</p>
-<p>But what if education has different effects for men and women? Perhaps discrimination means women receive lower returns to their education, or perhaps women are overrepresented in fields where education is particularly valuable. To test this, we need to allow the <em>slope</em> on education to differ by gender.</p>
-<p>This is exactly what interaction terms do.</p>
-</section>
-<section id="interactions-between-two-dummy-variables" class="level2" data-number="9.2">
-<h2 data-number="9.2" class="anchored" data-anchor-id="interactions-between-two-dummy-variables"><span class="header-section-number">9.2</span> Interactions Between Two Dummy Variables</h2>
-<p>Let’s start with the simplest case: interacting two dummy variables. Suppose we want to understand how being female and being married jointly affect wages.</p>
-<p>We create an <strong>interaction term</strong> by multiplying the two dummy variables:</p>
-<p><span class="math display">\[
-\ln(wage) = \beta_0 + \beta_1(female) + \beta_2(married) + \beta_3(female \times married) + \mu
-\]</span></p>
-<p>The interaction term <span class="math inline">\(female \times married\)</span> equals 1 only for married women and 0 for everyone else.</p>
+<p>Up until now, all of our dependent variables have been <strong>quantitative</strong> outcomes: wages, prices, birthweight, exam scores, and so on. But many important questions in economics—and especially in health economics and policy evaluation—involve <strong>qualitative</strong> outcomes. Did a patient survive? Did a worker find a job? Did a student graduate? Did a family enroll in a public program?</p>
+<p>In the simplest case, we can represent these outcomes as <strong>binary variables</strong> that take the value 1 if the event occurred and 0 otherwise. This chapter explores how to model binary outcomes using regression, starting with the straightforward linear probability model and then introducing logistic regression as an alternative.</p>
+<section id="from-continuous-to-binary-outcomes" class="level2" data-number="9.1">
+<h2 data-number="9.1" class="anchored" data-anchor-id="from-continuous-to-binary-outcomes"><span class="header-section-number">9.1</span> From Continuous to Binary Outcomes</h2>
+<p>To make the shift from continuous to binary outcomes concrete, let’s look at some data. The <code>mroz</code> dataset in the <code>wooldridge</code> package contains information on 753 married women in 1975. The variable <code>inlf</code> equals 1 if a woman is in the labor force and 0 otherwise.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>wage_data <span class="ot">&lt;-</span> wooldridge<span class="sc">::</span>wage1 <span class="sc">|&gt;</span> </span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">female_married =</span> female <span class="sc">*</span> married)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>lm1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(wage) <span class="sc">~</span> female <span class="sc">+</span> married <span class="sc">+</span> female_married, <span class="at">data =</span> wage_data)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-Call:
-lm(formula = log(wage) ~ female + married + female_married, data = wage_data)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--2.0240 -0.3245 -0.0800  0.3155  1.6849 
-
-Coefficients:
-               Estimate Std. Error t value             Pr(&gt;|t|)    
-(Intercept)     1.52081    0.05099  29.827 &lt; 0.0000000000000002 ***
-female         -0.13164    0.06680  -1.971               0.0493 *  
-married         0.42669    0.06155   6.932      0.0000000000123 ***
-female_married -0.37479    0.08571  -4.373      0.0000148080201 ***
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-Residual standard error: 0.4728 on 522 degrees of freedom
-Multiple R-squared:  0.2132,    Adjusted R-squared:  0.2087 
-F-statistic: 47.15 on 3 and 522 DF,  p-value: &lt; 0.00000000000000022</code></pre>
-</div>
-</div>
-<section id="interpreting-the-interaction" class="level3" data-number="9.2.1">
-<h3 data-number="9.2.1" class="anchored" data-anchor-id="interpreting-the-interaction"><span class="header-section-number">9.2.1</span> Interpreting the Interaction</h3>
-<p>To understand what each coefficient means, let’s work through the predicted wages for each group:</p>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th style="text-align: left;">Group</th>
-<th style="text-align: center;">female</th>
-<th style="text-align: center;">married</th>
-<th style="text-align: center;">female × married</th>
-<th style="text-align: left;">Predicted ln(wage)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">Unmarried men</td>
-<td style="text-align: center;">0</td>
-<td style="text-align: center;">0</td>
-<td style="text-align: center;">0</td>
-<td style="text-align: left;"><span class="math inline">\(\beta_0\)</span></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Unmarried women</td>
-<td style="text-align: center;">1</td>
-<td style="text-align: center;">0</td>
-<td style="text-align: center;">0</td>
-<td style="text-align: left;"><span class="math inline">\(\beta_0 + \beta_1\)</span></td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Married men</td>
-<td style="text-align: center;">0</td>
-<td style="text-align: center;">1</td>
-<td style="text-align: center;">0</td>
-<td style="text-align: left;"><span class="math inline">\(\beta_0 + \beta_2\)</span></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Married women</td>
-<td style="text-align: center;">1</td>
-<td style="text-align: center;">1</td>
-<td style="text-align: center;">1</td>
-<td style="text-align: left;"><span class="math inline">\(\beta_0 + \beta_1 + \beta_2 + \beta_3\)</span></td>
-</tr>
-</tbody>
-</table>
-<p>From our estimates:</p>
-<ul>
-<li><strong>Unmarried men</strong> (baseline): <span class="math inline">\(\ln(wage) = 1.57\)</span></li>
-<li><strong>Unmarried women</strong>: The coefficient on <code>female</code> (<span class="math inline">\(\hat{\beta}_1 \approx -0.13\)</span>) tells us unmarried women earn about 13% less than unmarried men.</li>
-<li><strong>Married men</strong>: The coefficient on <code>married</code> (<span class="math inline">\(\hat{\beta}_2 \approx 0.42\)</span>) tells us married men earn about 42% more than unmarried men—a large “marriage premium.”</li>
-<li><strong>Married women</strong>: We need to add all applicable coefficients: <span class="math inline">\(-0.13 + 0.42 + (-0.38) = -0.09\)</span>, so married women earn about 9% less than unmarried men.</li>
-</ul>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-The Interaction Effect
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>The coefficient on the interaction term (<span class="math inline">\(\hat{\beta}_3 \approx -0.38\)</span>) tells us that the marriage premium is <strong>different</strong> for women than for men. While married men earn 42% more than unmarried men, the marriage “premium” for women is only <span class="math inline">\(0.42 + (-0.38) = 0.04\)</span>, or about 4%—much smaller.</p>
-<p>Equivalently, the gender wage gap is larger for married workers than for unmarried workers.</p>
-</div>
-</div>
-</section>
-</section>
-<section id="interactions-between-dummies-and-continuous-variables" class="level2" data-number="9.3">
-<h2 data-number="9.3" class="anchored" data-anchor-id="interactions-between-dummies-and-continuous-variables"><span class="header-section-number">9.3</span> Interactions Between Dummies and Continuous Variables</h2>
-<p>Perhaps more powerful is interacting a dummy variable with a continuous variable. This allows the <strong>slope</strong>—not just the intercept—to differ across groups.</p>
-<p>Suppose we want to test whether men and women have different returns to education:</p>
-<p><span class="math display">\[
-\ln(wage) = \beta_0 + \beta_1(female) + \beta_2(educ) + \beta_3(female \times educ) + \mu
-\]</span></p>
-<p>The interaction term <span class="math inline">\(female \times educ\)</span> equals 0 for all men (since <span class="math inline">\(female = 0\)</span>) and equals the education level for women.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>wage_data <span class="ot">&lt;-</span> wooldridge<span class="sc">::</span>wage1 <span class="sc">|&gt;</span> </span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">female_educ =</span> female <span class="sc">*</span> educ)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>lm2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(wage) <span class="sc">~</span> female <span class="sc">+</span> educ <span class="sc">+</span> female_educ, <span class="at">data =</span> wage_data)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-Call:
-lm(formula = log(wage) ~ female + educ + female_educ, data = wage_data)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--2.02673 -0.27468 -0.03721  0.26221  1.34740 
-
-Coefficients:
-               Estimate  Std. Error t value             Pr(&gt;|t|)    
-(Intercept)  0.82595465  0.11805024   6.997     0.00000000000808 ***
-female      -0.36006448  0.18542958  -1.942               0.0527 .  
-educ         0.07722794  0.00898753   8.593 &lt; 0.0000000000000002 ***
-female_educ -0.00006409  0.01450349  -0.004               0.9965    
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-Residual standard error: 0.4459 on 522 degrees of freedom
-Multiple R-squared:  0.3002,    Adjusted R-squared:  0.2962 
-F-statistic: 74.65 on 3 and 522 DF,  p-value: &lt; 0.00000000000000022</code></pre>
-</div>
-</div>
-<section id="different-slopes-for-different-groups" class="level3" data-number="9.3.1">
-<h3 data-number="9.3.1" class="anchored" data-anchor-id="different-slopes-for-different-groups"><span class="header-section-number">9.3.1</span> Different Slopes for Different Groups</h3>
-<p>Let’s write out the predicted wage equations for each group:</p>
-<p><strong>For men</strong> (<span class="math inline">\(female = 0\)</span>): <span class="math display">\[
-\ln(wage) = \beta_0 + \beta_2(educ) = 0.389 + 0.082(educ)
-\]</span></p>
-<p><strong>For women</strong> (<span class="math inline">\(female = 1\)</span>): <span class="math display">\[
-\ln(wage) = (\beta_0 + \beta_1) + (\beta_2 + \beta_3)(educ) = (0.389 - 0.227) + (0.082 + 0.006)(educ)
-\]</span> <span class="math display">\[
-= 0.162 + 0.088(educ)
-\]</span></p>
-<p>Now we can see:</p>
-<ul>
-<li><strong>Men</strong> start with a higher intercept (0.389 vs 0.162)</li>
-<li><strong>Women</strong> have a slightly higher return to education (8.8% vs 8.2% per year)</li>
-</ul>
-<p>The interaction coefficient (<span class="math inline">\(\hat{\beta}_3 \approx 0.006\)</span>) is not statistically significant here, suggesting we cannot reject that men and women have the same returns to education. But the approach illustrates how interactions allow different slopes.</p>
-<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>lf_data <span class="ot">&lt;-</span> wooldridge<span class="sc">::</span>mroz</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(lf_data, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">factor</span>(inlf), <span class="at">fill =</span> <span class="fu">factor</span>(inlf))) <span class="sc">+</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bar</span>(<span class="at">width =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_text</span>(<span class="at">stat =</span> <span class="st">"count"</span>, <span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">after_stat</span>(count)), <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">size =</span> <span class="fl">4.5</span>) <span class="sc">+</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"0"</span> <span class="ot">=</span> <span class="st">"#D55E00"</span>, <span class="st">"1"</span> <span class="ot">=</span> <span class="st">"#0072B2"</span>),</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>                      <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Not in LF"</span>, <span class="st">"In LF"</span>)) <span class="sc">+</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_x_discrete</span>(<span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"0"</span> <span class="ot">=</span> <span class="st">"Not in Labor Force (y = 0)"</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"1"</span> <span class="ot">=</span> <span class="st">"In Labor Force (y = 1)"</span>)) <span class="sc">+</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">y =</span> <span class="st">"Number of Women"</span>,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">title =</span> <span class="st">"Labor Force Participation Among Married Women (1975)"</span>) <span class="sc">+</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>,</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>          <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="fig-interaction-slopes" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-binary-dist" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-interaction-slopes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;9.1: With an interaction term, men and women can have different slopes (returns to education), not just different intercepts.
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-binary-dist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9.1: The distribution of a binary outcome: women’s labor force participation. Unlike a continuous variable, the outcome can only take two values.
 </figcaption>
-<div aria-describedby="fig-interaction-slopes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="binary_outcomes_files/figure-html/fig-interaction-slopes-1.png" class="img-fluid figure-img" width="672">
+<div aria-describedby="fig-binary-dist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="binary_outcomes_files/figure-html/fig-binary-dist-1.png" class="img-fluid figure-img" width="672">
 </div>
 </figure>
 </div>
 </div>
 </div>
+<p>As <a href="#fig-binary-dist" class="quarto-xref">Figure&nbsp;<span>9.1</span></a> shows, about 57% of the women in the sample are in the labor force and 43% are not. This is fundamentally different from the continuous outcomes we have worked with before. There are no “in-between” values—a woman is either in the labor force or she isn’t.</p>
+<p>So what happens if we try to use OLS to model this outcome? The answer leads us to the <strong>linear probability model</strong>.</p>
+</section>
+<section id="the-linear-probability-model" class="level2" data-number="9.2">
+<h2 data-number="9.2" class="anchored" data-anchor-id="the-linear-probability-model"><span class="header-section-number">9.2</span> The Linear Probability Model</h2>
+<section id="why-ey-mathbfx-py-1-mathbfx" class="level3" data-number="9.2.1">
+<h3 data-number="9.2.1" class="anchored" data-anchor-id="why-ey-mathbfx-py-1-mathbfx"><span class="header-section-number">9.2.1</span> Why <span class="math inline">\(E(y | \mathbf{x}) = P(y = 1 | \mathbf{x})\)</span></h3>
+<p>When our dependent variable <span class="math inline">\(y\)</span> is binary, something interesting happens to the standard OLS regression. Consider the model:</p>
+<p><span class="math display">\[
+y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots + \beta_k x_k + \mu
+\]</span></p>
+<p>Recall that in OLS, the predicted value <span class="math inline">\(\hat{y}\)</span> estimates the conditional expectation <span class="math inline">\(E(y | \mathbf{x})\)</span>. When <span class="math inline">\(y\)</span> can only be 0 or 1, this conditional expectation has a special meaning. By the definition of expected value:</p>
+<p><span class="math display">\[
+E(y | \mathbf{x}) = 1 \times P(y = 1 | \mathbf{x}) + 0 \times P(y = 0 | \mathbf{x}) = P(y = 1 | \mathbf{x})
+\]</span></p>
+<p>In other words, the predicted value from our regression is the <strong>probability</strong> that the event occurs, given the values of the explanatory variables. This is a powerful result: even though we’re running plain OLS, the output has a probabilistic interpretation.</p>
+<p>This means we cannot interpret <span class="math inline">\(\beta_j\)</span> in the usual way—as the change in <span class="math inline">\(y\)</span> when <span class="math inline">\(x_j\)</span> increases by one unit—because <span class="math inline">\(y\)</span> doesn’t change continuously. Instead, we interpret <span class="math inline">\(\beta_j\)</span> as the change in the <strong>probability</strong> that <span class="math inline">\(y = 1\)</span> when <span class="math inline">\(x_j\)</span> increases by one unit, holding all other variables constant.</p>
+<p>This is why OLS applied to a binary outcome is called the <strong>linear probability model</strong> (LPM).</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Dummy Variables vs.&nbsp;Interactions: A Summary
+The LPM Interpretation Rule
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<ul>
-<li><strong>Dummy variable alone</strong>: Different intercepts, same slopes (parallel lines)</li>
-<li><strong>Interaction with continuous variable</strong>: Different intercepts AND different slopes</li>
-</ul>
+<p>In the linear probability model, <span class="math inline">\(\hat{\beta}_j\)</span> tells us the <strong>change in probability</strong> (not percentage change!) of the event occurring for a one-unit increase in <span class="math inline">\(x_j\)</span>. If <span class="math inline">\(\hat{\beta}_j = -0.15\)</span>, the probability decreases by 0.15, or equivalently by 15 <strong>percentage points</strong>. Be careful with language: “15 percentage points” and “15 percent” are not the same thing!</p>
 </div>
 </div>
 </section>
 </section>
-<section id="computing-effects-with-interactions" class="level2" data-number="9.4">
-<h2 data-number="9.4" class="anchored" data-anchor-id="computing-effects-with-interactions"><span class="header-section-number">9.4</span> Computing Effects with Interactions</h2>
-<p>When interactions are present, computing the effect of a variable requires care. The effect of one variable depends on the value of the other variable in the interaction.</p>
-<p>From our model: <span class="math display">\[
-\ln(wage) = \beta_0 + \beta_1(female) + \beta_2(educ) + \beta_3(female \times educ)
-\]</span></p>
-<p>The effect of education on wages is: <span class="math display">\[
-\frac{\partial \ln(wage)}{\partial educ} = \beta_2 + \beta_3(female)
-\]</span></p>
-<ul>
-<li>For men (<span class="math inline">\(female = 0\)</span>): Effect = <span class="math inline">\(\beta_2 = 0.082\)</span> (8.2% per year)</li>
-<li>For women (<span class="math inline">\(female = 1\)</span>): Effect = <span class="math inline">\(\beta_2 + \beta_3 = 0.082 + 0.006 = 0.088\)</span> (8.8% per year)</li>
-</ul>
-<p>Similarly, the effect of being female depends on education level: <span class="math display">\[
-\frac{\partial \ln(wage)}{\partial female} = \beta_1 + \beta_3(educ)
-\]</span></p>
-<p>At 12 years of education: Effect = <span class="math inline">\(-0.227 + 0.006(12) = -0.155\)</span> (-15.5%)</p>
-<p>At 16 years of education: Effect = <span class="math inline">\(-0.227 + 0.006(16) = -0.131\)</span> (-13.1%)</p>
-<p>The gender wage gap <strong>narrows</strong> as education increases (though the interaction isn’t statistically significant in this example).</p>
-</section>
-<section id="interactions-between-two-continuous-variables" class="level2" data-number="9.5">
-<h2 data-number="9.5" class="anchored" data-anchor-id="interactions-between-two-continuous-variables"><span class="header-section-number">9.5</span> Interactions Between Two Continuous Variables</h2>
-<p>We can also interact two continuous variables. For example, perhaps the effect of experience on wages depends on education level—more educated workers might have steeper experience-wage profiles because they’re in careers with more room for advancement.</p>
+<section id="lpm-example-womens-labor-force-participation" class="level2" data-number="9.3">
+<h2 data-number="9.3" class="anchored" data-anchor-id="lpm-example-womens-labor-force-participation"><span class="header-section-number">9.3</span> LPM Example: Women’s Labor Force Participation</h2>
+<p>To see how the LPM works in practice, let’s examine a classic question in labor economics: what factors affect whether married women participate in the labor force?</p>
+<p>We estimate the following model:</p>
 <p><span class="math display">\[
-\ln(wage) = \beta_0 + \beta_1(educ) + \beta_2(exper) + \beta_3(educ \times exper) + \mu
+inlf = \beta_0 + \beta_1(kidslt6) + \beta_2(kidsge6) + \beta_3(nwifeinc) + \beta_4(motheduc) + \mu
 \]</span></p>
+<p>where <code>kidslt6</code> is the number of children under age 6, <code>kidsge6</code> is the number of children aged 6–18, <code>nwifeinc</code> is the wife’s non-labor income (in thousands of dollars), and <code>motheduc</code> is the mother’s years of education.</p>
+<p>Before estimating the model, let’s visualize the raw relationship between our key variable of interest—young children—and labor force participation:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>wage_data <span class="ot">&lt;-</span> wooldridge<span class="sc">::</span>wage1 <span class="sc">|&gt;</span> </span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">educ_exper =</span> educ <span class="sc">*</span> exper)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>lm3 <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(wage) <span class="sc">~</span> educ <span class="sc">+</span> exper <span class="sc">+</span> educ_exper, <span class="at">data =</span> wage_data)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>lf_data <span class="sc">|&gt;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(kidslt6) <span class="sc">|&gt;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">pct_inlf =</span> <span class="fu">mean</span>(inlf),</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">n =</span> <span class="fu">n</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">factor</span>(kidslt6), <span class="at">y =</span> pct_inlf)) <span class="sc">+</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#0072B2"</span>, <span class="at">width =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste0</span>(<span class="fu">round</span>(pct_inlf <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="st">"%</span><span class="sc">\n</span><span class="st">(n="</span>, n, <span class="st">")"</span>)),</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>              <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.3</span>, <span class="at">size =</span> <span class="fl">3.5</span>) <span class="sc">+</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">percent_format</span>(), <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.8</span>)) <span class="sc">+</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Number of Children Under Age 6"</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">y =</span> <span class="st">"Share in Labor Force"</span>,</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">title =</span> <span class="st">"Labor Force Participation by Number of Young Children"</span>) <span class="sc">+</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-raw-relationship" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-raw-relationship-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9.2: Women with more young children are less likely to participate in the labor force. Each bar shows the share of women in each group who are working.
+</figcaption>
+<div aria-describedby="fig-raw-relationship-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="binary_outcomes_files/figure-html/fig-raw-relationship-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p><a href="#fig-raw-relationship" class="quarto-xref">Figure&nbsp;<span>9.2</span></a> makes the pattern clear even before we run any regressions: women with no young children have the highest labor force participation rate, and the rate drops sharply with each additional young child. Now let’s see what OLS tells us after controlling for other factors:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>reg <span class="ot">&lt;-</span> <span class="fu">lm</span>(inlf <span class="sc">~</span> kidslt6 <span class="sc">+</span> kidsge6 <span class="sc">+</span> nwifeinc <span class="sc">+</span> motheduc, <span class="at">data =</span> lf_data)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(reg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
-lm(formula = log(wage) ~ educ + exper + educ_exper, data = wage_data)
+lm(formula = inlf ~ kidslt6 + kidsge6 + nwifeinc + motheduc, 
+    data = lf_data)
 
 Residuals:
-     Min       1Q   Median       3Q      Max 
--2.05543 -0.29549 -0.05335  0.31047  1.44788 
+    Min      1Q  Median      3Q     Max 
+-0.8023 -0.5409  0.2867  0.3992  0.9144 
 
 Coefficients:
-              Estimate Std. Error t value            Pr(&gt;|t|)    
-(Intercept)  0.1532232  0.1673326   0.916              0.3603    
-educ         0.1030365  0.0127368   8.090 0.00000000000000422 ***
-exper        0.0132641  0.0060374   2.197              0.0285 *  
-educ_exper  -0.0002473  0.0004945  -0.500              0.6172    
+             Estimate Std. Error t value             Pr(&gt;|t|)    
+(Intercept)  0.541676   0.058607   9.242 &lt; 0.0000000000000002 ***
+kidslt6     -0.212154   0.033588  -6.316       0.000000000459 ***
+kidsge6      0.005765   0.013262   0.435             0.663874    
+nwifeinc    -0.005374   0.001512  -3.555             0.000402 ***
+motheduc     0.019190   0.005250   3.655             0.000275 ***
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-Residual standard error: 0.4617 on 522 degrees of freedom
-Multiple R-squared:  0.2497,    Adjusted R-squared:  0.2454 
-F-statistic: 57.91 on 3 and 522 DF,  p-value: &lt; 0.00000000000000022</code></pre>
+Residual standard error: 0.4781 on 748 degrees of freedom
+Multiple R-squared:  0.07454,   Adjusted R-squared:  0.06959 
+F-statistic: 15.06 on 4 and 748 DF,  p-value: 0.000000000007567</code></pre>
 </div>
 </div>
-<p>The interaction coefficient (<span class="math inline">\(\hat{\beta}_3 \approx 0.0003\)</span>) is small but positive and marginally significant. This suggests that the returns to experience are slightly higher for more educated workers.</p>
-<p>The effect of experience is: <span class="math display">\[
-\frac{\partial \ln(wage)}{\partial exper} = \beta_2 + \beta_3(educ)
-\]</span></p>
-<p>For someone with 12 years of education: <span class="math inline">\(0.019 + 0.0003(12) = 0.023\)</span> (2.3% per year)</p>
-<p>For someone with 16 years of education: <span class="math inline">\(0.019 + 0.0003(16) = 0.024\)</span> (2.4% per year)</p>
+<section id="interpreting-the-lpm-coefficients" class="level3" data-number="9.3.1">
+<h3 data-number="9.3.1" class="anchored" data-anchor-id="interpreting-the-lpm-coefficients"><span class="header-section-number">9.3.1</span> Interpreting the LPM Coefficients</h3>
+<p>Let’s walk through each coefficient carefully.</p>
+<p>The coefficient on <code>kidslt6</code> (<span class="math inline">\(\hat{\beta}_1 \approx -0.21\)</span>) tells us that each additional child under age 6 <strong>decreases the probability</strong> of being in the labor force by about 21 percentage points, holding all else constant. This is a large and statistically significant effect. To put this in perspective, going from 0 to 1 young child reduces the predicted probability of working by roughly one-fifth.</p>
+<p>The coefficient on <code>kidsge6</code> (<span class="math inline">\(\hat{\beta}_2 \approx 0.01\)</span>) suggests that children aged 6 and older have essentially no effect on labor force participation—the coefficient is small and not statistically significant. This makes intuitive sense: school-age children require less constant supervision than young children, so they impose fewer constraints on a mother’s ability to work outside the home.</p>
+<p>The coefficient on <code>nwifeinc</code> (<span class="math inline">\(\hat{\beta}_3 \approx -0.005\)</span>) indicates that higher non-labor income is associated with a slightly lower probability of working. Each additional thousand dollars of non-labor income reduces the probability by about half a percentage point. This is consistent with basic labor supply theory: when a household has more non-labor income (e.g., from a higher-earning husband), the wife has less financial pressure to enter the labor force.</p>
+<p>The coefficient on <code>motheduc</code> (<span class="math inline">\(\hat{\beta}_4 \approx 0.02\)</span>) suggests that women whose mothers had more education are slightly more likely to participate in the labor force. Each additional year of the mother’s education is associated with about a 2 percentage point increase in the probability of working.</p>
 </section>
-<section id="application-decomposing-the-gender-wage-gap" class="level2" data-number="9.6">
-<h2 data-number="9.6" class="anchored" data-anchor-id="application-decomposing-the-gender-wage-gap"><span class="header-section-number">9.6</span> Application: Decomposing the Gender Wage Gap</h2>
-<p>Economists have long sought to understand why women earn less than men on average. A classic approach uses regression with interactions to <strong>decompose</strong> the wage gap into:</p>
-<ol type="1">
-<li><strong>Explained differences</strong>: Gaps due to differences in education, experience, occupation, etc.</li>
-<li><strong>Unexplained differences</strong>: Gaps that remain after controlling for observable characteristics (potentially reflecting discrimination)</li>
-</ol>
-<p>Consider a comprehensive model:</p>
-<p><span class="math display">\[
-\ln(wage) = \beta_0 + \beta_1(female) + \sum_{j} \beta_j(HumanCapital_j) + \sum_{k} \beta_k(Occupation_k) + \mu
-\]</span></p>
+</section>
+<section id="problems-with-the-linear-probability-model" class="level2" data-number="9.4">
+<h2 data-number="9.4" class="anchored" data-anchor-id="problems-with-the-linear-probability-model"><span class="header-section-number">9.4</span> Problems with the Linear Probability Model</h2>
+<p>While the LPM is simple and intuitive, it has some important drawbacks that we need to understand.</p>
+<section id="problem-1-predictions-outside-0-1" class="level3" data-number="9.4.1">
+<h3 data-number="9.4.1" class="anchored" data-anchor-id="problem-1-predictions-outside-0-1"><span class="header-section-number">9.4.1</span> Problem 1: Predictions Outside [0, 1]</h3>
+<p>The most obvious problem is that the LPM can produce predicted probabilities that are <strong>less than 0 or greater than 1</strong>. Since probabilities must lie between 0 and 1, this is nonsensical.</p>
+<p>To see why this happens, recall that the LPM is just a straight line. A straight line extends infinitely in both directions, so for extreme enough values of <span class="math inline">\(x\)</span>, the predicted value will inevitably cross the 0 or 1 boundary.</p>
+<p>Let’s see this concretely. Consider a woman with 2 children under 6, 0 older children, non-labor income of <span class="math inline">\(30{,}000\)</span>, and a mother with 9 years of education. Using our estimates, her predicted probability of being in the labor force is:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Predicted probability for a specific woman</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>example_pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(reg, <span class="at">newdata =</span> <span class="fu">data.frame</span>(</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">kidslt6 =</span> <span class="dv">2</span>, <span class="at">kidsge6 =</span> <span class="dv">0</span>, <span class="at">nwifeinc =</span> <span class="dv">30</span>, <span class="at">motheduc =</span> <span class="dv">9</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>))</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Predicted probability:"</span>, <span class="fu">round</span>(example_pred, <span class="dv">4</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Predicted probability: 0.1288 </code></pre>
+</div>
+</div>
+<p>A <em>negative</em> probability—obviously impossible!</p>
+<p>We can see how widespread this problem is by looking at the full distribution of predicted probabilities from our model:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>lf_data <span class="ot">&lt;-</span> lf_data <span class="sc">|&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">pred =</span> <span class="fu">predict</span>(reg, <span class="at">type =</span> <span class="st">"response"</span>))</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> lf_data, <span class="fu">aes</span>(<span class="at">x =</span> pred)) <span class="sc">+</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="fl">0.05</span>, <span class="at">fill =</span> <span class="st">"#0072B2"</span>, <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">1</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Predicted Probability (LPM)"</span>,</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">y =</span> <span class="st">"Number of Observations"</span>,</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">title =</span> <span class="st">"Distribution of LPM Predicted Probabilities"</span>) <span class="sc">+</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-lpm-oob" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-lpm-oob-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9.3: Distribution of LPM predicted probabilities. The dashed red lines mark the valid [0, 1] range. Some predictions fall below zero.
+</figcaption>
+<div aria-describedby="fig-lpm-oob-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="binary_outcomes_files/figure-html/fig-lpm-oob-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p>We can also see this by plotting the predicted probabilities against the number of young children:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> lf_data) <span class="sc">+</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_jitter</span>(<span class="fu">aes</span>(<span class="at">x =</span> kidslt6, <span class="at">y =</span> pred), <span class="at">alpha =</span> <span class="fl">0.3</span>, <span class="at">width =</span> <span class="fl">0.15</span>, <span class="at">color =</span> <span class="st">"#0072B2"</span>) <span class="sc">+</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">1</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">annotate</span>(<span class="st">"rect"</span>, <span class="at">xmin =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">xmax =</span> <span class="fl">3.5</span>, <span class="at">ymin =</span> <span class="sc">-</span><span class="fl">0.35</span>, <span class="at">ymax =</span> <span class="dv">0</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">alpha =</span> <span class="fl">0.15</span>, <span class="at">fill =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="fl">2.8</span>, <span class="at">y =</span> <span class="sc">-</span><span class="fl">0.15</span>, <span class="at">label =</span> <span class="st">"Impossible</span><span class="sc">\n</span><span class="st">region"</span>,</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">fontface =</span> <span class="st">"italic"</span>, <span class="at">size =</span> <span class="fl">3.5</span>) <span class="sc">+</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.35</span>, <span class="fl">1.1</span>)) <span class="sc">+</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Number of Children Under Age 6"</span>,</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">y =</span> <span class="st">"Predicted Probability of Labor Force Participation"</span>) <span class="sc">+</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-lpm-scatter" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-lpm-scatter-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9.4: LPM predicted probabilities by number of young children. Some predictions fall below zero, violating the basic rules of probability.
+</figcaption>
+<div aria-describedby="fig-lpm-scatter-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="binary_outcomes_files/figure-html/fig-lpm-scatter-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p>As <a href="#fig-lpm-scatter" class="quarto-xref">Figure&nbsp;<span>9.4</span></a> shows, some predicted probabilities fall below zero—particularly for women with multiple young children. The LPM simply cannot respect the fact that probabilities are bounded.</p>
+</section>
+<section id="problem-2-heteroskedasticity" class="level3" data-number="9.4.2">
+<h3 data-number="9.4.2" class="anchored" data-anchor-id="problem-2-heteroskedasticity"><span class="header-section-number">9.4.2</span> Problem 2: Heteroskedasticity</h3>
+<p>A second, more subtle problem is that the LPM <strong>always</strong> exhibits <strong>heteroskedasticity</strong>. Recall that one of the Gauss-Markov assumptions (GM5) requires that the variance of the error term be constant across observations. When <span class="math inline">\(y\)</span> is binary, this assumption is necessarily violated.</p>
+<p>To see why, think about what the error term looks like in the LPM. When <span class="math inline">\(y\)</span> is 0 or 1, the error <span class="math inline">\(\mu = y - E(y|\mathbf{x})\)</span> can only take two possible values for any given <span class="math inline">\(\mathbf{x}\)</span>:</p>
 <ul>
-<li>The human capital variables (education, experience) capture differences in worker productivity</li>
-<li>The occupation dummies capture sorting into different types of jobs</li>
-<li>The coefficient <span class="math inline">\(\beta_1\)</span> on <code>female</code> represents the <strong>unexplained</strong> gap—the wage difference that remains after accounting for these factors</li>
+<li>If <span class="math inline">\(y = 1\)</span>: <span class="math inline">\(\mu = 1 - p(\mathbf{x})\)</span>, which happens with probability <span class="math inline">\(p(\mathbf{x})\)</span></li>
+<li>If <span class="math inline">\(y = 0\)</span>: <span class="math inline">\(\mu = 0 - p(\mathbf{x}) = -p(\mathbf{x})\)</span>, which happens with probability <span class="math inline">\(1 - p(\mathbf{x})\)</span></li>
 </ul>
-<p>Research by Blau and Kahn (2017) uses this approach with rich panel data. They find that while the raw gender wage gap has narrowed considerably since 1980, a substantial unexplained gap remains. Human capital differences explain less of the gap over time (as women have caught up in education and experience), but occupational and industry segregation continues to be important.</p>
-</section>
-<section id="best-practices-for-using-interactions" class="level2" data-number="9.7">
-<h2 data-number="9.7" class="anchored" data-anchor-id="best-practices-for-using-interactions"><span class="header-section-number">9.7</span> Best Practices for Using Interactions</h2>
-<section id="always-include-main-effects" class="level3" data-number="9.7.1">
-<h3 data-number="9.7.1" class="anchored" data-anchor-id="always-include-main-effects"><span class="header-section-number">9.7.1</span> Always Include Main Effects</h3>
-<p>When including an interaction term, always include the main effects too:</p>
-<p><strong>Correct:</strong> <span class="math display">\[
-y = \beta_0 + \beta_1(A) + \beta_2(B) + \beta_3(A \times B)
+<p>where <span class="math inline">\(p(\mathbf{x}) = E(y|\mathbf{x})\)</span> is the predicted probability. The variance of this error is:</p>
+<p><span class="math display">\[
+\text{Var}(\mu | \mathbf{x}) = p(\mathbf{x}) \times (1 - p(\mathbf{x}))
 \]</span></p>
-<p><strong>Incorrect:</strong> <span class="math display">\[
-y = \beta_0 + \beta_3(A \times B)
+<p>This variance depends on <span class="math inline">\(p(\mathbf{x})\)</span>, which depends on <span class="math inline">\(\mathbf{x}\)</span>. The variance is largest when <span class="math inline">\(p = 0.5\)</span> (maximum uncertainty about the outcome) and smallest when <span class="math inline">\(p\)</span> is near 0 or 1 (the outcome is nearly certain).</p>
+<p>Let’s visualize this:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-heterosk" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-heterosk-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9.5: The variance of the error term in a binary outcome model depends on the predicted probability. Variance is maximized at p = 0.5 and falls toward zero as p approaches 0 or 1.
+</figcaption>
+<div aria-describedby="fig-heterosk-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="binary_outcomes_files/figure-html/fig-heterosk-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p>Because of this built-in heteroskedasticity, the OLS estimator in the LPM is <strong>not BLUE</strong>—it is unbiased, but not the most efficient linear estimator. The practical consequence is that our standard errors will be incorrect unless we use <strong>robust standard errors</strong>, as we discussed in the chapter on heteroskedasticity.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+LPM: Use with Caution
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Despite these problems, the LPM remains widely used in economics because of its simplicity and because the coefficient estimates are often very similar to those from more sophisticated models. The key is to be aware of its limitations: always use robust standard errors to address heteroskedasticity, and be cautious about interpreting predicted probabilities near the boundaries.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="an-alternative-logistic-regression" class="level2" data-number="9.5">
+<h2 data-number="9.5" class="anchored" data-anchor-id="an-alternative-logistic-regression"><span class="header-section-number">9.5</span> An Alternative: Logistic Regression</h2>
+<p>Given the issues with the LPM, researchers sometimes turn to alternative estimators that are specifically designed for binary outcomes. The most common of these is the <strong>logit</strong> (or <strong>logistic regression</strong>) model.</p>
+<p>The key idea is to replace the linear function with a non-linear function that is guaranteed to produce predictions between 0 and 1. Instead of modeling the probability directly as a linear function of <span class="math inline">\(\mathbf{x}\)</span>, we write:</p>
+<p><span class="math display">\[
+P(y = 1 | \mathbf{x}) = G(\beta_0 + \beta_1 x_1 + \cdots + \beta_k x_k)
 \]</span></p>
-<p>Omitting main effects forces the interaction to capture both the main effects and the interaction, leading to misleading coefficients.</p>
+<p>where <span class="math inline">\(G(\cdot)\)</span> is a function that maps any real number into the interval <span class="math inline">\((0, 1)\)</span>.</p>
+<section id="the-logistic-function" class="level3" data-number="9.5.1">
+<h3 data-number="9.5.1" class="anchored" data-anchor-id="the-logistic-function"><span class="header-section-number">9.5.1</span> The Logistic Function</h3>
+<p>In logit regression, we specifically define <span class="math inline">\(G(\cdot)\)</span> to be the <strong>logistic function</strong>:</p>
+<p><span class="math display">\[
+G(z) = \frac{\exp(z)}{1 + \exp(z)}
+\]</span></p>
+<p>This function has an S-shaped (sigmoid) curve that is worth studying carefully:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-logistic-function" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-logistic-function-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9.6: The logistic function maps any real number to the (0, 1) interval. It is nearly linear in the middle but curves at the extremes, ensuring predicted probabilities always stay between 0 and 1.
+</figcaption>
+<div aria-describedby="fig-logistic-function-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="binary_outcomes_files/figure-html/fig-logistic-function-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p>Several features of <a href="#fig-logistic-function" class="quarto-xref">Figure&nbsp;<span>9.6</span></a> are worth noting. When <span class="math inline">\(z\)</span> is very negative, <span class="math inline">\(G(z)\)</span> is close to 0; when <span class="math inline">\(z\)</span> is very positive, <span class="math inline">\(G(z)\)</span> is close to 1; and at <span class="math inline">\(z = 0\)</span>, <span class="math inline">\(G(z) = 0.5\)</span>. Crucially, <span class="math inline">\(G(z)\)</span> is <strong>strictly</strong> between 0 and 1 for all values of <span class="math inline">\(z\)</span>—so the logit model can never produce impossible predicted probabilities.</p>
+<p>Notice also that the logistic function is <strong>nearly linear in the middle</strong> of its range (roughly between <span class="math inline">\(z = -2\)</span> and <span class="math inline">\(z = 2\)</span>) but curves toward the boundaries at the extremes. This will be important later when we compare the LPM and logit results.</p>
 </section>
-<section id="center-continuous-variables" class="level3" data-number="9.7.2">
-<h3 data-number="9.7.2" class="anchored" data-anchor-id="center-continuous-variables"><span class="header-section-number">9.7.2</span> Center Continuous Variables</h3>
-<p>When interacting continuous variables, centering them (subtracting the mean) can make coefficients more interpretable. After centering, the main effect coefficient gives the effect at the mean of the other variable, rather than at zero.</p>
+<section id="comparing-the-lpm-and-logit-visually" class="level3" data-number="9.5.2">
+<h3 data-number="9.5.2" class="anchored" data-anchor-id="comparing-the-lpm-and-logit-visually"><span class="header-section-number">9.5.2</span> Comparing the LPM and Logit Visually</h3>
+<p>To build intuition for why the logistic function matters, let’s compare what the LPM and logit model look like when fit to the same data. Using our full model with all four explanatory variables, we can compute a single “index” for each woman—the linear combination <span class="math inline">\(\hat{\beta}_0 + \hat{\beta}_1 x_1 + \cdots + \hat{\beta}_k x_k\)</span>—and then plot how each model translates that index into a predicted probability. This is the clearest way to see the difference between the two approaches:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-lpm-vs-logit-fit" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-lpm-vs-logit-fit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9.7: The LPM (blue, dashed) predicts probability as a straight line that can exceed [0, 1]. The logit (orange, solid) wraps the same linear index through the S-shaped logistic function, keeping predictions in bounds. Each gray point is one woman in the data, plotted at y = 0 or y = 1.
+</figcaption>
+<div aria-describedby="fig-lpm-vs-logit-fit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="binary_outcomes_files/figure-html/fig-lpm-vs-logit-fit-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p>In <a href="#fig-lpm-vs-logit-fit" class="quarto-xref">Figure&nbsp;<span>9.7</span></a>, the gray points show the actual data—all at <span class="math inline">\(y = 0\)</span> or <span class="math inline">\(y = 1\)</span>. The x-axis is the linear index, which combines all the explanatory variables into a single score for each woman. Women with low index values have characteristics that predict low labor force participation (e.g., many young children, high non-labor income); women with high index values have characteristics that predict high participation.</p>
+<p>The LPM maps this index to a predicted probability using a straight line, which inevitably extends beyond the [0, 1] bounds at the extremes. The logit wraps the same index through the S-shaped logistic function, keeping all predictions between 0 and 1. In the middle range—where most of the data sits—the two models agree closely. They diverge mainly at the tails, which is exactly where the LPM’s out-of-bounds problem arises.</p>
 </section>
-<section id="test-whether-interactions-are-needed" class="level3" data-number="9.7.3">
-<h3 data-number="9.7.3" class="anchored" data-anchor-id="test-whether-interactions-are-needed"><span class="header-section-number">9.7.3</span> Test Whether Interactions Are Needed</h3>
-<p>Not every model needs interactions. Test whether the interaction coefficient is statistically significant before interpreting it substantively. You can also use F-tests to jointly test multiple interaction terms.</p>
+<section id="maximum-likelihood-estimation" class="level3" data-number="9.5.3">
+<h3 data-number="9.5.3" class="anchored" data-anchor-id="maximum-likelihood-estimation"><span class="header-section-number">9.5.3</span> Maximum Likelihood Estimation</h3>
+<p>How do we estimate the logit model if we can’t use OLS? The answer is <strong>Maximum Likelihood Estimation (MLE)</strong>. The intuition behind MLE is straightforward, even if the mathematical details are complex.</p>
+<p>Think of it this way. For any set of <span class="math inline">\(\beta\)</span> coefficients, the logistic function gives us a predicted probability <span class="math inline">\(\hat{p}_i\)</span> for each observation <span class="math inline">\(i\)</span>. If <span class="math inline">\(y_i = 1\)</span> (the event occurred), we want <span class="math inline">\(\hat{p}_i\)</span> to be high—close to 1. If <span class="math inline">\(y_i = 0\)</span> (the event did not occur), we want <span class="math inline">\(\hat{p}_i\)</span> to be low—close to 0.</p>
+<p>The <strong>likelihood</strong> is a measure of how well the model’s predicted probabilities match the actual outcomes. MLE finds the set of <span class="math inline">\(\beta\)</span> coefficients that maximizes this likelihood—that is, the coefficients that make the observed data most probable.</p>
+<p>The process works iteratively:</p>
+<ol type="1">
+<li>Start with initial guesses for the <span class="math inline">\(\beta\)</span> coefficients.</li>
+<li>Plug these <span class="math inline">\(\beta\)</span>s into the logistic function to calculate predicted probabilities.</li>
+<li>Compute the total likelihood of observing the actual 0s and 1s given those predictions.</li>
+<li>Adjust the <span class="math inline">\(\beta\)</span>s to increase the likelihood.</li>
+<li>Repeat until the likelihood can’t be improved further.</li>
+</ol>
+<p>The details of how MLE works are beyond the scope of this course, but it is useful to know what is happening under the hood. The key takeaway is that MLE finds the coefficients that make the observed data most likely, rather than minimizing the sum of squared residuals like OLS does.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+OLS vs.&nbsp;MLE: Two Different Objectives
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>OLS minimizes <span class="math inline">\(\sum(y_i - \hat{y}_i)^2\)</span>—the sum of squared residuals. MLE maximizes the probability of observing the actual data given the model. For linear regression with normal errors, these two approaches give the same answer. For logistic regression, MLE is the appropriate method because the errors are not normal.</p>
+</div>
+</div>
 </section>
 </section>
-<section id="summary" class="level2" data-number="9.8">
-<h2 data-number="9.8" class="anchored" data-anchor-id="summary"><span class="header-section-number">9.8</span> Summary</h2>
-<p>Interaction terms extend the flexibility of regression models by allowing the effect of one variable to depend on another.</p>
-<p><strong>Interactions between dummy variables</strong> allow us to estimate separate effects for groups defined by multiple categories. The interaction coefficient captures the additional effect of belonging to both categories beyond what we’d expect from adding the individual effects.</p>
-<p><strong>Interactions between dummies and continuous variables</strong> allow different slopes for different groups. Without interactions, a dummy variable only shifts the intercept (parallel lines). With interactions, each group can have its own slope.</p>
-<p><strong>Interactions between continuous variables</strong> allow the marginal effect of one variable to vary with the level of another. This is useful when economic theory suggests complementarities or diminishing returns.</p>
-<p>When interactions are present, interpreting coefficients requires care. The effect of a variable involved in an interaction depends on the value of the other variable(s) in the interaction. Always compute effects at meaningful values (like means or specific policy-relevant points).</p>
+<section id="estimating-logistic-regression-in-r" class="level2" data-number="9.6">
+<h2 data-number="9.6" class="anchored" data-anchor-id="estimating-logistic-regression-in-r"><span class="header-section-number">9.6</span> Estimating Logistic Regression in R</h2>
+<p>Estimating logistic regression in R is straightforward. We use <code>glm()</code> (generalized linear model) instead of <code>lm()</code>, and specify <code>family = binomial(link = "logit")</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>logit_reg <span class="ot">&lt;-</span> <span class="fu">glm</span>(inlf <span class="sc">~</span> kidslt6 <span class="sc">+</span> kidsge6 <span class="sc">+</span> nwifeinc <span class="sc">+</span> motheduc,</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">"logit"</span>),</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> lf_data)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(logit_reg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = inlf ~ kidslt6 + kidsge6 + nwifeinc + motheduc, 
+    family = binomial(link = "logit"), data = lf_data)
+
+Coefficients:
+             Estimate Std. Error z value      Pr(&gt;|z|)    
+(Intercept)  0.177419   0.257368   0.689      0.490598    
+kidslt6     -0.964810   0.163790  -5.891 0.00000000385 ***
+kidsge6      0.027471   0.058680   0.468      0.639682    
+nwifeinc    -0.024769   0.007063  -3.507      0.000453 ***
+motheduc     0.085459   0.023509   3.635      0.000278 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 1029.75  on 752  degrees of freedom
+Residual deviance:  970.89  on 748  degrees of freedom
+AIC: 980.89
+
+Number of Fisher Scoring iterations: 4</code></pre>
+</div>
+</div>
+<p>Notice that the signs of the coefficients match the LPM: more young children reduce the probability of labor force participation, higher non-labor income reduces it, and more maternal education increases it. But the magnitudes look very different—the logit coefficients are not directly comparable to the LPM coefficients. We will discuss interpretation in detail below.</p>
+<section id="comparing-the-models-side-by-side" class="level3" data-number="9.6.1">
+<h3 data-number="9.6.1" class="anchored" data-anchor-id="comparing-the-models-side-by-side"><span class="header-section-number">9.6.1</span> Comparing the Models Side by Side</h3>
+<p>Let’s put the LPM and logit results next to each other using <code>modelsummary</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>models <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"LPM (OLS)"</span> <span class="ot">=</span> reg,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Logit"</span> <span class="ot">=</span> logit_reg</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="fu">modelsummary</span>(models,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>             <span class="at">stars =</span> <span class="fu">c</span>(<span class="st">'*'</span> <span class="ot">=</span> <span class="fl">0.1</span>, <span class="st">'**'</span> <span class="ot">=</span> <span class="fl">0.05</span>, <span class="st">'***'</span> <span class="ot">=</span> <span class="fl">0.01</span>),</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>             <span class="at">gof_map =</span> <span class="fu">c</span>(<span class="st">"nobs"</span>, <span class="st">"r.squared"</span>, <span class="st">"logLik"</span>, <span class="st">"aic"</span>),</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>             <span class="at">title =</span> <span class="st">"LPM vs. Logit: Women's Labor Force Participation"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="tbl-lpm-logit" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-lpm-logit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;9.1: Comparison of LPM and Logistic Regression estimates for women’s labor force participation.
+</figcaption>
+<div aria-describedby="tbl-lpm-logit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<!-- preamble start -->
+
+    <script src="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.js"></script>
+
+    <script>
+      // Create table-specific functions using external factory
+      const tableFns_fre5b328wkaj4ci32ca5 = TinyTable.createTableFunctions("tinytable_fre5b328wkaj4ci32ca5");
+      // tinytable span after
+      window.addEventListener('load', function () {
+          var cellsToStyle = [
+            // tinytable style arrays after
+          { positions: [ { i: '14', j: 2 }, { i: '14', j: 3 } ], css_id: 'tinytable_css_0en313c2udefccwt4eqa',}, 
+          { positions: [ { i: '10', j: 2 }, { i: '10', j: 3 } ], css_id: 'tinytable_css_kz8abu71bb8nc4fyn7ob',}, 
+          { positions: [ { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '4', j: 2 }, { i: '5', j: 2 }, { i: '6', j: 2 }, { i: '7', j: 2 }, { i: '8', j: 2 }, { i: '9', j: 2 }, { i: '11', j: 2 }, { i: '12', j: 2 }, { i: '13', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '3', j: 3 }, { i: '4', j: 3 }, { i: '5', j: 3 }, { i: '6', j: 3 }, { i: '7', j: 3 }, { i: '8', j: 3 }, { i: '9', j: 3 }, { i: '11', j: 3 }, { i: '12', j: 3 }, { i: '13', j: 3 } ], css_id: 'tinytable_css_x0gxt9ml27qaqk1y4ly5',}, 
+          { positions: [ { i: '0', j: 2 }, { i: '0', j: 3 } ], css_id: 'tinytable_css_w04wmpkwsprarwbarzmk',}, 
+          { positions: [ { i: '14', j: 1 } ], css_id: 'tinytable_css_nsg7kky8wipvqk1d8xep',}, 
+          { positions: [ { i: '10', j: 1 } ], css_id: 'tinytable_css_8fyunv6d520m52der6tf',}, 
+          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '4', j: 1 }, { i: '5', j: 1 }, { i: '6', j: 1 }, { i: '7', j: 1 }, { i: '8', j: 1 }, { i: '9', j: 1 }, { i: '11', j: 1 }, { i: '12', j: 1 }, { i: '13', j: 1 } ], css_id: 'tinytable_css_9cadugw1rnciizvvj7v7',}, 
+          { positions: [ { i: '0', j: 1 } ], css_id: 'tinytable_css_9jkx4n52tz3fnlfr16su',}, 
+          ];
+
+          // Loop over the arrays to style the cells
+          cellsToStyle.forEach(function (group) {
+              group.positions.forEach(function (cell) {
+                  tableFns_fre5b328wkaj4ci32ca5.styleCell(cell.i, cell.j, group.css_id);
+              });
+          });
+      });
+    </script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
+    <style>
+    /* tinytable css entries after */
+    #tinytable_fre5b328wkaj4ci32ca5 td.tinytable_css_0en313c2udefccwt4eqa, #tinytable_fre5b328wkaj4ci32ca5 th.tinytable_css_0en313c2udefccwt4eqa {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_fre5b328wkaj4ci32ca5 td.tinytable_css_kz8abu71bb8nc4fyn7ob, #tinytable_fre5b328wkaj4ci32ca5 th.tinytable_css_kz8abu71bb8nc4fyn7ob {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_fre5b328wkaj4ci32ca5 td.tinytable_css_x0gxt9ml27qaqk1y4ly5, #tinytable_fre5b328wkaj4ci32ca5 th.tinytable_css_x0gxt9ml27qaqk1y4ly5 { text-align: center }
+    #tinytable_fre5b328wkaj4ci32ca5 td.tinytable_css_w04wmpkwsprarwbarzmk, #tinytable_fre5b328wkaj4ci32ca5 th.tinytable_css_w04wmpkwsprarwbarzmk {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_fre5b328wkaj4ci32ca5 td.tinytable_css_nsg7kky8wipvqk1d8xep, #tinytable_fre5b328wkaj4ci32ca5 th.tinytable_css_nsg7kky8wipvqk1d8xep {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_fre5b328wkaj4ci32ca5 td.tinytable_css_8fyunv6d520m52der6tf, #tinytable_fre5b328wkaj4ci32ca5 th.tinytable_css_8fyunv6d520m52der6tf {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_fre5b328wkaj4ci32ca5 td.tinytable_css_9cadugw1rnciizvvj7v7, #tinytable_fre5b328wkaj4ci32ca5 th.tinytable_css_9cadugw1rnciizvvj7v7 { text-align: left }
+    #tinytable_fre5b328wkaj4ci32ca5 td.tinytable_css_9jkx4n52tz3fnlfr16su, #tinytable_fre5b328wkaj4ci32ca5 th.tinytable_css_9jkx4n52tz3fnlfr16su {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    </style>
+    <div class="container">
+      <table class="tinytable" id="tinytable_fre5b328wkaj4ci32ca5" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+        <caption>LPM vs. Logit: Women's Labor Force Participation</caption>
+        <thead>
+              <tr>
+                <th scope="col" data-row="0" data-col="1"> </th>
+                <th scope="col" data-row="0" data-col="2">LPM (OLS)</th>
+                <th scope="col" data-row="0" data-col="3">Logit</th>
+              </tr>
+        </thead>
+        <tfoot><tr><td colspan="3">* p &lt; 0.1, ** p &lt; 0.05, *** p &lt; 0.01</td></tr></tfoot>
+        <tbody>
+                <tr>
+                  <td data-row="1" data-col="1">(Intercept)</td>
+                  <td data-row="1" data-col="2">0.542***</td>
+                  <td data-row="1" data-col="3">0.177</td>
+                </tr>
+                <tr>
+                  <td data-row="2" data-col="1"></td>
+                  <td data-row="2" data-col="2">(0.059)</td>
+                  <td data-row="2" data-col="3">(0.257)</td>
+                </tr>
+                <tr>
+                  <td data-row="3" data-col="1">kidslt6</td>
+                  <td data-row="3" data-col="2">-0.212***</td>
+                  <td data-row="3" data-col="3">-0.965***</td>
+                </tr>
+                <tr>
+                  <td data-row="4" data-col="1"></td>
+                  <td data-row="4" data-col="2">(0.034)</td>
+                  <td data-row="4" data-col="3">(0.164)</td>
+                </tr>
+                <tr>
+                  <td data-row="5" data-col="1">kidsge6</td>
+                  <td data-row="5" data-col="2">0.006</td>
+                  <td data-row="5" data-col="3">0.027</td>
+                </tr>
+                <tr>
+                  <td data-row="6" data-col="1"></td>
+                  <td data-row="6" data-col="2">(0.013)</td>
+                  <td data-row="6" data-col="3">(0.059)</td>
+                </tr>
+                <tr>
+                  <td data-row="7" data-col="1">nwifeinc</td>
+                  <td data-row="7" data-col="2">-0.005***</td>
+                  <td data-row="7" data-col="3">-0.025***</td>
+                </tr>
+                <tr>
+                  <td data-row="8" data-col="1"></td>
+                  <td data-row="8" data-col="2">(0.002)</td>
+                  <td data-row="8" data-col="3">(0.007)</td>
+                </tr>
+                <tr>
+                  <td data-row="9" data-col="1">motheduc</td>
+                  <td data-row="9" data-col="2">0.019***</td>
+                  <td data-row="9" data-col="3">0.085***</td>
+                </tr>
+                <tr>
+                  <td data-row="10" data-col="1"></td>
+                  <td data-row="10" data-col="2">(0.005)</td>
+                  <td data-row="10" data-col="3">(0.024)</td>
+                </tr>
+                <tr>
+                  <td data-row="11" data-col="1">Num.Obs.</td>
+                  <td data-row="11" data-col="2">753</td>
+                  <td data-row="11" data-col="3">753</td>
+                </tr>
+                <tr>
+                  <td data-row="12" data-col="1">R2</td>
+                  <td data-row="12" data-col="2">0.075</td>
+                  <td data-row="12" data-col="3"></td>
+                </tr>
+                <tr>
+                  <td data-row="13" data-col="1">Log.Lik.</td>
+                  <td data-row="13" data-col="2">-510.246</td>
+                  <td data-row="13" data-col="3">-485.443</td>
+                </tr>
+                <tr>
+                  <td data-row="14" data-col="1">AIC</td>
+                  <td data-row="14" data-col="2">1032.5</td>
+                  <td data-row="14" data-col="3">980.9</td>
+                </tr>
+        </tbody>
+      </table>
+    </div>
+<!-- hack to avoid NA insertion in last line -->
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>The key things to notice in <a href="#tbl-lpm-logit" class="quarto-xref">Table&nbsp;<span>9.1</span></a> are that the signs are the same across both models (both agree on the direction of each effect), but the magnitudes are different because the logit coefficients represent something different (changes in log-odds rather than changes in probability).</p>
 </section>
-<section id="check-your-understanding" class="level2" data-number="9.9">
-<h2 data-number="9.9" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">9.9</span> Check Your Understanding</h2>
+<section id="predicted-probabilities-stay-in-bounds" class="level3" data-number="9.6.2">
+<h3 data-number="9.6.2" class="anchored" data-anchor-id="predicted-probabilities-stay-in-bounds"><span class="header-section-number">9.6.2</span> Predicted Probabilities Stay In Bounds</h3>
+<p>A major advantage of the logit model is that its predicted probabilities are always between 0 and 1. Let’s compare the distributions of predicted probabilities from both models:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>lf_data <span class="ot">&lt;-</span> lf_data <span class="sc">|&gt;</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">logit_pred =</span> <span class="fu">predict</span>(logit_reg, <span class="at">type =</span> <span class="st">"response"</span>))</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>pred_long <span class="ot">&lt;-</span> lf_data <span class="sc">|&gt;</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(pred, logit_pred) <span class="sc">|&gt;</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">everything</span>(),</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>                 <span class="at">names_to =</span> <span class="st">"model"</span>,</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>                 <span class="at">values_to =</span> <span class="st">"predicted"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">model =</span> <span class="fu">case_when</span>(</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>        model <span class="sc">==</span> <span class="st">"pred"</span> <span class="sc">~</span> <span class="st">"LPM (OLS)"</span>,</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>        model <span class="sc">==</span> <span class="st">"logit_pred"</span> <span class="sc">~</span> <span class="st">"Logit"</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    ))</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(pred_long, <span class="fu">aes</span>(<span class="at">x =</span> predicted, <span class="at">fill =</span> model)) <span class="sc">+</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="fl">0.05</span>, <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">linewidth =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">1</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">linewidth =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span> model) <span class="sc">+</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"LPM (OLS)"</span> <span class="ot">=</span> <span class="st">"#0072B2"</span>, <span class="st">"Logit"</span> <span class="ot">=</span> <span class="st">"#D55E00"</span>)) <span class="sc">+</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Predicted Probability"</span>,</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">y =</span> <span class="st">"Count"</span>) <span class="sc">+</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>,</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>          <span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">12</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-pred-comparison" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-pred-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9.8: Comparing predicted probability distributions from the LPM (left) and logit (right) models. The LPM produces some predictions below 0, while the logit keeps all predictions within the valid range.
+</figcaption>
+<div aria-describedby="fig-pred-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="binary_outcomes_files/figure-html/fig-pred-comparison-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p><a href="#fig-pred-comparison" class="quarto-xref">Figure&nbsp;<span>9.8</span></a> clearly shows the advantage of logistic regression: all predictions are squeezed into the valid [0, 1] range.</p>
+</section>
+</section>
+<section id="interpreting-logistic-regression" class="level2" data-number="9.7">
+<h2 data-number="9.7" class="anchored" data-anchor-id="interpreting-logistic-regression"><span class="header-section-number">9.7</span> Interpreting Logistic Regression</h2>
+<p>The biggest challenge with logistic regression is that the coefficients are <strong>not directly interpretable</strong> in the same way as OLS coefficients. In the LPM, a one-unit increase in <span class="math inline">\(x_j\)</span> changes the probability of <span class="math inline">\(y = 1\)</span> by exactly <span class="math inline">\(\beta_j\)</span> percentage points—always, regardless of where you start. In logistic regression, the relationship between <span class="math inline">\(x\)</span> and the probability is non-linear, so the effect of a one-unit change in <span class="math inline">\(x\)</span> depends on where you start.</p>
+<p>There are three common ways to interpret logit coefficients, each with different strengths.</p>
+<section id="interpretation-1-log-odds" class="level3" data-number="9.7.1">
+<h3 data-number="9.7.1" class="anchored" data-anchor-id="interpretation-1-log-odds"><span class="header-section-number">9.7.1</span> Interpretation 1: Log-Odds</h3>
+<p>Technically, the logit coefficients represent the change in the <strong>log-odds</strong> of the outcome. Let’s unpack what this means.</p>
+<p>The <strong>odds</strong> of an event are defined as the probability of the event occurring divided by the probability of it not occurring:</p>
+<p><span class="math display">\[
+\text{Odds} = \frac{P(y = 1)}{P(y = 0)} = \frac{P(y = 1)}{1 - P(y = 1)}
+\]</span></p>
+<p>For example, if the probability of being in the labor force is 0.75, the odds are <span class="math inline">\(0.75 / 0.25 = 3\)</span>. We would say “the odds are 3 to 1 in favor of being in the labor force.”</p>
+<p>The <strong>log-odds</strong> (also called the “logit”) is simply the natural log of the odds:</p>
+<p><span class="math display">\[
+\text{Log-odds} = \ln\left(\frac{P(y = 1)}{1 - P(y = 1)}\right)
+\]</span></p>
+<p>In the logistic regression model, the log-odds is a linear function of the <span class="math inline">\(x\)</span> variables:</p>
+<p><span class="math display">\[
+\ln\left(\frac{P(y = 1 | \mathbf{x})}{1 - P(y = 1 | \mathbf{x})}\right) = \beta_0 + \beta_1 x_1 + \cdots + \beta_k x_k
+\]</span></p>
+<p>So a one-unit increase in <span class="math inline">\(x_j\)</span> changes the log-odds by <span class="math inline">\(\beta_j\)</span>. This is mathematically clean but not very intuitive—most people don’t think in terms of log-odds.</p>
+<p>The main practical use of the log-odds interpretation is to determine <strong>direction</strong>: positive coefficients increase the probability of the event, and negative coefficients decrease it.</p>
+</section>
+<section id="interpretation-2-odds-ratios" class="level3" data-number="9.7.2">
+<h3 data-number="9.7.2" class="anchored" data-anchor-id="interpretation-2-odds-ratios"><span class="header-section-number">9.7.2</span> Interpretation 2: Odds Ratios</h3>
+<p>A more intuitive interpretation comes from exponentiating the coefficients. Since the log-odds changes by <span class="math inline">\(\beta_j\)</span> for a one-unit increase in <span class="math inline">\(x_j\)</span>, the <strong>odds</strong> are multiplied by <span class="math inline">\(\exp(\beta_j)\)</span>. This quantity <span class="math inline">\(\exp(\beta_j)\)</span> is called the <strong>odds ratio</strong>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>or_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">variable =</span> <span class="fu">c</span>(<span class="st">"Kids &lt; 6"</span>, <span class="st">"Kids 6-18"</span>, <span class="st">"Non-wife Income"</span>, <span class="st">"Mother's Educ"</span>),</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">odds_ratio =</span> <span class="fu">exp</span>(<span class="fu">coef</span>(logit_reg)[<span class="sc">-</span><span class="dv">1</span>]),</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">lower =</span> <span class="fu">exp</span>(<span class="fu">confint.default</span>(logit_reg)[<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>]),</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">upper =</span> <span class="fu">exp</span>(<span class="fu">confint.default</span>(logit_reg)[<span class="sc">-</span><span class="dv">1</span>, <span class="dv">2</span>])</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(or_data, <span class="fu">aes</span>(<span class="at">x =</span> odds_ratio, <span class="at">y =</span> <span class="fu">reorder</span>(variable, odds_ratio))) <span class="sc">+</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">1</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"gray50"</span>) <span class="sc">+</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_pointrange</span>(<span class="fu">aes</span>(<span class="at">xmin =</span> lower, <span class="at">xmax =</span> upper), <span class="at">color =</span> <span class="st">"#0072B2"</span>, <span class="at">size =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Odds Ratio (with 95% CI)"</span>,</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">y =</span> <span class="cn">NULL</span>,</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">title =</span> <span class="st">"Odds Ratios for Labor Force Participation"</span>) <span class="sc">+</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-odds-ratios" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-odds-ratios-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9.9: Odds ratios from the logistic regression. Values below 1 (to the left of the dashed line) decrease the odds of labor force participation; values above 1 increase them.
+</figcaption>
+<div aria-describedby="fig-odds-ratios-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="binary_outcomes_files/figure-html/fig-odds-ratios-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p><a href="#fig-odds-ratios" class="quarto-xref">Figure&nbsp;<span>9.9</span></a> shows the odds ratios with 95% confidence intervals. Here’s how to read them:</p>
+<ul>
+<li><strong>Kids &lt; 6</strong>: The odds ratio is about <span class="math inline">\(\exp(-0.87) \approx 0.42\)</span>. Each additional child under 6 <strong>multiplies</strong> the odds of working by 0.42—reducing them by 58%. This is a large effect.</li>
+<li><strong>Mother’s Educ</strong>: The odds ratio is about <span class="math inline">\(\exp(0.10) \approx 1.10\)</span>. Each additional year of mother’s education multiplies the odds of working by 1.10—increasing them by 10%.</li>
+<li>If the confidence interval includes 1 (crosses the dashed line), the effect is not statistically significant.</li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Understanding Odds Ratios
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>An odds ratio of 1 means no effect. An odds ratio of 2 means the odds are doubled. An odds ratio of 0.5 means the odds are halved. Odds ratios are always positive—they can never be negative or zero.</p>
+<p>Be careful not to confuse odds ratios with probability ratios. An odds ratio of 2 does <em>not</em> mean the probability doubles. The relationship between odds and probability is non-linear.</p>
+</div>
+</div>
+</section>
+<section id="interpretation-3-marginal-effects-at-the-mean" class="level3" data-number="9.7.3">
+<h3 data-number="9.7.3" class="anchored" data-anchor-id="interpretation-3-marginal-effects-at-the-mean"><span class="header-section-number">9.7.3</span> Interpretation 3: Marginal Effects at the Mean</h3>
+<p>The most practical way to compare logit estimates to LPM estimates is to compute <strong>marginal effects</strong>—the change in predicted probability for a one-unit change in <span class="math inline">\(x\)</span>, evaluated at specific values of the other variables. The most common approach is to evaluate at the <strong>mean</strong> of all explanatory variables.</p>
+<p>Let’s compute this for the effect of one additional young child:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a hypothetical person with average values for all RHS variables</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>mean_vals <span class="ot">&lt;-</span> lf_data <span class="sc">|&gt;</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="fu">all_of</span>(<span class="fu">c</span>(<span class="st">"kidslt6"</span>, <span class="st">"kidsge6"</span>, <span class="st">"nwifeinc"</span>, <span class="st">"motheduc"</span>)),</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    \(x) <span class="fu">mean</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    ))</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>mean_vals <span class="ot">&lt;-</span> mean_vals <span class="sc">|&gt;</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">slice</span>(<span class="dv">1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unlist</span>()</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>mean_vals</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   kidslt6    kidsge6   nwifeinc   motheduc 
+ 0.2377158  1.3532537 20.1289637  9.2509960 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Predicted probability at the mean</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>log_pred_mean <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">c</span>(<span class="dv">1</span>, mean_vals) <span class="sc">*</span> <span class="fu">coefficients</span>(logit_reg))</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>prob_mean <span class="ot">&lt;-</span> <span class="fu">plogis</span>(log_pred_mean)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Predicted probability at the mean:"</span>, <span class="fu">round</span>(prob_mean, <span class="dv">4</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Predicted probability at the mean: 0.5689 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Predicted probability with 1 more kid under 6</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>mean_vals_1morekid <span class="ot">&lt;-</span> mean_vals <span class="sc">+</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>log_pred_1morekid <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">c</span>(<span class="dv">1</span>, mean_vals_1morekid) <span class="sc">*</span> <span class="fu">coefficients</span>(logit_reg))</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>prob_1morekid <span class="ot">&lt;-</span> <span class="fu">plogis</span>(log_pred_1morekid)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Predicted probability with 1 more kid:"</span>, <span class="fu">round</span>(prob_1morekid, <span class="dv">4</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Predicted probability with 1 more kid: 0.3346 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Marginal effect</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>marginal_effect <span class="ot">&lt;-</span> prob_1morekid <span class="sc">-</span> prob_mean</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Marginal effect of 1 more kid (logit):"</span>, <span class="fu">round</span>(marginal_effect, <span class="dv">4</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Marginal effect of 1 more kid (logit): -0.2343 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"LPM coefficient on kidslt6:"</span>, <span class="fu">round</span>(<span class="fu">coef</span>(reg)[<span class="st">"kidslt6"</span>], <span class="dv">4</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>LPM coefficient on kidslt6: -0.2122 </code></pre>
+</div>
+</div>
+<p>The marginal effect of one additional young child at the mean is approximately <span class="math inline">\(-0.20\)</span>—very close to the LPM estimate of <span class="math inline">\(-0.21\)</span>. This illustrates a common and important finding: for observations near the middle of the probability distribution, the LPM and logit model often give very similar results.</p>
+<p>But the marginal effect from the logit model <strong>changes</strong> depending on where you evaluate it. Let’s see how the marginal effect of one more young child varies across the distribution:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-marginal-effects" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-marginal-effects-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9.10: The marginal effect of one additional young child on labor force participation probability, computed at different values of non-wife income. Unlike the constant LPM effect (dashed line), the logit marginal effect varies—it is largest where the predicted probability is near 0.5.
+</figcaption>
+<div aria-describedby="fig-marginal-effects-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="binary_outcomes_files/figure-html/fig-marginal-effects-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p><a href="#fig-marginal-effects" class="quarto-xref">Figure&nbsp;<span>9.10</span></a> reveals a key property of the logit model: the marginal effect is not constant. The LPM assumes the same effect everywhere (the dashed line), but the logit marginal effect varies depending on the starting probability. The effect is largest when the predicted probability is near 0.5 (where the logistic curve is steepest) and smaller when the probability is near 0 or 1 (where the curve flattens out).</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The <code>plogis()</code> Function
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In R, the <code>plogis()</code> function converts log-odds to probabilities. It applies the logistic function: <code>plogis(z)</code> <span class="math inline">\(= \exp(z) / (1 + \exp(z))\)</span>. This is the inverse of the <code>qlogis()</code> function, which converts probabilities to log-odds.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="application-low-birthweight-and-maternal-smoking" class="level2" data-number="9.8">
+<h2 data-number="9.8" class="anchored" data-anchor-id="application-low-birthweight-and-maternal-smoking"><span class="header-section-number">9.8</span> Application: Low Birthweight and Maternal Smoking</h2>
+<p>To see binary outcome models in a health economics context, let’s examine the relationship between maternal smoking and low birthweight. Using the <code>bwght</code> dataset from the <code>wooldridge</code> package, we define low birthweight as a birthweight below 88 ounces (approximately 2,500 grams—the standard clinical threshold):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>bw_data <span class="ot">&lt;-</span> wooldridge<span class="sc">::</span>bwght <span class="sc">|&gt;</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">low_bwght =</span> <span class="fu">ifelse</span>(bwght <span class="sc">&lt;</span> <span class="dv">88</span>, <span class="dv">1</span>, <span class="dv">0</span>))</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Prevalence of low birthweight:"</span>, <span class="fu">round</span>(<span class="fu">mean</span>(bw_data<span class="sc">$</span>low_bwght) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="st">"%</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Prevalence of low birthweight: 6 %</code></pre>
+</div>
+</div>
+<p>Now let’s estimate both an LPM and a logit model:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>lpm_bw <span class="ot">&lt;-</span> <span class="fu">lm</span>(low_bwght <span class="sc">~</span> cigs <span class="sc">+</span> faminc <span class="sc">+</span> motheduc <span class="sc">+</span> male, <span class="at">data =</span> bw_data)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>logit_bw <span class="ot">&lt;-</span> <span class="fu">glm</span>(low_bwght <span class="sc">~</span> cigs <span class="sc">+</span> faminc <span class="sc">+</span> motheduc <span class="sc">+</span> male,</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">"logit"</span>),</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">data =</span> bw_data)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>models_bw <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">"LPM"</span> <span class="ot">=</span> lpm_bw, <span class="st">"Logit"</span> <span class="ot">=</span> logit_bw)</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="fu">modelsummary</span>(models_bw,</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>             <span class="at">stars =</span> <span class="fu">c</span>(<span class="st">'*'</span> <span class="ot">=</span> <span class="fl">0.1</span>, <span class="st">'**'</span> <span class="ot">=</span> <span class="fl">0.05</span>, <span class="st">'***'</span> <span class="ot">=</span> <span class="fl">0.01</span>),</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>             <span class="at">gof_map =</span> <span class="fu">c</span>(<span class="st">"nobs"</span>, <span class="st">"r.squared"</span>, <span class="st">"logLik"</span>, <span class="st">"aic"</span>),</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>             <span class="at">title =</span> <span class="st">"Determinants of Low Birthweight"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="tbl-bwght-models" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-bwght-models-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;9.2: LPM and Logit estimates for the probability of low birthweight.
+</figcaption>
+<div aria-describedby="tbl-bwght-models-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<!-- preamble start -->
+
+    <script src="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.js"></script>
+
+    <script>
+      // Create table-specific functions using external factory
+      const tableFns_rg3k1ncqntnjv0vjf7bu = TinyTable.createTableFunctions("tinytable_rg3k1ncqntnjv0vjf7bu");
+      // tinytable span after
+      window.addEventListener('load', function () {
+          var cellsToStyle = [
+            // tinytable style arrays after
+          { positions: [ { i: '14', j: 2 }, { i: '14', j: 3 } ], css_id: 'tinytable_css_eaeafjpgne5y9939jj3r',}, 
+          { positions: [ { i: '10', j: 2 }, { i: '10', j: 3 } ], css_id: 'tinytable_css_eibt0j0pk7bggl5ggw3e',}, 
+          { positions: [ { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '4', j: 2 }, { i: '5', j: 2 }, { i: '6', j: 2 }, { i: '7', j: 2 }, { i: '8', j: 2 }, { i: '9', j: 2 }, { i: '11', j: 2 }, { i: '12', j: 2 }, { i: '13', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '3', j: 3 }, { i: '4', j: 3 }, { i: '5', j: 3 }, { i: '6', j: 3 }, { i: '7', j: 3 }, { i: '8', j: 3 }, { i: '9', j: 3 }, { i: '11', j: 3 }, { i: '12', j: 3 }, { i: '13', j: 3 } ], css_id: 'tinytable_css_kcic39xu3pit5lht351f',}, 
+          { positions: [ { i: '0', j: 2 }, { i: '0', j: 3 } ], css_id: 'tinytable_css_7jw27d8qzfh6dnsfn5cm',}, 
+          { positions: [ { i: '14', j: 1 } ], css_id: 'tinytable_css_q3j871s2bztq9g0xgql7',}, 
+          { positions: [ { i: '10', j: 1 } ], css_id: 'tinytable_css_pfrqn67wz245fnw3b8nb',}, 
+          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '4', j: 1 }, { i: '5', j: 1 }, { i: '6', j: 1 }, { i: '7', j: 1 }, { i: '8', j: 1 }, { i: '9', j: 1 }, { i: '11', j: 1 }, { i: '12', j: 1 }, { i: '13', j: 1 } ], css_id: 'tinytable_css_fkte1l05pzidyypq6bml',}, 
+          { positions: [ { i: '0', j: 1 } ], css_id: 'tinytable_css_ejlahn317qmlsmy83asm',}, 
+          ];
+
+          // Loop over the arrays to style the cells
+          cellsToStyle.forEach(function (group) {
+              group.positions.forEach(function (cell) {
+                  tableFns_rg3k1ncqntnjv0vjf7bu.styleCell(cell.i, cell.j, group.css_id);
+              });
+          });
+      });
+    </script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
+    <style>
+    /* tinytable css entries after */
+    #tinytable_rg3k1ncqntnjv0vjf7bu td.tinytable_css_eaeafjpgne5y9939jj3r, #tinytable_rg3k1ncqntnjv0vjf7bu th.tinytable_css_eaeafjpgne5y9939jj3r {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_rg3k1ncqntnjv0vjf7bu td.tinytable_css_eibt0j0pk7bggl5ggw3e, #tinytable_rg3k1ncqntnjv0vjf7bu th.tinytable_css_eibt0j0pk7bggl5ggw3e {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_rg3k1ncqntnjv0vjf7bu td.tinytable_css_kcic39xu3pit5lht351f, #tinytable_rg3k1ncqntnjv0vjf7bu th.tinytable_css_kcic39xu3pit5lht351f { text-align: center }
+    #tinytable_rg3k1ncqntnjv0vjf7bu td.tinytable_css_7jw27d8qzfh6dnsfn5cm, #tinytable_rg3k1ncqntnjv0vjf7bu th.tinytable_css_7jw27d8qzfh6dnsfn5cm {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_rg3k1ncqntnjv0vjf7bu td.tinytable_css_q3j871s2bztq9g0xgql7, #tinytable_rg3k1ncqntnjv0vjf7bu th.tinytable_css_q3j871s2bztq9g0xgql7 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_rg3k1ncqntnjv0vjf7bu td.tinytable_css_pfrqn67wz245fnw3b8nb, #tinytable_rg3k1ncqntnjv0vjf7bu th.tinytable_css_pfrqn67wz245fnw3b8nb {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_rg3k1ncqntnjv0vjf7bu td.tinytable_css_fkte1l05pzidyypq6bml, #tinytable_rg3k1ncqntnjv0vjf7bu th.tinytable_css_fkte1l05pzidyypq6bml { text-align: left }
+    #tinytable_rg3k1ncqntnjv0vjf7bu td.tinytable_css_ejlahn317qmlsmy83asm, #tinytable_rg3k1ncqntnjv0vjf7bu th.tinytable_css_ejlahn317qmlsmy83asm {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    </style>
+    <div class="container">
+      <table class="tinytable" id="tinytable_rg3k1ncqntnjv0vjf7bu" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+        <caption>Determinants of Low Birthweight</caption>
+        <thead>
+              <tr>
+                <th scope="col" data-row="0" data-col="1"> </th>
+                <th scope="col" data-row="0" data-col="2">LPM</th>
+                <th scope="col" data-row="0" data-col="3">Logit</th>
+              </tr>
+        </thead>
+        <tfoot><tr><td colspan="3">* p &lt; 0.1, ** p &lt; 0.05, *** p &lt; 0.01</td></tr></tfoot>
+        <tbody>
+                <tr>
+                  <td data-row="1" data-col="1">(Intercept)</td>
+                  <td data-row="1" data-col="2">0.064*</td>
+                  <td data-row="1" data-col="3">-2.647***</td>
+                </tr>
+                <tr>
+                  <td data-row="2" data-col="1"></td>
+                  <td data-row="2" data-col="2">(0.038)</td>
+                  <td data-row="2" data-col="3">(0.681)</td>
+                </tr>
+                <tr>
+                  <td data-row="3" data-col="1">cigs</td>
+                  <td data-row="3" data-col="2">0.003**</td>
+                  <td data-row="3" data-col="3">0.032**</td>
+                </tr>
+                <tr>
+                  <td data-row="4" data-col="1"></td>
+                  <td data-row="4" data-col="2">(0.001)</td>
+                  <td data-row="4" data-col="3">(0.015)</td>
+                </tr>
+                <tr>
+                  <td data-row="5" data-col="1">faminc</td>
+                  <td data-row="5" data-col="2">-0.001</td>
+                  <td data-row="5" data-col="3">-0.010</td>
+                </tr>
+                <tr>
+                  <td data-row="6" data-col="1"></td>
+                  <td data-row="6" data-col="2">(0.000)</td>
+                  <td data-row="6" data-col="3">(0.007)</td>
+                </tr>
+                <tr>
+                  <td data-row="7" data-col="1">motheduc</td>
+                  <td data-row="7" data-col="2">0.001</td>
+                  <td data-row="7" data-col="3">0.010</td>
+                </tr>
+                <tr>
+                  <td data-row="8" data-col="1"></td>
+                  <td data-row="8" data-col="2">(0.003)</td>
+                  <td data-row="8" data-col="3">(0.056)</td>
+                </tr>
+                <tr>
+                  <td data-row="9" data-col="1">male</td>
+                  <td data-row="9" data-col="2">-0.005</td>
+                  <td data-row="9" data-col="3">-0.090</td>
+                </tr>
+                <tr>
+                  <td data-row="10" data-col="1"></td>
+                  <td data-row="10" data-col="2">(0.013)</td>
+                  <td data-row="10" data-col="3">(0.228)</td>
+                </tr>
+                <tr>
+                  <td data-row="11" data-col="1">Num.Obs.</td>
+                  <td data-row="11" data-col="2">1387</td>
+                  <td data-row="11" data-col="3">1387</td>
+                </tr>
+                <tr>
+                  <td data-row="12" data-col="1">R2</td>
+                  <td data-row="12" data-col="2">0.006</td>
+                  <td data-row="12" data-col="3"></td>
+                </tr>
+                <tr>
+                  <td data-row="13" data-col="1">Log.Lik.</td>
+                  <td data-row="13" data-col="2">32.138</td>
+                  <td data-row="13" data-col="3">-310.351</td>
+                </tr>
+                <tr>
+                  <td data-row="14" data-col="1">AIC</td>
+                  <td data-row="14" data-col="2">-52.3</td>
+                  <td data-row="14" data-col="3">630.7</td>
+                </tr>
+        </tbody>
+      </table>
+    </div>
+<!-- hack to avoid NA insertion in last line -->
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>The LPM tells us that each additional cigarette smoked per day during pregnancy increases the probability of low birthweight by about 0.4 percentage points. The logit coefficients point in the same direction but are on the log-odds scale.</p>
+<p>Let’s visualize the predicted probability of low birthweight as a function of maternal smoking, comparing both models:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-smoking-bwght" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-smoking-bwght-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9.11: Predicted probability of low birthweight by number of cigarettes smoked per day, from both the LPM and logit models. The models agree closely in the range of the data but diverge at extremes.
+</figcaption>
+<div aria-describedby="fig-smoking-bwght-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="binary_outcomes_files/figure-html/fig-smoking-bwght-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p><a href="#fig-smoking-bwght" class="quarto-xref">Figure&nbsp;<span>9.11</span></a> illustrates several important points. For moderate levels of smoking (roughly 0–20 cigarettes per day, where most of the data lives), the two models give very similar predictions. At high levels of smoking, the LPM continues in a straight line—eventually predicting impossibly high probabilities—while the logit curve flattens out as it approaches 1. This is exactly the kind of situation where the logit model’s bounded predictions are an advantage.</p>
+</section>
+<section id="lpm-vs.-logistic-regression-when-to-use-which" class="level2" data-number="9.9">
+<h2 data-number="9.9" class="anchored" data-anchor-id="lpm-vs.-logistic-regression-when-to-use-which"><span class="header-section-number">9.9</span> LPM vs.&nbsp;Logistic Regression: When to Use Which?</h2>
+<p>As we have seen repeatedly, the marginal effects from the logistic regression are often quite similar to the LPM coefficients, at least for observations with characteristics near the center of the distribution. So should we bother with logistic regression at all?</p>
+<p>The answer depends on the context and the discipline.</p>
+<p>In <strong>economics</strong>, many researchers prefer the LPM for its simplicity and ease of interpretation. The out-of-bounds prediction problem can often be managed by using robust standard errors to handle heteroskedasticity and by being careful about extrapolation. Most applied microeconomics papers use the LPM as their primary specification, sometimes reporting logit results as a robustness check.</p>
+<p>In <strong>health sciences and epidemiology</strong>, logistic regression is the standard approach. Researchers in these fields tend to report odds ratios, and the logit framework integrates naturally with other methods common in biostatistics. If you are reading a paper in a health or medical journal, you will almost certainly encounter logistic regression.</p>
+<p>One area where both camps agree is <strong>prediction</strong>. If the goal is to predict outcomes—rather than to estimate causal effects—logistic regression generally outperforms the LPM. Its predictions are guaranteed to be valid probabilities, which matters for applications like machine learning, clinical risk scores, and forecasting.</p>
+<div id="tbl-comparison" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;9.3: LPM vs.&nbsp;Logistic Regression Comparison
+</figcaption>
+<div aria-describedby="tbl-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">LPM</th>
+<th style="text-align: left;">Logistic Regression</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>Estimation</strong></td>
+<td style="text-align: left;">OLS</td>
+<td style="text-align: left;">Maximum Likelihood</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Coefficients</strong></td>
+<td style="text-align: left;">Change in probability</td>
+<td style="text-align: left;">Change in log-odds</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Interpretation</strong></td>
+<td style="text-align: left;">Direct and intuitive</td>
+<td style="text-align: left;">Requires conversion (odds ratios or marginal effects)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Predictions</strong></td>
+<td style="text-align: left;">Can fall outside [0, 1]</td>
+<td style="text-align: left;">Always in (0, 1)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Heteroskedasticity</strong></td>
+<td style="text-align: left;">Always present</td>
+<td style="text-align: left;">Handled by MLE</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Common in</strong></td>
+<td style="text-align: left;">Economics</td>
+<td style="text-align: left;">Health sciences, epidemiology</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Best for</strong></td>
+<td style="text-align: left;">Causal inference with easy interpretation</td>
+<td style="text-align: left;">Prediction; settings where valid probabilities matter</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Practical Advice
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For this course, you should be comfortable with both approaches. The LPM is typically sufficient for causal inference questions, and its coefficients are immediately interpretable. Use logistic regression when you need predictions that are guaranteed to be valid probabilities, and when the prediction itself (rather than the coefficients) are most important. We will see an example use-case of this in <a href="advanced_did.html" class="quarto-xref"><span>Chapter 12</span></a>.</p>
+</div>
+</div>
+</section>
+<section id="summary" class="level2" data-number="9.10">
+<h2 data-number="9.10" class="anchored" data-anchor-id="summary"><span class="header-section-number">9.10</span> Summary</h2>
+<p>When the dependent variable is binary (0 or 1), we need to think carefully about how to model it.</p>
+<p>The <strong>linear probability model</strong> applies OLS to a binary outcome. Its coefficients are easy to interpret: <span class="math inline">\(\beta_j\)</span> is the change in the probability of <span class="math inline">\(y = 1\)</span> for a one-unit increase in <span class="math inline">\(x_j\)</span>. However, the LPM can produce predicted probabilities outside the [0, 1] range and inherently suffers from heteroskedasticity.</p>
+<p><strong>Logistic regression</strong> addresses the out-of-bounds problem by wrapping the linear prediction inside the logistic function, which maps any value to the (0, 1) interval. It is estimated using maximum likelihood rather than OLS. Logit coefficients represent changes in the log-odds and are harder to interpret directly, but they can be converted to odds ratios or marginal effects for more intuitive interpretation. Marginal effects computed at the mean are often similar to LPM coefficients.</p>
+<p>In practice, the choice between LPM and logistic regression often comes down to disciplinary convention and the specific goals of the analysis. Economists tend to favor the LPM for its simplicity; health researchers tend to favor the logit for its theoretical properties. When the two approaches give similar results—as they often do for marginal effects near the center of the distribution—the choice matters less than getting the research question right.</p>
+</section>
+<section id="check-your-understanding" class="level2" data-number="9.11">
+<h2 data-number="9.11" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">9.11</span> Check Your Understanding</h2>
 <p>For each question below, select the best answer from the dropdown menu.</p>
 <div class="question">
 <div class="answer-row">
-    <label>i. In the model ln(wage) = β₀ + β₁(female) + β₂(educ) + β₃(female × educ), what does β₃ represent? </label>
+    <label>i. In a linear probability model, how do we interpret the coefficient β₁ on an explanatory variable x₁? </label>
     <select onchange="checkAnswer(this, 'c')">
         <option value="">-- Select Answer --</option>
-        <option value="a">The effect of education on wages</option>
-        <option value="b">The effect of being female on wages</option>
-        <option value="c">How much the effect of education differs for women compared to men</option>
-        <option value="d">The average wage of women with no education</option>
+        <option value="a">A one-unit increase in x₁ leads to a β₁ unit increase in y</option>
+        <option value="b">A one-unit increase in x₁ leads to a β₁% increase in y</option>
+        <option value="c">A one-unit increase in x₁ changes the probability of y = 1 by β₁ (i.e., 100 × β₁ percentage points)</option>
+        <option value="d">A one-unit increase in x₁ multiplies the odds of y = 1 by β₁</option>
     </select>
 </div>
 
 <div class="answer-row">
-    <label>ii. In the same model, what is the effect of education on wages for women? </label>
+    <label>ii. What is the main advantage of logistic regression over the linear probability model? </label>
     <select onchange="checkAnswer(this, 'b')">
         <option value="">-- Select Answer --</option>
-        <option value="a">β₂</option>
-        <option value="b">β₂ + β₃</option>
-        <option value="c">β₁ + β₃</option>
-        <option value="d">β₃</option>
+        <option value="a">Logistic regression always has higher R-squared</option>
+        <option value="b">Logistic regression predictions are always between 0 and 1</option>
+        <option value="c">Logistic regression coefficients are easier to interpret</option>
+        <option value="d">Logistic regression does not require any assumptions</option>
     </select>
 </div>
 
 <div class="answer-row">
-    <label>iii. We estimate: ln(wage) = 1.5 + (-0.20)(female) + (0.30)(married) + (-0.25)(female × married). What are predicted log wages for married women? </label>
-    <select onchange="checkAnswer(this, 'd')">
-        <option value="">-- Select Answer --</option>
-        <option value="a">1.5</option>
-        <option value="b">1.30</option>
-        <option value="c">1.55</option>
-        <option value="d">1.35</option>
-    </select>
-</div>
-
-<div class="answer-row">
-    <label>iv. In that same model, what is the "marriage premium" (effect of being married) for women? </label>
+    <label>iii. In our LPM example, the coefficient on kidslt6 was approximately -0.21. What does this mean? </label>
     <select onchange="checkAnswer(this, 'a')">
         <option value="">-- Select Answer --</option>
-        <option value="a">0.05 (about 5%)</option>
-        <option value="b">0.30 (about 30%)</option>
-        <option value="c">-0.25 (about -25%)</option>
-        <option value="d">-0.20 (about -20%)</option>
+        <option value="a">Each additional child under 6 decreases the probability of labor force participation by about 21 percentage points</option>
+        <option value="b">Women with kids under 6 earn 21% less</option>
+        <option value="c">21% of women with young children are in the labor force</option>
+        <option value="d">Having children under 6 reduces wages by $0.21 per hour</option>
     </select>
 </div>
 
 <div class="answer-row">
-    <label>v. Why should we always include main effects when we include an interaction term? </label>
+    <label>iv. Why does the LPM always exhibit heteroskedasticity? </label>
+    <select onchange="checkAnswer(this, 'd')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Because the sample size is too small</option>
+        <option value="b">Because the explanatory variables are correlated</option>
+        <option value="c">Because the intercept is too large</option>
+        <option value="d">Because the variance of the error depends on the predicted probability, which varies with x</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>v. If the logit odds ratio for a variable is 0.42, what does this mean? </label>
     <select onchange="checkAnswer(this, 'c')">
         <option value="">-- Select Answer --</option>
-        <option value="a">R will give an error otherwise</option>
-        <option value="b">It increases the R-squared</option>
-        <option value="c">Omitting them forces the interaction to capture both main effects and interaction, leading to misleading coefficients</option>
-        <option value="d">Main effects are always statistically significant</option>
+        <option value="a">The probability decreases by 42%</option>
+        <option value="b">The probability increases by 42%</option>
+        <option value="c">A one-unit increase in the variable multiplies the odds of the event by 0.42, reducing them by 58%</option>
+        <option value="d">The variable has no significant effect</option>
     </select>
 </div>
 
 <div class="answer-row">
-    <label>vi. <strong>(Challenge)</strong> In the model y = β₀ + β₁x₁ + β₂x₂ + β₃(x₁ × x₂), what is ∂y/∂x₁? </label>
+    <label>vi. In logistic regression, what does a coefficient of β₁ = -0.80 on a variable x₁ directly represent? </label>
     <select onchange="checkAnswer(this, 'b')">
         <option value="">-- Select Answer --</option>
-        <option value="a">β₁</option>
-        <option value="b">β₁ + β₃x₂</option>
-        <option value="c">β₁ + β₂ + β₃</option>
-        <option value="d">β₃</option>
+        <option value="a">A one-unit increase in x₁ decreases the probability of y = 1 by 0.80</option>
+        <option value="b">A one-unit increase in x₁ decreases the log-odds of y = 1 by 0.80</option>
+        <option value="c">A one-unit increase in x₁ decreases wages by 80%</option>
+        <option value="d">A one-unit increase in x₁ multiplies the probability by 0.80</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>vii. <strong>(Challenge)</strong> Why are marginal effects from the logit model often similar to LPM coefficients for observations near the center of the distribution? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Because logistic regression is just a special case of OLS</option>
+        <option value="b">Because MLE and OLS always give the same answer</option>
+        <option value="c">Because the logistic function is approximately linear in the middle of its range, so the linear and nonlinear models closely agree there</option>
+        <option value="d">Because the logistic function always equals the identity function</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>viii. <strong>(Challenge)</strong> A researcher estimates a logit model and finds that the coefficient on "smoking" is 0.35. The predicted probability for a non-smoker with average characteristics is 0.10. Approximately what is the predicted probability for an otherwise identical smoker? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">0.45 (just add 0.35)</option>
+        <option value="b">About 0.14 (convert to log-odds, add 0.35, convert back)</option>
+        <option value="c">0.35</option>
+        <option value="d">About 0.50</option>
     </select>
 </div>
 </div>
 
 <div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -902,15 +1629,17 @@ Show Explanation
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="i">
-<li><p>The interaction coefficient β₃ captures how the effect of education <em>differs</em> between groups. It tells us how much more (or less) each year of education affects wages for women compared to men.</p></li>
-<li><p>For women (female = 1), the effect of education is the derivative with respect to educ: β₂ + β₃(female) = β₂ + β₃(1) = β₂ + β₃. The interaction term adds to (or subtracts from) the baseline effect.</p></li>
-<li><p>For married women, female = 1, married = 1, and female × married = 1. The predicted log wage is: 1.5 + (-0.20)(1) + (0.30)(1) + (-0.25)(1) = 1.5 - 0.20 + 0.30 - 0.25 = 1.35.</p></li>
-<li><p>The marriage premium for women is β₂ + β₃ = 0.30 + (-0.25) = 0.05. The interaction term reduces the marriage premium for women compared to men (who have a premium of just β₂ = 0.30).</p></li>
-<li><p>When we include an interaction A × B without the main effects A and B, the interaction term is forced to capture all variation associated with both A and B, not just their interaction. This leads to coefficients that are difficult to interpret and often misleading.</p></li>
-<li><p>Taking the partial derivative of y with respect to x₁, treating x₂ as constant: ∂y/∂x₁ = β₁ + β₃x₂. The effect of x₁ depends on the level of x₂—this is the defining feature of an interaction.</p></li>
+<li><p>In the LPM, the dependent variable is a probability (since <span class="math inline">\(y\)</span> is 0 or 1, <span class="math inline">\(E(y|\mathbf{x}) = P(y=1|\mathbf{x})\)</span>). So <span class="math inline">\(\beta_1\)</span> represents the change in the probability that <span class="math inline">\(y = 1\)</span> when <span class="math inline">\(x_1\)</span> increases by one unit, holding everything else constant.</p></li>
+<li><p>The logistic function <span class="math inline">\(G(z) = \exp(z)/(1 + \exp(z))\)</span> is strictly between 0 and 1 for all values of <span class="math inline">\(z\)</span>. This means predicted probabilities from the logit model can never be negative or greater than 1, unlike the LPM which can produce impossible predictions.</p></li>
+<li><p>The LPM coefficient on <code>kidslt6</code> tells us the change in probability of labor force participation for each additional child under age 6. A coefficient of -0.21 means each young child reduces the probability by about 21 percentage points—a substantial effect.</p></li>
+<li><p>When <span class="math inline">\(y\)</span> is binary, the error <span class="math inline">\(\mu = y - E(y|\mathbf{x})\)</span> can only take two values. Its variance is <span class="math inline">\(p(\mathbf{x})(1-p(\mathbf{x}))\)</span>, which depends on the predicted probability <span class="math inline">\(p(\mathbf{x})\)</span>. Since <span class="math inline">\(p(\mathbf{x})\)</span> is a function of <span class="math inline">\(\mathbf{x}\)</span>, the error variance changes with <span class="math inline">\(\mathbf{x}\)</span>—the definition of heteroskedasticity.</p></li>
+<li><p>An odds ratio of 0.42 means that a one-unit increase in the variable multiplies the odds by 0.42. Since <span class="math inline">\(0.42 &lt; 1\)</span>, the odds decrease. Specifically, the odds are reduced by <span class="math inline">\(1 - 0.42 = 0.58\)</span>, or 58%. This is different from saying the probability decreases by 58%—odds and probabilities are related but different quantities.</p></li>
+<li><p>Logit coefficients are changes in log-odds, not changes in probability. The log-odds of <span class="math inline">\(y = 1\)</span> is <span class="math inline">\(\ln(P(y=1)/P(y=0))\)</span>. A coefficient of <span class="math inline">\(-0.80\)</span> means a one-unit increase in <span class="math inline">\(x_1\)</span> decreases this log-odds by 0.80. To get the effect on probability, we need to compute marginal effects.</p></li>
+<li><p>The logistic function has an S-shape that is nearly linear in the middle (around <span class="math inline">\(p = 0.5\)</span>) and curves at the extremes (near 0 and 1). For observations where the predicted probability is near 0.5, the slope of the logistic function is close to constant, so the linear approximation (the LPM) works well. The two models diverge more for observations with very high or very low predicted probabilities.</p></li>
+<li><p>For the non-smoker: <span class="math inline">\(p = 0.10\)</span>, so odds = <span class="math inline">\(0.10/0.90 = 0.111\)</span>, and log-odds = <span class="math inline">\(\ln(0.111) = -2.197\)</span>. Adding the smoking coefficient: <span class="math inline">\(-2.197 + 0.35 = -1.847\)</span>. Converting back: <span class="math inline">\(p = \exp(-1.847)/(1 + \exp(-1.847)) = 0.158/(1.158) \approx 0.136\)</span>. So the probability increases from 10% to about 14%—not 45%! This illustrates why we cannot simply add logit coefficients to probabilities.</p></li>
 </ol>
 </div>
 </div>

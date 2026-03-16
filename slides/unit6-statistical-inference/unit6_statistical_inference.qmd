@@ -1177,6 +1177,273 @@ confint(reg_mtcars, "wt", level = 0.95)
 ```
 
 
+# F-Tests: Testing Multiple Hypotheses
+
+## The Problem with Multiple t-Tests
+
+So far, all our tools test **one coefficient at a time**.
+
+. . .
+
+But what if we want to ask: "Do `bedrooms` and `age` **jointly** matter for house prices?"
+
+. . .
+
+You might think: just look at each t-test separately!
+
+. . .
+
+::: {.callout-warning}
+## Two Problems with That Approach
+1. **No restrictions on other parameters:** A t-test on $\beta_2$ puts no restrictions on $\beta_3$. Both could be individually insignificant yet *jointly* explain a lot.
+
+2. **Multiple comparisons:** Running many tests at 5% means you'll reject some true nulls by chance. With 20 tests, expect ~1 false rejection!
+:::
+
+
+## The F-Test Solution
+
+The **F-test** tests multiple coefficients **simultaneously**.
+
+. . .
+
+Consider our housing model:
+
+$$price = \beta_0 + \beta_1(sqft) + \beta_2(bedrooms) + \beta_3(age) + \mu$$
+
+. . .
+
+We want to test whether `bedrooms` and `age` *jointly* matter:
+
+$$H_0: \beta_2 = \beta_3 = 0$$
+$$H_1: H_0 \text{ is not true (at least one } \neq 0 \text{)}$$
+
+
+## The F-Test Compares Two Models {.smaller}
+
+The key idea: compare the model **with** and **without** the restricted variables.
+
+. . .
+
+**Unrestricted model** (full model):
+$$price = \beta_0 + \beta_1(sqft) + \beta_2(bedrooms) + \beta_3(age) + \mu$$
+
+. . .
+
+**Restricted model** (assuming $H_0$ is true):
+$$price = \beta_0 + \beta_1(sqft) + \mu$$
+
+. . .
+
+If `bedrooms` and `age` actually matter, then **dropping them should make the model fit much worse.**
+
+. . .
+
+The F-statistic measures *how much worse* the fit gets.
+
+
+## The F-Statistic Formula {.smaller}
+
+$$F = \frac{(SSR_R - SSR_{UR})/q}{SSR_{UR}/df_{UR}}$$
+
+. . .
+
+| Symbol | Meaning |
+|--------|---------|
+| $SSR_R$ | Sum of squared residuals from **restricted** model |
+| $SSR_{UR}$ | Sum of squared residuals from **unrestricted** model |
+| $q$ | Number of restrictions (variables dropped) |
+| $df_{UR}$ | Degrees of freedom in unrestricted model ($n - k - 1$) |
+
+. . .
+
+**Intuition:** The numerator captures how much the fit worsens when we drop the variables. The denominator scales by the noise in the data. A large $F$ means the dropped variables really mattered.
+
+
+## How Big Is "Big Enough"? The F Distribution {.smaller}
+
+We have an F-statistic — but how do we know if it's large enough to reject $H_0$?
+
+. . .
+
+Same logic as the t-test: we need a **reference distribution** that tells us what $F$ values we'd expect to see *if the null were true*.
+
+. . .
+
+Under $H_0$ (the dropped variables truly don't matter), the F-statistic follows the **F distribution** with parameters $q$ (numerator df) and $df_{UR}$ (denominator df).
+
+. . .
+
+- The F distribution is **right-skewed** and always **non-negative** (since SSR can only *increase* when we drop variables, $F \geq 0$)
+- Under $H_0$, the F-stat should be close to **1** on average (dropping irrelevant variables barely worsens fit)
+- If $F$ is **much larger than 1**, it's unlikely under $H_0$ — evidence that the dropped variables matter
+
+. . .
+
+::: {.callout-important}
+## Decision Rule
+Choose a significance level $\alpha$ (typically 5%). Find the **critical value** $F_{crit}$ such that $P(F > F_{crit}) = \alpha$. If our F-statistic exceeds $F_{crit}$, **reject $H_0$**.
+:::
+
+## F-Test: Computing It by Hand {.smaller}
+
+- I can use the `qf()` function to find $F_{crit}$
+
+. . .
+
+```{r}
+#| echo: true
+
+# Unrestricted model (full model)
+reg_unrestricted <- lm(sale_price ~ sqft + bedrooms + age,
+                       data = housing_data)
+
+# Restricted model (drop bedrooms and age)
+reg_restricted <- lm(sale_price ~ sqft, data = housing_data)
+
+# Compute F-statistic manually
+ssr_r <- sum(resid(reg_restricted)^2)
+ssr_ur <- sum(resid(reg_unrestricted)^2)
+df_ur <- df.residual(reg_unrestricted)
+q <- 2  # number of restrictions
+
+f_stat <- ((ssr_r - ssr_ur) / q) / (ssr_ur / df_ur)
+
+# Critical value at 5% significance
+f_crit <- qf(0.05, df1 = q, df2 = df_ur, lower.tail = FALSE)
+
+cat("F-statistic:", round(f_stat, 2), "\n")
+cat("Critical value (5%):", round(f_crit, 2), "\n")
+cat("Reject H0?", f_stat > f_crit, "\n")
+```
+
+
+## Visualizing the F Distribution {.smaller}
+
+```{r}
+#| echo: false
+#| fig-width: 10
+#| fig-height: 5
+
+f_seq <- seq(0, max(f_stat * 1.2, 8), by = 0.01)
+f_dens <- df(f_seq, df1 = q, df2 = df_ur)
+
+f_df <- data.frame(f = f_seq, density = f_dens)
+
+ggplot(f_df, aes(x = f, y = density)) +
+    geom_line(linewidth = 1, color = "#0072B2") +
+    geom_area(data = f_df |> filter(f >= f_crit),
+              aes(x = f, y = density),
+              fill = "#D55E00", alpha = 0.4) +
+    geom_vline(xintercept = f_crit, linetype = "dashed", color = "#D55E00", linewidth = 0.8) +
+    geom_vline(xintercept = f_stat, linetype = "solid", color = "black", linewidth = 1) +
+    annotate("text", x = f_crit + 0.3, y = max(f_dens) * 0.4,
+             label = paste0("Critical value = ", round(f_crit, 2)),
+             hjust = 0, color = "#D55E00", fontface = "bold", size = 4) +
+    annotate("text", x = f_stat + 0.3, y = max(f_dens) * 0.6,
+             label = paste0("Our F = ", round(f_stat, 2)),
+             hjust = 0, color = "black", fontface = "bold", size = 4) +
+    annotate("text", x = f_crit + 1.5, y = max(f_dens) * 0.15,
+             label = "Rejection\nregion (5%)",
+             color = "#D55E00", fontface = "italic", size = 3.5) +
+    labs(x = "F-statistic",
+         y = "Density",
+         title = paste0("F Distribution (df1 = ", q, ", df1 = ", df_ur, ")")) +
+    theme_minimal(base_size = 14) +
+    theme(plot.title = element_text(hjust = 0.5))
+```
+
+Our F-statistic falls **deep in the rejection region** — strong evidence that `bedrooms` and `age` jointly matter.
+
+
+## The Easy Way: `anova()` {.smaller}
+
+In practice, use R's `anova()` function — pass it the restricted model first, then the unrestricted:
+
+. . .
+
+```{r}
+#| echo: true
+
+anova(reg_restricted, reg_unrestricted)
+```
+
+. . .
+
+It gives you the F-statistic, degrees of freedom, and p-value directly.
+
+
+## The F-Statistic in Terms of $R^2$ {.smaller}
+
+The F-statistic can also be written using R-squared values:
+
+$$F = \frac{(R^2_{UR} - R^2_R)/q}{(1 - R^2_{UR})/df_{UR}}$$
+
+. . .
+
+This version makes the intuition even clearer:
+
+- **Numerator:** How much does $R^2$ *improve* when we add the extra variables?
+- **Denominator:** How much unexplained variation remains in the full model?
+
+. . .
+
+```{r}
+#| echo: true
+
+r2_r <- summary(reg_restricted)$r.squared
+r2_ur <- summary(reg_unrestricted)$r.squared
+
+f_r2 <- ((r2_ur - r2_r) / q) / ((1 - r2_ur) / df_ur)
+cat("F from SSR formula:", round(f_stat, 2), "\n")
+cat("F from R² formula: ", round(f_r2, 2), "\n")
+```
+
+Same answer — just two ways to compute the same thing.
+
+
+## Properties of the F-Test {.smaller}
+
+::: {.callout-note}
+## Key Properties
+
+- The F-statistic is **always non-negative**, so F-tests are always **one-sided** (we only reject in the right tail)
+
+- If we reject $H_0$, we say the variables are **jointly statistically significant**
+
+- We **cannot** determine *which* individual variable is significant — only that at least one matters
+
+- If variables are jointly insignificant, it provides justification for **dropping them** from the model
+:::
+
+## Try It: F-Test Workflow {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Your turn!
+:::
+
+Using the `housing_data`, test whether `bedrooms` and `age` jointly matter by:
+
+1. Estimate the unrestricted model: `sale_price ~ sqft + bedrooms + age`
+2. Estimate the restricted model: `sale_price ~ sqft`
+3. Use `anova()` to perform the F-test
+4. What is the F-statistic? Do you reject $H_0$ at 5%?
+
+. . .
+
+```{r}
+#| echo: true
+#| output-location: fragment
+
+anova(
+    lm(sale_price ~ sqft, data = housing_data),
+    lm(sale_price ~ sqft + bedrooms + age, data = housing_data)
+)
+```
+
+
+# Wrapping Up
+
 ## Key Takeaways {.smaller}
 
 ::: {.callout-tip}
@@ -1190,18 +1457,7 @@ confint(reg_mtcars, "wt", level = 0.95)
 
 4. **Confidence interval:** A range of plausible values for $\beta_j$
 
-5. **Statistical ≠ practical significance** — always look at the *magnitude*, not just the stars!
+5. **F-test:** Tests whether multiple coefficients are *jointly* significant — use `anova()` in R
+
+6. **Statistical ≠ practical significance** — always look at the *magnitude*, not just the stars!
 :::
-
-
-## Next Time
-
-- **F-tests:** Testing multiple hypotheses simultaneously
-
-. . .
-
-- **Heteroskedasticity:** What happens when the variance of $\mu$ isn't constant?
-
-. . .
-
-- **Robust standard errors:** Inference that works even when assumptions fail
