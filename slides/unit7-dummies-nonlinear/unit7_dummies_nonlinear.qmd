@@ -217,6 +217,7 @@ $$score = \beta_0 + \beta_2(calculus) + \beta_3(no\_calculus) + \mu$$
 . . .
 
 - For every observation: $calculus + no\_calculus = 1$
+- Re-writing this, we can see: $calculus = 1 - no\_calculus$
 
 . . .
 
@@ -226,55 +227,39 @@ $$score = \beta_0 + \beta_2(calculus) + \beta_3(no\_calculus) + \mu$$
 
 ::: {.callout-important}
 ## The Rule
-With $g$ categories, include $g - 1$ dummy variables. The omitted category is the **baseline** (reference group).
+We must always **omit one group** when including dummy variables. The omitted category is the **baseline** (reference group).
 :::
 
 
 ## Multiple Categories {.smaller}
 
-::: columns
-::: {.column width="55%"}
-Three penguin species → **two** dummies:
-
-```{r}
-#| echo: true
-
-lm_pen <- lm(flipper_length_mm ~ body_mass_g +
-              species, data = penguins)
-coef(lm_pen) |> round(3)
-```
-
-:::
-::: {.column width="45%"}
-
-```{r}
-#| echo: false
-#| fig-width: 5
-#| fig-height: 5
-
-ggplot(penguins |> drop_na(),
-       aes(x = body_mass_g, y = flipper_length_mm, color = species)) +
-  geom_point(alpha = 0.5, size = 2) +
-  geom_smooth(method = "lm", se = FALSE, linewidth = 1) +
-  scale_color_manual(values = c("#D55E00", "#009E73", "#0072B2")) +
-  labs(x = "Body Mass (g)", y = "Flipper Length (mm)", color = NULL) +
-  theme_minimal(base_size = 14) +
-  theme(legend.position = "bottom")
-```
-
-:::
-:::
+- Suppose we want to estimate the effect of a penguins body mass on flipper length but *controlling for species*
 
 . . .
 
-- Baseline = Adelie. Chinstrap flippers are ~5.6 mm longer; Gentoo ~15.7 mm longer (same body mass)
+```{r}
+
+penguins |>
+  select(flipper_length_mm, body_mass_g, species)
+
+```
+
+. . .
+
+However, `species` can take multiple values - not just two!
+
+```{r}
+
+count(penguins, species)
+
+```
 
 
 ## But How Do We Encode Multiple Categories? {.smaller}
 
-R's `factor()` handles this behind the scenes — but what is it actually doing?
+- With $g$ categories, we create $g - 1$ dummies:
 
-With $g$ categories, we create $g - 1$ dummies using `case_when()`:
+. . .
 
 ```{r}
 #| echo: true
@@ -295,15 +280,17 @@ knitr::kable(pen_sample)
 . . .
 
 - Adelie → both dummies = 0 (the **baseline**)
-- Each observation gets exactly **one** dummy = 1 (or none, if baseline)
-
 
 ## Interpreting: Everything Is Relative to the Baseline {.smaller}
 
 Back to our penguin regression (baseline = **Adelie**):
 
 ```{r}
-#| echo: false
+#| echo: true
+
+
+lm_pen <- lm(flipper_length_mm ~ body_mass_g +
+              species, data = penguins)
 
 coef(lm_pen) |> round(3)
 ```
