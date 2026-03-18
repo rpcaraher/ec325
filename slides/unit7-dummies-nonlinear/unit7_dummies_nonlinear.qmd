@@ -197,7 +197,7 @@ ggplot(wooldridge::econmath, aes(x = hsgpa, y = score)) +
            linewidth = 0.8) +
   annotate("text", x = 4.35,
            y = b[1] + b[3]/2 + b[2]*4.2,
-           label = paste0("β₂ ≈ ", round(b[3], 1)),
+           label = paste0("β2 ≈ ", round(b[3], 1)),
            fontface = "bold", size = 5) +
   scale_color_manual(values = c("0" = "#D55E00", "1" = "#0072B2"),
                      labels = c("No Calculus", "Took Calculus")) +
@@ -264,17 +264,17 @@ count(penguins, species)
 ```{r}
 #| echo: true
 
-set.seed(42)
-pen_sample <- penguins |>
-  drop_na() |>
-  select(species, flipper_length_mm) |>
-  slice_sample(n = 6) |>
+
+penguins <- penguins |>
   mutate(
     chinstrap = case_when(species == "Chinstrap" ~ 1, TRUE ~ 0),
     gentoo    = case_when(species == "Gentoo"    ~ 1, TRUE ~ 0)
   )
 
-knitr::kable(pen_sample)
+set.seed(42)
+penguins |>
+  slice_sample(n = 6) |>
+  select(flipper_length_mm, body_mass_g, species, chinstrap, gentoo)
 ```
 
 . . .
@@ -289,8 +289,7 @@ Back to our penguin regression (baseline = **Adelie**):
 #| echo: true
 
 
-lm_pen <- lm(flipper_length_mm ~ body_mass_g +
-              species, data = penguins)
+lm_pen <- lm(flipper_length_mm ~ body_mass_g + chinstrap + gentoo, data = penguins)
 
 coef(lm_pen) |> round(3)
 ```
@@ -305,13 +304,9 @@ coef(lm_pen) |> round(3)
 
 . . .
 
-- What about Chinstrap vs. Gentoo? We can **subtract**: $15.68 - 5.59 \approx 10.1$ mm
-
-. . .
-
 ::: {.callout-important}
 ## Key Insight
-Every dummy coefficient is a **comparison to the omitted baseline**. To compare two non-baseline groups, subtract their coefficients.
+Every dummy coefficient is a **comparison to the omitted baseline**.
 :::
 
 
@@ -323,9 +318,7 @@ Every dummy coefficient is a **comparison to the omitted baseline**. To compare 
 ```{r}
 #| echo: true
 
-lm_a <- lm(flipper_length_mm ~
-  body_mass_g + species,
-  data = penguins)
+lm_a <- lm(flipper_length_mm ~ body_mass_g + chinstrap + gentoo, data = penguins)
 coef(lm_a) |> round(3)
 ```
 :::
@@ -334,12 +327,12 @@ coef(lm_a) |> round(3)
 ```{r}
 #| echo: true
 
-pen2 <- penguins |>
-  mutate(species = relevel(
-    species, ref = "Gentoo"))
-lm_g <- lm(flipper_length_mm ~
-  body_mass_g + species,
-  data = pen2)
+penguins <- penguins |>
+  mutate(
+    adelie = case_when(species == "Adelie" ~ 1, TRUE ~ 0)
+  )
+
+lm_g <- lm(flipper_length_mm ~ body_mass_g + chinstrap + adelie, data = penguins)
 coef(lm_g) |> round(3)
 ```
 :::
@@ -372,26 +365,42 @@ Choose a baseline that makes your comparisons natural. For studying the gender w
 :::
 
 
-## Factor Variables in R
+## Factor Variables in R {.smaller}
 
 - Creating dummies manually is tedious — R does it automatically with **factors**:
+- `factor()` tells R to treat the variable as categorical and create dummies automatically
+- Especially useful if a qualitative variable can take on lots of different possible values (i.e., `state`, `occupation`, etc.)
+
+. . .
+
 
 ```{r}
 #| echo: true
-#| eval: false
+#| eval: true
 
-# R picks first alphabetical category as baseline:
-lm(y ~ x + factor(region), data = df)
+penguins <- penguins |>
+  mutate(species = as.factor(species))
 
-# Use relevel() to choose your own baseline:
-lm(y ~ x + relevel(factor(region), ref = "South"), data = df)
+# R picks first alphabetical category as baseline (Adelie):
+lm(flipper_length_mm ~ body_mass_g + species, data = penguins)
 ```
 
 . . .
 
-- R omits the first alphabetical category by default
+- R omits the first alphabetical category by default — use `relevel()` to change it
 
-- Use `relevel()` to choose a different baseline
+. . .
+
+```{r}
+#| echo: true
+#| eval: true
+
+penguins <- penguins |>
+  mutate(species = relevel(species, ref = "Gentoo"))
+
+# Use relevel() to choose your own baseline (Gentoo):
+lm(flipper_length_mm ~ body_mass_g + species,   data = penguins)
+```
 
 
 # Non-Linear Models: Quadratics
@@ -403,7 +412,7 @@ lm(y ~ x + relevel(factor(region), ref = "South"), data = df)
 . . .
 
 - But many relationships curve:
-  - Experience → wages: rises fast early, flattens later
+  - Experience → wages: rises fast early, becomes lower later
   - Pollution → health: gets worse at an increasing rate
   - Advertising → sales: diminishing returns
 
@@ -411,8 +420,11 @@ lm(y ~ x + relevel(factor(region), ref = "South"), data = df)
 
 - We can capture this with a **quadratic** (polynomial) model:
 
+. . .
+
 $$Y = \beta_0 + \beta_1 X + \beta_2 X^2 + \mu$$
 
+. . .
 
 ## Quadratic: The Shape {.smaller}
 
@@ -423,15 +435,15 @@ $$Y = \beta_0 + \beta_1 X + \beta_2 X^2 + \mu$$
 
 tibble(x = seq(0, 50, 0.5)) |>
   mutate(
-    `β₂ < 0 (inverted U)` = 3.7 + 0.30*x - 0.006*x^2,
-    `β₂ > 0 (U-shape)` = 15 - 0.50*x + 0.01*x^2
+    `β2 < 0 (inverted U)` = 3.7 + 0.30*x - 0.006*x^2,
+    `β2 > 0 (U-shape)` = 15 - 0.50*x + 0.01*x^2
   ) |>
   pivot_longer(-x, names_to = "Shape", values_to = "Y") |>
   ggplot(aes(x = x, y = Y, color = Shape)) +
   geom_line(linewidth = 1.5) +
   scale_color_manual(values = c("#D55E00", "#0072B2")) +
   labs(x = "X", y = "Y", color = NULL,
-       title = "The Sign of β₂ Determines the Curve") +
+       title = "The Sign of β2 Determines the Curve") +
   theme_minimal(base_size = 16) +
   theme(legend.position = "bottom")
 ```
@@ -444,10 +456,25 @@ tibble(x = seq(0, 50, 0.5)) |>
 
 $$wage = \beta_0 + \beta_1(exper) + \beta_2(exper^2) + \mu$$
 
+**Key idea:** create a new variable $exper^2$ and include it as an additional regressor
+
+. . .
+
+**Step 1:** Create the squared term manually
+
 ```{r}
 #| echo: true
 
 wage_data <- wage1 |> mutate(exper2 = exper^2)
+```
+
+. . .
+
+**Step 2:** Run OLS with both $exper$ and $exper^2$
+
+```{r}
+#| echo: true
+
 lm_quad <- lm(wage ~ exper + exper2, data = wage_data)
 coef(lm_quad) |> round(4)
 ```
@@ -455,6 +482,7 @@ coef(lm_quad) |> round(4)
 . . .
 
 - $\hat{\beta}_1 > 0$ and $\hat{\beta}_2 < 0$ → inverted-U confirmed!
+- This is still OLS — we just added $X^2$ as another variable
 
 
 ## Visualizing the Quadratic Fit {.smaller}
@@ -464,8 +492,15 @@ coef(lm_quad) |> round(4)
 #| fig-width: 9
 #| fig-height: 5.5
 
-ggplot(wage1, aes(x = exper, y = wage)) +
-  geom_point(alpha = 0.3, color = "gray50", size = 1.5) +
+set.seed(42)
+n <- 200
+sim_exper <- runif(n, 0, 40)
+sim_wage <- 3 + 0.8 * sim_exper - 0.018 * sim_exper^2 + rnorm(n, sd = 1.5)
+
+sim_data <- data.frame(exper = sim_exper, wage = sim_wage)
+
+ggplot(sim_data, aes(x = exper, y = wage)) +
+  geom_point(alpha = 0.4, color = "gray50", size = 1.5) +
   geom_smooth(method = "lm", formula = y ~ x,
               aes(color = "Linear"), se = FALSE, linewidth = 1.2) +
   geom_smooth(method = "lm", formula = y ~ x + I(x^2),
@@ -482,11 +517,15 @@ ggplot(wage1, aes(x = exper, y = wage)) +
 
 The marginal effect of $X$ on $Y$ is **not constant** — it depends on $X$:
 
+. . .
+
 $$\frac{\partial Y}{\partial X} = \beta_1 + 2\beta_2 X$$
 
 . . .
 
 With $\hat{\beta}_1 \approx 0.298$ and $\hat{\beta}_2 \approx -0.006$:
+
+. . .
 
 | Experience | Marginal Effect | Interpretation |
 |:----------:|:---------------:|:---------------|
@@ -529,7 +568,15 @@ tibble(exper = 0:50) |>
 
 ## Why Use Logs? {.smaller}
 
-- Many economic variables (wages, income, prices) are **right-skewed**
+- Many regressions in economics often will use *logarithmic values*
+
+. . .
+
+Why?
+  - Many economic variables (wages, income, prices) are **right-skewed**
+  - Logging compresses the right tail → more symmetric distribution
+
+. . .
 
 ```{r}
 #| echo: false
@@ -551,43 +598,26 @@ gridExtra::grid.arrange(p1, p2, ncol = 2)
 
 . . .
 
-- Logging compresses the right tail → more symmetric distribution
-
 - More importantly: logs let us talk about **percentage changes**
 
 
-## The Key Property of Logs {.smaller}
+## Why Is the Log-Linear Model So Widely Used? {.smaller}
 
-The reason logs work for percentages:
-
-$$\ln(Y_1) - \ln(Y_0) = \ln\!\left(\frac{Y_1}{Y_0}\right) \approx \frac{Y_1 - Y_0}{Y_0}$$
+The log-linear model is the most common log model in applied economics:
 
 . . .
-
-A **difference in logs** ≈ the **proportional change** (for small changes)
-
-. . .
-
-| Wage Change | Proportional Change | Difference in Logs |
-|:----------:|:-------------------:|:-----------------:|
-| \$20 → \$21 | $1/20 = 0.050$ | $\ln(21)-\ln(20) = 0.049$ |
-| \$20 → \$22 | $2/20 = 0.100$ | $\ln(22)-\ln(20) = 0.095$ |
-| \$20 → \$25 | $5/20 = 0.250$ | $\ln(25)-\ln(20) = 0.223$ |
-
-. . .
-
-Works great for small changes; for larger ones, use exact formula: $100 \times (e^{\beta} - 1)$%
-
-
-## Log-Linear: The Derivation {.smaller}
-
-The most common log model in applied economics:
 
 $$\ln(Y) = \beta_0 + \beta_1 X + \mu$$
 
 . . .
 
-**Step 1:** Increase $X$ by one unit (from $X_0$ to $X_0 + 1$):
+Let's see why. What happens when $X$ increases by one unit?
+
+. . .
+
+**Step 1:** Write out the model at $X_0 + 1$ and $X_0$:
+
+. . .
 
 $$\ln(Y_1) = \beta_0 + \beta_1(X_0 + 1)$$
 $$\ln(Y_0) = \beta_0 + \beta_1 X_0$$
@@ -598,10 +628,40 @@ $$\ln(Y_0) = \beta_0 + \beta_1 X_0$$
 
 $$\ln(Y_1) - \ln(Y_0) = \beta_1$$
 
+So a one-unit change in $X$ produces a change of $\beta_1$ **in the log of** $Y$. But what does that mean in real terms?
 
-## Log-Linear: The Derivation (cont.) {.smaller}
 
-**Step 3:** Use our approximation $\ln(Y_1) - \ln(Y_0) \approx \frac{Y_1 - Y_0}{Y_0}$:
+## From Logs to Percent Changes {.smaller}
+
+We need one key property of logs:
+
+$$\ln(Y_1) - \ln(Y_0) = \ln\!\left(\frac{Y_1}{Y_0}\right) \approx \frac{Y_1 - Y_0}{Y_0}$$
+
+. . .
+
+A **difference in logs** $\approx$ the **proportional change** (for small changes)
+
+. . .
+
+| Wage Change | Proportional Change | Difference in Logs |
+|:----------:|:-------------------:|:-----------------:|
+| \$20 → \$21 | $1/20 = 0.050$ | $\ln(21)-\ln(20) = 0.049$ |
+| \$20 → \$22 | $2/20 = 0.100$ | $\ln(22)-\ln(20) = 0.095$ |
+| \$20 → \$25 | $5/20 = 0.250$ | $\ln(25)-\ln(20) = 0.223$ |
+| \$20 → \$50 | $30/20 = 1.500$ | $\ln(50)-\ln(20) = 0.916$ |
+
+. . .
+
+Works great for small changes; for larger ones, use exact formula: $100 \times (e^{\beta} - 1)$%
+
+
+## Putting It Together {.smaller}
+
+From the derivation, we found: $\ln(Y_1) - \ln(Y_0) = \beta_1$
+
+. . .
+
+**Step 3:** Apply our approximation:
 
 $$\frac{Y_1 - Y_0}{Y_0} \approx \beta_1$$
 
@@ -621,14 +681,33 @@ A **one-unit** increase in $X$ → approximately $100 \times \beta_1$ **percent*
 
 ## Log-Linear: Example {.smaller}
 
+$$\log(wage) = \beta_0 + \beta_1(educ) + \mu$$
+
+. . .
+
+**Step 1:** Take the log of the dependent variable
+
 ```{r}
 #| echo: true
 
-lm_loglin <- lm(log(wage) ~ educ, data = wage1)
+wage1 <- wage1 |> mutate(log_wage = log(wage))
+```
+
+. . .
+
+**Step 2:** Run OLS with $\log(wage)$ as the outcome
+
+```{r}
+#| echo: true
+
+lm_loglin <- lm(log_wage ~ educ, data = wage1)
 coef(lm_loglin) |> round(4)
 ```
 
 . . .
+
+
+## Log-Linear: Example {.smaller}
 
 - $\hat{\beta}_1 \approx 0.083$ → one more year of education is associated with ≈ **8.3% higher wages**
 
@@ -637,11 +716,19 @@ coef(lm_loglin) |> round(4)
 #| fig-width: 9
 #| fig-height: 4
 
-ggplot(wage1, aes(x = educ, y = wage)) +
-  geom_point(alpha = 0.3, color = "gray50", size = 1.5) +
+set.seed(123)
+n <- 250
+sim_educ <- runif(n, 6, 20)
+sim_wage <- exp(0.5 + 0.12 * sim_educ + rnorm(n, sd = 0.3))
+sim_data <- data.frame(educ = sim_educ, wage = sim_wage)
+
+lm_loglin_sim <- lm(log(wage) ~ educ, data = sim_data)
+
+ggplot(sim_data, aes(x = educ, y = wage)) +
+  geom_point(alpha = 0.4, color = "gray50", size = 1.5) +
   geom_smooth(method = "lm", formula = y ~ x,
               aes(color = "Level-Level"), se = FALSE, linewidth = 1.2) +
-  stat_function(fun = function(x) exp(coef(lm_loglin)[1] + coef(lm_loglin)[2]*x),
+  stat_function(fun = function(x) exp(coef(lm_loglin_sim)[1] + coef(lm_loglin_sim)[2]*x),
                 aes(color = "Log-Level"), linewidth = 1.2) +
   scale_color_manual(values = c("Level-Level" = "#0072B2", "Log-Level" = "#D55E00")) +
   labs(x = "Education (years)", y = "Hourly Wage ($)", color = "Model") +
@@ -677,7 +764,11 @@ ggplot(wage1, aes(x = educ, y = wage)) +
 
 $bwght = 116.1 + 2.47 \cdot \ln(faminc)$
 
-A 1% increase in family income → $2.47/100 = 0.025$ ounce increase in birthweight
+Formula: $\Delta Y = \frac{\beta_1}{100} \cdot \%\Delta X$
+
+$\Delta bwght = \frac{2.47}{100} \cdot 1 = 0.025$
+
+A 1% increase in family income → **0.025 oz** increase in birthweight
 
 :::
 ::: {.column width="50%"}
@@ -686,7 +777,11 @@ A 1% increase in family income → $2.47/100 = 0.025$ ounce increase in birthwei
 
 $\ln(wage) = -0.02 + 0.83 \cdot \ln(educ)$
 
-A 1% increase in education → ≈ 0.83% increase in wages
+Formula: $\%\Delta Y = \beta_1 \cdot \%\Delta X$
+
+$\%\Delta wage = 0.83 \cdot 1 = 0.83$%
+
+A 1% increase in education → **0.83%** increase in wages
 
 $\beta_1$ is the **elasticity** — a unit-free measure of responsiveness
 
@@ -700,23 +795,32 @@ $\beta_1$ is the **elasticity** — a unit-free measure of responsiveness
 #| fig-width: 9
 #| fig-height: 3.5
 
-bw_data <- bwght |> filter(faminc > 0)
-lm_ll <- lm(bwght ~ log(faminc), data = bw_data)
+set.seed(99)
+n <- 250
 
-p1 <- ggplot(bw_data, aes(x = faminc, y = bwght)) +
-  geom_point(alpha = 0.2, color = "gray50", size = 1) +
+# Level-Log: Y = b0 + b1*log(X) + e
+sim_inc <- runif(n, 1, 80)
+sim_bw <- 90 + 8 * log(sim_inc) + rnorm(n, sd = 2)
+sim_ll <- data.frame(faminc = sim_inc, bwght = sim_bw)
+
+p1 <- ggplot(sim_ll, aes(x = faminc, y = bwght)) +
+  geom_point(alpha = 0.4, color = "gray50", size = 1) +
   geom_smooth(method = "lm", formula = y ~ log(x),
               color = "#009E73", se = FALSE, linewidth = 1.2) +
   labs(x = "Family Income ($1000s)", y = "Birthweight (oz)",
        title = "Level-Log") +
   theme_minimal(base_size = 12)
 
-we_data <- wage1 |> filter(educ > 0)
-lm_loglog <- lm(log(wage) ~ log(educ), data = we_data)
+# Log-Log: log(Y) = b0 + b1*log(X) + e
+sim_educ <- runif(n, 4, 20)
+sim_wage <- exp(0.3 + 0.9 * log(sim_educ) + rnorm(n, sd = 0.25))
+sim_loglog <- data.frame(educ = sim_educ, wage = sim_wage)
 
-p2 <- ggplot(we_data, aes(x = educ, y = wage)) +
-  geom_point(alpha = 0.2, color = "gray50", size = 1) +
-  stat_function(fun = function(x) exp(coef(lm_loglog)[1] + coef(lm_loglog)[2]*log(x)),
+lm_loglog_sim <- lm(log(wage) ~ log(educ), data = sim_loglog)
+
+p2 <- ggplot(sim_loglog, aes(x = educ, y = wage)) +
+  geom_point(alpha = 0.4, color = "gray50", size = 1) +
+  stat_function(fun = function(x) exp(coef(lm_loglog_sim)[1] + coef(lm_loglog_sim)[2]*log(x)),
                 color = "#D55E00", linewidth = 1.2) +
   labs(x = "Education (years)", y = "Hourly Wage ($)",
        title = "Log-Log") +
@@ -744,9 +848,8 @@ gridExtra::grid.arrange(p1, p2, ncol = 2)
 
 ::: {.callout-warning}
 ## Watch Out
-The "$100 \times \beta_1$%" approximation works for small $\beta_1$ (roughly $|\beta_1| < 0.20$).
-
-For larger coefficients, use the **exact** formula: $100 \times (e^{\beta_1} - 1)$%
+1) The "$100 \times \beta_1$%" approximation works for small $\beta_1$ (roughly $|\beta_1| < 0.20$). For larger coefficients, use the **exact** formula: $100 \times (e^{\beta_1} - 1)$%
+2) Be wary if your pre-logged variable contains negative numbers or zeros!
 :::
 
 
@@ -781,3 +884,93 @@ For larger coefficients, use the **exact** formula: $100 \times (e^{\beta_1} - 1
 . . .
 
 4. Always ask: **is the dependent variable logged? Is $X$ logged?** That tells you the interpretation.
+
+
+# Practice Problems
+
+
+## Practice 1: Reading a Regression Table {.smaller}
+
+::: columns
+::: {.column width="45%"}
+
+```{r}
+#| echo: false
+
+wage1 <- wage1 |> mutate(exper2 = exper^2)
+mod_practice <- lm(wage ~ educ + exper + exper2, data = wage1)
+modelsummary(mod_practice, stars = TRUE, gof_omit = "AIC|BIC|Log|RMSE|F",
+             coef_rename = c("educ" = "Education", "exper" = "Experience",
+                             "exper2" = "Experience²"),
+             title = "Dep. Var: Hourly Wage ($)")
+```
+
+:::
+::: {.column width="55%"}
+
+**Questions:**
+
+a) Interpret the coefficient on Education
+b) What is the marginal effect of experience at $exper = 10$?
+c) At what level of experience does the wage peak?
+
+. . .
+
+**Answers:**
+
+a) One more year of education → **\$0.57/hr** higher wages, holding experience constant
+b) $\frac{\partial wage}{\partial exper} = \hat{\beta}_{exper} + 2\hat{\beta}_{exper^2}(10)$ — plug in the coefficients from the table!
+c) Set $\hat{\beta}_{exper} + 2\hat{\beta}_{exper^2} \cdot exper = 0$ and solve for $exper$
+
+:::
+:::
+
+
+## Practice 2: Log Models {.smaller}
+
+For each equation, state the model type, write the interpretation formula, and interpret $\hat{\beta}_1$:
+
+. . .
+
+a) $\ln(\widehat{wage}) = 1.60 + 0.07 \cdot educ$
+
+. . .
+
+**Log-level.** Formula: $\%\Delta Y = 100 \times \beta_1 \cdot \Delta X = 100 \times 0.07 \times 1 = 7$%. One more year of education → approximately **7% higher wages**
+
+. . .
+
+b) $\widehat{bwght} = 100.8 + 3.10 \cdot \ln(faminc)$
+
+. . .
+
+**Level-log.** Formula: $\Delta Y = \frac{\beta_1}{100} \cdot \%\Delta X = \frac{3.10}{100} \cdot 1 = 0.031$. A 1% increase in family income → **0.031 oz** increase in birthweight
+
+. . .
+
+c) $\ln(\widehat{salary}) = 4.80 + 0.25 \cdot \ln(sales)$
+
+. . .
+
+**Log-log.** Formula: $\%\Delta Y = \beta_1 \cdot \%\Delta X = 0.25 \cdot 1 = 0.25$%. A 1% increase in sales → **0.25% increase** in CEO salary. $\beta_1$ is an **elasticity**.
+
+
+## Practice 3: Identify and Interpret {.smaller}
+
+For each equation, state the model type and interpret $\hat{\beta}_1$:
+
+a) $\widehat{price} = 20{,}000 + 15{,}000 \cdot pool$ where $pool = 1$ if the house has a pool
+
+b) $\ln(\widehat{wage}) = 2.10 - 0.15 \cdot female$ where $female = 1$ for women
+
+c) $\widehat{score} = 50 + 4.2 \cdot hours - 0.10 \cdot hours^2$
+
+. . .
+
+**Answers:**
+
+a) **Level-level with a dummy.** Houses with a pool sell for $\$15{,}000$ more than houses without, on average.
+
+b) **Log-level with a dummy.** $100 \times (-0.15) = -15$%. Women earn approximately **15% less** than men, on average. (Since $|\beta_1| < 0.20$, the approximation is reasonable.)
+
+c) **Quadratic.** The marginal effect of studying is $4.2 - 0.20 \cdot hours$. At $hours = 5$: $4.2 - 1.0 = 3.2$ points per additional hour. Returns to studying diminish.
