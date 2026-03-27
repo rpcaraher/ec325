@@ -1,0 +1,788 @@
+---
+title: "Interaction Effects"
+subtitle: "EC 325: Econometrics"
+author: "Prof. Caraher"
+institute: "Colby College"
+date: "today"
+date-format: "medium"
+embed-resources: true
+format:
+  revealjs:
+    theme: colby-theme.scss
+    slide-number: true
+    incremental: true
+    footer: "EC325 | Unit 8 | Interaction Effects"
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+#| echo: false
+
+library(tidyverse)
+library(wooldridge)
+library(modelsummary)
+library(modeldata)
+options(scipen = 999)
+```
+
+
+# Why Interactions?
+
+## Quick Review: What Dummies Do {.smaller}
+
+- Last unit we saw that **dummy variables** shift the intercept:
+
+$$\widehat{score} = \hat{\beta}_0 + \hat{\beta}_1(hsgpa) + \hat{\beta}_2(calculus)$$
+
+- Calculus-takers: $(\hat{\beta}_0 + \hat{\beta}_2) + \hat{\beta}_1(hsgpa)$
+- Non-calculus-takers: $\hat{\beta}_0 + \hat{\beta}_1(hsgpa)$
+
+. . .
+
+::: {.callout-important}
+## The Limitation
+Both groups have the **same slope** — the effect of GPA is assumed identical for both groups. Is that always realistic?
+:::
+
+
+## What If the Slopes Differ? {.smaller}
+
+- Maybe calculus preparation changes *how much* GPA matters
+- Maybe education has different returns for men vs. women
+- Maybe the suburb premium differs by property type
+
+. . .
+
+- We need a way to let the **effect** of one variable **depend on** the value of another
+
+. . .
+
+> **Interaction effects** let us model this by including the *product* of two variables in our regression
+
+
+# Interactions Between Two Dummies
+
+## Setting Up the Model {.smaller}
+
+- Suppose we want to understand how **gender** and **marital status** jointly affect wages
+
+. . .
+
+$$\ln(wage) = \beta_0 + \beta_1(female) + \beta_2(married) + \beta_3(female \times married) + \mu$$
+
+. . .
+
+- $female \times married$ is the **interaction term**
+- It equals **1** only when *both* are true (the person is female AND married)
+- It equals **0** for everyone else
+
+## Identifying the Baseline {.smaller}
+
+- With dummy variables, we always need a **baseline group**: the group where all dummies equal zero
+
+. . .
+
+- Here, the baseline is **unmarried men** ($female = 0$, $married = 0$)
+
+. . .
+
+- $\beta_0$ is the average $\ln(wage)$ for this baseline group
+- Every other coefficient is an effect **relative to unmarried men**
+
+. . .
+
+::: {.callout-tip}
+## Key Habit
+Before interpreting any coefficient, always ask: *who is the baseline?*
+:::
+
+
+## What Does Each Coefficient Mean? {.smaller}
+
+Once we add the interaction, each coefficient has a **specific** meaning:
+
+. . .
+
+- $\beta_1$ = effect of being female **when $married = 0$** (i.e., gender gap among *unmarried* workers)
+
+. . .
+
+- $\beta_2$ = effect of being married **when $female = 0$** (i.e., marriage premium for *men*)
+
+. . .
+
+- $\beta_3$ = the **additional** effect of being *both* female and married, beyond the sum of the individual effects
+
+. . .
+
+::: {.callout-important}
+## Two Equivalent Readings of β₃
+
+1. How much does the **marriage premium** differ between men and women?
+2. How much does the **gender gap** differ between married and unmarried workers?
+
+Both give the same number — the interaction is symmetric!
+:::
+
+
+## Plugging in the Values {.smaller}
+
+| Group | female | married | Predicted $\ln(wage)$ |
+|:------|:------:|:-------:|:----------------------|
+| Unmarried men (baseline) | 0 | 0 | $\beta_0$ |
+| Unmarried women | 1 | 0 | $\beta_0 + \beta_1$ |
+| Married men | 0 | 1 | $\beta_0 + \beta_2$ |
+| Married women | 1 | 1 | $\beta_0 + \beta_1 + \beta_2 + \beta_3$ |
+
+. . .
+
+- **Married women**: total effect relative to baseline = $\beta_1 + \beta_2 + \beta_3$ — **not** just $\beta_1 + \beta_2$!
+- If $\beta_3 = 0$, we don't need the interaction (simpler model works)
+
+
+## The Data {.smaller}
+
+```{r}
+#| echo: true
+
+wage_data <- wooldridge::wage1 |>
+    mutate(female_married = female * married)
+```
+
+```{r}
+#| echo: false
+
+wage_data |>
+    mutate(ln_wage = round(log(wage), 3)) |>
+    select(ln_wage, female, married, female_married) |>
+    head(8) |>
+    knitr::kable(col.names = c("ln(wage)", "female", "married", "female × married"),
+                 align = "c")
+```
+
+Notice: `female × married` = 1 **only** when *both* dummies equal 1.
+
+
+## Let's Estimate It {.smaller}
+
+```{r}
+#| echo: true
+
+lm_interact <- lm(log(wage) ~ female + married + female_married, data = wage_data)
+coef(lm_interact) |> round(3)
+```
+
+. . .
+
+- **Unmarried women** earn `r paste0(round(100*coef(lm_interact)[2], 1))`% less than unmarried men
+- **Married men** earn `r paste0(round(100*coef(lm_interact)[3], 1))`% more than unmarried men
+- The interaction term ($\hat{\beta}_3 \approx `r round(coef(lm_interact)[4], 3)`$): marriage premium is **much smaller** for women
+
+
+## Interpreting the Results {.smaller}
+
+```{r}
+#| echo: false
+
+coefs <- coef(lm_interact)
+
+tribble(
+    ~Group, ~Formula, ~`Predicted ln(wage)`, ~`Wage vs. baseline`,
+    "Unmarried men",
+        "β₀",
+        round(coefs[1], 3),
+        "---",
+    "Unmarried women",
+        "β₀ + β₁",
+        round(coefs[1] + coefs[2], 3),
+        paste0(round(100*(exp(coefs[2]) - 1), 1), "%"),
+    "Married men",
+        "β₀ + β₂",
+        round(coefs[1] + coefs[3], 3),
+        paste0("+", round(100*(exp(coefs[3]) - 1), 1), "%"),
+    "Married women",
+        "β₀ + β₁ + β₂ + β₃",
+        round(coefs[1] + coefs[2] + coefs[3] + coefs[4], 3),
+        paste0(round(100*(exp(coefs[2] + coefs[3] + coefs[4]) - 1), 1), "%")
+) |>
+    knitr::kable()
+```
+
+. . .
+
+- Marriage is associated with **higher wages for men** but **not for women**
+- The interaction term nearly wipes out the marriage premium for women
+
+
+## Visualizing the Components {.smaller auto-animate=true}
+
+```{r}
+#| echo: false
+
+# Helper function for the progressive waterfall plot
+# show_groups: how many groups to reveal (1-4)
+plot_waterfall <- function(coefs, show_groups = 4) {
+
+    # Full waterfall data for all 4 groups
+    all_data <- tribble(
+        ~group, ~component, ~start, ~end, ~coef_label, ~group_num,
+        "Unmarried\nmen", "β0 (intercept)", 0, coefs[1], round(coefs[1], 2), 1,
+        "Unmarried\nwomen", "β0 (intercept)", 0, coefs[1], NA_real_, 2,
+        "Unmarried\nwomen", "β1 (female)", coefs[1], coefs[1] + coefs[2], round(coefs[2], 2), 2,
+        "Married\nmen", "β0 (intercept)", 0, coefs[1], NA_real_, 3,
+        "Married\nmen", "β2 (married)", coefs[1], coefs[1] + coefs[3], round(coefs[3], 2), 3,
+        "Married\nwomen", "β0 (intercept)", 0, coefs[1], NA_real_, 4,
+        "Married\nwomen", "β1 (female)", coefs[1], coefs[1] + coefs[2], NA_real_, 4,
+        "Married\nwomen", "β2 (married)", coefs[1] + coefs[2], coefs[1] + coefs[2] + coefs[3], NA_real_, 4,
+        "Married\nwomen", "β3 (interaction)", coefs[1] + coefs[2] + coefs[3], coefs[1] + coefs[2] + coefs[3] + coefs[4], round(coefs[4], 2), 4
+    ) |>
+        mutate(
+            group = factor(group, levels = c("Unmarried\nmen", "Unmarried\nwomen", "Married\nmen", "Married\nwomen")),
+            component = factor(component, levels = c("β0 (intercept)", "β1 (female)", "β2 (married)", "β3 (interaction)")),
+            # Handle negative segments: swap so ymin < ymax
+            ymin = pmin(start, end),
+            ymax = pmax(start, end)
+        )
+
+    # Filter to only groups we want to show
+    plot_data <- all_data |> filter(group_num <= show_groups)
+
+    # Totals for each visible group (the final predicted value)
+    totals <- plot_data |>
+        group_by(group) |>
+        summarise(total = last(end), .groups = "drop")
+
+    # Split into two layers so adjustment segments are always visible on top
+    intercept_bars <- plot_data |> filter(component == "β0 (intercept)")
+    adjustment_bars <- plot_data |> filter(component != "β0 (intercept)")
+
+    ggplot(plot_data, aes(x = group)) +
+        # Layer 1: intercept bars (background)
+        geom_rect(data = intercept_bars,
+                  aes(xmin = as.numeric(group) - 0.35,
+                      xmax = as.numeric(group) + 0.35,
+                      ymin = ymin, ymax = ymax,
+                      fill = component),
+                  color = "white", linewidth = 0.5) +
+        # Layer 2: adjustment bars (foreground — drawn on top of intercepts)
+        geom_rect(data = adjustment_bars,
+                  aes(xmin = as.numeric(group) - 0.35,
+                      xmax = as.numeric(group) + 0.35,
+                      ymin = ymin, ymax = ymax,
+                      fill = component),
+                  color = "white", linewidth = 0.5) +
+        geom_text(data = plot_data |> filter(!is.na(coef_label)),
+                  aes(x = group,
+                      y = (ymin + ymax) / 2,
+                      label = coef_label),
+                  fontface = "bold", size = 4, color = "white") +
+        geom_segment(data = totals,
+                     aes(x = as.numeric(group) - 0.38,
+                         xend = as.numeric(group) + 0.38,
+                         y = total, yend = total),
+                     linewidth = 1, color = "black") +
+        geom_text(data = totals, aes(x = group, y = total,
+                  label = paste0("= ", round(total, 2))),
+                  hjust = -0.8,
+                  vjust = -1, fontface = "bold", size = 4.5) +
+        scale_fill_manual(
+            values = c("β0 (intercept)" = "#002169",
+                       "β1 (female)" = "#D55E00",
+                       "β2 (married)" = "#0072B2",
+                       "β3 (interaction)" = "#EEB808"),
+            name = "Component",
+            drop = FALSE
+        ) +
+        scale_x_discrete(drop = FALSE) +
+        labs(x = NULL, y = "Predicted ln(wage)",
+             title = "Building Up Predicted Wages from Coefficients") +
+        coord_cartesian(ylim = c(0, 2.1)) +
+        theme_minimal(base_size = 14) +
+        theme(legend.position = "bottom",
+              panel.grid.major.x = element_blank())
+}
+```
+
+**Step 1:** Start with the baseline — **unmarried men** get only $\beta_0$
+
+```{r}
+#| echo: false
+#| fig-width: 10
+#| fig-height: 5
+
+plot_waterfall(coefs, show_groups = 1)
+```
+
+
+## Visualizing the Components {.smaller auto-animate=true}
+
+**Step 2:** **Unmarried women** = $\beta_0 + \beta_1$ — the [orange]{style="color: #D55E00; font-weight: bold;"} segment pulls their bar *down*
+
+```{r}
+#| echo: false
+#| fig-width: 10
+#| fig-height: 5
+
+plot_waterfall(coefs, show_groups = 2)
+```
+
+
+## Visualizing the Components {.smaller auto-animate=true}
+
+**Step 3:** **Married men** = $\beta_0 + \beta_2$ — the [blue]{style="color: #0072B2; font-weight: bold;"} marriage premium pushes their bar *up*
+
+```{r}
+#| echo: false
+#| fig-width: 10
+#| fig-height: 5
+
+plot_waterfall(coefs, show_groups = 3)
+```
+
+
+## Visualizing the Components {.smaller auto-animate=true}
+
+**Step 4:** **Married women** = $\beta_0 + \beta_1 + \beta_2 + \beta_3$ — all four components
+
+- The [gold]{style="color: #EEB808; font-weight: bold;"} interaction ($\beta_3$) nearly wipes out the [blue]{style="color: #0072B2; font-weight: bold;"} marriage premium
+
+```{r}
+#| echo: false
+#| fig-width: 10
+#| fig-height: 5
+
+plot_waterfall(coefs, show_groups = 4)
+```
+
+
+# Dummy × Continuous Interactions
+
+## Different Slopes for Different Groups {.smaller}
+
+- What if we want the **return to education** to differ by gender?
+
+. . .
+
+$$\ln(wage) = \beta_0 + \beta_1(female) + \beta_2(educ) + \beta_3(female \times educ) + \mu$$
+
+. . .
+
+- $female \times educ$ = 0 for all men, and = `educ` for all women
+
+. . .
+
+- This gives each group a **different intercept AND slope**:
+
+## Two Separate Regression Lines {.smaller}
+
+**Men** ($female = 0$):
+$$\ln(wage) = \beta_0 + \beta_2(educ)$$
+
+**Women** ($female = 1$):
+$$\ln(wage) = \underbrace{(\beta_0 + \beta_1)}_{\text{different intercept}} + \underbrace{(\beta_2 + \beta_3)}_{\text{different slope}}(educ)$$
+
+. . .
+
+- $\beta_1$ = **intercept** difference (level shift for women at $educ = 0$)
+- $\beta_3$ = **slope** difference (how much more/less women gain per year of education)
+
+. . .
+
+::: {.callout-important}
+## vs. Dummy-Only Model
+Without the interaction, both groups share the **same slope** (parallel lines). The interaction lets the lines have **different slopes** — they can converge, diverge, or even cross.
+:::
+
+
+## Simulated Example {.smaller}
+
+To see this clearly, let's generate data where the difference is obvious:
+
+- Men: 8% return to education; Women: 14% return
+- Women start with a lower intercept
+
+```{r}
+#| echo: true
+
+set.seed(42)
+n <- 500
+
+sim_data <- tibble(
+    female = rep(c(0, 1), each = n/2),
+    educ = round(runif(n, min = 8, max = 20)),
+    error = rnorm(n, mean = 0, sd = 0.4),
+    lwage = 0.8 - 0.90 * female + 0.08 * educ + 0.06 * female * educ + error
+) |>
+    mutate(female_educ = female * educ)
+```
+
+## Simulated Example {.smaller}
+
+```{r}
+#| echo: false
+
+sim_data |>
+    slice_sample(n = 10) |>
+    select(lwage, female, educ, female_educ) |>
+    head(8) |>
+    mutate(lwage = round(lwage, 3)) |>
+    knitr::kable(col.names = c("ln(wage)", "female", "educ", "female × educ"),
+                 align = "c")
+```
+
+Notice: `female × educ` = 0 for all men, and = `educ` for all women.
+
+
+## Estimating the Model {.smaller}
+
+```{r}
+#| echo: true
+
+lm_slope <- lm(lwage ~ female + educ + female_educ, data = sim_data)
+coef(lm_slope) |> round(3)
+```
+
+. . .
+
+```{r}
+#| echo: false
+slope_coefs <- coef(lm_slope)
+```
+
+- Return to education for **men**: $\hat{\beta}_2 \approx `r round(slope_coefs[3], 3)`$ → `r round(100*slope_coefs[3], 1)`% per year
+- Return to education for **women**: $\hat{\beta}_2 + \hat{\beta}_3 \approx `r round(slope_coefs[3] + slope_coefs[4], 3)`$ → `r round(100*(slope_coefs[3] + slope_coefs[4]), 1)`% per year
+- The **interaction** ($\hat{\beta}_3 \approx `r round(slope_coefs[4], 3)`$): women gain `r round(100*slope_coefs[4], 1)` percentage points *more* per year of education
+
+
+## Visualizing Different Slopes {.smaller}
+
+```{r}
+#| echo: false
+#| fig-width: 10
+#| fig-height: 5.5
+
+sim_data <- sim_data |>
+    mutate(gender_label = ifelse(female == 1, "Women", "Men"))
+
+ggplot(sim_data, aes(x = educ, y = lwage, color = gender_label)) +
+    geom_point(alpha = 0.2, size = 1.5) +
+    geom_smooth(method = "lm", se = FALSE, linewidth = 1.3) +
+    scale_color_manual(values = c("Men" = "#0072B2", "Women" = "#D55E00")) +
+    labs(x = "Years of Education", y = "ln(wage)",
+         title = "Different Returns to Education by Gender",
+         color = NULL) +
+    theme_minimal(base_size = 16) +
+    theme(legend.position = "bottom")
+```
+
+- The lines are **not parallel** — women's steeper slope narrows the gap at high education levels
+
+
+## Side-by-Side: Dummy-Only vs. Interaction {.smaller}
+
+```{r}
+#| echo: false
+#| fig-width: 11
+#| fig-height: 5
+
+# Dummy only model
+lm_dummy_only <- lm(lwage ~ female + educ, data = sim_data)
+d_coefs <- coef(lm_dummy_only)
+
+p1_data <- sim_data |>
+    mutate(
+        pred = d_coefs[1] + d_coefs[2] * female + d_coefs[3] * educ
+    )
+
+p1 <- ggplot(p1_data, aes(x = educ, color = gender_label)) +
+    geom_point(aes(y = lwage), alpha = 0.15, size = 1) +
+    geom_line(aes(y = pred), linewidth = 1.3) +
+    scale_color_manual(values = c("Men" = "#0072B2", "Women" = "#D55E00")) +
+    labs(x = "Education", y = "ln(wage)", title = "Dummy Only (Parallel Lines)", color = NULL) +
+    theme_minimal(base_size = 14) +
+    theme(legend.position = "bottom")
+
+# Interaction model
+p2_data <- sim_data |>
+    mutate(
+        pred = slope_coefs[1] + slope_coefs[2] * female + slope_coefs[3] * educ + slope_coefs[4] * female_educ
+    )
+
+p2 <- ggplot(p2_data, aes(x = educ, color = gender_label)) +
+    geom_point(aes(y = lwage), alpha = 0.15, size = 1) +
+    geom_line(aes(y = pred), linewidth = 1.3) +
+    scale_color_manual(values = c("Men" = "#0072B2", "Women" = "#D55E00")) +
+    labs(x = "Education", y = "ln(wage)", title = "Interaction (Different Slopes)", color = NULL) +
+    theme_minimal(base_size = 14) +
+    theme(legend.position = "bottom")
+
+library(patchwork)
+p1 + p2
+```
+
+
+# Computing Total Effects
+
+## The General Rule {.smaller}
+
+When interactions are present, the **total effect** of a variable includes all terms where it appears:
+
+. . .
+
+$$\ln(wage) = \beta_0 + \beta_1(female) + \beta_2(educ) + \beta_3(female \times educ) + \mu$$
+
+. . .
+
+- Effect of education: $\frac{\partial \ln(wage)}{\partial educ} = \beta_2 + \beta_3(female)$
+  - For men: $\beta_2$
+  - For women: $\beta_2 + \beta_3$
+
+. . .
+
+- Effect of being female: $\frac{\partial \ln(wage)}{\partial female} = \beta_1 + \beta_3(educ)$
+  - **Depends on education level!**
+
+
+## The Gender Gap at Different Education Levels {.smaller}
+
+```{r}
+#| echo: true
+
+educ_levels <- c(8, 10, 12, 14, 16, 18)
+
+tibble(
+    `Education` = educ_levels,
+    `Gender gap (log pts)` = round(slope_coefs[2] + slope_coefs[4] * educ_levels, 3),
+    `Approx. % gap` = round(100 * (slope_coefs[2] + slope_coefs[4] * educ_levels), 1)
+) |> knitr::kable()
+```
+
+. . .
+
+::: {.callout-warning}
+## Common Mistake
+Never report just the main effect $\beta_1$ as "the effect of being female." With an interaction, the true effect is $\beta_1 + \beta_3(educ)$ — it depends on education!
+:::
+
+
+# Application: Sacramento Housing
+
+## Setting Up the Problem {.smaller}
+
+::: {.nonincremental}
+- **Outcome**: log(sale price) of homes in Sacramento
+- **Variables**:
+  - `sqft`: interior square footage (continuous)
+  - `suburb`: 1 if outside Sacramento city limits, 0 if inside (dummy)
+  - `type`: Condo, Multi-Family, or Residential (factor → R creates dummies)
+- **Baseline**: Condo in Sacramento proper (all dummies = 0)
+- **Question**: Does the suburb premium differ by property type?
+:::
+
+
+## The Model {.smaller}
+
+$$\ln(price) = \beta_0 + \beta_1(sqft) + \beta_2(MF) + \beta_3(Res) + \beta_4(Sub) + \beta_5(MF \times Sub) + \beta_6(Res \times Sub) + \mu$$
+
+```{r}
+#| echo: true
+
+sac_data <- modeldata::Sacramento |>
+    mutate(ln_price = log(price),
+           type.f = factor(type),
+           suburb = case_when(city == "SACRAMENTO" ~ 0, TRUE ~ 1))
+
+lm_housing <- lm(ln_price ~ sqft + type.f + suburb + type.f:suburb, data = sac_data)
+```
+
+
+## Results {.smaller}
+
+```{r}
+#| echo: false
+#| output: asis
+
+modelsummary(
+    fmt = 4,
+    list("log(Sale Price)" = lm_housing),
+    stars = c("*" = 0.1, "**" = 0.05, "***" = 0.01),
+    title = "OLS Regression of Sacramento Home Prices",
+    gof_map = c("nobs", "adj.r.squared"),
+    coef_map = c(
+        "sqft" = "Square Feet",
+        "suburb" = "Suburb",
+        "type.fMulti_Family" = "Type: Multi-Family",
+        "type.fResidential" = "Type: Residential",
+        "type.fMulti_Family:suburb" = "Multi-Family × Suburb",
+        "type.fResidential:suburb" = "Residential × Suburb"
+    )
+)
+```
+
+
+## Building Up Predicted Values {.smaller}
+
+```{r}
+#| echo: false
+
+hcoefs <- coef(lm_housing)
+
+tribble(
+    ~`Property Type`, ~Location, ~Formula, ~Value,
+    "Condo", "Sacramento",
+        "β₀", round(hcoefs["(Intercept)"], 3),
+    "Multi-Family", "Sacramento",
+        "β₀ + β_MF", round(hcoefs["(Intercept)"] + hcoefs["type.fMulti_Family"], 3),
+    "Residential", "Sacramento",
+        "β₀ + β_Res", round(hcoefs["(Intercept)"] + hcoefs["type.fResidential"], 3),
+    "Condo", "Suburb",
+        "β₀ + β_Sub", round(hcoefs["(Intercept)"] + hcoefs["suburb"], 3),
+    "Multi-Family", "Suburb",
+        "β₀ + β_MF + β_Sub + β_MF×Sub", round(hcoefs["(Intercept)"] + hcoefs["type.fMulti_Family"] + hcoefs["suburb"] + hcoefs["type.fMulti_Family:suburb"], 3),
+    "Residential", "Suburb",
+        "β₀ + β_Res + β_Sub + β_Res×Sub", round(hcoefs["(Intercept)"] + hcoefs["type.fResidential"] + hcoefs["suburb"] + hcoefs["type.fResidential:suburb"], 3)
+) |>
+    knitr::kable()
+```
+
+. . .
+
+- The interaction tells us the **suburb premium differs by property type**
+
+
+# Why You Need Main Effects
+
+## What Goes Wrong Without Them? {.smaller}
+
+What if we *only* include the interaction — no main effects?
+
+$$\ln(wage) = \beta_0 + \beta_1(female \times married) + \mu$$
+
+. . .
+
+```{r}
+#| echo: true
+
+wage_data <- wooldridge::wage1 |>
+    mutate(female_married = female * married)
+
+lm_correct <- lm(log(wage) ~ female + married + female_married, data = wage_data)
+lm_wrong   <- lm(log(wage) ~ female_married, data = wage_data)
+```
+
+
+## Comparing the Models {.smaller}
+
+```{r}
+#| echo: false
+#| output: asis
+
+modelsummary(
+    fmt = 4,
+    list("Correct" = lm_correct, "Interaction Only" = lm_wrong),
+    stars = c("*" = 0.1, "**" = 0.05, "***" = 0.01),
+    gof_map = c("nobs", "adj.r.squared"),
+    coef_map = c(
+        "female" = "Female",
+        "married" = "Married",
+        "female_married" = "Female × Married"
+    )
+)
+```
+
+
+## What Can Each Model Predict? {.smaller}
+
+```{r}
+#| echo: false
+
+ccoefs <- coef(lm_correct)
+wcoefs <- coef(lm_wrong)
+
+tribble(
+    ~Group,
+    ~`Correct: Formula`, ~`Correct: Value`,
+    ~`Wrong: Formula`, ~`Wrong: Value`,
+    "Unmarried men",
+        "β₀", round(ccoefs[1], 3),
+        "β₀", round(wcoefs[1], 3),
+    "Unmarried women",
+        "β₀ + β₁", round(ccoefs[1] + ccoefs[2], 3),
+        "β₀", round(wcoefs[1], 3),
+    "Married men",
+        "β₀ + β₂", round(ccoefs[1] + ccoefs[3], 3),
+        "β₀", round(wcoefs[1], 3),
+    "Married women",
+        "β₀ + β₁ + β₂ + β₃", round(ccoefs[1] + ccoefs[2] + ccoefs[3] + ccoefs[4], 3),
+        "β₀ + β₁", round(wcoefs[1] + wcoefs[2], 3)
+) |>
+    knitr::kable()
+```
+
+. . .
+
+- The interaction-only model gives the **same prediction** to unmarried men, unmarried women, and married men — it can't tell them apart!
+
+
+## The Lesson {.smaller}
+
+::: {.callout-warning}
+## Always Include the Main Effects
+When you include $X_1 \times X_2$ in a model, **always** also include $X_1$ and $X_2$ separately. Otherwise the interaction absorbs effects it was never meant to capture.
+:::
+
+. . .
+
+| Feature | Dummy-only model | Interaction model |
+|:--------|:----------------|:-----------------|
+| **Intercept** | Different for each group | Different for each group |
+| **Slope** | Same for all groups | Different for each group |
+| **Assumption** | Effect of $X$ is the same across groups | Effect of $X$ can vary across groups |
+| **Flexibility** | Less flexible | More flexible |
+
+
+# Interpretation Practice
+
+## Practice: Turn to Your Neighbor {.smaller .nonincremental}
+
+Consider this model of home prices in Sacramento:
+
+$$\ln(price) = \beta_0 + \beta_1(sqft) + \beta_2(Residential) + \beta_3(Suburb) + \beta_4(Residential \times Suburb) + \mu$$
+
+::: columns
+::: {.column width="50%"}
+**Discuss with your neighbor:**
+
+1. What is the baseline group?
+2. What does $\beta_2$ represent?
+3. What does $\beta_3$ represent?
+4. What is the suburb premium for residential homes?
+5. What is the total effect of being a suburban residential home (vs. baseline)?
+:::
+::: {.column width="50%"}
+**Answers:**
+
+1. Condo in Sacramento
+2. Price difference: Residential vs. Condo (in Sacramento)
+3. Suburb premium for Condos
+4. $\beta_3 + \beta_4$
+5. $\beta_2 + \beta_3 + \beta_4$
+:::
+:::
+
+
+## Key Takeaways {.smaller}
+
+::: {.nonincremental}
+
+1. **Interaction terms** = the product of two variables on the RHS
+2. **Dummy × Dummy**: the combination of two characteristics may have an effect ≠ sum of individual effects
+3. **Dummy × Continuous**: allows different **slopes** (not just different intercepts) for each group
+4. **Total effects** must include all terms where a variable appears — don't just report the main effect!
+5. **Always include the main effects** alongside the interaction term
+
+:::

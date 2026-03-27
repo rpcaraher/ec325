@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>12&nbsp; Advanced Difference-in-Differences – EC325 Lecture Notes</title>
+<title>13&nbsp; Advanced Difference-in-Differences – EC325 Lecture Notes</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -144,7 +144,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/advanced_did.html"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Advanced Difference-in-Differences</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/advanced_did.html"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Advanced Difference-in-Differences</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -238,38 +238,44 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../chapters/interaction_effects.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Interaction Effects</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../chapters/heteroskedasticity.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Heteroskedasticity</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Heteroskedasticity</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/binary_outcomes.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Binary Outcomes</span></span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Binary Outcomes</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/panel_fe.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Panel Data and Fixed Effects</span></span></a>
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Panel Data and Fixed Effects</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/did.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span></a>
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/advanced_did.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Advanced Difference-in-Differences</span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Advanced Difference-in-Differences</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/instrumental_variables.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Instrumental Variables</span></span></a>
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Instrumental Variables</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -323,32 +329,32 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#data-driven-control-selection" id="toc-data-driven-control-selection" class="nav-link active" data-scroll-target="#data-driven-control-selection"><span class="header-section-number">12.1</span> Data-Driven Control Selection</a>
+  <li><a href="#data-driven-control-selection" id="toc-data-driven-control-selection" class="nav-link active" data-scroll-target="#data-driven-control-selection"><span class="header-section-number">13.1</span> Data-Driven Control Selection</a>
   <ul class="collapse">
-  <li><a href="#the-problem-systematically-different-treatment-and-control-groups" id="toc-the-problem-systematically-different-treatment-and-control-groups" class="nav-link" data-scroll-target="#the-problem-systematically-different-treatment-and-control-groups"><span class="header-section-number">12.1.1</span> The Problem: Systematically Different Treatment and Control Groups</a></li>
-  <li><a href="#propensity-score-weighting-the-intuition" id="toc-propensity-score-weighting-the-intuition" class="nav-link" data-scroll-target="#propensity-score-weighting-the-intuition"><span class="header-section-number">12.1.2</span> Propensity Score Weighting: The Intuition</a></li>
-  <li><a href="#the-ipw-did-algorithm" id="toc-the-ipw-did-algorithm" class="nav-link" data-scroll-target="#the-ipw-did-algorithm"><span class="header-section-number">12.1.3</span> The IPW-DiD Algorithm</a></li>
-  <li><a href="#comparing-results" id="toc-comparing-results" class="nav-link" data-scroll-target="#comparing-results"><span class="header-section-number">12.1.4</span> Comparing Results</a></li>
+  <li><a href="#the-problem-systematically-different-treatment-and-control-groups" id="toc-the-problem-systematically-different-treatment-and-control-groups" class="nav-link" data-scroll-target="#the-problem-systematically-different-treatment-and-control-groups"><span class="header-section-number">13.1.1</span> The Problem: Systematically Different Treatment and Control Groups</a></li>
+  <li><a href="#propensity-score-weighting-the-intuition" id="toc-propensity-score-weighting-the-intuition" class="nav-link" data-scroll-target="#propensity-score-weighting-the-intuition"><span class="header-section-number">13.1.2</span> Propensity Score Weighting: The Intuition</a></li>
+  <li><a href="#the-ipw-did-algorithm" id="toc-the-ipw-did-algorithm" class="nav-link" data-scroll-target="#the-ipw-did-algorithm"><span class="header-section-number">13.1.3</span> The IPW-DiD Algorithm</a></li>
+  <li><a href="#comparing-results" id="toc-comparing-results" class="nav-link" data-scroll-target="#comparing-results"><span class="header-section-number">13.1.4</span> Comparing Results</a></li>
   </ul></li>
-  <li><a href="#dynamic-did-and-event-studies" id="toc-dynamic-did-and-event-studies" class="nav-link" data-scroll-target="#dynamic-did-and-event-studies"><span class="header-section-number">12.2</span> Dynamic DiD and Event Studies</a>
+  <li><a href="#dynamic-did-and-event-studies" id="toc-dynamic-did-and-event-studies" class="nav-link" data-scroll-target="#dynamic-did-and-event-studies"><span class="header-section-number">13.2</span> Dynamic DiD and Event Studies</a>
   <ul class="collapse">
-  <li><a href="#why-treatment-effects-may-change-over-time" id="toc-why-treatment-effects-may-change-over-time" class="nav-link" data-scroll-target="#why-treatment-effects-may-change-over-time"><span class="header-section-number">12.2.1</span> Why Treatment Effects May Change Over Time</a></li>
-  <li><a href="#relative-time" id="toc-relative-time" class="nav-link" data-scroll-target="#relative-time"><span class="header-section-number">12.2.2</span> Relative Time</a></li>
-  <li><a href="#the-dynamic-did-model" id="toc-the-dynamic-did-model" class="nav-link" data-scroll-target="#the-dynamic-did-model"><span class="header-section-number">12.2.3</span> The Dynamic DiD Model</a></li>
-  <li><a href="#example-environmental-policy-and-manufacturing-employment" id="toc-example-environmental-policy-and-manufacturing-employment" class="nav-link" data-scroll-target="#example-environmental-policy-and-manufacturing-employment"><span class="header-section-number">12.2.4</span> Example: Environmental Policy and Manufacturing Employment</a></li>
-  <li><a href="#estimating-the-dynamic-model" id="toc-estimating-the-dynamic-model" class="nav-link" data-scroll-target="#estimating-the-dynamic-model"><span class="header-section-number">12.2.5</span> Estimating the Dynamic Model</a></li>
-  <li><a href="#the-event-study-plot" id="toc-the-event-study-plot" class="nav-link" data-scroll-target="#the-event-study-plot"><span class="header-section-number">12.2.6</span> The Event Study Plot</a></li>
-  <li><a href="#interpreting-the-event-study" id="toc-interpreting-the-event-study" class="nav-link" data-scroll-target="#interpreting-the-event-study"><span class="header-section-number">12.2.7</span> Interpreting the Event Study</a></li>
+  <li><a href="#why-treatment-effects-may-change-over-time" id="toc-why-treatment-effects-may-change-over-time" class="nav-link" data-scroll-target="#why-treatment-effects-may-change-over-time"><span class="header-section-number">13.2.1</span> Why Treatment Effects May Change Over Time</a></li>
+  <li><a href="#relative-time" id="toc-relative-time" class="nav-link" data-scroll-target="#relative-time"><span class="header-section-number">13.2.2</span> Relative Time</a></li>
+  <li><a href="#the-dynamic-did-model" id="toc-the-dynamic-did-model" class="nav-link" data-scroll-target="#the-dynamic-did-model"><span class="header-section-number">13.2.3</span> The Dynamic DiD Model</a></li>
+  <li><a href="#example-environmental-policy-and-manufacturing-employment" id="toc-example-environmental-policy-and-manufacturing-employment" class="nav-link" data-scroll-target="#example-environmental-policy-and-manufacturing-employment"><span class="header-section-number">13.2.4</span> Example: Environmental Policy and Manufacturing Employment</a></li>
+  <li><a href="#estimating-the-dynamic-model" id="toc-estimating-the-dynamic-model" class="nav-link" data-scroll-target="#estimating-the-dynamic-model"><span class="header-section-number">13.2.5</span> Estimating the Dynamic Model</a></li>
+  <li><a href="#the-event-study-plot" id="toc-the-event-study-plot" class="nav-link" data-scroll-target="#the-event-study-plot"><span class="header-section-number">13.2.6</span> The Event Study Plot</a></li>
+  <li><a href="#interpreting-the-event-study" id="toc-interpreting-the-event-study" class="nav-link" data-scroll-target="#interpreting-the-event-study"><span class="header-section-number">13.2.7</span> Interpreting the Event Study</a></li>
   </ul></li>
-  <li><a href="#cluster-robust-standard-errors" id="toc-cluster-robust-standard-errors" class="nav-link" data-scroll-target="#cluster-robust-standard-errors"><span class="header-section-number">12.3</span> Cluster-Robust Standard Errors</a>
+  <li><a href="#cluster-robust-standard-errors" id="toc-cluster-robust-standard-errors" class="nav-link" data-scroll-target="#cluster-robust-standard-errors"><span class="header-section-number">13.3</span> Cluster-Robust Standard Errors</a>
   <ul class="collapse">
-  <li><a href="#the-problem-non-independent-observations" id="toc-the-problem-non-independent-observations" class="nav-link" data-scroll-target="#the-problem-non-independent-observations"><span class="header-section-number">12.3.1</span> The Problem: Non-Independent Observations</a></li>
-  <li><a href="#visualizing-the-problem" id="toc-visualizing-the-problem" class="nav-link" data-scroll-target="#visualizing-the-problem"><span class="header-section-number">12.3.2</span> Visualizing the Problem</a></li>
-  <li><a href="#simulation-the-dangers-of-ignoring-clustering" id="toc-simulation-the-dangers-of-ignoring-clustering" class="nav-link" data-scroll-target="#simulation-the-dangers-of-ignoring-clustering"><span class="header-section-number">12.3.3</span> Simulation: The Dangers of Ignoring Clustering</a></li>
-  <li><a href="#implementing-cluster-robust-standard-errors" id="toc-implementing-cluster-robust-standard-errors" class="nav-link" data-scroll-target="#implementing-cluster-robust-standard-errors"><span class="header-section-number">12.3.4</span> Implementing Cluster-Robust Standard Errors</a></li>
+  <li><a href="#the-problem-non-independent-observations" id="toc-the-problem-non-independent-observations" class="nav-link" data-scroll-target="#the-problem-non-independent-observations"><span class="header-section-number">13.3.1</span> The Problem: Non-Independent Observations</a></li>
+  <li><a href="#visualizing-the-problem" id="toc-visualizing-the-problem" class="nav-link" data-scroll-target="#visualizing-the-problem"><span class="header-section-number">13.3.2</span> Visualizing the Problem</a></li>
+  <li><a href="#simulation-the-dangers-of-ignoring-clustering" id="toc-simulation-the-dangers-of-ignoring-clustering" class="nav-link" data-scroll-target="#simulation-the-dangers-of-ignoring-clustering"><span class="header-section-number">13.3.3</span> Simulation: The Dangers of Ignoring Clustering</a></li>
+  <li><a href="#implementing-cluster-robust-standard-errors" id="toc-implementing-cluster-robust-standard-errors" class="nav-link" data-scroll-target="#implementing-cluster-robust-standard-errors"><span class="header-section-number">13.3.4</span> Implementing Cluster-Robust Standard Errors</a></li>
   </ul></li>
-  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">12.4</span> Summary</a></li>
-  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">12.5</span> Check Your Understanding</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">13.4</span> Summary</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">13.5</span> Check Your Understanding</a></li>
   </ul>
 </nav>
     </div>
@@ -357,7 +363,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span id="sec-advanced-did" class="quarto-section-identifier"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Advanced Difference-in-Differences</span></span></h1>
+<h1 class="title"><span id="sec-advanced-did" class="quarto-section-identifier"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Advanced Difference-in-Differences</span></span></h1>
 </div>
 
 
@@ -496,10 +502,10 @@ function checkAnswer(selectElement, correctValue) {
 </div>
 </div>
 <p>The basic difference-in-differences framework is powerful, but real-world applications often require more sophisticated tools. This chapter covers three important extensions: <strong>data-driven control selection</strong> using propensity scores, <strong>dynamic DiD</strong> for effects that evolve over time, and <strong>cluster-robust standard errors</strong> for proper inference with grouped data.</p>
-<section id="data-driven-control-selection" class="level2" data-number="12.1">
-<h2 data-number="12.1" class="anchored" data-anchor-id="data-driven-control-selection"><span class="header-section-number">12.1</span> Data-Driven Control Selection</h2>
-<section id="the-problem-systematically-different-treatment-and-control-groups" class="level3" data-number="12.1.1">
-<h3 data-number="12.1.1" class="anchored" data-anchor-id="the-problem-systematically-different-treatment-and-control-groups"><span class="header-section-number">12.1.1</span> The Problem: Systematically Different Treatment and Control Groups</h3>
+<section id="data-driven-control-selection" class="level2" data-number="13.1">
+<h2 data-number="13.1" class="anchored" data-anchor-id="data-driven-control-selection"><span class="header-section-number">13.1</span> Data-Driven Control Selection</h2>
+<section id="the-problem-systematically-different-treatment-and-control-groups" class="level3" data-number="13.1.1">
+<h3 data-number="13.1.1" class="anchored" data-anchor-id="the-problem-systematically-different-treatment-and-control-groups"><span class="header-section-number">13.1.1</span> The Problem: Systematically Different Treatment and Control Groups</h3>
 <p>In the previous chapter, we emphasized that your DiD estimate is only as good as your counterfactual. When treated and control groups are systematically different, the parallel trends assumption becomes implausible.</p>
 <p>Consider estimating the effect of the Affordable Care Act (ACA) Medicaid expansion on uninsured rates. States that expanded Medicaid are very different from states that didn’t: they tend to be more politically liberal, have different demographics, different industries, and different baseline health care systems.</p>
 <p>Using all non-expanding states as controls produces biased estimates because these states were on different trajectories <em>even before</em> the policy.</p>
@@ -508,7 +514,7 @@ function checkAnswer(selectElement, correctValue) {
 <div id="fig-naive-trends" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-naive-trends-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;12.1: Without adjustment, treated and control states show diverging pre-trends, violating the parallel trends assumption.
+Figure&nbsp;13.1: Without adjustment, treated and control states show diverging pre-trends, violating the parallel trends assumption.
 </figcaption>
 <div aria-describedby="fig-naive-trends-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="advanced_did_files/figure-html/fig-naive-trends-1.png" class="img-fluid figure-img" width="672">
@@ -519,8 +525,8 @@ Figure&nbsp;12.1: Without adjustment, treated and control states show diverging 
 </div>
 <p>The figure shows that even <em>before</em> the ACA expansion in 2014, treated states had steeper downward trends in uninsured rates. This pre-existing difference would be incorrectly attributed to the policy in a naive DiD analysis.</p>
 </section>
-<section id="propensity-score-weighting-the-intuition" class="level3" data-number="12.1.2">
-<h3 data-number="12.1.2" class="anchored" data-anchor-id="propensity-score-weighting-the-intuition"><span class="header-section-number">12.1.2</span> Propensity Score Weighting: The Intuition</h3>
+<section id="propensity-score-weighting-the-intuition" class="level3" data-number="13.1.2">
+<h3 data-number="13.1.2" class="anchored" data-anchor-id="propensity-score-weighting-the-intuition"><span class="header-section-number">13.1.2</span> Propensity Score Weighting: The Intuition</h3>
 <p>The solution is to find control units that are <em>similar</em> to treated units. If we could compare only states that were “on the verge” of expanding but didn’t, we would have a much better counterfactual.</p>
 <p><strong>Propensity score methods</strong> formalize this intuition. The idea is:</p>
 <ol type="1">
@@ -530,8 +536,8 @@ Figure&nbsp;12.1: Without adjustment, treated and control states show diverging 
 </ol>
 <p>Control units with high propensity scores (high predicted probability of treatment) but who weren’t actually treated become our primary comparison group. They’re similar to treated units on observables, making parallel trends more plausible.</p>
 </section>
-<section id="the-ipw-did-algorithm" class="level3" data-number="12.1.3">
-<h3 data-number="12.1.3" class="anchored" data-anchor-id="the-ipw-did-algorithm"><span class="header-section-number">12.1.3</span> The IPW-DiD Algorithm</h3>
+<section id="the-ipw-did-algorithm" class="level3" data-number="13.1.3">
+<h3 data-number="13.1.3" class="anchored" data-anchor-id="the-ipw-did-algorithm"><span class="header-section-number">13.1.3</span> The IPW-DiD Algorithm</h3>
 <p><strong>Inverse Propensity Score Weighted DiD (IPW-DiD)</strong> proceeds in three steps:</p>
 <p><strong>Step 1: Estimate the Propensity Score</strong></p>
 <p>We estimate a logistic regression predicting treatment status from pre-treatment characteristics:</p>
@@ -670,14 +676,14 @@ IPW_i = D_i + (1 - D_i) \times \frac{\hat{P}_i}{1 - \hat{P}_i}
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>                 <span class="at">data =</span> panel_weighted)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="comparing-results" class="level3" data-number="12.1.4">
-<h3 data-number="12.1.4" class="anchored" data-anchor-id="comparing-results"><span class="header-section-number">12.1.4</span> Comparing Results</h3>
+<section id="comparing-results" class="level3" data-number="13.1.4">
+<h3 data-number="13.1.4" class="anchored" data-anchor-id="comparing-results"><span class="header-section-number">13.1.4</span> Comparing Results</h3>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-ipw-comparison" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-ipw-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;12.2: IPW weighting restores parallel pre-trends by up-weighting control units similar to treated units.
+Figure&nbsp;13.2: IPW weighting restores parallel pre-trends by up-weighting control units similar to treated units.
 </figcaption>
 <div aria-describedby="fig-ipw-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="advanced_did_files/figure-html/fig-ipw-comparison-1.png" class="img-fluid figure-img" width="672">
@@ -729,10 +735,10 @@ Key Insight
 </div>
 </section>
 </section>
-<section id="dynamic-did-and-event-studies" class="level2" data-number="12.2">
-<h2 data-number="12.2" class="anchored" data-anchor-id="dynamic-did-and-event-studies"><span class="header-section-number">12.2</span> Dynamic DiD and Event Studies</h2>
-<section id="why-treatment-effects-may-change-over-time" class="level3" data-number="12.2.1">
-<h3 data-number="12.2.1" class="anchored" data-anchor-id="why-treatment-effects-may-change-over-time"><span class="header-section-number">12.2.1</span> Why Treatment Effects May Change Over Time</h3>
+<section id="dynamic-did-and-event-studies" class="level2" data-number="13.2">
+<h2 data-number="13.2" class="anchored" data-anchor-id="dynamic-did-and-event-studies"><span class="header-section-number">13.2</span> Dynamic DiD and Event Studies</h2>
+<section id="why-treatment-effects-may-change-over-time" class="level3" data-number="13.2.1">
+<h3 data-number="13.2.1" class="anchored" data-anchor-id="why-treatment-effects-may-change-over-time"><span class="header-section-number">13.2.1</span> Why Treatment Effects May Change Over Time</h3>
 <p>The basic DiD model estimates a single treatment effect that applies to all post-treatment periods. But many policies have effects that <strong>evolve over time</strong>:</p>
 <ul>
 <li>A job training program might have small initial effects that grow as workers gain experience</li>
@@ -741,8 +747,8 @@ Key Insight
 </ul>
 <p><strong>Dynamic DiD</strong> allows us to estimate separate treatment effects for each time period, capturing how the policy impact unfolds.</p>
 </section>
-<section id="relative-time" class="level3" data-number="12.2.2">
-<h3 data-number="12.2.2" class="anchored" data-anchor-id="relative-time"><span class="header-section-number">12.2.2</span> Relative Time</h3>
+<section id="relative-time" class="level3" data-number="13.2.2">
+<h3 data-number="13.2.2" class="anchored" data-anchor-id="relative-time"><span class="header-section-number">13.2.2</span> Relative Time</h3>
 <p>Dynamic DiD models use <strong>relative time</strong>—the number of periods since treatment occurred—rather than calendar time. If treatment occurs in 2015:</p>
 <table class="caption-top table">
 <thead>
@@ -780,8 +786,8 @@ Key Insight
 </table>
 <p>This framing lets us estimate effects at each distance from treatment and, crucially, test whether pre-treatment “effects” are zero (as they should be if parallel trends holds).</p>
 </section>
-<section id="the-dynamic-did-model" class="level3" data-number="12.2.3">
-<h3 data-number="12.2.3" class="anchored" data-anchor-id="the-dynamic-did-model"><span class="header-section-number">12.2.3</span> The Dynamic DiD Model</h3>
+<section id="the-dynamic-did-model" class="level3" data-number="13.2.3">
+<h3 data-number="13.2.3" class="anchored" data-anchor-id="the-dynamic-did-model"><span class="header-section-number">13.2.3</span> The Dynamic DiD Model</h3>
 <p>The dynamic DiD model includes dummy variables for each relative time period:</p>
 <p><span class="math display">\[
 y_{it} = \sum_{k \neq -1} \beta_k D_{it}^k + \alpha_i + \tau_t + \mu_{it}
@@ -789,8 +795,8 @@ y_{it} = \sum_{k \neq -1} \beta_k D_{it}^k + \alpha_i + \tau_t + \mu_{it}
 <p>where <span class="math inline">\(D_{it}^k = 1\)</span> if unit <span class="math inline">\(i\)</span> is treated and period <span class="math inline">\(t\)</span> is <span class="math inline">\(k\)</span> periods from treatment.</p>
 <p>We <strong>omit</strong> <span class="math inline">\(k = -1\)</span> (the period just before treatment) as the reference category. All coefficients are interpreted relative to this baseline.</p>
 </section>
-<section id="example-environmental-policy-and-manufacturing-employment" class="level3" data-number="12.2.4">
-<h3 data-number="12.2.4" class="anchored" data-anchor-id="example-environmental-policy-and-manufacturing-employment"><span class="header-section-number">12.2.4</span> Example: Environmental Policy and Manufacturing Employment</h3>
+<section id="example-environmental-policy-and-manufacturing-employment" class="level3" data-number="13.2.4">
+<h3 data-number="13.2.4" class="anchored" data-anchor-id="example-environmental-policy-and-manufacturing-employment"><span class="header-section-number">13.2.4</span> Example: Environmental Policy and Manufacturing Employment</h3>
 <p>Suppose we want to estimate how an environmental regulation affects manufacturing employment in cities. We have data on 50 cities observed from 1995 to 2010, with 25 cities adopting the policy in 2005.</p>
 <p>Let’s visualize the raw trends first:</p>
 <div class="cell">
@@ -798,7 +804,7 @@ y_{it} = \sum_{k \neq -1} \beta_k D_{it}^k + \alpha_i + \tau_t + \mu_{it}
 <div id="fig-env-trends" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-env-trends-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;12.3: Treatment and control cities show parallel pre-trends, then diverge after the policy in 2005.
+Figure&nbsp;13.3: Treatment and control cities show parallel pre-trends, then diverge after the policy in 2005.
 </figcaption>
 <div aria-describedby="fig-env-trends-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="advanced_did_files/figure-html/fig-env-trends-1.png" class="img-fluid figure-img" width="672">
@@ -809,8 +815,8 @@ Figure&nbsp;12.3: Treatment and control cities show parallel pre-trends, then di
 </div>
 <p>The trends are parallel before 2005, then the treated cities experience a growing decline in manufacturing employment.</p>
 </section>
-<section id="estimating-the-dynamic-model" class="level3" data-number="12.2.5">
-<h3 data-number="12.2.5" class="anchored" data-anchor-id="estimating-the-dynamic-model"><span class="header-section-number">12.2.5</span> Estimating the Dynamic Model</h3>
+<section id="estimating-the-dynamic-model" class="level3" data-number="13.2.5">
+<h3 data-number="13.2.5" class="anchored" data-anchor-id="estimating-the-dynamic-model"><span class="header-section-number">13.2.5</span> Estimating the Dynamic Model</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimate dynamic DiD (note: rel_t_treat_-1 is omitted as reference)</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>dyn_did <span class="ot">&lt;-</span> <span class="fu">feols</span>(</span>
@@ -824,15 +830,15 @@ Figure&nbsp;12.3: Treatment and control cities show parallel pre-trends, then di
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="the-event-study-plot" class="level3" data-number="12.2.6">
-<h3 data-number="12.2.6" class="anchored" data-anchor-id="the-event-study-plot"><span class="header-section-number">12.2.6</span> The Event Study Plot</h3>
+<section id="the-event-study-plot" class="level3" data-number="13.2.6">
+<h3 data-number="13.2.6" class="anchored" data-anchor-id="the-event-study-plot"><span class="header-section-number">13.2.6</span> The Event Study Plot</h3>
 <p>The best way to present dynamic DiD results is an <strong>event study plot</strong>. We plot each coefficient with its 95% confidence interval, with the x-axis showing relative time and a vertical line at the treatment date.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-event-study" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-event-study-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;12.4: Event study plot showing treatment effects over time. Pre-treatment coefficients near zero support parallel trends; post-treatment coefficients show the growing negative effect.
+Figure&nbsp;13.4: Event study plot showing treatment effects over time. Pre-treatment coefficients near zero support parallel trends; post-treatment coefficients show the growing negative effect.
 </figcaption>
 <div aria-describedby="fig-event-study-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="advanced_did_files/figure-html/fig-event-study-1.png" class="img-fluid figure-img" width="672">
@@ -842,8 +848,8 @@ Figure&nbsp;12.4: Event study plot showing treatment effects over time. Pre-trea
 </div>
 </div>
 </section>
-<section id="interpreting-the-event-study" class="level3" data-number="12.2.7">
-<h3 data-number="12.2.7" class="anchored" data-anchor-id="interpreting-the-event-study"><span class="header-section-number">12.2.7</span> Interpreting the Event Study</h3>
+<section id="interpreting-the-event-study" class="level3" data-number="13.2.7">
+<h3 data-number="13.2.7" class="anchored" data-anchor-id="interpreting-the-event-study"><span class="header-section-number">13.2.7</span> Interpreting the Event Study</h3>
 <p>The event study plot reveals several important patterns:</p>
 <ol type="1">
 <li><p><strong>Pre-treatment coefficients (k &lt; -1):</strong> These cluster around zero with confidence intervals that include zero. This is strong evidence for parallel trends—before the policy, treated and control cities were on similar trajectories.</p></li>
@@ -865,10 +871,10 @@ Why Pre-Trends Matter
 </div>
 </section>
 </section>
-<section id="cluster-robust-standard-errors" class="level2" data-number="12.3">
-<h2 data-number="12.3" class="anchored" data-anchor-id="cluster-robust-standard-errors"><span class="header-section-number">12.3</span> Cluster-Robust Standard Errors</h2>
-<section id="the-problem-non-independent-observations" class="level3" data-number="12.3.1">
-<h3 data-number="12.3.1" class="anchored" data-anchor-id="the-problem-non-independent-observations"><span class="header-section-number">12.3.1</span> The Problem: Non-Independent Observations</h3>
+<section id="cluster-robust-standard-errors" class="level2" data-number="13.3">
+<h2 data-number="13.3" class="anchored" data-anchor-id="cluster-robust-standard-errors"><span class="header-section-number">13.3</span> Cluster-Robust Standard Errors</h2>
+<section id="the-problem-non-independent-observations" class="level3" data-number="13.3.1">
+<h3 data-number="13.3.1" class="anchored" data-anchor-id="the-problem-non-independent-observations"><span class="header-section-number">13.3.1</span> The Problem: Non-Independent Observations</h3>
 <p>Standard OLS assumes observations are independent. But in panel data, observations from the same unit across time are often correlated. Students in the same classroom share a teacher; workers in the same firm share management; residents of the same state share policies.</p>
 <p>When errors are <strong>correlated within clusters</strong>, standard errors from regular OLS are too small. This leads to:</p>
 <ul>
@@ -878,14 +884,14 @@ Why Pre-Trends Matter
 <li><strong>Too many false positives</strong> (Type I errors)</li>
 </ul>
 </section>
-<section id="visualizing-the-problem" class="level3" data-number="12.3.2">
-<h3 data-number="12.3.2" class="anchored" data-anchor-id="visualizing-the-problem"><span class="header-section-number">12.3.2</span> Visualizing the Problem</h3>
+<section id="visualizing-the-problem" class="level3" data-number="13.3.2">
+<h3 data-number="13.3.2" class="anchored" data-anchor-id="visualizing-the-problem"><span class="header-section-number">13.3.2</span> Visualizing the Problem</h3>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-cluster-visual" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-cluster-visual-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;12.5: With clustered data, observations within groups are correlated. Regular standard errors don’t account for this, leading to overconfidence.
+Figure&nbsp;13.5: With clustered data, observations within groups are correlated. Regular standard errors don’t account for this, leading to overconfidence.
 </figcaption>
 <div aria-describedby="fig-cluster-visual-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="advanced_did_files/figure-html/fig-cluster-visual-1.png" class="img-fluid figure-img" width="672">
@@ -895,15 +901,15 @@ Figure&nbsp;12.5: With clustered data, observations within groups are correlated
 </div>
 </div>
 </section>
-<section id="simulation-the-dangers-of-ignoring-clustering" class="level3" data-number="12.3.3">
-<h3 data-number="12.3.3" class="anchored" data-anchor-id="simulation-the-dangers-of-ignoring-clustering"><span class="header-section-number">12.3.3</span> Simulation: The Dangers of Ignoring Clustering</h3>
+<section id="simulation-the-dangers-of-ignoring-clustering" class="level3" data-number="13.3.3">
+<h3 data-number="13.3.3" class="anchored" data-anchor-id="simulation-the-dangers-of-ignoring-clustering"><span class="header-section-number">13.3.3</span> Simulation: The Dangers of Ignoring Clustering</h3>
 <p>Let’s simulate what happens when we ignore clustering. We’ll generate data where the <strong>true treatment effect is zero</strong>, so any “significant” result is a false positive.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-cluster-sim" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-cluster-sim-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;12.6: Distribution of p-values from 500 simulations where the true effect is zero. Naive standard errors (left) produce too many small p-values; cluster-robust standard errors (right) are properly calibrated.
+Figure&nbsp;13.6: Distribution of p-values from 500 simulations where the true effect is zero. Naive standard errors (left) produce too many small p-values; cluster-robust standard errors (right) are properly calibrated.
 </figcaption>
 <div aria-describedby="fig-cluster-sim-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="advanced_did_files/figure-html/fig-cluster-sim-1.png" class="img-fluid figure-img" width="672">
@@ -919,8 +925,8 @@ Figure&nbsp;12.6: Distribution of p-values from 500 simulations where the true e
 </ul>
 <p>Ignoring clustering leads to a <strong>massive inflation of false positives</strong>!</p>
 </section>
-<section id="implementing-cluster-robust-standard-errors" class="level3" data-number="12.3.4">
-<h3 data-number="12.3.4" class="anchored" data-anchor-id="implementing-cluster-robust-standard-errors"><span class="header-section-number">12.3.4</span> Implementing Cluster-Robust Standard Errors</h3>
+<section id="implementing-cluster-robust-standard-errors" class="level3" data-number="13.3.4">
+<h3 data-number="13.3.4" class="anchored" data-anchor-id="implementing-cluster-robust-standard-errors"><span class="header-section-number">13.3.4</span> Implementing Cluster-Robust Standard Errors</h3>
 <p>In <code>fixest</code>, cluster-robust standard errors are easy to implement using the <code>cluster</code> argument:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Standard (naive) standard errors</span></span>
@@ -948,16 +954,16 @@ Rule of Thumb: Cluster at the Treatment Level
 </div>
 </section>
 </section>
-<section id="summary" class="level2" data-number="12.4">
-<h2 data-number="12.4" class="anchored" data-anchor-id="summary"><span class="header-section-number">12.4</span> Summary</h2>
+<section id="summary" class="level2" data-number="13.4">
+<h2 data-number="13.4" class="anchored" data-anchor-id="summary"><span class="header-section-number">13.4</span> Summary</h2>
 <p>This chapter covered three important extensions to basic DiD:</p>
 <p><strong>Propensity Score Weighting (IPW-DiD)</strong> improves the counterfactual by up-weighting control units that are similar to treated units. When treated and control groups differ systematically, naive DiD violates parallel trends; IPW helps restore balance. The algorithm involves estimating propensity scores, computing inverse probability weights, and using those weights in the TWFE regression.</p>
 <p><strong>Dynamic DiD and Event Studies</strong> allow treatment effects to vary over time. By estimating separate effects for each period relative to treatment, we can see whether effects grow, shrink, or remain stable. Crucially, the pre-treatment coefficients serve as a placebo test: if they’re significantly different from zero, parallel trends is violated.</p>
 <p><strong>Cluster-Robust Standard Errors</strong> correct for correlated errors within groups. When observations within clusters (states, schools, firms) are correlated, standard OLS inference is overconfident, leading to inflated false positive rates. Clustering at the treatment level provides valid inference.</p>
 <p>These tools are essential for credible DiD analysis in practice.</p>
 </section>
-<section id="check-your-understanding" class="level2" data-number="12.5">
-<h2 data-number="12.5" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">12.5</span> Check Your Understanding</h2>
+<section id="check-your-understanding" class="level2" data-number="13.5">
+<h2 data-number="13.5" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">13.5</span> Check Your Understanding</h2>
 <p>For each question below, select the best answer from the dropdown menu.</p>
 <div class="question">
 <div class="answer-row">
@@ -1478,12 +1484,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
       <a href="../chapters/did.html" class="pagination-link" aria-label="Difference-in-Differences">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span>
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="../chapters/instrumental_variables.html" class="pagination-link" aria-label="Instrumental Variables">
-        <span class="nav-page-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Instrumental Variables</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Instrumental Variables</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

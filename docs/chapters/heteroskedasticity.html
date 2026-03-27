@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>8&nbsp; Heteroskedasticity – EC325 Lecture Notes</title>
+<title>9&nbsp; Heteroskedasticity – EC325 Lecture Notes</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -85,7 +85,7 @@ div.csl-indent {
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
 <link href="../chapters/binary_outcomes.html" rel="next">
-<link href="../chapters/dummies_nonlins.html" rel="prev">
+<link href="../chapters/interaction_effects.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -164,7 +164,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/heteroskedasticity.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Heteroskedasticity</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/heteroskedasticity.html"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Heteroskedasticity</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -258,38 +258,44 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../chapters/interaction_effects.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Interaction Effects</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../chapters/heteroskedasticity.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Heteroskedasticity</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Heteroskedasticity</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/binary_outcomes.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Binary Outcomes</span></span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Binary Outcomes</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/panel_fe.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Panel Data and Fixed Effects</span></span></a>
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Panel Data and Fixed Effects</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/did.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span></a>
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/advanced_did.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Advanced Difference-in-Differences</span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Advanced Difference-in-Differences</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/instrumental_variables.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Instrumental Variables</span></span></a>
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Instrumental Variables</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -343,47 +349,47 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#the-homoskedasticity-assumption" id="toc-the-homoskedasticity-assumption" class="nav-link active" data-scroll-target="#the-homoskedasticity-assumption"><span class="header-section-number">8.1</span> The Homoskedasticity Assumption</a>
+  <li><a href="#the-homoskedasticity-assumption" id="toc-the-homoskedasticity-assumption" class="nav-link active" data-scroll-target="#the-homoskedasticity-assumption"><span class="header-section-number">9.1</span> The Homoskedasticity Assumption</a>
   <ul class="collapse">
-  <li><a href="#gauss-markov-assumption-5" id="toc-gauss-markov-assumption-5" class="nav-link" data-scroll-target="#gauss-markov-assumption-5"><span class="header-section-number">8.1.1</span> Gauss-Markov Assumption 5</a></li>
-  <li><a href="#what-does-homoskedasticity-look-like" id="toc-what-does-homoskedasticity-look-like" class="nav-link" data-scroll-target="#what-does-homoskedasticity-look-like"><span class="header-section-number">8.1.2</span> What Does Homoskedasticity Look Like?</a></li>
+  <li><a href="#gauss-markov-assumption-5" id="toc-gauss-markov-assumption-5" class="nav-link" data-scroll-target="#gauss-markov-assumption-5"><span class="header-section-number">9.1.1</span> Gauss-Markov Assumption 5</a></li>
+  <li><a href="#what-does-homoskedasticity-look-like" id="toc-what-does-homoskedasticity-look-like" class="nav-link" data-scroll-target="#what-does-homoskedasticity-look-like"><span class="header-section-number">9.1.2</span> What Does Homoskedasticity Look Like?</a></li>
   </ul></li>
-  <li><a href="#heteroskedasticity-when-variance-changes" id="toc-heteroskedasticity-when-variance-changes" class="nav-link" data-scroll-target="#heteroskedasticity-when-variance-changes"><span class="header-section-number">8.2</span> Heteroskedasticity: When Variance Changes</a>
+  <li><a href="#heteroskedasticity-when-variance-changes" id="toc-heteroskedasticity-when-variance-changes" class="nav-link" data-scroll-target="#heteroskedasticity-when-variance-changes"><span class="header-section-number">9.2</span> Heteroskedasticity: When Variance Changes</a>
   <ul class="collapse">
-  <li><a href="#what-is-heteroskedasticity" id="toc-what-is-heteroskedasticity" class="nav-link" data-scroll-target="#what-is-heteroskedasticity"><span class="header-section-number">8.2.1</span> What Is Heteroskedasticity?</a></li>
-  <li><a href="#what-does-heteroskedasticity-look-like" id="toc-what-does-heteroskedasticity-look-like" class="nav-link" data-scroll-target="#what-does-heteroskedasticity-look-like"><span class="header-section-number">8.2.2</span> What Does Heteroskedasticity Look Like?</a></li>
-  <li><a href="#side-by-side-comparison" id="toc-side-by-side-comparison" class="nav-link" data-scroll-target="#side-by-side-comparison"><span class="header-section-number">8.2.3</span> Side-by-Side Comparison</a></li>
+  <li><a href="#what-is-heteroskedasticity" id="toc-what-is-heteroskedasticity" class="nav-link" data-scroll-target="#what-is-heteroskedasticity"><span class="header-section-number">9.2.1</span> What Is Heteroskedasticity?</a></li>
+  <li><a href="#what-does-heteroskedasticity-look-like" id="toc-what-does-heteroskedasticity-look-like" class="nav-link" data-scroll-target="#what-does-heteroskedasticity-look-like"><span class="header-section-number">9.2.2</span> What Does Heteroskedasticity Look Like?</a></li>
+  <li><a href="#side-by-side-comparison" id="toc-side-by-side-comparison" class="nav-link" data-scroll-target="#side-by-side-comparison"><span class="header-section-number">9.2.3</span> Side-by-Side Comparison</a></li>
   </ul></li>
-  <li><a href="#why-does-heteroskedasticity-matter" id="toc-why-does-heteroskedasticity-matter" class="nav-link" data-scroll-target="#why-does-heteroskedasticity-matter"><span class="header-section-number">8.3</span> Why Does Heteroskedasticity Matter?</a>
+  <li><a href="#why-does-heteroskedasticity-matter" id="toc-why-does-heteroskedasticity-matter" class="nav-link" data-scroll-target="#why-does-heteroskedasticity-matter"><span class="header-section-number">9.3</span> Why Does Heteroskedasticity Matter?</a>
   <ul class="collapse">
-  <li><a href="#the-good-news-coefficients-are-still-unbiased" id="toc-the-good-news-coefficients-are-still-unbiased" class="nav-link" data-scroll-target="#the-good-news-coefficients-are-still-unbiased"><span class="header-section-number">8.3.1</span> The Good News: Coefficients Are Still Unbiased</a></li>
-  <li><a href="#the-bad-news-standard-errors-are-wrong" id="toc-the-bad-news-standard-errors-are-wrong" class="nav-link" data-scroll-target="#the-bad-news-standard-errors-are-wrong"><span class="header-section-number">8.3.2</span> The Bad News: Standard Errors Are Wrong</a></li>
-  <li><a href="#type-i-error-a-quick-review" id="toc-type-i-error-a-quick-review" class="nav-link" data-scroll-target="#type-i-error-a-quick-review"><span class="header-section-number">8.3.3</span> Type I Error: A Quick Review</a></li>
+  <li><a href="#the-good-news-coefficients-are-still-unbiased" id="toc-the-good-news-coefficients-are-still-unbiased" class="nav-link" data-scroll-target="#the-good-news-coefficients-are-still-unbiased"><span class="header-section-number">9.3.1</span> The Good News: Coefficients Are Still Unbiased</a></li>
+  <li><a href="#the-bad-news-standard-errors-are-wrong" id="toc-the-bad-news-standard-errors-are-wrong" class="nav-link" data-scroll-target="#the-bad-news-standard-errors-are-wrong"><span class="header-section-number">9.3.2</span> The Bad News: Standard Errors Are Wrong</a></li>
+  <li><a href="#type-i-error-a-quick-review" id="toc-type-i-error-a-quick-review" class="nav-link" data-scroll-target="#type-i-error-a-quick-review"><span class="header-section-number">9.3.3</span> Type I Error: A Quick Review</a></li>
   </ul></li>
-  <li><a href="#simulation-seeing-the-problem" id="toc-simulation-seeing-the-problem" class="nav-link" data-scroll-target="#simulation-seeing-the-problem"><span class="header-section-number">8.4</span> Simulation: Seeing the Problem</a>
+  <li><a href="#simulation-seeing-the-problem" id="toc-simulation-seeing-the-problem" class="nav-link" data-scroll-target="#simulation-seeing-the-problem"><span class="header-section-number">9.4</span> Simulation: Seeing the Problem</a>
   <ul class="collapse">
-  <li><a href="#setup-simulating-hypothesis-tests" id="toc-setup-simulating-hypothesis-tests" class="nav-link" data-scroll-target="#setup-simulating-hypothesis-tests"><span class="header-section-number">8.4.1</span> Setup: Simulating Hypothesis Tests</a></li>
-  <li><a href="#now-with-heteroskedasticity" id="toc-now-with-heteroskedasticity" class="nav-link" data-scroll-target="#now-with-heteroskedasticity"><span class="header-section-number">8.4.2</span> Now With Heteroskedasticity</a></li>
+  <li><a href="#setup-simulating-hypothesis-tests" id="toc-setup-simulating-hypothesis-tests" class="nav-link" data-scroll-target="#setup-simulating-hypothesis-tests"><span class="header-section-number">9.4.1</span> Setup: Simulating Hypothesis Tests</a></li>
+  <li><a href="#now-with-heteroskedasticity" id="toc-now-with-heteroskedasticity" class="nav-link" data-scroll-target="#now-with-heteroskedasticity"><span class="header-section-number">9.4.2</span> Now With Heteroskedasticity</a></li>
   </ul></li>
-  <li><a href="#heteroskedasticity-robust-standard-errors" id="toc-heteroskedasticity-robust-standard-errors" class="nav-link" data-scroll-target="#heteroskedasticity-robust-standard-errors"><span class="header-section-number">8.5</span> Heteroskedasticity-Robust Standard Errors</a>
+  <li><a href="#heteroskedasticity-robust-standard-errors" id="toc-heteroskedasticity-robust-standard-errors" class="nav-link" data-scroll-target="#heteroskedasticity-robust-standard-errors"><span class="header-section-number">9.5</span> Heteroskedasticity-Robust Standard Errors</a>
   <ul class="collapse">
-  <li><a href="#the-solution" id="toc-the-solution" class="nav-link" data-scroll-target="#the-solution"><span class="header-section-number">8.5.1</span> The Solution</a></li>
-  <li><a href="#visualizing-the-sampling-distributions" id="toc-visualizing-the-sampling-distributions" class="nav-link" data-scroll-target="#visualizing-the-sampling-distributions"><span class="header-section-number">8.5.2</span> Visualizing the Sampling Distributions</a></li>
-  <li><a href="#comparing-type-i-error-rates" id="toc-comparing-type-i-error-rates" class="nav-link" data-scroll-target="#comparing-type-i-error-rates"><span class="header-section-number">8.5.3</span> Comparing Type I Error Rates</a></li>
+  <li><a href="#the-solution" id="toc-the-solution" class="nav-link" data-scroll-target="#the-solution"><span class="header-section-number">9.5.1</span> The Solution</a></li>
+  <li><a href="#visualizing-the-sampling-distributions" id="toc-visualizing-the-sampling-distributions" class="nav-link" data-scroll-target="#visualizing-the-sampling-distributions"><span class="header-section-number">9.5.2</span> Visualizing the Sampling Distributions</a></li>
+  <li><a href="#comparing-type-i-error-rates" id="toc-comparing-type-i-error-rates" class="nav-link" data-scroll-target="#comparing-type-i-error-rates"><span class="header-section-number">9.5.3</span> Comparing Type I Error Rates</a></li>
   </ul></li>
-  <li><a href="#implementing-robust-standard-errors-in-r" id="toc-implementing-robust-standard-errors-in-r" class="nav-link" data-scroll-target="#implementing-robust-standard-errors-in-r"><span class="header-section-number">8.6</span> Implementing Robust Standard Errors in R</a>
+  <li><a href="#implementing-robust-standard-errors-in-r" id="toc-implementing-robust-standard-errors-in-r" class="nav-link" data-scroll-target="#implementing-robust-standard-errors-in-r"><span class="header-section-number">9.6</span> Implementing Robust Standard Errors in R</a>
   <ul class="collapse">
-  <li><a href="#using-fixest" id="toc-using-fixest" class="nav-link" data-scroll-target="#using-fixest"><span class="header-section-number">8.6.1</span> Using <code>fixest</code></a></li>
-  <li><a href="#best-practice-always-use-robust-standard-errors" id="toc-best-practice-always-use-robust-standard-errors" class="nav-link" data-scroll-target="#best-practice-always-use-robust-standard-errors"><span class="header-section-number">8.6.2</span> Best Practice: Always Use Robust Standard Errors</a></li>
+  <li><a href="#using-fixest" id="toc-using-fixest" class="nav-link" data-scroll-target="#using-fixest"><span class="header-section-number">9.6.1</span> Using <code>fixest</code></a></li>
+  <li><a href="#best-practice-always-use-robust-standard-errors" id="toc-best-practice-always-use-robust-standard-errors" class="nav-link" data-scroll-target="#best-practice-always-use-robust-standard-errors"><span class="header-section-number">9.6.2</span> Best Practice: Always Use Robust Standard Errors</a></li>
   </ul></li>
-  <li><a href="#detecting-heteroskedasticity" id="toc-detecting-heteroskedasticity" class="nav-link" data-scroll-target="#detecting-heteroskedasticity"><span class="header-section-number">8.7</span> Detecting Heteroskedasticity</a>
+  <li><a href="#detecting-heteroskedasticity" id="toc-detecting-heteroskedasticity" class="nav-link" data-scroll-target="#detecting-heteroskedasticity"><span class="header-section-number">9.7</span> Detecting Heteroskedasticity</a>
   <ul class="collapse">
-  <li><a href="#residual-plots" id="toc-residual-plots" class="nav-link" data-scroll-target="#residual-plots"><span class="header-section-number">8.7.1</span> Residual Plots</a></li>
-  <li><a href="#what-to-look-for" id="toc-what-to-look-for" class="nav-link" data-scroll-target="#what-to-look-for"><span class="header-section-number">8.7.2</span> What to Look For</a></li>
-  <li><a href="#formal-tests" id="toc-formal-tests" class="nav-link" data-scroll-target="#formal-tests"><span class="header-section-number">8.7.3</span> Formal Tests</a></li>
+  <li><a href="#residual-plots" id="toc-residual-plots" class="nav-link" data-scroll-target="#residual-plots"><span class="header-section-number">9.7.1</span> Residual Plots</a></li>
+  <li><a href="#what-to-look-for" id="toc-what-to-look-for" class="nav-link" data-scroll-target="#what-to-look-for"><span class="header-section-number">9.7.2</span> What to Look For</a></li>
+  <li><a href="#formal-tests" id="toc-formal-tests" class="nav-link" data-scroll-target="#formal-tests"><span class="header-section-number">9.7.3</span> Formal Tests</a></li>
   </ul></li>
-  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">8.8</span> Summary</a></li>
-  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">8.9</span> Check Your Understanding</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">9.8</span> Summary</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">9.9</span> Check Your Understanding</a></li>
   </ul>
 </nav>
     </div>
@@ -392,7 +398,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span id="sec-heteroskedasticity" class="quarto-section-identifier"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Heteroskedasticity</span></span></h1>
+<h1 class="title"><span id="sec-heteroskedasticity" class="quarto-section-identifier"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Heteroskedasticity</span></span></h1>
 </div>
 
 
@@ -531,10 +537,10 @@ function checkAnswer(selectElement, correctValue) {
 </div>
 </div>
 <p>One of the key assumptions underlying OLS is that the variance of the error term is constant across all values of the explanatory variables. When this assumption fails, we have <strong>heteroskedasticity</strong>—and while our coefficient estimates remain unbiased, our standard errors become unreliable. This chapter explores what heteroskedasticity is, why it matters, and how to fix it.</p>
-<section id="the-homoskedasticity-assumption" class="level2" data-number="8.1">
-<h2 data-number="8.1" class="anchored" data-anchor-id="the-homoskedasticity-assumption"><span class="header-section-number">8.1</span> The Homoskedasticity Assumption</h2>
-<section id="gauss-markov-assumption-5" class="level3" data-number="8.1.1">
-<h3 data-number="8.1.1" class="anchored" data-anchor-id="gauss-markov-assumption-5"><span class="header-section-number">8.1.1</span> Gauss-Markov Assumption 5</h3>
+<section id="the-homoskedasticity-assumption" class="level2" data-number="9.1">
+<h2 data-number="9.1" class="anchored" data-anchor-id="the-homoskedasticity-assumption"><span class="header-section-number">9.1</span> The Homoskedasticity Assumption</h2>
+<section id="gauss-markov-assumption-5" class="level3" data-number="9.1.1">
+<h3 data-number="9.1.1" class="anchored" data-anchor-id="gauss-markov-assumption-5"><span class="header-section-number">9.1.1</span> Gauss-Markov Assumption 5</h3>
 <p>Recall the Gauss-Markov assumptions that make OLS the Best Linear Unbiased Estimator (BLUE). The fifth assumption is <strong>homoskedasticity</strong>:</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -551,15 +557,15 @@ Homoskedasticity
 </div>
 <p>This assumption is crucial because it allows us to derive the correct formula for the variance of <span class="math inline">\(\hat{\beta}\)</span>, which in turn gives us valid standard errors, t-statistics, and p-values.</p>
 </section>
-<section id="what-does-homoskedasticity-look-like" class="level3" data-number="8.1.2">
-<h3 data-number="8.1.2" class="anchored" data-anchor-id="what-does-homoskedasticity-look-like"><span class="header-section-number">8.1.2</span> What Does Homoskedasticity Look Like?</h3>
+<section id="what-does-homoskedasticity-look-like" class="level3" data-number="9.1.2">
+<h3 data-number="9.1.2" class="anchored" data-anchor-id="what-does-homoskedasticity-look-like"><span class="header-section-number">9.1.2</span> What Does Homoskedasticity Look Like?</h3>
 <p>In a homoskedastic regression, the spread of observations around the regression line is <strong>constant</strong> across all values of <span class="math inline">\(x\)</span>.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-homoskedastic" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-homoskedastic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;8.1: Homoskedastic data: the spread of points around the regression line is constant across all values of x.
+Figure&nbsp;9.1: Homoskedastic data: the spread of points around the regression line is constant across all values of x.
 </figcaption>
 <div aria-describedby="fig-homoskedastic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="heteroskedasticity_files/figure-html/fig-homoskedastic-1.png" class="img-fluid figure-img" width="672">
@@ -571,22 +577,22 @@ Figure&nbsp;8.1: Homoskedastic data: the spread of points around the regression 
 <p>Notice how the “cone” of data points has roughly the same width whether <span class="math inline">\(x\)</span> is small or large. This is homoskedasticity in action.</p>
 </section>
 </section>
-<section id="heteroskedasticity-when-variance-changes" class="level2" data-number="8.2">
-<h2 data-number="8.2" class="anchored" data-anchor-id="heteroskedasticity-when-variance-changes"><span class="header-section-number">8.2</span> Heteroskedasticity: When Variance Changes</h2>
-<section id="what-is-heteroskedasticity" class="level3" data-number="8.2.1">
-<h3 data-number="8.2.1" class="anchored" data-anchor-id="what-is-heteroskedasticity"><span class="header-section-number">8.2.1</span> What Is Heteroskedasticity?</h3>
+<section id="heteroskedasticity-when-variance-changes" class="level2" data-number="9.2">
+<h2 data-number="9.2" class="anchored" data-anchor-id="heteroskedasticity-when-variance-changes"><span class="header-section-number">9.2</span> Heteroskedasticity: When Variance Changes</h2>
+<section id="what-is-heteroskedasticity" class="level3" data-number="9.2.1">
+<h3 data-number="9.2.1" class="anchored" data-anchor-id="what-is-heteroskedasticity"><span class="header-section-number">9.2.1</span> What Is Heteroskedasticity?</h3>
 <p><strong>Heteroskedasticity</strong> occurs when the variance of the error term changes with the level of the explanatory variable: <span class="math display">\[Var(\mu_i | x_i) = \sigma_i^2\]</span></p>
 <p>The subscript <span class="math inline">\(i\)</span> indicates that variance depends on observation <span class="math inline">\(i\)</span>’s value of <span class="math inline">\(x\)</span>.</p>
 </section>
-<section id="what-does-heteroskedasticity-look-like" class="level3" data-number="8.2.2">
-<h3 data-number="8.2.2" class="anchored" data-anchor-id="what-does-heteroskedasticity-look-like"><span class="header-section-number">8.2.2</span> What Does Heteroskedasticity Look Like?</h3>
+<section id="what-does-heteroskedasticity-look-like" class="level3" data-number="9.2.2">
+<h3 data-number="9.2.2" class="anchored" data-anchor-id="what-does-heteroskedasticity-look-like"><span class="header-section-number">9.2.2</span> What Does Heteroskedasticity Look Like?</h3>
 <p>The classic pattern is a “fan” or “cone” shape, where the spread of data increases (or decreases) as <span class="math inline">\(x\)</span> changes:</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-heteroskedastic" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-heteroskedastic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;8.2: Heteroskedastic data: the spread of points around the regression line increases with x, creating a ‘fan’ or ‘cone’ pattern.
+Figure&nbsp;9.2: Heteroskedastic data: the spread of points around the regression line increases with x, creating a ‘fan’ or ‘cone’ pattern.
 </figcaption>
 <div aria-describedby="fig-heteroskedastic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="heteroskedasticity_files/figure-html/fig-heteroskedastic-1.png" class="img-fluid figure-img" width="672">
@@ -602,14 +608,14 @@ Figure&nbsp;8.2: Heteroskedastic data: the spread of points around the regressio
 <li><strong>Experience and wages:</strong> More experienced workers have more variable wages</li>
 </ul>
 </section>
-<section id="side-by-side-comparison" class="level3" data-number="8.2.3">
-<h3 data-number="8.2.3" class="anchored" data-anchor-id="side-by-side-comparison"><span class="header-section-number">8.2.3</span> Side-by-Side Comparison</h3>
+<section id="side-by-side-comparison" class="level3" data-number="9.2.3">
+<h3 data-number="9.2.3" class="anchored" data-anchor-id="side-by-side-comparison"><span class="header-section-number">9.2.3</span> Side-by-Side Comparison</h3>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-comparison" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;8.3: Comparing homoskedastic (left) and heteroskedastic (right) data. The key difference is whether the spread of points changes with x.
+Figure&nbsp;9.3: Comparing homoskedastic (left) and heteroskedastic (right) data. The key difference is whether the spread of points changes with x.
 </figcaption>
 <div aria-describedby="fig-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="heteroskedasticity_files/figure-html/fig-comparison-1.png" class="img-fluid figure-img" width="960">
@@ -620,15 +626,15 @@ Figure&nbsp;8.3: Comparing homoskedastic (left) and heteroskedastic (right) data
 </div>
 </section>
 </section>
-<section id="why-does-heteroskedasticity-matter" class="level2" data-number="8.3">
-<h2 data-number="8.3" class="anchored" data-anchor-id="why-does-heteroskedasticity-matter"><span class="header-section-number">8.3</span> Why Does Heteroskedasticity Matter?</h2>
-<section id="the-good-news-coefficients-are-still-unbiased" class="level3" data-number="8.3.1">
-<h3 data-number="8.3.1" class="anchored" data-anchor-id="the-good-news-coefficients-are-still-unbiased"><span class="header-section-number">8.3.1</span> The Good News: Coefficients Are Still Unbiased</h3>
+<section id="why-does-heteroskedasticity-matter" class="level2" data-number="9.3">
+<h2 data-number="9.3" class="anchored" data-anchor-id="why-does-heteroskedasticity-matter"><span class="header-section-number">9.3</span> Why Does Heteroskedasticity Matter?</h2>
+<section id="the-good-news-coefficients-are-still-unbiased" class="level3" data-number="9.3.1">
+<h3 data-number="9.3.1" class="anchored" data-anchor-id="the-good-news-coefficients-are-still-unbiased"><span class="header-section-number">9.3.1</span> The Good News: Coefficients Are Still Unbiased</h3>
 <p>Here’s the crucial point: <strong>heteroskedasticity does NOT bias our coefficient estimates</strong>. The unbiasedness of OLS depends only on Gauss-Markov assumptions 1-4, not on homoskedasticity.</p>
 <p>So <span class="math inline">\(E[\hat{\beta}] = \beta\)</span> still holds. Our estimates are centered on the truth.</p>
 </section>
-<section id="the-bad-news-standard-errors-are-wrong" class="level3" data-number="8.3.2">
-<h3 data-number="8.3.2" class="anchored" data-anchor-id="the-bad-news-standard-errors-are-wrong"><span class="header-section-number">8.3.2</span> The Bad News: Standard Errors Are Wrong</h3>
+<section id="the-bad-news-standard-errors-are-wrong" class="level3" data-number="9.3.2">
+<h3 data-number="9.3.2" class="anchored" data-anchor-id="the-bad-news-standard-errors-are-wrong"><span class="header-section-number">9.3.2</span> The Bad News: Standard Errors Are Wrong</h3>
 <p>However, the standard error formulas we’ve been using assume homoskedasticity. When this assumption is violated:</p>
 <ul>
 <li>The formula <span class="math inline">\(SE(\hat{\beta}_1) = \frac{\hat{\sigma}}{\sqrt{SST_x}}\)</span> is <strong>invalid</strong></li>
@@ -638,8 +644,8 @@ Figure&nbsp;8.3: Comparing homoskedastic (left) and heteroskedastic (right) data
 </ul>
 <p>The result? <strong>We reject the null hypothesis too often</strong>, even when it’s true.</p>
 </section>
-<section id="type-i-error-a-quick-review" class="level3" data-number="8.3.3">
-<h3 data-number="8.3.3" class="anchored" data-anchor-id="type-i-error-a-quick-review"><span class="header-section-number">8.3.3</span> Type I Error: A Quick Review</h3>
+<section id="type-i-error-a-quick-review" class="level3" data-number="9.3.3">
+<h3 data-number="9.3.3" class="anchored" data-anchor-id="type-i-error-a-quick-review"><span class="header-section-number">9.3.3</span> Type I Error: A Quick Review</h3>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -657,10 +663,10 @@ Type I Error
 <p>With heteroskedasticity and standard OLS standard errors, the actual Type I error rate can be much higher than 5%—sometimes 10%, 15%, or even higher.</p>
 </section>
 </section>
-<section id="simulation-seeing-the-problem" class="level2" data-number="8.4">
-<h2 data-number="8.4" class="anchored" data-anchor-id="simulation-seeing-the-problem"><span class="header-section-number">8.4</span> Simulation: Seeing the Problem</h2>
-<section id="setup-simulating-hypothesis-tests" class="level3" data-number="8.4.1">
-<h3 data-number="8.4.1" class="anchored" data-anchor-id="setup-simulating-hypothesis-tests"><span class="header-section-number">8.4.1</span> Setup: Simulating Hypothesis Tests</h3>
+<section id="simulation-seeing-the-problem" class="level2" data-number="9.4">
+<h2 data-number="9.4" class="anchored" data-anchor-id="simulation-seeing-the-problem"><span class="header-section-number">9.4</span> Simulation: Seeing the Problem</h2>
+<section id="setup-simulating-hypothesis-tests" class="level3" data-number="9.4.1">
+<h3 data-number="9.4.1" class="anchored" data-anchor-id="setup-simulating-hypothesis-tests"><span class="header-section-number">9.4.1</span> Setup: Simulating Hypothesis Tests</h3>
 <p>Let’s run a simulation to see exactly what goes wrong. We’ll generate data where the <strong>true effect is zero</strong> (<span class="math inline">\(\beta_1 = 0\)</span>), then see how often we incorrectly reject this true null hypothesis.</p>
 <p>First, let’s see what happens under <strong>homoskedasticity</strong> (where everything works correctly):</p>
 <div class="cell">
@@ -697,7 +703,7 @@ Type I Error
 <div id="fig-homo-pvals" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-homo-pvals-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;8.4: Under homoskedasticity, p-values are uniformly distributed when the null is true, and the rejection rate matches our significance level.
+Figure&nbsp;9.4: Under homoskedasticity, p-values are uniformly distributed when the null is true, and the rejection rate matches our significance level.
 </figcaption>
 <div aria-describedby="fig-homo-pvals-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="heteroskedasticity_files/figure-html/fig-homo-pvals-1.png" class="img-fluid figure-img" width="672">
@@ -708,8 +714,8 @@ Figure&nbsp;8.4: Under homoskedasticity, p-values are uniformly distributed when
 </div>
 <p>Under homoskedasticity, the Type I error rate is 5.7%—almost exactly 5%, as expected.</p>
 </section>
-<section id="now-with-heteroskedasticity" class="level3" data-number="8.4.2">
-<h3 data-number="8.4.2" class="anchored" data-anchor-id="now-with-heteroskedasticity"><span class="header-section-number">8.4.2</span> Now With Heteroskedasticity</h3>
+<section id="now-with-heteroskedasticity" class="level3" data-number="9.4.2">
+<h3 data-number="9.4.2" class="anchored" data-anchor-id="now-with-heteroskedasticity"><span class="header-section-number">9.4.2</span> Now With Heteroskedasticity</h3>
 <p>Now let’s see what happens when we have heteroskedasticity but use standard OLS standard errors:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Function for ONE simulation trial under HETEROSKEDASTICITY</span></span>
@@ -743,7 +749,7 @@ Figure&nbsp;8.4: Under homoskedasticity, p-values are uniformly distributed when
 <div id="fig-hetero-pvals" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-hetero-pvals-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;8.5: Under heteroskedasticity, standard OLS p-values pile up near zero, causing excessive rejections. Robust standard errors fix this problem.
+Figure&nbsp;9.5: Under heteroskedasticity, standard OLS p-values pile up near zero, causing excessive rejections. Robust standard errors fix this problem.
 </figcaption>
 <div aria-describedby="fig-hetero-pvals-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="heteroskedasticity_files/figure-html/fig-hetero-pvals-1.png" class="img-fluid figure-img" width="960">
@@ -756,23 +762,23 @@ Figure&nbsp;8.5: Under heteroskedasticity, standard OLS p-values pile up near ze
 <p>With heteroskedasticity-robust standard errors (right panel), the rejection rate returns to approximately 5%.</p>
 </section>
 </section>
-<section id="heteroskedasticity-robust-standard-errors" class="level2" data-number="8.5">
-<h2 data-number="8.5" class="anchored" data-anchor-id="heteroskedasticity-robust-standard-errors"><span class="header-section-number">8.5</span> Heteroskedasticity-Robust Standard Errors</h2>
-<section id="the-solution" class="level3" data-number="8.5.1">
-<h3 data-number="8.5.1" class="anchored" data-anchor-id="the-solution"><span class="header-section-number">8.5.1</span> The Solution</h3>
+<section id="heteroskedasticity-robust-standard-errors" class="level2" data-number="9.5">
+<h2 data-number="9.5" class="anchored" data-anchor-id="heteroskedasticity-robust-standard-errors"><span class="header-section-number">9.5</span> Heteroskedasticity-Robust Standard Errors</h2>
+<section id="the-solution" class="level3" data-number="9.5.1">
+<h3 data-number="9.5.1" class="anchored" data-anchor-id="the-solution"><span class="header-section-number">9.5.1</span> The Solution</h3>
 <p>The fix is remarkably simple: use a different formula for the standard errors that accounts for heteroskedasticity. These are called <strong>heteroskedasticity-robust standard errors</strong> (also known as White standard errors or Huber-White standard errors).</p>
 <p>The standard OLS variance formula is: <span class="math display">\[Var(\hat{\beta}_1) = \frac{\sum_{i=1}^{n}\hat{u}_i^2 / (n-2)}{SST_x^2}\]</span></p>
 <p>The heteroskedasticity-robust formula is: <span class="math display">\[Var(\hat{\beta}_1) = \frac{\sum_{i=1}^{n}(x_i - \bar{x})^2\hat{u}_i^2}{SST_x^2}\]</span></p>
 <p>The key difference is that robust standard errors <strong>weight each squared residual by how far its <span class="math inline">\(x_i\)</span> is from the mean</strong>. This accounts for the fact that residuals may have different variances at different values of <span class="math inline">\(x\)</span>.</p>
 </section>
-<section id="visualizing-the-sampling-distributions" class="level3" data-number="8.5.2">
-<h3 data-number="8.5.2" class="anchored" data-anchor-id="visualizing-the-sampling-distributions"><span class="header-section-number">8.5.2</span> Visualizing the Sampling Distributions</h3>
+<section id="visualizing-the-sampling-distributions" class="level3" data-number="9.5.2">
+<h3 data-number="9.5.2" class="anchored" data-anchor-id="visualizing-the-sampling-distributions"><span class="header-section-number">9.5.2</span> Visualizing the Sampling Distributions</h3>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-sampling-dist" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-sampling-dist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;8.6: The actual sampling distribution (blue) compared to what standard OLS SEs predict (red dashed) vs.&nbsp;robust SEs (green). OLS SEs are too narrow; robust SEs match reality.
+Figure&nbsp;9.6: The actual sampling distribution (blue) compared to what standard OLS SEs predict (red dashed) vs.&nbsp;robust SEs (green). OLS SEs are too narrow; robust SEs match reality.
 </figcaption>
 <div aria-describedby="fig-sampling-dist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="heteroskedasticity_files/figure-html/fig-sampling-dist-1.png" class="img-fluid figure-img" width="672">
@@ -788,14 +794,14 @@ Figure&nbsp;8.6: The actual sampling distribution (blue) compared to what standa
 <li>Robust SEs (green) correctly capture the true variability</li>
 </ul>
 </section>
-<section id="comparing-type-i-error-rates" class="level3" data-number="8.5.3">
-<h3 data-number="8.5.3" class="anchored" data-anchor-id="comparing-type-i-error-rates"><span class="header-section-number">8.5.3</span> Comparing Type I Error Rates</h3>
+<section id="comparing-type-i-error-rates" class="level3" data-number="9.5.3">
+<h3 data-number="9.5.3" class="anchored" data-anchor-id="comparing-type-i-error-rates"><span class="header-section-number">9.5.3</span> Comparing Type I Error Rates</h3>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-type1-comparison" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-type1-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;8.7: Type I error rates across different scenarios. Robust standard errors maintain the correct 5% rate even with heteroskedasticity.
+Figure&nbsp;9.7: Type I error rates across different scenarios. Robust standard errors maintain the correct 5% rate even with heteroskedasticity.
 </figcaption>
 <div aria-describedby="fig-type1-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="heteroskedasticity_files/figure-html/fig-type1-comparison-1.png" class="img-fluid figure-img" width="672">
@@ -806,10 +812,10 @@ Figure&nbsp;8.7: Type I error rates across different scenarios. Robust standard 
 </div>
 </section>
 </section>
-<section id="implementing-robust-standard-errors-in-r" class="level2" data-number="8.6">
-<h2 data-number="8.6" class="anchored" data-anchor-id="implementing-robust-standard-errors-in-r"><span class="header-section-number">8.6</span> Implementing Robust Standard Errors in R</h2>
-<section id="using-fixest" class="level3" data-number="8.6.1">
-<h3 data-number="8.6.1" class="anchored" data-anchor-id="using-fixest"><span class="header-section-number">8.6.1</span> Using <code>fixest</code></h3>
+<section id="implementing-robust-standard-errors-in-r" class="level2" data-number="9.6">
+<h2 data-number="9.6" class="anchored" data-anchor-id="implementing-robust-standard-errors-in-r"><span class="header-section-number">9.6</span> Implementing Robust Standard Errors in R</h2>
+<section id="using-fixest" class="level3" data-number="9.6.1">
+<h3 data-number="9.6.1" class="anchored" data-anchor-id="using-fixest"><span class="header-section-number">9.6.1</span> Using <code>fixest</code></h3>
 <p>The easiest way to get robust standard errors is with the <code>fixest</code> package, which we’ll use throughout this course:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate some heteroskedastic data</span></span>
@@ -930,8 +936,8 @@ Figure&nbsp;8.7: Type I error rates across different scenarios. Robust standard 
 <li>This affects <strong>t-statistics and p-values</strong></li>
 </ul>
 </section>
-<section id="best-practice-always-use-robust-standard-errors" class="level3" data-number="8.6.2">
-<h3 data-number="8.6.2" class="anchored" data-anchor-id="best-practice-always-use-robust-standard-errors"><span class="header-section-number">8.6.2</span> Best Practice: Always Use Robust Standard Errors</h3>
+<section id="best-practice-always-use-robust-standard-errors" class="level3" data-number="9.6.2">
+<h3 data-number="9.6.2" class="anchored" data-anchor-id="best-practice-always-use-robust-standard-errors"><span class="header-section-number">9.6.2</span> Best Practice: Always Use Robust Standard Errors</h3>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -953,10 +959,10 @@ Best Practice
 </div>
 </section>
 </section>
-<section id="detecting-heteroskedasticity" class="level2" data-number="8.7">
-<h2 data-number="8.7" class="anchored" data-anchor-id="detecting-heteroskedasticity"><span class="header-section-number">8.7</span> Detecting Heteroskedasticity</h2>
-<section id="residual-plots" class="level3" data-number="8.7.1">
-<h3 data-number="8.7.1" class="anchored" data-anchor-id="residual-plots"><span class="header-section-number">8.7.1</span> Residual Plots</h3>
+<section id="detecting-heteroskedasticity" class="level2" data-number="9.7">
+<h2 data-number="9.7" class="anchored" data-anchor-id="detecting-heteroskedasticity"><span class="header-section-number">9.7</span> Detecting Heteroskedasticity</h2>
+<section id="residual-plots" class="level3" data-number="9.7.1">
+<h3 data-number="9.7.1" class="anchored" data-anchor-id="residual-plots"><span class="header-section-number">9.7.1</span> Residual Plots</h3>
 <p>The best way to detect heteroskedasticity is to <strong>look at your residuals</strong>. Plot the residuals against the fitted values (or against each explanatory variable) and look for patterns:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit model to heteroskedastic data</span></span>
@@ -974,7 +980,7 @@ Best Practice
 <div id="fig-residual-plot" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-residual-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;8.8: Residual plot showing the ‘fan’ pattern characteristic of heteroskedasticity. The spread of residuals increases with fitted values.
+Figure&nbsp;9.8: Residual plot showing the ‘fan’ pattern characteristic of heteroskedasticity. The spread of residuals increases with fitted values.
 </figcaption>
 <div aria-describedby="fig-residual-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="heteroskedasticity_files/figure-html/fig-residual-plot-1.png" class="img-fluid figure-img" width="672">
@@ -984,8 +990,8 @@ Figure&nbsp;8.8: Residual plot showing the ‘fan’ pattern characteristic of h
 </div>
 </div>
 </section>
-<section id="what-to-look-for" class="level3" data-number="8.7.2">
-<h3 data-number="8.7.2" class="anchored" data-anchor-id="what-to-look-for"><span class="header-section-number">8.7.2</span> What to Look For</h3>
+<section id="what-to-look-for" class="level3" data-number="9.7.2">
+<h3 data-number="9.7.2" class="anchored" data-anchor-id="what-to-look-for"><span class="header-section-number">9.7.2</span> What to Look For</h3>
 <p><strong>Homoskedasticity:</strong> Residuals form a random cloud with constant spread</p>
 <p><strong>Heteroskedasticity:</strong> Look for:</p>
 <ul>
@@ -994,8 +1000,8 @@ Figure&nbsp;8.8: Residual plot showing the ‘fan’ pattern characteristic of h
 <li>Different variability for different groups</li>
 </ul>
 </section>
-<section id="formal-tests" class="level3" data-number="8.7.3">
-<h3 data-number="8.7.3" class="anchored" data-anchor-id="formal-tests"><span class="header-section-number">8.7.3</span> Formal Tests</h3>
+<section id="formal-tests" class="level3" data-number="9.7.3">
+<h3 data-number="9.7.3" class="anchored" data-anchor-id="formal-tests"><span class="header-section-number">9.7.3</span> Formal Tests</h3>
 <p>While visual inspection is usually sufficient, you can also use formal tests like the <strong>Breusch-Pagan test</strong>:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Breusch-Pagan test</span></span>
@@ -1011,8 +1017,8 @@ BP = 29.91, df = 1, p-value = 0.00000004526</code></pre>
 <p>A small p-value (&lt; 0.05) suggests heteroskedasticity is present. However, <strong>don’t rely solely on formal tests</strong>—always look at your residual plots too.</p>
 </section>
 </section>
-<section id="summary" class="level2" data-number="8.8">
-<h2 data-number="8.8" class="anchored" data-anchor-id="summary"><span class="header-section-number">8.8</span> Summary</h2>
+<section id="summary" class="level2" data-number="9.8">
+<h2 data-number="9.8" class="anchored" data-anchor-id="summary"><span class="header-section-number">9.8</span> Summary</h2>
 <p>Heteroskedasticity is a common issue in economic data where the variance of errors changes with the explanatory variables.</p>
 <p><strong>Key Points:</strong></p>
 <ol type="1">
@@ -1024,8 +1030,8 @@ BP = 29.91, df = 1, p-value = 0.00000004526</code></pre>
 </ol>
 <p><strong>Best Practice:</strong> Always use heteroskedasticity-robust standard errors. They’re valid whether or not heteroskedasticity is present, so there’s no downside to using them.</p>
 </section>
-<section id="check-your-understanding" class="level2" data-number="8.9">
-<h2 data-number="8.9" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">8.9</span> Check Your Understanding</h2>
+<section id="check-your-understanding" class="level2" data-number="9.9">
+<h2 data-number="9.9" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">9.9</span> Check Your Understanding</h2>
 <p>For each question below, select the best answer from the dropdown menu.</p>
 <div class="question">
 <div class="answer-row">
@@ -1550,13 +1556,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../chapters/dummies_nonlins.html" class="pagination-link" aria-label="Dummy Variables and Non-Linear Models">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Dummy Variables and Non-Linear Models</span></span>
+      <a href="../chapters/interaction_effects.html" class="pagination-link" aria-label="Interaction Effects">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Interaction Effects</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="../chapters/binary_outcomes.html" class="pagination-link" aria-label="Binary Outcomes">
-        <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Binary Outcomes</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Binary Outcomes</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

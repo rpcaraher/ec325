@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>13&nbsp; Instrumental Variables – EC325 Lecture Notes</title>
+<title>14&nbsp; Instrumental Variables – EC325 Lecture Notes</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -144,7 +144,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/instrumental_variables.html"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Instrumental Variables</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/instrumental_variables.html"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Instrumental Variables</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -238,38 +238,44 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../chapters/interaction_effects.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Interaction Effects</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../chapters/heteroskedasticity.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Heteroskedasticity</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Heteroskedasticity</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/binary_outcomes.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Binary Outcomes</span></span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Binary Outcomes</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/panel_fe.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Panel Data and Fixed Effects</span></span></a>
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Panel Data and Fixed Effects</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/did.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span></a>
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/advanced_did.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Advanced Difference-in-Differences</span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Advanced Difference-in-Differences</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/instrumental_variables.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Instrumental Variables</span></span></a>
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Instrumental Variables</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -323,52 +329,52 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#the-fundamental-problem-endogeneity" id="toc-the-fundamental-problem-endogeneity" class="nav-link active" data-scroll-target="#the-fundamental-problem-endogeneity"><span class="header-section-number">13.1</span> The Fundamental Problem: Endogeneity</a>
+  <li><a href="#the-fundamental-problem-endogeneity" id="toc-the-fundamental-problem-endogeneity" class="nav-link active" data-scroll-target="#the-fundamental-problem-endogeneity"><span class="header-section-number">14.1</span> The Fundamental Problem: Endogeneity</a>
   <ul class="collapse">
-  <li><a href="#when-ols-fails" id="toc-when-ols-fails" class="nav-link" data-scroll-target="#when-ols-fails"><span class="header-section-number">13.1.1</span> When OLS Fails</a></li>
-  <li><a href="#formalizing-the-problem" id="toc-formalizing-the-problem" class="nav-link" data-scroll-target="#formalizing-the-problem"><span class="header-section-number">13.1.2</span> Formalizing the Problem</a></li>
+  <li><a href="#when-ols-fails" id="toc-when-ols-fails" class="nav-link" data-scroll-target="#when-ols-fails"><span class="header-section-number">14.1.1</span> When OLS Fails</a></li>
+  <li><a href="#formalizing-the-problem" id="toc-formalizing-the-problem" class="nav-link" data-scroll-target="#formalizing-the-problem"><span class="header-section-number">14.1.2</span> Formalizing the Problem</a></li>
   </ul></li>
-  <li><a href="#the-instrumental-variables-solution" id="toc-the-instrumental-variables-solution" class="nav-link" data-scroll-target="#the-instrumental-variables-solution"><span class="header-section-number">13.2</span> The Instrumental Variables Solution</a>
+  <li><a href="#the-instrumental-variables-solution" id="toc-the-instrumental-variables-solution" class="nav-link" data-scroll-target="#the-instrumental-variables-solution"><span class="header-section-number">14.2</span> The Instrumental Variables Solution</a>
   <ul class="collapse">
-  <li><a href="#the-key-insight" id="toc-the-key-insight" class="nav-link" data-scroll-target="#the-key-insight"><span class="header-section-number">13.2.1</span> The Key Insight</a></li>
-  <li><a href="#two-requirements-for-a-valid-instrument" id="toc-two-requirements-for-a-valid-instrument" class="nav-link" data-scroll-target="#two-requirements-for-a-valid-instrument"><span class="header-section-number">13.2.2</span> Two Requirements for a Valid Instrument</a></li>
-  <li><a href="#graphical-intuition" id="toc-graphical-intuition" class="nav-link" data-scroll-target="#graphical-intuition"><span class="header-section-number">13.2.3</span> Graphical Intuition</a></li>
+  <li><a href="#the-key-insight" id="toc-the-key-insight" class="nav-link" data-scroll-target="#the-key-insight"><span class="header-section-number">14.2.1</span> The Key Insight</a></li>
+  <li><a href="#two-requirements-for-a-valid-instrument" id="toc-two-requirements-for-a-valid-instrument" class="nav-link" data-scroll-target="#two-requirements-for-a-valid-instrument"><span class="header-section-number">14.2.2</span> Two Requirements for a Valid Instrument</a></li>
+  <li><a href="#graphical-intuition" id="toc-graphical-intuition" class="nav-link" data-scroll-target="#graphical-intuition"><span class="header-section-number">14.2.3</span> Graphical Intuition</a></li>
   </ul></li>
-  <li><a href="#application-fertility-and-labor-supply" id="toc-application-fertility-and-labor-supply" class="nav-link" data-scroll-target="#application-fertility-and-labor-supply"><span class="header-section-number">13.3</span> Application: Fertility and Labor Supply</a>
+  <li><a href="#application-fertility-and-labor-supply" id="toc-application-fertility-and-labor-supply" class="nav-link" data-scroll-target="#application-fertility-and-labor-supply"><span class="header-section-number">14.3</span> Application: Fertility and Labor Supply</a>
   <ul class="collapse">
-  <li><a href="#the-research-question" id="toc-the-research-question" class="nav-link" data-scroll-target="#the-research-question"><span class="header-section-number">13.3.1</span> The Research Question</a></li>
-  <li><a href="#the-angrist-and-evans-1998-instrument" id="toc-the-angrist-and-evans-1998-instrument" class="nav-link" data-scroll-target="#the-angrist-and-evans-1998-instrument"><span class="header-section-number">13.3.2</span> The Angrist and Evans (1998) Instrument</a></li>
-  <li><a href="#simulating-the-angrist-evans-setup" id="toc-simulating-the-angrist-evans-setup" class="nav-link" data-scroll-target="#simulating-the-angrist-evans-setup"><span class="header-section-number">13.3.3</span> Simulating the Angrist-Evans Setup</a></li>
-  <li><a href="#testing-the-relevance-condition" id="toc-testing-the-relevance-condition" class="nav-link" data-scroll-target="#testing-the-relevance-condition"><span class="header-section-number">13.3.4</span> Testing the Relevance Condition</a></li>
-  <li><a href="#testing-excludability-sort-of" id="toc-testing-excludability-sort-of" class="nav-link" data-scroll-target="#testing-excludability-sort-of"><span class="header-section-number">13.3.5</span> Testing Excludability (Sort of)</a></li>
+  <li><a href="#the-research-question" id="toc-the-research-question" class="nav-link" data-scroll-target="#the-research-question"><span class="header-section-number">14.3.1</span> The Research Question</a></li>
+  <li><a href="#the-angrist-and-evans-1998-instrument" id="toc-the-angrist-and-evans-1998-instrument" class="nav-link" data-scroll-target="#the-angrist-and-evans-1998-instrument"><span class="header-section-number">14.3.2</span> The Angrist and Evans (1998) Instrument</a></li>
+  <li><a href="#simulating-the-angrist-evans-setup" id="toc-simulating-the-angrist-evans-setup" class="nav-link" data-scroll-target="#simulating-the-angrist-evans-setup"><span class="header-section-number">14.3.3</span> Simulating the Angrist-Evans Setup</a></li>
+  <li><a href="#testing-the-relevance-condition" id="toc-testing-the-relevance-condition" class="nav-link" data-scroll-target="#testing-the-relevance-condition"><span class="header-section-number">14.3.4</span> Testing the Relevance Condition</a></li>
+  <li><a href="#testing-excludability-sort-of" id="toc-testing-excludability-sort-of" class="nav-link" data-scroll-target="#testing-excludability-sort-of"><span class="header-section-number">14.3.5</span> Testing Excludability (Sort of)</a></li>
   </ul></li>
-  <li><a href="#two-stage-least-squares-2sls" id="toc-two-stage-least-squares-2sls" class="nav-link" data-scroll-target="#two-stage-least-squares-2sls"><span class="header-section-number">13.4</span> Two-Stage Least Squares (2SLS)</a>
+  <li><a href="#two-stage-least-squares-2sls" id="toc-two-stage-least-squares-2sls" class="nav-link" data-scroll-target="#two-stage-least-squares-2sls"><span class="header-section-number">14.4</span> Two-Stage Least Squares (2SLS)</a>
   <ul class="collapse">
-  <li><a href="#the-estimation-strategy" id="toc-the-estimation-strategy" class="nav-link" data-scroll-target="#the-estimation-strategy"><span class="header-section-number">13.4.1</span> The Estimation Strategy</a></li>
-  <li><a href="#why-does-this-work" id="toc-why-does-this-work" class="nav-link" data-scroll-target="#why-does-this-work"><span class="header-section-number">13.4.2</span> Why Does This Work?</a></li>
-  <li><a href="#implementing-2sls" id="toc-implementing-2sls" class="nav-link" data-scroll-target="#implementing-2sls"><span class="header-section-number">13.4.3</span> Implementing 2SLS</a></li>
-  <li><a href="#proper-2sls-with-feols" id="toc-proper-2sls-with-feols" class="nav-link" data-scroll-target="#proper-2sls-with-feols"><span class="header-section-number">13.4.4</span> Proper 2SLS with <code>feols()</code></a></li>
-  <li><a href="#comparing-ols-and-2sls" id="toc-comparing-ols-and-2sls" class="nav-link" data-scroll-target="#comparing-ols-and-2sls"><span class="header-section-number">13.4.5</span> Comparing OLS and 2SLS</a></li>
+  <li><a href="#the-estimation-strategy" id="toc-the-estimation-strategy" class="nav-link" data-scroll-target="#the-estimation-strategy"><span class="header-section-number">14.4.1</span> The Estimation Strategy</a></li>
+  <li><a href="#why-does-this-work" id="toc-why-does-this-work" class="nav-link" data-scroll-target="#why-does-this-work"><span class="header-section-number">14.4.2</span> Why Does This Work?</a></li>
+  <li><a href="#implementing-2sls" id="toc-implementing-2sls" class="nav-link" data-scroll-target="#implementing-2sls"><span class="header-section-number">14.4.3</span> Implementing 2SLS</a></li>
+  <li><a href="#proper-2sls-with-feols" id="toc-proper-2sls-with-feols" class="nav-link" data-scroll-target="#proper-2sls-with-feols"><span class="header-section-number">14.4.4</span> Proper 2SLS with <code>feols()</code></a></li>
+  <li><a href="#comparing-ols-and-2sls" id="toc-comparing-ols-and-2sls" class="nav-link" data-scroll-target="#comparing-ols-and-2sls"><span class="header-section-number">14.4.5</span> Comparing OLS and 2SLS</a></li>
   </ul></li>
-  <li><a href="#testing-for-weak-instruments" id="toc-testing-for-weak-instruments" class="nav-link" data-scroll-target="#testing-for-weak-instruments"><span class="header-section-number">13.5</span> Testing for Weak Instruments</a>
+  <li><a href="#testing-for-weak-instruments" id="toc-testing-for-weak-instruments" class="nav-link" data-scroll-target="#testing-for-weak-instruments"><span class="header-section-number">14.5</span> Testing for Weak Instruments</a>
   <ul class="collapse">
-  <li><a href="#the-weak-instrument-problem" id="toc-the-weak-instrument-problem" class="nav-link" data-scroll-target="#the-weak-instrument-problem"><span class="header-section-number">13.5.1</span> The Weak Instrument Problem</a></li>
-  <li><a href="#the-f-test-rule-of-thumb" id="toc-the-f-test-rule-of-thumb" class="nav-link" data-scroll-target="#the-f-test-rule-of-thumb"><span class="header-section-number">13.5.2</span> The F-Test Rule of Thumb</a></li>
-  <li><a href="#what-happens-with-a-weak-instrument" id="toc-what-happens-with-a-weak-instrument" class="nav-link" data-scroll-target="#what-happens-with-a-weak-instrument"><span class="header-section-number">13.5.3</span> What Happens with a Weak Instrument?</a></li>
+  <li><a href="#the-weak-instrument-problem" id="toc-the-weak-instrument-problem" class="nav-link" data-scroll-target="#the-weak-instrument-problem"><span class="header-section-number">14.5.1</span> The Weak Instrument Problem</a></li>
+  <li><a href="#the-f-test-rule-of-thumb" id="toc-the-f-test-rule-of-thumb" class="nav-link" data-scroll-target="#the-f-test-rule-of-thumb"><span class="header-section-number">14.5.2</span> The F-Test Rule of Thumb</a></li>
+  <li><a href="#what-happens-with-a-weak-instrument" id="toc-what-happens-with-a-weak-instrument" class="nav-link" data-scroll-target="#what-happens-with-a-weak-instrument"><span class="header-section-number">14.5.3</span> What Happens with a Weak Instrument?</a></li>
   </ul></li>
-  <li><a href="#what-does-iv-estimate-the-late" id="toc-what-does-iv-estimate-the-late" class="nav-link" data-scroll-target="#what-does-iv-estimate-the-late"><span class="header-section-number">13.6</span> What Does IV Estimate? The LATE</a>
+  <li><a href="#what-does-iv-estimate-the-late" id="toc-what-does-iv-estimate-the-late" class="nav-link" data-scroll-target="#what-does-iv-estimate-the-late"><span class="header-section-number">14.6</span> What Does IV Estimate? The LATE</a>
   <ul class="collapse">
-  <li><a href="#the-local-average-treatment-effect" id="toc-the-local-average-treatment-effect" class="nav-link" data-scroll-target="#the-local-average-treatment-effect"><span class="header-section-number">13.6.1</span> The Local Average Treatment Effect</a></li>
-  <li><a href="#four-types-of-people" id="toc-four-types-of-people" class="nav-link" data-scroll-target="#four-types-of-people"><span class="header-section-number">13.6.2</span> Four Types of People</a></li>
-  <li><a href="#who-are-the-compliers" id="toc-who-are-the-compliers" class="nav-link" data-scroll-target="#who-are-the-compliers"><span class="header-section-number">13.6.3</span> Who Are the Compliers?</a></li>
-  <li><a href="#trade-offs-of-iv-estimation" id="toc-trade-offs-of-iv-estimation" class="nav-link" data-scroll-target="#trade-offs-of-iv-estimation"><span class="header-section-number">13.6.4</span> Trade-offs of IV Estimation</a></li>
+  <li><a href="#the-local-average-treatment-effect" id="toc-the-local-average-treatment-effect" class="nav-link" data-scroll-target="#the-local-average-treatment-effect"><span class="header-section-number">14.6.1</span> The Local Average Treatment Effect</a></li>
+  <li><a href="#four-types-of-people" id="toc-four-types-of-people" class="nav-link" data-scroll-target="#four-types-of-people"><span class="header-section-number">14.6.2</span> Four Types of People</a></li>
+  <li><a href="#who-are-the-compliers" id="toc-who-are-the-compliers" class="nav-link" data-scroll-target="#who-are-the-compliers"><span class="header-section-number">14.6.3</span> Who Are the Compliers?</a></li>
+  <li><a href="#trade-offs-of-iv-estimation" id="toc-trade-offs-of-iv-estimation" class="nav-link" data-scroll-target="#trade-offs-of-iv-estimation"><span class="header-section-number">14.6.4</span> Trade-offs of IV Estimation</a></li>
   </ul></li>
-  <li><a href="#classic-iv-applications" id="toc-classic-iv-applications" class="nav-link" data-scroll-target="#classic-iv-applications"><span class="header-section-number">13.7</span> Classic IV Applications</a>
+  <li><a href="#classic-iv-applications" id="toc-classic-iv-applications" class="nav-link" data-scroll-target="#classic-iv-applications"><span class="header-section-number">14.7</span> Classic IV Applications</a>
   <ul class="collapse">
-  <li><a href="#example-card-1995---returns-to-education" id="toc-example-card-1995---returns-to-education" class="nav-link" data-scroll-target="#example-card-1995---returns-to-education"><span class="header-section-number">13.7.1</span> Example: Card (1995) - Returns to Education</a></li>
+  <li><a href="#example-card-1995---returns-to-education" id="toc-example-card-1995---returns-to-education" class="nav-link" data-scroll-target="#example-card-1995---returns-to-education"><span class="header-section-number">14.7.1</span> Example: Card (1995) - Returns to Education</a></li>
   </ul></li>
-  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">13.8</span> Summary</a></li>
-  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">13.9</span> Check Your Understanding</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">14.8</span> Summary</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">14.9</span> Check Your Understanding</a></li>
   </ul>
 </nav>
     </div>
@@ -377,7 +383,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span id="sec-iv" class="quarto-section-identifier"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Instrumental Variables</span></span></h1>
+<h1 class="title"><span id="sec-iv" class="quarto-section-identifier"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Instrumental Variables</span></span></h1>
 </div>
 
 
@@ -517,10 +523,10 @@ function checkAnswer(selectElement, correctValue) {
 </div>
 <p>We’ve built up a powerful toolkit for causal inference: randomized experiments, multivariate regression, fixed effects, and difference-in-differences. But what happens when none of these methods are available?</p>
 <p>Sometimes we have only cross-sectional data, treatment is clearly endogenous, we cannot randomize, and there’s no natural experiment to exploit. In these situations, <strong>instrumental variables (IV)</strong> offers a path forward—if we can find the right instrument.</p>
-<section id="the-fundamental-problem-endogeneity" class="level2" data-number="13.1">
-<h2 data-number="13.1" class="anchored" data-anchor-id="the-fundamental-problem-endogeneity"><span class="header-section-number">13.1</span> The Fundamental Problem: Endogeneity</h2>
-<section id="when-ols-fails" class="level3" data-number="13.1.1">
-<h3 data-number="13.1.1" class="anchored" data-anchor-id="when-ols-fails"><span class="header-section-number">13.1.1</span> When OLS Fails</h3>
+<section id="the-fundamental-problem-endogeneity" class="level2" data-number="14.1">
+<h2 data-number="14.1" class="anchored" data-anchor-id="the-fundamental-problem-endogeneity"><span class="header-section-number">14.1</span> The Fundamental Problem: Endogeneity</h2>
+<section id="when-ols-fails" class="level3" data-number="14.1.1">
+<h3 data-number="14.1.1" class="anchored" data-anchor-id="when-ols-fails"><span class="header-section-number">14.1.1</span> When OLS Fails</h3>
 <p>Recall that OLS provides unbiased estimates when the zero conditional mean assumption holds: <span class="math inline">\(E[\mu | X] = 0\)</span>. When this assumption fails—when <span class="math inline">\(X\)</span> is correlated with the error term—we say <span class="math inline">\(X\)</span> is <strong>endogenous</strong>, and OLS is biased.</p>
 <p>Endogeneity arises from three main sources:</p>
 <p><strong>1. Omitted Variable Bias</strong></p>
@@ -530,8 +536,8 @@ function checkAnswer(selectElement, correctValue) {
 <p><strong>3. Reverse Causality</strong></p>
 <p>We want to estimate the effect of police on crime, but high-crime areas get more police deployed. The causation runs both ways, making it impossible to isolate the effect of policing.</p>
 </section>
-<section id="formalizing-the-problem" class="level3" data-number="13.1.2">
-<h3 data-number="13.1.2" class="anchored" data-anchor-id="formalizing-the-problem"><span class="header-section-number">13.1.2</span> Formalizing the Problem</h3>
+<section id="formalizing-the-problem" class="level3" data-number="14.1.2">
+<h3 data-number="14.1.2" class="anchored" data-anchor-id="formalizing-the-problem"><span class="header-section-number">14.1.2</span> Formalizing the Problem</h3>
 <p>Suppose we want to estimate:</p>
 <p><span class="math display">\[
 y = \beta_0 + \beta_1 x + \mu
@@ -540,14 +546,14 @@ y = \beta_0 + \beta_1 x + \mu
 <p>We cannot interpret the OLS coefficient as a causal effect.</p>
 </section>
 </section>
-<section id="the-instrumental-variables-solution" class="level2" data-number="13.2">
-<h2 data-number="13.2" class="anchored" data-anchor-id="the-instrumental-variables-solution"><span class="header-section-number">13.2</span> The Instrumental Variables Solution</h2>
-<section id="the-key-insight" class="level3" data-number="13.2.1">
-<h3 data-number="13.2.1" class="anchored" data-anchor-id="the-key-insight"><span class="header-section-number">13.2.1</span> The Key Insight</h3>
+<section id="the-instrumental-variables-solution" class="level2" data-number="14.2">
+<h2 data-number="14.2" class="anchored" data-anchor-id="the-instrumental-variables-solution"><span class="header-section-number">14.2</span> The Instrumental Variables Solution</h2>
+<section id="the-key-insight" class="level3" data-number="14.2.1">
+<h3 data-number="14.2.1" class="anchored" data-anchor-id="the-key-insight"><span class="header-section-number">14.2.1</span> The Key Insight</h3>
 <p>The IV approach finds a variable <span class="math inline">\(Z\)</span> that “shakes up” <span class="math inline">\(X\)</span> in a way that’s unrelated to the error term. Think of it as finding a source of <strong>exogenous variation</strong> in <span class="math inline">\(X\)</span>—variation that comes from outside the system and isn’t contaminated by the factors causing endogeneity.</p>
 </section>
-<section id="two-requirements-for-a-valid-instrument" class="level3" data-number="13.2.2">
-<h3 data-number="13.2.2" class="anchored" data-anchor-id="two-requirements-for-a-valid-instrument"><span class="header-section-number">13.2.2</span> Two Requirements for a Valid Instrument</h3>
+<section id="two-requirements-for-a-valid-instrument" class="level3" data-number="14.2.2">
+<h3 data-number="14.2.2" class="anchored" data-anchor-id="two-requirements-for-a-valid-instrument"><span class="header-section-number">14.2.2</span> Two Requirements for a Valid Instrument</h3>
 <p>For <span class="math inline">\(Z\)</span> to be a valid instrument, it must satisfy two conditions:</p>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -566,15 +572,15 @@ The Two IV Assumptions
 </div>
 </div>
 </section>
-<section id="graphical-intuition" class="level3" data-number="13.2.3">
-<h3 data-number="13.2.3" class="anchored" data-anchor-id="graphical-intuition"><span class="header-section-number">13.2.3</span> Graphical Intuition</h3>
+<section id="graphical-intuition" class="level3" data-number="14.2.3">
+<h3 data-number="14.2.3" class="anchored" data-anchor-id="graphical-intuition"><span class="header-section-number">14.2.3</span> Graphical Intuition</h3>
 <p>The IV strategy can be visualized as a causal diagram:</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-iv-dag" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-iv-dag-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;13.1: The instrumental variables strategy. Z affects Y only through X (exclusion restriction), while unobservables (μ) affect both X and Y, creating endogeneity.
+Figure&nbsp;14.1: The instrumental variables strategy. Z affects Y only through X (exclusion restriction), while unobservables (μ) affect both X and Y, creating endogeneity.
 </figcaption>
 <div aria-describedby="fig-iv-dag-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="instrumental_variables_files/figure-html/fig-iv-dag-1.png" class="img-fluid figure-img" width="672">
@@ -586,10 +592,10 @@ Figure&nbsp;13.1: The instrumental variables strategy. Z affects Y only through 
 <p>The key insight: <span class="math inline">\(X\)</span> has two types of variation—“good” variation unrelated to <span class="math inline">\(\mu\)</span>, and “bad” variation correlated with <span class="math inline">\(\mu\)</span>. OLS uses both and is therefore biased. IV uses only the “good” variation induced by <span class="math inline">\(Z\)</span>, giving us an unbiased estimate.</p>
 </section>
 </section>
-<section id="application-fertility-and-labor-supply" class="level2" data-number="13.3">
-<h2 data-number="13.3" class="anchored" data-anchor-id="application-fertility-and-labor-supply"><span class="header-section-number">13.3</span> Application: Fertility and Labor Supply</h2>
-<section id="the-research-question" class="level3" data-number="13.3.1">
-<h3 data-number="13.3.1" class="anchored" data-anchor-id="the-research-question"><span class="header-section-number">13.3.1</span> The Research Question</h3>
+<section id="application-fertility-and-labor-supply" class="level2" data-number="14.3">
+<h2 data-number="14.3" class="anchored" data-anchor-id="application-fertility-and-labor-supply"><span class="header-section-number">14.3</span> Application: Fertility and Labor Supply</h2>
+<section id="the-research-question" class="level3" data-number="14.3.1">
+<h3 data-number="14.3.1" class="anchored" data-anchor-id="the-research-question"><span class="header-section-number">14.3.1</span> The Research Question</h3>
 <p>What is the causal effect of having children on mothers’ labor force participation? This question is crucial for understanding gender wage gaps, designing parental leave policies, and evaluating childcare subsidies.</p>
 <p>But we cannot randomize fertility! And the decision to have children is deeply endogenous:</p>
 <ul>
@@ -598,8 +604,8 @@ Figure&nbsp;13.1: The instrumental variables strategy. Z affects Y only through 
 <li><strong>Omitted variables:</strong> Unobserved preferences affect both fertility and work</li>
 </ul>
 </section>
-<section id="the-angrist-and-evans-1998-instrument" class="level3" data-number="13.3.2">
-<h3 data-number="13.3.2" class="anchored" data-anchor-id="the-angrist-and-evans-1998-instrument"><span class="header-section-number">13.3.2</span> The Angrist and Evans (1998) Instrument</h3>
+<section id="the-angrist-and-evans-1998-instrument" class="level3" data-number="14.3.2">
+<h3 data-number="14.3.2" class="anchored" data-anchor-id="the-angrist-and-evans-1998-instrument"><span class="header-section-number">14.3.2</span> The Angrist and Evans (1998) Instrument</h3>
 <p>In a landmark study, Angrist and Evans (1998) found a clever instrument for fertility: the <strong>sex composition of the first two children</strong>.</p>
 <p>The instrument works because parents prefer mixed-sex children. If your first two children are the same sex (both boys or both girls), you’re more likely to try for a third child to “get” the other sex.</p>
 <p><strong>Why is this relevant?</strong> (<span class="math inline">\(Cov(Z, X) \neq 0\)</span>)</p>
@@ -614,12 +620,12 @@ Figure&nbsp;13.1: The instrumental variables strategy. Z affects Y only through 
 <li>The only plausible channel is through fertility decisions</li>
 </ul>
 </section>
-<section id="simulating-the-angrist-evans-setup" class="level3" data-number="13.3.3">
-<h3 data-number="13.3.3" class="anchored" data-anchor-id="simulating-the-angrist-evans-setup"><span class="header-section-number">13.3.3</span> Simulating the Angrist-Evans Setup</h3>
+<section id="simulating-the-angrist-evans-setup" class="level3" data-number="14.3.3">
+<h3 data-number="14.3.3" class="anchored" data-anchor-id="simulating-the-angrist-evans-setup"><span class="header-section-number">14.3.3</span> Simulating the Angrist-Evans Setup</h3>
 <p>Let’s create simulated data that mirrors the Angrist-Evans setting to illustrate how IV works:</p>
 </section>
-<section id="testing-the-relevance-condition" class="level3" data-number="13.3.4">
-<h3 data-number="13.3.4" class="anchored" data-anchor-id="testing-the-relevance-condition"><span class="header-section-number">13.3.4</span> Testing the Relevance Condition</h3>
+<section id="testing-the-relevance-condition" class="level3" data-number="14.3.4">
+<h3 data-number="14.3.4" class="anchored" data-anchor-id="testing-the-relevance-condition"><span class="header-section-number">14.3.4</span> Testing the Relevance Condition</h3>
 <p>First, let’s verify that same-sex siblings predict having more than two children:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check relevance: does samesex predict morekids?</span></span>
@@ -641,7 +647,7 @@ Figure&nbsp;13.1: The instrumental variables strategy. Z affects Y only through 
 <div id="fig-relevance" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-relevance-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;13.2: The relevance condition: parents with same-sex children are more likely to have a third child.
+Figure&nbsp;14.2: The relevance condition: parents with same-sex children are more likely to have a third child.
 </figcaption>
 <div aria-describedby="fig-relevance-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="instrumental_variables_files/figure-html/fig-relevance-1.png" class="img-fluid figure-img" width="672">
@@ -652,15 +658,15 @@ Figure&nbsp;13.2: The relevance condition: parents with same-sex children are mo
 </div>
 <p>The difference is substantial—same-sex parents are about 7 percentage points more likely to have a third child. The instrument is relevant.</p>
 </section>
-<section id="testing-excludability-sort-of" class="level3" data-number="13.3.5">
-<h3 data-number="13.3.5" class="anchored" data-anchor-id="testing-excludability-sort-of"><span class="header-section-number">13.3.5</span> Testing Excludability (Sort of)</h3>
+<section id="testing-excludability-sort-of" class="level3" data-number="14.3.5">
+<h3 data-number="14.3.5" class="anchored" data-anchor-id="testing-excludability-sort-of"><span class="header-section-number">14.3.5</span> Testing Excludability (Sort of)</h3>
 <p>We cannot directly test the exclusion restriction, but we can check whether the instrument has a small <em>reduced-form</em> relationship with the outcome:</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-exclusion" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-exclusion-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;13.3: Checking excludability: the direct relationship between same-sex and labor supply is small, consistent with the effect operating through fertility.
+Figure&nbsp;14.3: Checking excludability: the direct relationship between same-sex and labor supply is small, consistent with the effect operating through fertility.
 </figcaption>
 <div aria-describedby="fig-exclusion-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="instrumental_variables_files/figure-html/fig-exclusion-1.png" class="img-fluid figure-img" width="672">
@@ -672,10 +678,10 @@ Figure&nbsp;13.3: Checking excludability: the direct relationship between same-s
 <p>The difference is small (about 1-2 percentage points), consistent with the effect operating through fertility rather than directly. Of course, this doesn’t <em>prove</em> excludability—we must rely on economic reasoning to argue there’s no direct channel.</p>
 </section>
 </section>
-<section id="two-stage-least-squares-2sls" class="level2" data-number="13.4">
-<h2 data-number="13.4" class="anchored" data-anchor-id="two-stage-least-squares-2sls"><span class="header-section-number">13.4</span> Two-Stage Least Squares (2SLS)</h2>
-<section id="the-estimation-strategy" class="level3" data-number="13.4.1">
-<h3 data-number="13.4.1" class="anchored" data-anchor-id="the-estimation-strategy"><span class="header-section-number">13.4.1</span> The Estimation Strategy</h3>
+<section id="two-stage-least-squares-2sls" class="level2" data-number="14.4">
+<h2 data-number="14.4" class="anchored" data-anchor-id="two-stage-least-squares-2sls"><span class="header-section-number">14.4</span> Two-Stage Least Squares (2SLS)</h2>
+<section id="the-estimation-strategy" class="level3" data-number="14.4.1">
+<h3 data-number="14.4.1" class="anchored" data-anchor-id="the-estimation-strategy"><span class="header-section-number">14.4.1</span> The Estimation Strategy</h3>
 <p>IV models are typically estimated using <strong>Two-Stage Least Squares (2SLS)</strong>:</p>
 <p><strong>Stage 1 (First Stage):</strong> Regress the endogenous variable on the instrument: <span class="math display">\[
 X_i = \pi_0 + \pi_1 Z_i + \nu_i
@@ -687,15 +693,15 @@ Y_i = \beta_0 + \beta_1 \hat{X}_i + \mu_i
 \]</span></p>
 <p>The coefficient <span class="math inline">\(\hat{\beta}_1^{2SLS}\)</span> is our causal estimate.</p>
 </section>
-<section id="why-does-this-work" class="level3" data-number="13.4.2">
-<h3 data-number="13.4.2" class="anchored" data-anchor-id="why-does-this-work"><span class="header-section-number">13.4.2</span> Why Does This Work?</h3>
+<section id="why-does-this-work" class="level3" data-number="14.4.2">
+<h3 data-number="14.4.2" class="anchored" data-anchor-id="why-does-this-work"><span class="header-section-number">14.4.2</span> Why Does This Work?</h3>
 <p>The first stage “purges” <span class="math inline">\(X\)</span> of its problematic variation. Since <span class="math inline">\(Z\)</span> is exogenous (by assumption), the predicted values <span class="math inline">\(\hat{X}\)</span> contain only exogenous variation. When we regress <span class="math inline">\(Y\)</span> on <span class="math inline">\(\hat{X}\)</span>, we’re using only this “clean” variation, giving us an unbiased estimate.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-2sls-intuition" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-2sls-intuition-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;13.4: 2SLS uses only the variation in X that comes from the instrument Z, discarding the endogenous variation.
+Figure&nbsp;14.4: 2SLS uses only the variation in X that comes from the instrument Z, discarding the endogenous variation.
 </figcaption>
 <div aria-describedby="fig-2sls-intuition-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="instrumental_variables_files/figure-html/fig-2sls-intuition-1.png" class="img-fluid figure-img" width="672">
@@ -705,8 +711,8 @@ Figure&nbsp;13.4: 2SLS uses only the variation in X that comes from the instrume
 </div>
 </div>
 </section>
-<section id="implementing-2sls" class="level3" data-number="13.4.3">
-<h3 data-number="13.4.3" class="anchored" data-anchor-id="implementing-2sls"><span class="header-section-number">13.4.3</span> Implementing 2SLS</h3>
+<section id="implementing-2sls" class="level3" data-number="14.4.3">
+<h3 data-number="14.4.3" class="anchored" data-anchor-id="implementing-2sls"><span class="header-section-number">14.4.3</span> Implementing 2SLS</h3>
 <p>Let’s estimate the model step by step:</p>
 <p><strong>Step 1: The First Stage</strong></p>
 <div class="cell">
@@ -786,8 +792,8 @@ Standard Error Warning
 </div>
 </div>
 </section>
-<section id="proper-2sls-with-feols" class="level3" data-number="13.4.4">
-<h3 data-number="13.4.4" class="anchored" data-anchor-id="proper-2sls-with-feols"><span class="header-section-number">13.4.4</span> Proper 2SLS with <code>feols()</code></h3>
+<section id="proper-2sls-with-feols" class="level3" data-number="14.4.4">
+<h3 data-number="14.4.4" class="anchored" data-anchor-id="proper-2sls-with-feols"><span class="header-section-number">14.4.4</span> Proper 2SLS with <code>feols()</code></h3>
 <p>The <code>fixest</code> package provides proper 2SLS estimation with correct standard errors:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Proper 2SLS estimation</span></span>
@@ -816,8 +822,8 @@ F-test (1st stage), morekids: stat = 92.6067, p &lt; 2.2e-16 , on 1 and 49,998 D
 </div>
 </div>
 </section>
-<section id="comparing-ols-and-2sls" class="level3" data-number="13.4.5">
-<h3 data-number="13.4.5" class="anchored" data-anchor-id="comparing-ols-and-2sls"><span class="header-section-number">13.4.5</span> Comparing OLS and 2SLS</h3>
+<section id="comparing-ols-and-2sls" class="level3" data-number="14.4.5">
+<h3 data-number="14.4.5" class="anchored" data-anchor-id="comparing-ols-and-2sls"><span class="header-section-number">14.4.5</span> Comparing OLS and 2SLS</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># OLS for comparison (biased)</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>ols <span class="ot">&lt;-</span> <span class="fu">lm</span>(mom_worked <span class="sc">~</span> morekids, <span class="at">data =</span> ae_sim)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -827,7 +833,7 @@ F-test (1st stage), morekids: stat = 92.6067, p &lt; 2.2e-16 , on 1 and 49,998 D
 <div id="fig-ols-vs-iv" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-ols-vs-iv-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;13.5: Comparing OLS (biased) and 2SLS (unbiased) estimates. OLS overstates the negative effect because career orientation confounds the relationship.
+Figure&nbsp;14.5: Comparing OLS (biased) and 2SLS (unbiased) estimates. OLS overstates the negative effect because career orientation confounds the relationship.
 </figcaption>
 <div aria-describedby="fig-ols-vs-iv-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="instrumental_variables_files/figure-html/fig-ols-vs-iv-1.png" class="img-fluid figure-img" width="672">
@@ -840,10 +846,10 @@ Figure&nbsp;13.5: Comparing OLS (biased) and 2SLS (unbiased) estimates. OLS over
 <p>The 2SLS estimate is much closer to the true effect because it uses only the exogenous variation from the same-sex instrument.</p>
 </section>
 </section>
-<section id="testing-for-weak-instruments" class="level2" data-number="13.5">
-<h2 data-number="13.5" class="anchored" data-anchor-id="testing-for-weak-instruments"><span class="header-section-number">13.5</span> Testing for Weak Instruments</h2>
-<section id="the-weak-instrument-problem" class="level3" data-number="13.5.1">
-<h3 data-number="13.5.1" class="anchored" data-anchor-id="the-weak-instrument-problem"><span class="header-section-number">13.5.1</span> The Weak Instrument Problem</h3>
+<section id="testing-for-weak-instruments" class="level2" data-number="14.5">
+<h2 data-number="14.5" class="anchored" data-anchor-id="testing-for-weak-instruments"><span class="header-section-number">14.5</span> Testing for Weak Instruments</h2>
+<section id="the-weak-instrument-problem" class="level3" data-number="14.5.1">
+<h3 data-number="14.5.1" class="anchored" data-anchor-id="the-weak-instrument-problem"><span class="header-section-number">14.5.1</span> The Weak Instrument Problem</h3>
 <p>If the instrument is only weakly correlated with <span class="math inline">\(X\)</span>, 2SLS performs poorly:</p>
 <ul>
 <li>Estimates become biased (toward OLS!)</li>
@@ -851,8 +857,8 @@ Figure&nbsp;13.5: Comparing OLS (biased) and 2SLS (unbiased) estimates. OLS over
 <li>Inference is invalid</li>
 </ul>
 </section>
-<section id="the-f-test-rule-of-thumb" class="level3" data-number="13.5.2">
-<h3 data-number="13.5.2" class="anchored" data-anchor-id="the-f-test-rule-of-thumb"><span class="header-section-number">13.5.2</span> The F-Test Rule of Thumb</h3>
+<section id="the-f-test-rule-of-thumb" class="level3" data-number="14.5.2">
+<h3 data-number="14.5.2" class="anchored" data-anchor-id="the-f-test-rule-of-thumb"><span class="header-section-number">14.5.2</span> The F-Test Rule of Thumb</h3>
 <p><strong>Stock and Yogo (2005)</strong> established a rule of thumb:</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -869,8 +875,8 @@ Weak Instrument Test
 </div>
 <p>In our example, the first-stage F-statistic is well over 100—a very strong instrument.</p>
 </section>
-<section id="what-happens-with-a-weak-instrument" class="level3" data-number="13.5.3">
-<h3 data-number="13.5.3" class="anchored" data-anchor-id="what-happens-with-a-weak-instrument"><span class="header-section-number">13.5.3</span> What Happens with a Weak Instrument?</h3>
+<section id="what-happens-with-a-weak-instrument" class="level3" data-number="14.5.3">
+<h3 data-number="14.5.3" class="anchored" data-anchor-id="what-happens-with-a-weak-instrument"><span class="header-section-number">14.5.3</span> What Happens with a Weak Instrument?</h3>
 <p>Let’s see what happens when we use a weak (essentially random) instrument:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a weak instrument (random noise)</span></span>
@@ -887,7 +893,7 @@ Weak Instrument Test
 <div id="fig-weak-iv" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-weak-iv-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;13.6: With a weak instrument (random noise), the 2SLS estimate becomes unreliable with huge standard errors.
+Figure&nbsp;14.6: With a weak instrument (random noise), the 2SLS estimate becomes unreliable with huge standard errors.
 </figcaption>
 <div aria-describedby="fig-weak-iv-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="instrumental_variables_files/figure-html/fig-weak-iv-1.png" class="img-fluid figure-img" width="672">
@@ -899,14 +905,14 @@ Figure&nbsp;13.6: With a weak instrument (random noise), the 2SLS estimate becom
 <p>With a weak instrument, the estimate is wildly off and the confidence interval is enormous. <strong>Always check your first-stage F-statistic!</strong></p>
 </section>
 </section>
-<section id="what-does-iv-estimate-the-late" class="level2" data-number="13.6">
-<h2 data-number="13.6" class="anchored" data-anchor-id="what-does-iv-estimate-the-late"><span class="header-section-number">13.6</span> What Does IV Estimate? The LATE</h2>
-<section id="the-local-average-treatment-effect" class="level3" data-number="13.6.1">
-<h3 data-number="13.6.1" class="anchored" data-anchor-id="the-local-average-treatment-effect"><span class="header-section-number">13.6.1</span> The Local Average Treatment Effect</h3>
+<section id="what-does-iv-estimate-the-late" class="level2" data-number="14.6">
+<h2 data-number="14.6" class="anchored" data-anchor-id="what-does-iv-estimate-the-late"><span class="header-section-number">14.6</span> What Does IV Estimate? The LATE</h2>
+<section id="the-local-average-treatment-effect" class="level3" data-number="14.6.1">
+<h3 data-number="14.6.1" class="anchored" data-anchor-id="the-local-average-treatment-effect"><span class="header-section-number">14.6.1</span> The Local Average Treatment Effect</h3>
 <p>An important subtlety: IV does not estimate the same quantity as OLS or DiD. It estimates the <strong>Local Average Treatment Effect (LATE)</strong>—the causal effect for a specific subpopulation called <strong>compliers</strong>.</p>
 </section>
-<section id="four-types-of-people" class="level3" data-number="13.6.2">
-<h3 data-number="13.6.2" class="anchored" data-anchor-id="four-types-of-people"><span class="header-section-number">13.6.2</span> Four Types of People</h3>
+<section id="four-types-of-people" class="level3" data-number="14.6.2">
+<h3 data-number="14.6.2" class="anchored" data-anchor-id="four-types-of-people"><span class="header-section-number">14.6.2</span> Four Types of People</h3>
 <p>In the fertility example, we can categorize people by how their fertility responds to the instrument:</p>
 <table class="caption-top table">
 <colgroup>
@@ -940,8 +946,8 @@ Figure&nbsp;13.6: With a weak instrument (random noise), the 2SLS estimate becom
 </table>
 <p><strong>IV identifies the causal effect only for compliers</strong>—those whose treatment status was actually changed by the instrument.</p>
 </section>
-<section id="who-are-the-compliers" class="level3" data-number="13.6.3">
-<h3 data-number="13.6.3" class="anchored" data-anchor-id="who-are-the-compliers"><span class="header-section-number">13.6.3</span> Who Are the Compliers?</h3>
+<section id="who-are-the-compliers" class="level3" data-number="14.6.3">
+<h3 data-number="14.6.3" class="anchored" data-anchor-id="who-are-the-compliers"><span class="header-section-number">14.6.3</span> Who Are the Compliers?</h3>
 <p>In the Angrist-Evans context, compliers are parents who:</p>
 <ul>
 <li>Wanted mixed-sex children strongly enough to try for a third</li>
@@ -954,8 +960,8 @@ Figure&nbsp;13.6: With a weak instrument (random noise), the 2SLS estimate becom
 <li>Parents who strongly preferred small families</li>
 </ul>
 </section>
-<section id="trade-offs-of-iv-estimation" class="level3" data-number="13.6.4">
-<h3 data-number="13.6.4" class="anchored" data-anchor-id="trade-offs-of-iv-estimation"><span class="header-section-number">13.6.4</span> Trade-offs of IV Estimation</h3>
+<section id="trade-offs-of-iv-estimation" class="level3" data-number="14.6.4">
+<h3 data-number="14.6.4" class="anchored" data-anchor-id="trade-offs-of-iv-estimation"><span class="header-section-number">14.6.4</span> Trade-offs of IV Estimation</h3>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -984,8 +990,8 @@ Figure&nbsp;13.6: With a weak instrument (random noise), the 2SLS estimate becom
 </table>
 </section>
 </section>
-<section id="classic-iv-applications" class="level2" data-number="13.7">
-<h2 data-number="13.7" class="anchored" data-anchor-id="classic-iv-applications"><span class="header-section-number">13.7</span> Classic IV Applications</h2>
+<section id="classic-iv-applications" class="level2" data-number="14.7">
+<h2 data-number="14.7" class="anchored" data-anchor-id="classic-iv-applications"><span class="header-section-number">14.7</span> Classic IV Applications</h2>
 <p>Instrumental variables have been used to study many important questions:</p>
 <table class="caption-top table">
 <colgroup>
@@ -1023,8 +1029,8 @@ Figure&nbsp;13.6: With a weak instrument (random noise), the 2SLS estimate becom
 </tr>
 </tbody>
 </table>
-<section id="example-card-1995---returns-to-education" class="level3" data-number="13.7.1">
-<h3 data-number="13.7.1" class="anchored" data-anchor-id="example-card-1995---returns-to-education"><span class="header-section-number">13.7.1</span> Example: Card (1995) - Returns to Education</h3>
+<section id="example-card-1995---returns-to-education" class="level3" data-number="14.7.1">
+<h3 data-number="14.7.1" class="anchored" data-anchor-id="example-card-1995---returns-to-education"><span class="header-section-number">14.7.1</span> Example: Card (1995) - Returns to Education</h3>
 <p><strong>Question:</strong> What is the causal effect of education on wages?</p>
 <p><strong>Problem:</strong> Ability is unobserved but affects both education and wages, biasing OLS upward.</p>
 <p><strong>Instrument:</strong> Distance to the nearest college. People who grew up closer to a college got more education.</p>
@@ -1033,8 +1039,8 @@ Figure&nbsp;13.6: With a weak instrument (random noise), the 2SLS estimate becom
 <p><strong>Finding:</strong> Returns to education are actually <em>higher</em> than OLS suggests—the ability bias works in the opposite direction from what many expected.</p>
 </section>
 </section>
-<section id="summary" class="level2" data-number="13.8">
-<h2 data-number="13.8" class="anchored" data-anchor-id="summary"><span class="header-section-number">13.8</span> Summary</h2>
+<section id="summary" class="level2" data-number="14.8">
+<h2 data-number="14.8" class="anchored" data-anchor-id="summary"><span class="header-section-number">14.8</span> Summary</h2>
 <p>Instrumental variables provide a powerful tool for causal inference when other methods fail. The key is finding a variable that affects treatment but has no direct effect on the outcome.</p>
 <p><strong>The two requirements:</strong></p>
 <ol type="1">
@@ -1050,8 +1056,8 @@ Figure&nbsp;13.6: With a weak instrument (random noise), the 2SLS estimate becom
 </ul>
 <p>IV requires strong assumptions, but when those assumptions are credible, it provides a path to causal inference even in challenging observational settings.</p>
 </section>
-<section id="check-your-understanding" class="level2" data-number="13.9">
-<h2 data-number="13.9" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">13.9</span> Check Your Understanding</h2>
+<section id="check-your-understanding" class="level2" data-number="14.9">
+<h2 data-number="14.9" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">14.9</span> Check Your Understanding</h2>
 <p>For each question below, select the best answer from the dropdown menu.</p>
 <div class="question">
 <div class="answer-row">
@@ -1572,7 +1578,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
       <a href="../chapters/advanced_did.html" class="pagination-link" aria-label="Advanced Difference-in-Differences">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Advanced Difference-in-Differences</span></span>
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Advanced Difference-in-Differences</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
