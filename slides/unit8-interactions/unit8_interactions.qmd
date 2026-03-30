@@ -36,7 +36,11 @@ options(scipen = 999)
 
 - Last unit we saw that **dummy variables** shift the intercept:
 
+. . .
+
 $$\widehat{score} = \hat{\beta}_0 + \hat{\beta}_1(hsgpa) + \hat{\beta}_2(calculus)$$
+
+. . .
 
 - Calculus-takers: $(\hat{\beta}_0 + \hat{\beta}_2) + \hat{\beta}_1(hsgpa)$
 - Non-calculus-takers: $\hat{\beta}_0 + \hat{\beta}_1(hsgpa)$
@@ -53,7 +57,6 @@ Both groups have the **same slope** — the effect of GPA is assumed identical f
 
 - Maybe calculus preparation changes *how much* GPA matters
 - Maybe education has different returns for men vs. women
-- Maybe the suburb premium differs by property type
 
 . . .
 
@@ -69,6 +72,8 @@ Both groups have the **same slope** — the effect of GPA is assumed identical f
 ## Setting Up the Model {.smaller}
 
 - Suppose we want to understand how **gender** and **marital status** jointly affect wages
+
+- We can estimate this relationship using an **interaction term*:*
 
 . . .
 
@@ -107,29 +112,39 @@ Once we add the interaction, each coefficient has a **specific** meaning:
 
 . . .
 
-- $\beta_1$ = effect of being female **when $married = 0$** (i.e., gender gap among *unmarried* workers)
+- $\beta_1$ = effect of being female **when $married = 0$** (relative to unmarried men)
 
 . . .
 
-- $\beta_2$ = effect of being married **when $female = 0$** (i.e., marriage premium for *men*)
+- $\beta_2$ = effect of being married **when $female = 0$** (relative to unmarried men)
 
 . . .
 
-- $\beta_3$ = the **additional** effect of being *both* female and married, beyond the sum of the individual effects
+- $\beta_3$ = the **additional** effect of being *both* female and married, beyond the sum of the individual effects (relative to unmarried men)
 
-. . .
+## Plugging in the Values
 
-::: {.callout-important}
-## Two Equivalent Readings of β₃
+| Group | female | married | Predicted $\ln(wage)$ |
+|:------|:------:|:-------:|:----------------------|
+| Unmarried men (baseline) | 0 | 0 | $\beta_0$ |
 
-1. How much does the **marriage premium** differ between men and women?
-2. How much does the **gender gap** differ between married and unmarried workers?
+## Plugging in the Values
 
-Both give the same number — the interaction is symmetric!
-:::
+| Group | female | married | Predicted $\ln(wage)$ |
+|:------|:------:|:-------:|:----------------------|
+| Unmarried men (baseline) | 0 | 0 | $\beta_0$ |
+| Unmarried women | 1 | 0 | $\beta_0 + \beta_1$ |
+
+## Plugging in the Values
+
+| Group | female | married | Predicted $\ln(wage)$ |
+|:------|:------:|:-------:|:----------------------|
+| Unmarried men (baseline) | 0 | 0 | $\beta_0$ |
+| Unmarried women | 1 | 0 | $\beta_0 + \beta_1$ |
+| Married men | 0 | 1 | $\beta_0 + \beta_2$ |
 
 
-## Plugging in the Values {.smaller}
+## Plugging in the Values
 
 | Group | female | married | Predicted $\ln(wage)$ |
 |:------|:------:|:-------:|:----------------------|
@@ -138,10 +153,7 @@ Both give the same number — the interaction is symmetric!
 | Married men | 0 | 1 | $\beta_0 + \beta_2$ |
 | Married women | 1 | 1 | $\beta_0 + \beta_1 + \beta_2 + \beta_3$ |
 
-. . .
 
-- **Married women**: total effect relative to baseline = $\beta_1 + \beta_2 + \beta_3$ — **not** just $\beta_1 + \beta_2$!
-- If $\beta_3 = 0$, we don't need the interaction (simpler model works)
 
 
 ## The Data {.smaller}
@@ -405,6 +417,8 @@ To see this clearly, let's generate data where the difference is obvious:
 - Men: 8% return to education; Women: 14% return
 - Women start with a lower intercept
 
+. . .
+
 ```{r}
 #| echo: true
 
@@ -543,7 +557,7 @@ $$\ln(wage) = \beta_0 + \beta_1(female) + \beta_2(educ) + \beta_3(female \times 
 
 . . .
 
-- Effect of being female: $\frac{\partial \ln(wage)}{\partial female} = \beta_1 + \beta_3(educ)$
+- Effect of being female (i.e., gender wage gap): $\frac{\partial \ln(wage)}{\partial female} = \beta_1 + \beta_3(educ)$
   - **Depends on education level!**
 
 
@@ -726,6 +740,7 @@ tribble(
 . . .
 
 - The interaction-only model gives the **same prediction** to unmarried men, unmarried women, and married men — it can't tell them apart!
+- In other words, in lumps all other groups *except married women* into the same baseline group
 
 
 ## The Lesson {.smaller}
