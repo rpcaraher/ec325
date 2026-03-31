@@ -73,7 +73,7 @@ Both groups have the **same slope** — the effect of GPA is assumed identical f
 
 - Suppose we want to understand how **gender** and **marital status** jointly affect wages
 
-- We can estimate this relationship using an **interaction term*:*
+- We can estimate this relationship using an **interaction term**:
 
 . . .
 
@@ -195,45 +195,12 @@ coef(lm_interact) |> round(3)
 - The interaction term ($\hat{\beta}_3 \approx `r round(coef(lm_interact)[4], 3)`$): marriage premium is **much smaller** for women
 
 
-## Interpreting the Results {.smaller}
+## Visualizing the Components {.smaller auto-animate=true}
 
 ```{r}
 #| echo: false
 
 coefs <- coef(lm_interact)
-
-tribble(
-    ~Group, ~Formula, ~`Predicted ln(wage)`, ~`Wage vs. baseline`,
-    "Unmarried men",
-        "β₀",
-        round(coefs[1], 3),
-        "---",
-    "Unmarried women",
-        "β₀ + β₁",
-        round(coefs[1] + coefs[2], 3),
-        paste0(round(100*(exp(coefs[2]) - 1), 1), "%"),
-    "Married men",
-        "β₀ + β₂",
-        round(coefs[1] + coefs[3], 3),
-        paste0("+", round(100*(exp(coefs[3]) - 1), 1), "%"),
-    "Married women",
-        "β₀ + β₁ + β₂ + β₃",
-        round(coefs[1] + coefs[2] + coefs[3] + coefs[4], 3),
-        paste0(round(100*(exp(coefs[2] + coefs[3] + coefs[4]) - 1), 1), "%")
-) |>
-    knitr::kable()
-```
-
-. . .
-
-- Marriage is associated with **higher wages for men** but **not for women**
-- The interaction term nearly wipes out the marriage premium for women
-
-
-## Visualizing the Components {.smaller auto-animate=true}
-
-```{r}
-#| echo: false
 
 # Helper function for the progressive waterfall plot
 # show_groups: how many groups to reveal (1-4)
@@ -369,6 +336,38 @@ plot_waterfall(coefs, show_groups = 3)
 
 plot_waterfall(coefs, show_groups = 4)
 ```
+
+## Practice: Turn to Your Neighbor {.smaller .nonincremental}
+
+Consider this model of home prices in Sacramento:
+
+$$\ln(price) = \beta_0 + \beta_1(sqft) + \beta_2(Family) + \beta_3(Suburb) + \beta_4(Family \times Suburb) + \mu$$
+
+where $Family = 1$ if the unit is detached, single-family residential house and $0$ if not, $Suburb = 1$ if the unit is outside the city limits of Sacramento
+
+. . .
+
+::: columns
+::: {.column width="50%"}
+**Discuss with your neighbor:**
+
+1. What is the baseline group?
+2. What does $\beta_2$ represent?
+3. What does $\beta_3$ represent?
+4. What is the suburb premium for single family homes?
+5. What is the total effect of being a suburban single-family home (vs. baseline)?
+:::
+::: {.column width="50%"}
+**Answers:**
+
+1. Multi-family apartment in Sacramento
+2. Price difference: Detached family home vs condo/apartment (in Sacramento)
+3. Suburb premium for condos/apartments
+4. $\beta_3 + \beta_4$
+5. $\beta_2 + \beta_3 + \beta_4$
+:::
+:::
+
 
 
 # Dummy × Continuous Interactions
@@ -583,91 +582,6 @@ Never report just the main effect $\beta_1$ as "the effect of being female." Wit
 :::
 
 
-# Application: Sacramento Housing
-
-## Setting Up the Problem {.smaller}
-
-::: {.nonincremental}
-- **Outcome**: log(sale price) of homes in Sacramento
-- **Variables**:
-  - `sqft`: interior square footage (continuous)
-  - `suburb`: 1 if outside Sacramento city limits, 0 if inside (dummy)
-  - `type`: Condo, Multi-Family, or Residential (factor → R creates dummies)
-- **Baseline**: Condo in Sacramento proper (all dummies = 0)
-- **Question**: Does the suburb premium differ by property type?
-:::
-
-
-## The Model {.smaller}
-
-$$\ln(price) = \beta_0 + \beta_1(sqft) + \beta_2(MF) + \beta_3(Res) + \beta_4(Sub) + \beta_5(MF \times Sub) + \beta_6(Res \times Sub) + \mu$$
-
-```{r}
-#| echo: true
-
-sac_data <- modeldata::Sacramento |>
-    mutate(ln_price = log(price),
-           type.f = factor(type),
-           suburb = case_when(city == "SACRAMENTO" ~ 0, TRUE ~ 1))
-
-lm_housing <- lm(ln_price ~ sqft + type.f + suburb + type.f:suburb, data = sac_data)
-```
-
-
-## Results {.smaller}
-
-```{r}
-#| echo: false
-#| output: asis
-
-modelsummary(
-    fmt = 4,
-    list("log(Sale Price)" = lm_housing),
-    stars = c("*" = 0.1, "**" = 0.05, "***" = 0.01),
-    title = "OLS Regression of Sacramento Home Prices",
-    gof_map = c("nobs", "adj.r.squared"),
-    coef_map = c(
-        "sqft" = "Square Feet",
-        "suburb" = "Suburb",
-        "type.fMulti_Family" = "Type: Multi-Family",
-        "type.fResidential" = "Type: Residential",
-        "type.fMulti_Family:suburb" = "Multi-Family × Suburb",
-        "type.fResidential:suburb" = "Residential × Suburb"
-    )
-)
-```
-
-
-## Building Up Predicted Values {.smaller}
-
-```{r}
-#| echo: false
-
-hcoefs <- coef(lm_housing)
-
-tribble(
-    ~`Property Type`, ~Location, ~Formula, ~Value,
-    "Condo", "Sacramento",
-        "β₀", round(hcoefs["(Intercept)"], 3),
-    "Multi-Family", "Sacramento",
-        "β₀ + β_MF", round(hcoefs["(Intercept)"] + hcoefs["type.fMulti_Family"], 3),
-    "Residential", "Sacramento",
-        "β₀ + β_Res", round(hcoefs["(Intercept)"] + hcoefs["type.fResidential"], 3),
-    "Condo", "Suburb",
-        "β₀ + β_Sub", round(hcoefs["(Intercept)"] + hcoefs["suburb"], 3),
-    "Multi-Family", "Suburb",
-        "β₀ + β_MF + β_Sub + β_MF×Sub", round(hcoefs["(Intercept)"] + hcoefs["type.fMulti_Family"] + hcoefs["suburb"] + hcoefs["type.fMulti_Family:suburb"], 3),
-    "Residential", "Suburb",
-        "β₀ + β_Res + β_Sub + β_Res×Sub", round(hcoefs["(Intercept)"] + hcoefs["type.fResidential"] + hcoefs["suburb"] + hcoefs["type.fResidential:suburb"], 3)
-) |>
-    knitr::kable()
-```
-
-. . .
-
-- The interaction tells us the **suburb premium differs by property type**
-
-
 # Why You Need Main Effects
 
 ## What Goes Wrong Without Them? {.smaller}
@@ -758,36 +672,6 @@ When you include $X_1 \times X_2$ in a model, **always** also include $X_1$ and 
 | **Slope** | Same for all groups | Different for each group |
 | **Assumption** | Effect of $X$ is the same across groups | Effect of $X$ can vary across groups |
 | **Flexibility** | Less flexible | More flexible |
-
-
-# Interpretation Practice
-
-## Practice: Turn to Your Neighbor {.smaller .nonincremental}
-
-Consider this model of home prices in Sacramento:
-
-$$\ln(price) = \beta_0 + \beta_1(sqft) + \beta_2(Residential) + \beta_3(Suburb) + \beta_4(Residential \times Suburb) + \mu$$
-
-::: columns
-::: {.column width="50%"}
-**Discuss with your neighbor:**
-
-1. What is the baseline group?
-2. What does $\beta_2$ represent?
-3. What does $\beta_3$ represent?
-4. What is the suburb premium for residential homes?
-5. What is the total effect of being a suburban residential home (vs. baseline)?
-:::
-::: {.column width="50%"}
-**Answers:**
-
-1. Condo in Sacramento
-2. Price difference: Residential vs. Condo (in Sacramento)
-3. Suburb premium for Condos
-4. $\beta_3 + \beta_4$
-5. $\beta_2 + \beta_3 + \beta_4$
-:::
-:::
 
 
 ## Key Takeaways {.smaller}
