@@ -8,6 +8,7 @@
 
 library(tidyverse)
 library(wooldridge)
+library(fixest)
 library(modelsummary)
 
 options(scipen = 999)
@@ -148,6 +149,18 @@ and use multivariate regression to control for observable confounders.
 But we face a fundamental limitation:
 we cannot control for unobserved characteristics that differ across units.
 
+For example, suppose we survey three cities in 2020:
+
+| City | Year | Unemployment (%) | Crime Rate |
+|------|:----:|:----------------:|:----------:|
+| Boston | 2020 | 6.2 | 312 |
+| Denver | 2020 | 5.1 | 285 |
+| Miami | 2020 | 7.8 | 410 |
+
+We observe each city once.
+We can compare across cities,
+but we cannot separate the effect of unemployment from all the other ways these cities differ.
+
 ### Panel Data
 
 **Panel data** (also called longitudinal data) tracks the same units across multiple time periods.
@@ -160,6 +173,28 @@ Examples include:
 
 The key feature is that we observe the **same unit** at **different times**,
 allowing us to see how that unit changes when circumstances change.
+
+Extending our example, suppose we observe those same three cities across three years:
+
+| City | Year | Unemployment (%) | Crime Rate |
+|------|:----:|:----------------:|:----------:|
+| Boston | 2018 | 4.8 | 298 |
+| Boston | 2019 | 5.5 | 305 |
+| Boston | 2020 | 6.2 | 312 |
+| Denver | 2018 | 4.0 | 270 |
+| Denver | 2019 | 4.5 | 278 |
+| Denver | 2020 | 5.1 | 285 |
+| Miami | 2018 | 6.5 | 390 |
+| Miami | 2019 | 7.0 | 401 |
+| Miami | 2020 | 7.8 | 410 |
+
+Now we have 9 observations: 3 cities $\times$ 3 years.
+Because we see each city multiple times,
+we can ask a different question:
+when unemployment rises *within a given city*,
+does crime in *that same city* tend to rise as well?
+This is the core idea behind fixed effects,
+which we turn to next.
 
 
 ## Why Panel Data Helps: The Intuition
@@ -264,13 +299,17 @@ where $\bar{y}_i = \frac{1}{T}\sum_{t=1}^{T} y_{it}$ is unit $i$'s average outco
 Now subtract this time-averaged equation from the original:
 
 $$
-y_{it} - \bar{y}_i = \beta_1(x_{it} - \bar{x}_i) + (\tau_t - \bar{\tau}) + (\mu_{it} - \bar{\mu}_i)
+y_{it} - \bar{y}_i = (\beta_0 - \beta_0) + \beta_1(x_{it} - \bar{x}_i) + (a_i - a_i) + (\tau_t - \bar{\tau}) + (\mu_{it} - \bar{\mu}_i)
 $$
 
-Notice what happened:
-the $a_i$ term **completely disappears**!
-Since $a_i$ is constant over time,
-$a_i - a_i = 0$.
+The intercept drops out: $\beta_0 - \beta_0 = 0$.
+More importantly, the fixed effect drops out: since $a_i$ is constant over time,
+its time average is just itself ($\bar{a}_i = a_i$), so $a_i - a_i = 0$.
+We are left with:
+
+$$
+y_{it} - \bar{y}_i = \beta_1(x_{it} - \bar{x}_i) + (\tau_t - \bar{\tau}) + (\mu_{it} - \bar{\mu}_i)
+$$
 
 We can write this more compactly as:
 
@@ -382,7 +421,7 @@ and we can see the estimated fixed effects if desired.
 #| warning: false
 
 # Create factor variable for city and dummy for 1987
-crime_data <- crime_data |> 
+crime_data <- crime_data |>
     mutate(
         city_f = factor(city_id),
         year_87 = ifelse(year == 87, 1, 0)
@@ -403,11 +442,154 @@ For instance,
 we can see which cities have unusually high or low crime rates after accounting for unemployment.
 
 
+## A Small Example: Police Spending and Property Crime
+
+Before moving on,
+let's work through a small example where we can examine every fixed effect individually.
+This will also introduce the `feols()` function from `fixest`.
+
+Suppose we observe 5 cities over 4 years and record each city's property crime rate (per 1,000 residents) and its per-capita police spending (in hundreds of dollars):
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+city_panel <- tibble(
+    city = rep(c("Austin", "Baltimore", "Denver", "Portland", "Raleigh"), each = 4),
+    year = rep(2017:2020, times = 5),
+    police_spend = c(
+        3.8, 4.0, 4.3, 4.1,   # Austin: modest increase then dip
+        6.2, 6.5, 6.4, 6.0,   # Baltimore: high but declining
+        4.5, 4.7, 5.0, 4.6,   # Denver: increase then cut
+        3.5, 3.4, 3.2, 3.0,   # Portland: steady decline
+        3.9, 4.2, 4.5, 4.3    # Raleigh: increase then dip
+    ),
+    property_crime = c(
+        35.2, 34.1, 32.8, 33.5,   # Austin
+        48.6, 47.3, 47.9, 49.2,   # Baltimore
+        38.4, 37.1, 35.6, 37.8,   # Denver
+        42.1, 43.5, 44.8, 46.2,   # Portland
+        30.1, 29.2, 27.8, 28.9    # Raleigh
+    )
+)
+
+city_panel
+```
+
+A few things to notice in the raw data.
+Baltimore spends the most on policing *and* has the highest crime rate.
+Raleigh spends relatively little *and* has the lowest crime rate.
+A naive cross-sectional comparison would suggest that more police spending is associated with *more* crime---but
+this conflates the spending effect with all the other ways these cities differ.
+Cities with high crime invest more in policing precisely *because* they have high crime,
+and those same cities may have persistent characteristics (poverty, density, drug markets)
+that keep crime elevated regardless of spending levels.
+
+### Estimating with `feols()`
+
+The `feols()` function from the `fixest` package uses a slightly different syntax than `lm()`.
+Fixed effects go after a vertical bar (`|`):
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+fe_reg <- feols(property_crime ~ police_spend | city + year, data = city_panel)
+summary(fe_reg)
+```
+
+Everything to the left of `|` is the standard regression formula.
+Everything to the right lists the fixed effects---here, city and year.
+Behind the scenes,
+`feols()` will automatically create a dummy variable for each unique value `city` and `year` will take and
+include it in the regression.
+Unlike the dummy variable approach with `lm()`,
+`feols()` does not report the individual fixed effect coefficients in the main output.
+It assumes that you are not interested in the estimate coefficients on the dummy variabes themselves,
+and so it only reports the coefficients on variables to the left of `|` (here, `police_spend`).
+ 
+
+### Extracting and Interpreting the Fixed Effects
+
+We can retrieve the estimated fixed effects using the `fixef()` function:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+fe_estimates <- fixef(fe_reg)
+fe_estimates$city
+fe_estimates$year
+```
+
+**City fixed effects.**
+Each value represents that city's baseline property crime rate,
+after accounting for police spending and year effects.
+Baltimore has the highest city fixed effect---it has a high crime rate
+for reasons unrelated to how much it spends on policing in any given year
+(persistent poverty, population density, historical disinvestment, etc.).
+Raleigh has the lowest,
+reflecting characteristics that keep its crime rate low independent of police budgets.
+
+These are the time-invariant unobservables $a_i$ from our model.
+Absorbing them prevents cross-city differences from biasing our estimate of the effect of police spending on crime.
+
+**Year fixed effects.**
+Each value captures shocks common to all cities in a given year.
+If 2020 shows a positive year effect,
+that would reflect a nationwide increase in property crime that affected all five cities---something
+we want to account for so it doesn't get attributed to changes in police spending that happened to occur at the same time.
+
+In practice,
+we rarely interpret the individual fixed effect estimates.
+With 5 cities we can read through each one,
+but a typical application has hundreds or thousands of units,
+and reporting each one would be unwieldy and beside the point.
+The fixed effects are there to absorb unobserved heterogeneity so that our estimate of $\beta_1$ is not biased---they are not themselves the object of interest.
+This is why `feols()` omits them from the default output
+and why regression tables in published papers just note "City FE: Yes" and "Year FE: Yes"
+rather than reporting every coefficient.
+The `fixef()` function is available for diagnostics
+or the occasional case where the unit-level intercepts matter,
+but most of the time your attention should be on the treatment variable.
+
+**Why is there no intercept?**
+You may have noticed that the `feols()` output includes no intercept term,
+and that there is a separate dummy variable (fixed effect) for *every* city and *every* year---not
+$N - 1$ or $T - 1$ dummies as you might expect from a standard regression with categorical variables.
+This is a deliberate modeling choice.
+In a typical OLS regression with a factor variable,
+we include an intercept and omit one category as the reference group.
+The intercept captures the baseline level for the omitted category,
+and each dummy coefficient is interpreted *relative* to that baseline.
+
+`feols()` takes a different approach:
+it drops the intercept entirely and instead estimates a fixed effect for every group.
+Each fixed effect is then interpretable as the baseline level for that specific unit or time period,
+not as a deviation from some arbitrarily chosen reference category.
+When we looked at the city fixed effects above,
+Baltimore's value was Baltimore's baseline crime rate---not
+"how much higher Baltimore is than Austin" or whichever city happens to come first alphabetically.
+This makes the individual fixed effects more intuitive to read,
+because their interpretation does not depend on which category was omitted.
+
+Mathematically the two approaches are equivalent.
+Including an intercept with $N - 1$ dummies spans the same column space as including $N$ dummies with no intercept;
+they produce identical fitted values, residuals, and coefficient estimates for the treatment variable.
+The only difference is how the fixed effects themselves are parameterized.
+Since we almost never interpret the individual fixed effects anyway,
+this distinction rarely matters for applied work---but
+it explains why your output looks the way it does.
+
+
 ## What Fixed Effects Control For (and What They Don't)
 
-Fixed effects are powerful,
-but they're not magic.
-It's crucial to understand exactly what they do and don't control for.
+Fixed effects are useful,
+but they are not a cure-all.
+It is worth being precise about what they do and do not control for.
 
 ### What Unit Fixed Effects Control For
 
@@ -464,10 +646,68 @@ $$
 
 where $z_{it}$ is a control variable that changes over time within units.
 
-This helps address the remaining source of potential bias:
-unit-specific, time-varying confounders.
-Of course,
-we can only control for variables we observe and measure.
+This addresses unit-specific, time-varying confounders---the
+one source of bias that fixed effects alone cannot eliminate.
+We can only control for variables we observe and measure,
+but adding them narrows the remaining scope for omitted variable bias.
+
+Returning to our city crime panel,
+our earlier model estimated the effect of police spending on property crime with city and year fixed effects.
+But local economic conditions are a plausible time-varying confounder:
+when a city's economy weakens,
+property crime may rise *and* the city may cut police budgets due to falling tax revenue.
+If we don't account for this,
+the estimated effect of police spending could be biased.
+
+We can add the unemployment rate as a control variable.
+In `feols()`,
+time-varying controls go on the left side of the `|`,
+just like in a standard regression formula:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# Add unemployment as a time-varying control
+city_panel <- city_panel |>
+    mutate(
+        unem_rate = c(
+            3.1, 2.8, 2.9, 5.0,   # Austin
+            5.8, 5.5, 5.3, 7.6,   # Baltimore
+            3.0, 2.7, 2.8, 5.4,   # Denver
+            3.8, 3.6, 3.9, 6.2,   # Portland
+            3.4, 3.1, 3.0, 5.1    # Raleigh
+        )
+    )
+
+# Without the control
+fe_no_control <- feols(property_crime ~ police_spend | city + year,
+                       data = city_panel)
+
+# With the control
+fe_with_control <- feols(property_crime ~ police_spend + unem_rate | city + year,
+                         data = city_panel)
+
+modelsummary(list("No Control" = fe_no_control,
+                  "With Unemployment" = fe_with_control),
+             gof_map = c("adj.r.squared"),
+             add_rows = tribble(
+                 ~term, ~`No Control`, ~`With Unemployment`,
+                 "City FE", "Yes", "Yes",
+                 "Year FE", "Yes", "Yes"
+             ))
+```
+
+Adding a control is no different from a standard regression---just include it on the left side of `|`.
+The fixed effects on the right side still absorb time-invariant city characteristics and common year shocks.
+The unemployment rate, because it varies across cities *and* over time,
+cannot be absorbed by fixed effects and must be included explicitly.
+
+One restriction worth noting:
+we *cannot* include time-invariant variables (like a city's region or founding year) as controls in a fixed effects model.
+Those are perfectly collinear with the city fixed effects---the fixed effects already capture them.
+Only variables that change within a unit over time belong on the left side of `|`.
 
 
 ## Practical Considerations

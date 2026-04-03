@@ -8,6 +8,7 @@
 
 library(tidyverse)
 library(wooldridge)
+library(fixest)
 library(modelsummary)
 
 options(scipen = 999)
@@ -238,7 +239,7 @@ $$
 
 where `kidslt6` is the number of children under age 6,
 `kidsge6` is the number of children aged 6--18,
-`nwifeinc` is the wife's non-labor income (in thousands of dollars),
+`nwifeinc` is non-wife income, i.e., the husband's income (in thousands of dollars),
 and `motheduc` is the mother's years of education.
 
 Before estimating the model,
@@ -296,10 +297,10 @@ This makes intuitive sense:
 school-age children require less constant supervision than young children,
 so they impose fewer constraints on a mother's ability to work outside the home.
 
-The coefficient on `nwifeinc` ($\hat{\beta}_3 \approx -0.005$) indicates that higher non-labor income is associated with a slightly lower probability of working.
-Each additional thousand dollars of non-labor income reduces the probability by about half a percentage point.
+The coefficient on `nwifeinc` ($\hat{\beta}_3 \approx -0.005$) indicates that higher husband's income is associated with a slightly lower probability of working.
+Each additional thousand dollars of husband's income reduces the probability by about half a percentage point.
 This is consistent with basic labor supply theory:
-when a household has more non-labor income (e.g., from a higher-earning husband),
+when the husband earns more,
 the wife has less financial pressure to enter the labor force.
 
 The coefficient on `motheduc` ($\hat{\beta}_4 \approx 0.02$) suggests that women whose mothers had more education are slightly more likely to participate in the labor force.
@@ -324,9 +325,9 @@ so for extreme enough values of $x$,
 the predicted value will inevitably cross the 0 or 1 boundary.
 
 Let's see this concretely.
-Consider a woman with 2 children under 6,
+Consider a woman with 3 children under 6,
 0 older children,
-non-labor income of $30{,}000$,
+husband's income of $50{,}000$,
 and a mother with 9 years of education.
 Using our estimates,
 her predicted probability of being in the labor force is:
@@ -338,7 +339,7 @@ her predicted probability of being in the labor force is:
 
 # Predicted probability for a specific woman
 example_pred <- predict(reg, newdata = data.frame(
-    kidslt6 = 2, kidsge6 = 0, nwifeinc = 30, motheduc = 9
+    kidslt6 = 3, kidsge6 = 0, nwifeinc = 50, motheduc = 9
 ))
 cat("Predicted probability:", round(example_pred, 4), "\n")
 ```
@@ -448,6 +449,56 @@ ggplot(data.frame(p = p_seq, variance = var_seq), aes(x = p, y = variance)) +
     theme(plot.title = element_text(hjust = 0.5))
 ```
 
+We can see this visually using a simple simulation.
+@fig-heterosk-scatter plots binary outcomes against a single explanatory variable $x$,
+with the LPM fitted line overlaid and vertical segments showing each residual.
+Focus on the **left side** of the plot, where $\hat{p}$ is near 0:
+almost everyone has $y = 0$, so the residuals are short.
+Now look at the **middle**, where $\hat{p}$ is near 0.5:
+the outcomes are a roughly even mix of 0s and 1s,
+so the residuals are long in both directions.
+This changing spread is heteroskedasticity---and it is inherent to binary data.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-heterosk-scatter
+#| fig-cap: "Simulated binary outcomes plotted against x, with the LPM line and residual segments. On the left (low predicted probability), nearly all outcomes are 0 and residuals are small. In the middle (predicted probability near 0.5), outcomes are a mix of 0s and 1s and residuals are large. This fanning pattern is heteroskedasticity."
+
+set.seed(42)
+n_sim <- 200
+x_sim <- runif(n_sim, -3, 3)
+p_true <- plogis(-1 + 1.5 * x_sim)
+y_sim <- rbinom(n_sim, 1, p_true)
+
+sim_data <- data.frame(x = x_sim, y = y_sim)
+lpm_sim <- lm(y ~ x, data = sim_data)
+sim_data$fitted <- fitted(lpm_sim)
+
+ggplot(sim_data, aes(x = x, y = y)) +
+    geom_segment(aes(xend = x, yend = fitted),
+                 color = "gray60", alpha = 0.5) +
+    geom_point(aes(color = factor(y)), alpha = 0.7, size = 2) +
+    geom_smooth(method = "lm", se = FALSE,
+                color = "#D55E00", linewidth = 1, linetype = "dashed") +
+    scale_color_manual(values = c("0" = "#0072B2", "1" = "#E69F00"),
+                       labels = c("y = 0", "y = 1"),
+                       name = NULL) +
+    annotate("label", x = -2, y = 0.6, size = 3.5, fill = "white",
+             label = "Low p̂ → small residuals") +
+    annotate("label", x = 0.5, y = -0.15, size = 3.5, fill = "white",
+             label = "p̂ ≈ 0.5 → large residuals") +
+    annotate("label", x = 2, y = 0.4, size = 3.5, fill = "white",
+             label = "High p̂ → small residuals") +
+    labs(x = "x",
+         y = "Outcome (0 or 1)",
+         title = "Heteroskedasticity in Binary Outcomes") +
+    theme_minimal() +
+    theme(plot.title = element_text(hjust = 0.5),
+          legend.position = "bottom")
+```
+
 Because of this built-in heteroskedasticity,
 the OLS estimator in the LPM is **not BLUE**---it is unbiased,
 but not the most efficient linear estimator.
@@ -539,6 +590,13 @@ $G(z)$ is **strictly** between 0 and 1 for all values of $z$---so the logit mode
 Notice also that the logistic function is **nearly linear in the middle** of its range (roughly between $z = -2$ and $z = 2$) but curves toward the boundaries at the extremes.
 This will be important later when we compare the LPM and logit results.
 
+There is an important consequence of wrapping the linear index inside $G(\cdot)$: the model is now **nonlinear in the parameters** $\beta$.
+In the LPM, we had $P(y = 1 | \mathbf{x}) = \beta_0 + \beta_1 x_1 + \cdots + \beta_k x_k$, which is a linear function of the $\beta$'s---exactly the kind of equation OLS is designed to estimate.
+In the logit model, we have $P(y = 1 | \mathbf{x}) = G(\beta_0 + \beta_1 x_1 + \cdots + \beta_k x_k)$, where $G(\cdot)$ is the nonlinear logistic function.
+Because $G(\cdot)$ is nonlinear, there is no way to rearrange this equation into the $y = X\beta + \mu$ form that OLS requires.
+Instead, logistic regression is estimated by **maximum likelihood estimation** (MLE), which finds the values of $\beta$ that make the observed data most probable under the model.
+We won't go into the details of MLE in this course, but the key point is that we need a fundamentally different estimation technique because the nonlinearity of $G(\cdot)$ takes us outside the world where OLS applies.
+
 ### Comparing the LPM and Logit Visually
 
 To build intuition for why the logistic function matters,
@@ -556,7 +614,7 @@ This is the clearest way to see the difference between the two approaches:
 
 # Estimate the logit model here so it's available for the figure
 # (it will also be shown to students in the "Estimating Logistic Regression in R" section)
-logit_reg <- glm(inlf ~ kidslt6 + kidsge6 + nwifeinc + motheduc,
+logit_reg <- feglm(inlf ~ kidslt6 + kidsge6 + nwifeinc + motheduc,
     family = binomial(link = "logit"),
     data = lf_data)
 
@@ -649,9 +707,48 @@ The process works iteratively:
 4. Adjust the $\beta$s to increase the likelihood.
 5. Repeat until the likelihood can't be improved further.
 
-The details of how MLE works are beyond the scope of this course,
-but it is useful to know what is happening under the hood.
-The key takeaway is that MLE finds the coefficients that make the observed data most likely,
+Consider a tiny example with just four observations,
+where $y_i = 1$ means "in the labor force" and the only explanatory variable is whether the person has young children ($x_i$):
+
+| Person | $x_i$ (kids < 6) | $y_i$ (in LF?) |
+|--------|:-:|:-:|
+| 1 | 0 | 1 |
+| 2 | 0 | 1 |
+| 3 | 1 | 0 |
+| 4 | 1 | 1 |
+
+We want to estimate $P(y_i = 1) = G(\beta_0 + \beta_1 x_i)$,
+where $G(z) = \frac{\exp(z)}{1 + \exp(z)}$ is the logistic function.
+Suppose we start with $\beta_0 = 0$ and $\beta_1 = 0$.
+Then every person gets $\hat{p}_i = G(0 + 0 \cdot x_i) = G(0) = \frac{\exp(0)}{1 + \exp(0)} = \frac{1}{2} = 0.5$.
+For each observation,
+the likelihood contribution is $\hat{p}_i$ if $y_i = 1$ and $(1 - \hat{p}_i)$ if $y_i = 0$,
+so the total likelihood is:
+
+$$L = (0.5)(0.5)(0.5)(0.5) = 0.0625$$
+
+Not great---there's only a 6.25% chance we'd observe exactly this data if the model were correct.
+
+Now try $\beta_0 = 1$ and $\beta_1 = -1$.
+For persons 1 and 2 ($x_i = 0$):
+
+$$\hat{p} = G(1 + (-1)(0)) = G(1) = \frac{\exp(1)}{1 + \exp(1)} = \frac{2.718}{3.718} \approx 0.731$$
+
+For persons 3 and 4 ($x_i = 1$):
+
+$$\hat{p} = G(1 + (-1)(1)) = G(0) = \frac{\exp(0)}{1 + \exp(0)} = \frac{1}{2} = 0.5$$
+
+The likelihood becomes:
+
+$$L = (0.731)(0.731)(0.5)(0.5) \approx 0.134$$
+
+This is more than double the previous likelihood.
+The second set of coefficients fits better because it assigns higher predicted probabilities to the two people without young children who *are* in the labor force.
+In practice, MLE uses calculus-based optimization to find the $\beta$ values that maximize the likelihood.
+
+The full details of the optimization are beyond the scope of this course,
+but it is worth understanding the basic logic.
+MLE finds the coefficients that make the observed data most likely,
 rather than minimizing the sum of squared residuals like OLS does.
 
 ::: {.callout-note}
@@ -668,24 +765,28 @@ MLE is the appropriate method because the errors are not normal.
 ## Estimating Logistic Regression in R
 
 Estimating logistic regression in R is straightforward.
-We use `glm()` (generalized linear model) instead of `lm()`,
-and specify `family = binomial(link = "logit")`:
+Just as we switched from `lm()` to `feols()` for linear regression,
+we can use `feglm()` from the `fixest` package for logistic regression.
+We specify `family = binomial(link = "logit")` to tell R we want a logit model:
 
 ```{r}
 #| echo: true
 #| message: false
 #| warning: false
 
-logit_reg <- glm(inlf ~ kidslt6 + kidsge6 + nwifeinc + motheduc,
+logit_reg <- feglm(inlf ~ kidslt6 + kidsge6 + nwifeinc + motheduc,
     family = binomial(link = "logit"),
     data = lf_data)
 
 summary(logit_reg)
 ```
 
+This works just like `feols()` but estimates the model via maximum likelihood instead of OLS.
+You could also use base R's `glm()` function, which takes the same `family` argument---`feglm()` just keeps us within the `fixest` ecosystem so we get the same convenient syntax for robust standard errors, fixed effects, and `modelsummary()` output.
+
 Notice that the signs of the coefficients match the LPM:
 more young children reduce the probability of labor force participation,
-higher non-labor income reduces it,
+higher husband's income reduces it,
 and more maternal education increases it.
 But the magnitudes look very different---the logit coefficients are not directly comparable to the LPM coefficients.
 We will discuss interpretation in detail below.
@@ -825,11 +926,14 @@ This quantity $\exp(\beta_j)$ is called the **odds ratio**.
 #| label: fig-odds-ratios
 #| fig-cap: "Odds ratios from the logistic regression. Values below 1 (to the left of the dashed line) decrease the odds of labor force participation; values above 1 increase them."
 
+logit_coefs <- coef(logit_reg)[-1]
+logit_ses <- se(logit_reg)[-1]
+
 or_data <- data.frame(
     variable = c("Kids < 6", "Kids 6-18", "Non-wife Income", "Mother's Educ"),
-    odds_ratio = exp(coef(logit_reg)[-1]),
-    lower = exp(confint.default(logit_reg)[-1, 1]),
-    upper = exp(confint.default(logit_reg)[-1, 2])
+    odds_ratio = exp(logit_coefs),
+    lower = exp(logit_coefs - 1.96 * logit_ses),
+    upper = exp(logit_coefs + 1.96 * logit_ses)
 )
 
 ggplot(or_data, aes(x = odds_ratio, y = reorder(variable, odds_ratio))) +
@@ -983,11 +1087,11 @@ Now let's estimate both an LPM and a logit model:
 #| label: tbl-bwght-models
 #| tbl-cap: "LPM and Logit estimates for the probability of low birthweight."
 
-lpm_bw <- lm(low_bwght ~ cigs + faminc + motheduc + male, data = bw_data)
+lpm_bw <- feols(low_bwght ~ cigs + faminc + motheduc + male, data = bw_data)
 
-logit_bw <- glm(low_bwght ~ cigs + faminc + motheduc + male,
-                family = binomial(link = "logit"),
-                data = bw_data)
+logit_bw <- feglm(low_bwght ~ cigs + faminc + motheduc + male,
+                  family = binomial(link = "logit"),
+                  data = bw_data)
 
 models_bw <- list("LPM" = lpm_bw, "Logit" = logit_bw)
 modelsummary(models_bw,

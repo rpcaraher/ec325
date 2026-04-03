@@ -682,6 +682,222 @@ A helpful way to remember: `pivot_longer()` makes your data *longer* (more rows,
 :::
 
 
+## Merging Data with Joins
+
+In applied economics,
+the data you need for an analysis rarely comes in a single file.
+You might have county-level health outcomes in one dataset
+and county-level demographic characteristics in another,
+or state policy variables in one file and state economic indicators in a second.
+To bring these together for regression analysis,
+you need to **merge** (or **join**) the datasets.
+
+The `tidyverse` provides a family of `_join()` functions that merge two data frames based on one or more shared key variables.
+The key variable is simply a column that appears in both datasets and identifies which rows should be matched---a
+county FIPS code, a state abbreviation, a year, or some combination of these.
+
+### A Simple Example
+
+Suppose you have two small datasets about states.
+One contains population data and the other contains policy information:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+library(tidyverse)
+
+# Population data
+pop_data <- tibble(
+    state = c("NC", "VA", "SC", "GA"),
+    population = c(10.7, 8.6, 5.2, 10.9)
+)
+
+# Policy data
+policy_data <- tibble(
+    state = c("NC", "VA", "SC", "TN"),
+    medicaid_expanded = c(TRUE, TRUE, FALSE, TRUE)
+)
+
+pop_data
+policy_data
+```
+
+Notice that the two datasets overlap but are not identical:
+both contain NC, VA, and SC,
+but `pop_data` has GA while `policy_data` has TN.
+How the join handles these non-overlapping rows is what distinguishes the different join types.
+
+### `left_join()`
+
+A **left join** keeps all rows from the first (left) dataset
+and adds matching columns from the second (right) dataset.
+Rows in the left dataset that have no match in the right dataset get `NA` for the new columns:
+
+```{r}
+#| echo: true
+
+left_join(pop_data, policy_data, by = "state")
+```
+
+All four states from `pop_data` are retained.
+GA has no match in `policy_data`, so its `medicaid_expanded` value is `NA`.
+TN, which appears only in `policy_data`, is dropped because it is not in the left dataset.
+
+This is the most commonly used join in applied work.
+When you have a "main" analysis dataset and want to add variables from a supplementary source,
+`left_join()` ensures you don't lose any of your primary observations.
+
+### `right_join()`
+
+A **right join** is the mirror image:
+it keeps all rows from the second (right) dataset and fills in `NA` where the left dataset has no match:
+
+```{r}
+#| echo: true
+
+right_join(pop_data, policy_data, by = "state")
+```
+
+Now TN is retained (with `NA` for `population`) and GA is dropped.
+In practice, `right_join()` is less common because you can always achieve the same result by switching the order of the datasets in a `left_join()`.
+
+### `inner_join()`
+
+An **inner join** keeps only rows that have a match in *both* datasets:
+
+```{r}
+#| echo: true
+
+inner_join(pop_data, policy_data, by = "state")
+```
+
+Only NC, VA, and SC appear---they are the states present in both datasets.
+GA and TN are both dropped.
+
+Use `inner_join()` when you only want observations for which you have complete data from both sources.
+The downside is that you may silently lose observations,
+so always check how many rows you started with and how many the join returns.
+
+### `full_join()`
+
+A **full join** keeps all rows from both datasets,
+filling in `NA` wherever a match is missing:
+
+```{r}
+#| echo: true
+
+full_join(pop_data, policy_data, by = "state")
+```
+
+All five states appear.
+GA has `NA` for `medicaid_expanded` and TN has `NA` for `population`.
+This is useful when you want to see the complete universe of observations across both sources
+and deal with missing values later.
+
+### Joining on Multiple Key Variables
+
+Many economics datasets require matching on more than one variable.
+Panel data, for instance, typically needs to be joined on both a unit identifier and a time variable.
+You can pass a vector of column names to the `by` argument:
+
+```{r}
+#| echo: true
+
+# State-year economic data
+econ_data <- tibble(
+    state = c("NC", "NC", "VA", "VA"),
+    year  = c(2020, 2021, 2020, 2021),
+    unem_rate = c(6.8, 4.1, 6.2, 3.8)
+)
+
+# State-year health data
+health_data <- tibble(
+    state = c("NC", "NC", "VA", "VA"),
+    year  = c(2020, 2021, 2020, 2021),
+    infant_mort = c(7.1, 6.9, 5.8, 5.6)
+)
+
+left_join(econ_data, health_data, by = c("state", "year"))
+```
+
+Each row is matched on the combination of `state` *and* `year`,
+so North Carolina in 2020 gets paired with the correct infant mortality rate for that state and year.
+If you only joined on `state`, each NC row would match both NC-2020 and NC-2021 from the other dataset,
+creating duplicate rows---a common mistake that inflates your sample size and produces incorrect results.
+
+### Joining When Key Variables Have Different Names
+
+Sometimes the key variable is named differently in the two datasets.
+Rather than renaming a column before the merge,
+you can specify the mapping directly:
+
+```{r}
+#| echo: true
+
+# This dataset uses "st" instead of "state"
+policy_data_alt <- tibble(
+    st = c("NC", "VA", "SC", "TN"),
+    medicaid_expanded = c(TRUE, TRUE, FALSE, TRUE)
+)
+
+left_join(pop_data, policy_data_alt, by = c("state" = "st"))
+```
+
+The `by = c("state" = "st")` syntax tells R to match `state` in the left dataset to `st` in the right dataset.
+The output keeps the column name from the left dataset.
+
+### Diagnosing Join Problems
+
+Merges can go wrong in ways that are easy to miss if you don't check.
+Here are two things to watch for after every join:
+
+**Check the row count.**
+If your merged dataset has more rows than your original dataset,
+you likely have duplicate keys in the right-hand dataset---meaning
+one row in your main data matched multiple rows in the supplementary data.
+This is the most common join mistake in applied work:
+
+```{r}
+#| echo: true
+
+# Accidental duplicates in the lookup table
+bad_lookup <- tibble(
+    state = c("NC", "NC", "VA", "SC"),
+    region = c("South", "Southeast", "South", "South")
+)
+
+# This produces MORE rows than we started with
+result <- left_join(pop_data, bad_lookup, by = "state")
+result
+nrow(pop_data)
+nrow(result)
+```
+
+NC appeared twice in `bad_lookup`, so the join created two rows for NC.
+If this goes unnoticed, every subsequent analysis is wrong.
+Always compare `nrow()` before and after a join.
+
+**Check for unexpected `NA` values.**
+After a `left_join()`, scan the new columns for `NA` values.
+A handful of missing values might be expected (not every observation will have a match),
+but a large number suggests a problem with the key variable---perhaps
+different formatting, spelling differences, or leading zeros in FIPS codes that were stripped when the data was read in.
+
+::: {.callout-tip}
+## Join Quick Reference
+
+| Function | Keeps |
+|----------|-------|
+| `left_join(x, y)` | All rows from `x`, matching rows from `y` |
+| `right_join(x, y)` | All rows from `y`, matching rows from `x` |
+| `inner_join(x, y)` | Only rows with matches in both |
+| `full_join(x, y)` | All rows from both |
+: Join functions and what they retain {#tbl-join-functions}
+:::
+
+
 ## Exporting Data
 
 After cleaning, reshaping, or creating a new dataset,
@@ -779,6 +995,8 @@ This appendix covered the essential workflow for getting data into and out of R 
 - **Know wide vs. long:** Wide data has one row per unit with separate columns for time periods; long data has one row per unit-time observation. Most R analysis functions expect long data.
 
 - **Reshape with pivot functions:** Use `pivot_longer()` to go from wide to long and `pivot_wider()` to go from long to wide. The key arguments are `cols`, `names_to`/`names_from`, and `values_to`/`values_from`.
+
+- **Merge with joins:** Use `left_join()` to add variables from a supplementary dataset while keeping all rows in your main data. Always join on the correct key variables (including both unit and time identifiers for panel data), and check your row count before and after to catch duplicate-key problems.
 
 - **Export in the right format:** Use `write_csv()` for universal compatibility, `write_rds()` for R-only workflows, and format-specific functions like `write_dta()` when sharing with colleagues who use other software.
 
