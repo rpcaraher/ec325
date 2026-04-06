@@ -1,0 +1,872 @@
+---
+title: "Binary Outcomes"
+subtitle: "EC 325: Econometrics"
+author: "Prof. Caraher"
+institute: "Colby College"
+date: today
+format:
+  revealjs:
+    theme: colby-theme.scss
+    slide-number: true
+    incremental: true
+    embed-resources: true
+    fig-align: center
+    code-overflow: wrap
+    footer: "EC325 | Unit 10 | Binary Outcomes"
+    scrollable: true
+execute:
+  echo: false
+  message: false
+  warning: false
+  cache: true
+---
+
+```{r}
+#| label: setup
+
+library(tidyverse)
+library(wooldridge)
+library(fixest)
+library(modelsummary)
+library(patchwork)
+
+options(scipen = 999)
+
+theme_set(theme_minimal(base_size = 16) +
+          theme(plot.title = element_text(face = "bold", size = 18),
+                plot.subtitle = element_text(size = 13, color = "gray40"),
+                panel.grid.minor = element_blank()))
+```
+
+
+## Where We Are
+
+- We've been building a regression toolkit all semester
+- Started with bivariate OLS, added multiple regression, statistical inference
+- Incorporated **qualitative information on the right-hand side**: dummy variables for categories, interaction effects for differential slopes
+- Made our models more flexible: polynomials, logs, robust SEs
+
+. . .
+
+Today: what happens when the **left-hand side** --- the dependent variable --- is qualitative?
+
+
+## Binary Outcomes Are Everywhere
+
+| Field | Outcome | $y = 1$ | $y = 0$ |
+|:------|:--------|:--------|:--------|
+| Labor | Employed? | Working | Not working |
+| Health | Low birthweight? | < 2,500g | $\geq$ 2,500g |
+| Education | Graduated? | Yes | No |
+| Finance | Defaulted? | Yes | No |
+| Policy | Enrolled in program? | Yes | No |
+
+. . .
+
+These are all **binary** (or **dummy**) dependent variables: $y$ can only be 0 or 1.
+
+
+## The Key Insight (1/2)
+
+When $y$ is 0 or 1, what does $E(y \mid \mathbf{x})$ mean?
+
+. . .
+
+Recall the formula for expected value. When $y$ takes only two values:
+
+$$E(y \mid \mathbf{x}) = \sum_{\text{all values}} [\text{value} \times P(\text{value})]$$
+
+. . .
+
+$$= 1 \times P(y = 1 \mid \mathbf{x}) \;+\; 0 \times P(y = 0 \mid \mathbf{x})$$
+
+. . .
+
+$$= P(y = 1 \mid \mathbf{x})$$
+
+
+## The Key Insight (2/2)
+
+So we have:
+
+$$E(y \mid \mathbf{x}) = P(y = 1 \mid \mathbf{x})$$
+
+. . .
+
+Why does this matter? Recall that OLS estimates the conditional expectation $E(y \mid \mathbf{x})$.
+
+. . .
+
+So when $y$ is binary, OLS is estimating a **probability**.
+
+. . .
+
+::: {.highlight-box}
+With a binary dependent variable, $\hat{y}$ is the **predicted probability** that $y = 1$, given the values of $\mathbf{x}$.
+:::
+
+
+## The Linear Probability Model
+
+Just run OLS with a binary $y$:
+
+$$y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots + \beta_k x_k + \mu$$
+
+. . .
+
+This is called the **linear probability model** (LPM).
+
+. . .
+
+Since $\hat{y} = \hat{P}(y = 1 \mid \mathbf{x})$, the coefficients have a special interpretation:
+
+::: {.highlight-box}
+$\hat{\beta}_j$ = the change in the **probability** of $y = 1$ for a one-unit increase in $x_j$, holding all else constant.
+:::
+
+
+## Interpretation: Percentage Points!
+
+::: {.callout-warning}
+## Be Careful with Language
+If $\hat{\beta}_1 = -0.15$, we say:
+
+"A one-unit increase in $x_1$ **decreases the probability** of $y = 1$ by **15 percentage points**."
+
+**Not** "15 percent"! Percentage points and percent are different things.
+:::
+
+. . .
+
+- Suppose $P(y = 1) = 0.60$ and $\hat{\beta}_1 = -0.15$:
+  - New probability: $0.60 - 0.15 = 0.45$
+  - That's a 15 **percentage point** decrease
+  - But it's a 25 **percent** decrease (since $0.15 / 0.60 = 0.25$)
+
+
+## Example: Women's Labor Force Participation
+
+```{r}
+#| label: data-setup
+
+lf_data <- wooldridge::mroz
+```
+
+The `mroz` dataset from `wooldridge`: **753 married women** in 1975.
+
+- `inlf` = 1 if in the labor force, 0 otherwise
+- `kidslt6` = number of children under age 6
+- `kidsge6` = number of children aged 6--18
+- `nwifeinc` = husband's income (thousands of \$)
+- `educ` = woman's years of education
+
+. . .
+
+**Question:** what factors affect whether a married woman participates in the labor force?
+
+
+## The Raw Data
+
+```{r}
+#| label: fig-inlf-bar
+#| fig-width: 7
+#| fig-height: 4
+
+ggplot(lf_data, aes(x = factor(inlf), fill = factor(inlf))) +
+    geom_bar(width = 0.5) +
+    geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.5, size = 5) +
+    scale_fill_manual(values = c("0" = "#D55E00", "1" = "steelblue")) +
+    scale_x_discrete(labels = c("0" = "Not in LF (y = 0)", "1" = "In LF (y = 1)")) +
+    labs(x = NULL, y = "Count",
+         title = "Labor Force Participation Among Married Women") +
+    theme(legend.position = "none")
+```
+
+About 57% of women in the sample are in the labor force. Unlike continuous outcomes, there are no in-between values.
+
+
+## Raw Relationship: Young Children and LFP
+
+```{r}
+#| label: fig-kids-lfp
+#| fig-width: 8
+#| fig-height: 3.5
+
+lf_data |>
+    group_by(kidslt6) |>
+    summarise(pct_inlf = mean(inlf), n = n()) |>
+    ggplot(aes(x = factor(kidslt6), y = pct_inlf)) +
+    geom_col(fill = "steelblue", width = 0.5) +
+    geom_text(aes(label = paste0(round(pct_inlf * 100, 1), "%\n(n=", n, ")")),
+              vjust = -0.3, size = 4) +
+    scale_y_continuous(labels = scales::percent_format(), limits = c(0, 0.8)) +
+    labs(x = "Number of Children Under Age 6",
+         y = "Share in Labor Force",
+         title = "Labor Force Participation by Number of Young Children") +
+    theme(plot.title = element_text(hjust = 0.5))
+```
+
+Clear pattern: more young children $\rightarrow$ lower LFP. Let's see what the LPM tells us.
+
+
+## Estimating the LPM
+
+```{r}
+#| echo: true
+
+reg_lpm <- lm(inlf ~ kidslt6 + kidsge6 + nwifeinc + educ,
+              data = lf_data)
+summary(reg_lpm)
+```
+
+
+## Interpreting the Coefficients {.smaller}
+
+::: {.columns}
+::: {.column width="50%"}
+### `kidslt6`: $\hat{\beta}_1 \approx -0.19$
+
+Each additional child under 6 **decreases** the probability of working by about 19 percentage points.
+
+### `educ`: $\hat{\beta}_4 \approx 0.04$
+
+Each additional year of education **increases** the probability of working by about 4 percentage points.
+:::
+
+::: {.column width="50%"}
+### `kidsge6`: $\hat{\beta}_2 \approx 0.02$
+
+Older children have little effect --- small and not significant.
+
+### `nwifeinc`: $\hat{\beta}_3 \approx -0.005$
+
+Each additional \$1,000 of husband's income reduces probability by about 0.5 pp.
+:::
+:::
+
+
+## Two Problems with the LPM
+
+The LPM is simple and intuitive, but it has two important drawbacks:
+
+. . .
+
+1. **Built-in heteroskedasticity**: when $y$ is binary, the error variance *always* depends on $\mathbf{x}$, violating Gauss-Markov assumption 5. (We already know how to fix this!)
+
+. . .
+
+2. **Out-of-bounds predictions**: the LPM is a straight line, so it can produce predicted probabilities **less than 0** or **greater than 1** --- which are impossible.
+
+. . .
+
+Let's look at each one.
+
+
+## Problem 1: Built-In Heteroskedasticity {.smaller}
+
+When $y$ is binary, the error $\mu = y - E(y \mid \mathbf{x})$ can only take **two possible values** for a given $\mathbf{x}$:
+
+. . .
+
+- If $y = 1$: $\;\mu = 1 - p(\mathbf{x})$, which happens with probability $p(\mathbf{x})$
+- If $y = 0$: $\;\mu = 0 - p(\mathbf{x}) = -p(\mathbf{x})$, which happens with probability $1 - p(\mathbf{x})$
+
+. . .
+
+where $p(\mathbf{x}) = E(y \mid \mathbf{x})$ is the predicted probability.
+
+. . .
+
+The variance of this error is:
+
+$$\text{Var}(\mu \mid \mathbf{x}) = p(\mathbf{x})\big[1 - p(\mathbf{x})\big]^2 + \big[1 - p(\mathbf{x})\big]\big[p(\mathbf{x})\big]^2 = p(\mathbf{x})\big(1 - p(\mathbf{x})\big)$$
+
+. . .
+
+This depends on $p(\mathbf{x})$, which depends on $\mathbf{x}$. **The error variance changes with $\mathbf{x}$** --- that's heteroskedasticity, by definition!
+
+
+## Visualizing LPM Heteroskedasticity
+
+```{r}
+#| label: fig-het-residuals
+#| fig-width: 9
+#| fig-height: 4
+
+set.seed(42)
+n_sim <- 200
+x_sim <- runif(n_sim, -3, 3)
+p_true <- plogis(-1 + 1.5 * x_sim)
+y_sim <- rbinom(n_sim, 1, p_true)
+sim_df <- tibble(x = x_sim, y = y_sim)
+lpm_sim <- lm(y ~ x, data = sim_df)
+sim_df$fitted <- fitted(lpm_sim)
+
+ggplot(sim_df, aes(x = x, y = y)) +
+    geom_segment(aes(xend = x, yend = fitted), color = "gray60", alpha = 0.4) +
+    geom_point(aes(color = factor(y)), alpha = 0.7, size = 2) +
+    geom_smooth(method = "lm", se = FALSE, color = "darkred", linewidth = 1, linetype = "dashed") +
+    scale_color_manual(values = c("0" = "steelblue", "1" = "#D55E00"),
+                       labels = c("y = 0", "y = 1"), name = NULL) +
+    annotate("label", x = -2.2, y = 0.6, size = 3.5, fill = "white", label = "Low p̂ → small residuals") +
+    annotate("label", x = 0.8, y = -0.18, size = 3.5, fill = "white", label = "p̂ ≈ 0.5 → large residuals") +
+    annotate("label", x = 2.5, y = 0.4, size = 3.5, fill = "white", label = "High p̂ → small residuals") +
+    labs(x = "x", y = "y (0 or 1)",
+         title = "Residuals Fan Out in the Middle",
+         subtitle = "Residual spread is largest where p̂ ≈ 0.5 and smallest near 0 or 1") +
+    theme(legend.position = "bottom")
+```
+
+
+## The Fix: Robust Standard Errors
+
+We already know how to handle this from our heteroskedasticity unit!
+
+. . .
+
+Just use `feols()` with `vcov = "HC1"`:
+
+```{r}
+#| echo: true
+
+# Standard OLS SEs (wrong under heteroskedasticity)
+lpm_default <- feols(inlf ~ kidslt6 + kidsge6 + nwifeinc + educ,
+                     data = lf_data)
+
+# Robust SEs (correct)
+lpm_robust <- feols(inlf ~ kidslt6 + kidsge6 + nwifeinc + educ,
+                    vcov = "HC1", data = lf_data)
+```
+
+## The LPM in Practice
+
+```{r}
+#| label: fig-het-variance
+#| fig-width: 7
+#| fig-height: 4
+
+p_seq <- seq(0.01, 0.99, by = 0.01)
+ggplot(tibble(p = p_seq, v = p_seq * (1 - p_seq)), aes(x = p, y = v)) +
+    geom_line(color = "steelblue", linewidth = 1.2) +
+    geom_point(data = tibble(p = 0.5, v = 0.25), size = 3, color = "#D55E00") +
+    annotate("text", x = 0.58, y = 0.255, label = "Max at p = 0.5",
+             color = "#D55E00", size = 4) +
+    labs(x = "Predicted Probability p(x)", y = "Var(error) = p(1 - p)",
+         title = "Error Variance in the LPM",
+         subtitle = "Variance is largest at p = 0.5 and shrinks toward 0 and 1")
+```
+
+- Problem 1 (heteroskedasticity): ✅ solved with robust SEs
+- Problem 2 (out-of-bounds): still a concern --- let's look at it now
+
+
+## Problem 2: Out-of-Bounds Predictions
+
+```{r}
+#| label: fig-oob
+#| fig-width: 9
+#| fig-height: 4
+
+lf_data <- lf_data |>
+    mutate(pred_lpm = predict(reg_lpm))
+
+ggplot(lf_data, aes(x = pred_lpm)) +
+    geom_histogram(binwidth = 0.05, fill = "steelblue", color = "white", alpha = 0.8) +
+    geom_vline(xintercept = 0, linetype = "dashed", color = "red", linewidth = 0.8) +
+    geom_vline(xintercept = 1, linetype = "dashed", color = "red", linewidth = 0.8) +
+    annotate("rect", xmin = -0.35, xmax = 0, ymin = 0, ymax = Inf,
+             alpha = 0.15, fill = "red") +
+    labs(x = "Predicted Probability (LPM)", y = "Count",
+         title = "LPM Predicted Probabilities",
+         subtitle = "Red region: impossible probabilities below zero!")
+```
+
+The LPM is a **straight line** --- for extreme enough values of $\mathbf{x}$, it will cross the 0 or 1 boundary. No easy fix for this one --- we need a different model.
+
+
+## An Alternative: Logistic/Logit Regression
+
+What if instead of a straight line, we used a function that **keeps predictions between 0 and 1**?
+
+$$P(y = 1 \mid \mathbf{x}) = G(\beta_0 + \beta_1 x_1 + \cdots + \beta_k x_k)$$
+
+. . .
+
+where $G(z) = \frac{\exp(z)}{1 + \exp(z)}$ is the **logistic function**.
+
+. . .
+
+The idea: wrap the linear index $\beta_0 + \beta_1 x_1 + \cdots$ inside $G(\cdot)$, which maps any real number into the interval $(0, 1)$.
+
+
+## The Logistic Function
+
+```{r}
+#| label: fig-logistic
+#| fig-width: 9
+#| fig-height: 4
+
+z_seq <- seq(-6, 6, by = 0.1)
+ggplot(tibble(z = z_seq, G = plogis(z_seq)), aes(x = z, y = G)) +
+    geom_line(color = "steelblue", linewidth = 1.4) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "gray70") +
+    geom_hline(yintercept = 1, linetype = "dashed", color = "gray70") +
+    geom_point(data = tibble(z = 0, G = 0.5), size = 3, color = "#D55E00") +
+    annotate("text", x = 1, y = 0.54, label = "G(0) = 0.5", color = "#D55E00", size = 5) +
+    annotate("text", x = -4.5, y = 0.15, label = "Approaches 0\nbut never reaches it",
+             color = "gray40", size = 3.5, fontface = "italic") +
+    annotate("text", x = 4.5, y = 0.85, label = "Approaches 1\nbut never reaches it",
+             color = "gray40", size = 3.5, fontface = "italic") +
+    annotate("segment", x = -1.5, xend = 1.5, y = 0.25, yend = 0.75,
+             color = "#009E73", linewidth = 0.8, linetype = "dashed") +
+    annotate("text", x = 2.2, y = 0.4, label = "Nearly linear\nin the middle",
+             color = "#009E73", size = 3.5, fontface = "italic") +
+    labs(x = "z (linear index)", y = "G(z)",
+         title = "The Logistic (Sigmoid) Function",
+         subtitle = "Always between 0 and 1 --- no impossible predictions!")
+```
+
+
+## Key Properties {.smaller}
+
+- **Always between 0 and 1** --- no out-of-bounds predictions
+- **S-shaped**: nearly linear in the middle, curves at extremes
+- **Symmetric** around $z = 0$ (where $G = 0.5$)
+
+. . .
+
+Because $G(\cdot)$ is nonlinear, we can't use OLS. Instead: **Maximum Likelihood Estimation** (MLE).
+
+. . .
+
+::: {.highlight-box}
+**OLS** minimizes $\sum(y_i - \hat{y}_i)^2$.
+
+**MLE** finds coefficients that make the observed data **most probable**: high $\hat{p}_i$ when $y_i = 1$, low $\hat{p}_i$ when $y_i = 0$.
+:::
+
+
+## Estimating Logit in R {.smaller}
+
+Just like switching from `lm()` to `feols()`, we use `feglm()` from `fixest`:
+
+```{r}
+#| echo: true
+
+logit_reg <- feglm(inlf ~ kidslt6 + kidsge6 + nwifeinc + educ,
+                   family = binomial(link = "logit"),
+                   data = lf_data)
+summary(logit_reg)
+```
+
+
+## Side-by-Side Comparison {.smaller}
+
+::: {.columns}
+::: {.column width="55%"}
+```{r}
+#| echo: true
+
+modelsummary(
+  list("LPM" = reg_lpm,
+       "Logit" = logit_reg),
+  stars = c('*' = 0.1,
+            '**' = 0.05,
+            '***' = 0.01),
+  gof_map = c("nobs",
+              "r.squared",
+              "logLik"))
+```
+:::
+
+::: {.column width="45%"}
+- **Signs** are the same across both models --- they agree on directions
+- But **magnitudes** differ: logit coefficients are on a **different scale** (log-odds)
+- How do we interpret them?
+:::
+:::
+
+
+## Interpreting Logit: The Problem
+
+In the LPM, $\hat{\beta}_j$ is the change in **probability** --- simple and direct.
+
+In logit, $\hat{\beta}_j$ is the change in the **log-odds** --- not directly intuitive.
+
+. . .
+
+Three ways to make sense of logit coefficients:
+
+1. **Log-odds** (direct, but abstract)
+2. **Odds ratios** (exponentiate the coefficient)
+3. **Marginal effects** (most practical --- directly comparable to LPM)
+
+. . .
+
+Let's walk through all three.
+
+
+## Interpretation 1: Log-Odds {.smaller}
+
+The **odds** of an event are: $\;\text{Odds} = \frac{P(y = 1)}{1 - P(y = 1)}$
+
+. . .
+
+- If $P = 0.75$: odds = $0.75 / 0.25 = 3$ ("3 to 1 in favor")
+- If $P = 0.50$: odds = $0.50 / 0.50 = 1$ ("even odds")
+- If $P = 0.20$: odds = $0.20 / 0.80 = 0.25$ ("4 to 1 against")
+
+. . .
+
+The logit model is linear in the **log-odds**:
+
+$$\ln\left(\frac{P(y = 1 \mid \mathbf{x})}{1 - P(y = 1 \mid \mathbf{x})}\right) = \beta_0 + \beta_1 x_1 + \cdots + \beta_k x_k$$
+
+. . .
+
+So $\hat{\beta}_j$ is the change in **log-odds** for a one-unit increase in $x_j$.
+
+. . .
+
+::: {.caution-box}
+This is mathematically clean, but not very intuitive --- most people don't think in log-odds. The main practical use: **positive** coefficients increase the probability; **negative** coefficients decrease it.
+:::
+
+
+## Interpretation 2: Odds Ratios {.smaller}
+
+Exponentiating the logit coefficient gives the **odds ratio**: $\exp(\hat{\beta}_j)$.
+
+```{r}
+#| label: fig-odds-ratios
+#| fig-width: 8
+#| fig-height: 3.5
+
+logit_coefs <- coef(logit_reg)[-1]
+logit_ses <- se(logit_reg)[-1]
+
+or_data <- tibble(
+    variable = c("Kids < 6", "Kids 6-18", "Non-wife Income", "Education"),
+    odds_ratio = exp(logit_coefs),
+    lower = exp(logit_coefs - 1.96 * logit_ses),
+    upper = exp(logit_coefs + 1.96 * logit_ses)
+)
+
+ggplot(or_data, aes(x = odds_ratio, y = reorder(variable, odds_ratio))) +
+    geom_vline(xintercept = 1, linetype = "dashed", color = "gray50") +
+    geom_pointrange(aes(xmin = lower, xmax = upper), color = "steelblue", size = 0.8) +
+    labs(x = "Odds Ratio (with 95% CI)", y = NULL,
+         title = "Odds Ratios for Labor Force Participation",
+         subtitle = "Values < 1 reduce the odds; values > 1 increase the odds")
+```
+
+- **Kids < 6**: OR $\approx$ 0.42 --- each young child **cuts** odds of working about 0.40
+- **Education**: OR $\approx$ 1.22 --- each year **increases** odds by about a quarter
+
+
+## Interpretation 3: Marginal Effects {.smaller}
+
+Unlike the LPM, the logit's effect on probability **depends on where you start**.
+
+. . .
+
+To compute the marginal effect of a variable:
+
+1. **Pick specific values** for all the $x$ variables
+2. Compute the **predicted probability** at those values
+3. **Increase the variable of interest by 1**, keeping everything else the same
+4. Compute the **new predicted probability**
+5. **Subtract**: the difference is the marginal effect
+
+. . .
+
+::: {.highlight-box}
+Marginal effect = $\hat{P}(y = 1 \mid x_j + 1) \;-\; \hat{P}(y = 1 \mid x_j)$
+:::
+
+. . .
+
+Let's walk through a concrete example.
+
+
+## A Quick Note on `predict()` {.smaller}
+
+R's `predict()` function lets us compute $\hat{y}$ automatically for any values of $\mathbf{x}$.
+
+
+Instead of manually plugging numbers into the estimated equation, we pass `predict()` a **fitted model** and a `newdata` data frame with the $x$ values we want:
+
+```{r}
+#| echo: true
+#| eval: false
+
+predict(my_model, newdata = data.frame(x1 = 5, x2 = 10), type = "response")
+```
+
+. . .
+
+- The column names in `newdata` must **exactly match** the variable names in the model
+- For logit models, `type = "response"` tells R to return a **predicted probability** (not the log-odds)
+- Without `type = "response"`, `predict()` returns the raw linear index $\hat{\beta}_0 + \hat{\beta}_1 x_1 + \cdots$
+
+
+## Marginal Effect: A Specific Woman {.smaller}
+
+Consider a specific woman: **0 kids under 6**, 1 older kid, husband's income \$20k, 12 years of education.
+
+What is the effect of her having **one young child**?
+
+. . .
+
+```{r}
+#| echo: true
+
+# Step 1: Predicted probability with 0 kids under 6
+prob_0kids <- predict(logit_reg, type = "response",
+                      newdata = data.frame(kidslt6 = 0, kidsge6 = 1,
+                                           nwifeinc = 20, educ = 12))
+
+# Step 2: Predicted probability with 1 kid under 6 (everything else the same)
+prob_1kid <- predict(logit_reg, type = "response",
+                     newdata = data.frame(kidslt6 = 1, kidsge6 = 1,
+                                          nwifeinc = 20, educ = 12))
+
+cat("P(working | 0 kids < 6):", round(prob_0kids, 4), "\n")
+cat("P(working | 1 kid < 6): ", round(prob_1kid, 4), "\n")
+cat("Marginal effect:        ", round(prob_1kid - prob_0kids, 4), "\n")
+```
+
+. . .
+
+For this particular woman, one young child decreases the probability of working by about **26 percentage points**.
+
+
+## A Different Woman, A Different ME {.smaller}
+
+Now consider a woman with the same characteristics but **husband's income of \$50k**:
+
+```{r}
+#| echo: true
+
+prob_0kids_rich <- predict(logit_reg, type = "response",
+                           newdata = data.frame(kidslt6 = 0, kidsge6 = 1,
+                                                nwifeinc = 50, educ = 12))
+prob_1kid_rich <- predict(logit_reg, type = "response",
+                          newdata = data.frame(kidslt6 = 1, kidsge6 = 1,
+                                               nwifeinc = 50, educ = 12))
+
+cat("P(working | 0 kids < 6):", round(prob_0kids_rich, 4), "\n")
+cat("P(working | 1 kid < 6): ", round(prob_1kid_rich, 4), "\n")
+cat("Marginal effect:        ", round(prob_1kid_rich - prob_0kids_rich, 4), "\n")
+```
+
+. . .
+
+- The marginal effect is **different** because this woman starts at a different predicted probability. 
+- Just like all non-linear models, the ME depends on the values of $x_j$
+
+## Marginal Effect at the Mean {.smaller}
+
+- How do we know which $x$ values to report ME at?
+- The standard approach: evaluate at the **mean** of all explanatory variables.
+
+. . .
+
+```{r}
+#| echo: true
+
+# Compute means of each variable
+mean_data <- lf_data |>
+    summarize(kidslt6 = mean(kidslt6), kidsge6 = mean(kidsge6),
+              nwifeinc = mean(nwifeinc), educ = mean(educ))
+mean_data
+```
+
+. . .
+
+```{r}
+#| echo: true
+
+# Probability at the mean
+prob_at_mean <- predict(logit_reg, type = "response", newdata = mean_data)
+
+# Probability with one more kid under 6
+mean_data_plus1 <- mean_data |> mutate(kidslt6 = kidslt6 + 1)
+prob_plus1 <- predict(logit_reg, type = "response", newdata = mean_data_plus1)
+
+marginal_effect <- prob_plus1 - prob_at_mean
+cat("Marginal effect at the mean:", round(marginal_effect, 4), "\n")
+```
+
+## How Does the Logit ME Compare to the LPM? {.smaller}
+
+```{r}
+#| echo: true
+
+cat("Logit ME at mean:", round(marginal_effect, 4), "\n")
+cat("LPM coefficient:  ", round(coef(reg_lpm)["kidslt6"], 4), "\n")
+```
+
+. . .
+
+They're **very similar**!
+
+. . .
+
+This is not a coincidence. Look back at the logistic function: it is nearly **linear** in the middle of its range. For observations near $p = 0.5$, the straight line (LPM) and the S-curve (logit) give approximately the same slope.
+
+::: {.highlight-box}
+Near the center of the probability distribution, the LPM and logit produce **similar marginal effects**. They diverge mainly at the tails.
+:::
+
+
+## LPM vs. Logit: Predictions Compared
+
+```{r}
+#| label: fig-lpm-vs-logit
+#| fig-width: 9
+#| fig-height: 4
+
+lf_data <- lf_data |>
+    mutate(
+        logit_index = predict(logit_reg, type = "link"),
+        logit_pred = predict(logit_reg, type = "response")
+    )
+
+lpm_on_index <- lm(pred_lpm ~ logit_index, data = lf_data)
+
+index_grid <- tibble(logit_index = seq(min(lf_data$logit_index) - 1,
+                                        max(lf_data$logit_index) + 1, by = 0.05)) |>
+    mutate(
+        logit_pred = plogis(logit_index),
+        lpm_pred = predict(lpm_on_index, newdata = pick(everything()))
+    )
+
+pred_long <- index_grid |>
+    pivot_longer(cols = c(lpm_pred, logit_pred), names_to = "model", values_to = "predicted") |>
+    mutate(model = ifelse(model == "lpm_pred", "LPM", "Logit"))
+
+ggplot() +
+    geom_jitter(data = lf_data, aes(x = logit_index, y = inlf),
+                alpha = 0.1, height = 0.03, color = "gray50", size = 0.8) +
+    geom_line(data = pred_long |> filter(model == "LPM"),
+              aes(x = logit_index, y = predicted, color = "LPM"),
+              linewidth = 1, linetype = "dashed") +
+    geom_line(data = pred_long |> filter(model == "Logit"),
+              aes(x = logit_index, y = predicted, color = "Logit"),
+              linewidth = 1) +
+    geom_hline(yintercept = 0, linetype = "dotted", color = "red", alpha = 0.5) +
+    geom_hline(yintercept = 1, linetype = "dotted", color = "red", alpha = 0.5) +
+    scale_color_manual(values = c("LPM" = "steelblue", "Logit" = "#D55E00")) +
+    coord_cartesian(ylim = c(-0.3, 1.3)) +
+    labs(x = "Linear Index", y = "Predicted Probability",
+         color = "Model",
+         title = "LPM vs. Logit Predictions",
+         subtitle = "They agree closely in the middle but diverge at the tails") +
+    theme(legend.position = "bottom")
+```
+
+
+## Rounding Up: LPM vs. Logit {.smaller}
+
+::: {.columns}
+::: {.column width="50%"}
+### Linear Probability Model
+
+- Models probability as a **straight line**: $P(y = 1) = \mathbf{x}\boldsymbol{\beta}$
+- Estimated by **OLS**
+- Coefficients = direct change in probability
+- Can predict outside [0, 1]
+- Always heteroskedastic (use robust SEs)
+:::
+
+::: {.column width="50%"}
+### Logistic Regression
+
+- Models probability through the **S-curve**: $P(y = 1) = G(\mathbf{x}\boldsymbol{\beta})$
+- Estimated by **MLE**
+- Coefficients = change in log-odds (convert via OR or ME)
+- Predictions always in (0, 1)
+- Heteroskedasticity handled by design
+:::
+:::
+
+. . .
+
+::: {.highlight-box}
+**The punchline:** despite these differences, the two models typically produce **very similar estimated effects** across most of the distribution of $\mathbf{x}$. They only diverge meaningfully at the tails, where predicted probabilities are near 0 or 1. For the vast majority of observations in a typical dataset, you will get essentially the same answer from either approach.
+:::
+
+
+## Practical Advice {.smaller}
+
+- **In economics**: the LPM is the workhorse. Most applied micro papers use it as the primary specification, sometimes reporting logit as a robustness check.
+
+. . .
+
+- **In health sciences/other fields**: logistic regression is the standard. Odds ratios are the lingua franca.
+
+. . .
+
+- **But if focus is on prediction**: logit wins across fields --- its predictions are valid probabilities.
+
+. . .
+
+::: {.highlight-box}
+When both models give **similar marginal effects** (as they often do near the center), the choice matters less than getting the **research question** right. Start with the LPM for its simplicity; use logit when you need valid probabilities or when your audience expects it.
+:::
+
+## When to Use Which? {.smaller}
+
+| | LPM | Logistic Regression |
+|:---|:---|:---|
+| **Estimation** | OLS | Maximum Likelihood |
+| **Coefficients** | Change in probability | Change in log-odds |
+| **Interpretation** | Direct and intuitive | Requires conversion (OR or ME) |
+| **Predictions** | Can fall outside [0, 1] | Always in (0, 1) |
+| **Heteroskedasticity** | Always present (use robust SEs) | Handled by MLE |
+| **Common in** | Economics | Health sciences, epidemiology |
+| **Best for** | Causal inference | Prediction |
+
+
+## Summary {.smaller}
+
+1. When $y$ is binary, $E(y \mid \mathbf{x}) = P(y = 1 \mid \mathbf{x})$
+2. **LPM**: run OLS; $\hat{\beta}_j$ = change in probability (percentage points)
+3. LPM problems: out-of-bounds predictions and always heteroskedastic (use robust SEs!)
+4. **Logit**: wraps predictions in the logistic function; estimated by MLE
+5. Logit coefficients = log-odds; convert via odds ratios or marginal effects
+6. **Marginal effects at the mean** are the most practical way to compare logit to LPM
+7. Near the center of the distribution, the two models typically **agree closely**
+
+
+## Try It Yourself {.smaller}
+
+The `bwght` dataset in `wooldridge` has data on infant birthweight. Create a binary variable `low_bwght` equal to 1 if `bwght < 88` (below 2,500 grams).
+
+. . .
+
+**1.** Estimate an LPM (with robust SEs) and a logit model:
+
+$$low\_bwght = \beta_0 + \beta_1 \cdot cigs + \beta_2 \cdot faminc + \beta_3 \cdot motheduc + \mu$$
+
+```{r}
+#| echo: true
+#| eval: false
+
+bw_data <- wooldridge::bwght |> mutate(low_bwght = ifelse(bwght < 88, 1, 0))
+
+lpm_bw  <- feols(low_bwght ~ cigs + faminc + motheduc, vcov = "HC1", data = bw_data)
+logit_bw <- feglm(low_bwght ~ cigs + faminc + motheduc,
+                   family = binomial(link = "logit"), data = bw_data)
+```
+
+. . .
+
+**2.** Interpret the LPM coefficient on `cigs` in a sentence.
+
+. . .
+
+**3.** Using `predict()`, compute the marginal effect of 1 additional cigarette for a woman at the mean of all variables. How does it compare to the LPM coefficient?
+
+

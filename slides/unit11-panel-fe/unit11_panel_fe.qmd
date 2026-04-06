@@ -1,0 +1,840 @@
+---
+title: "Panel Data and Fixed Effects"
+subtitle: "EC 325: Econometrics"
+author: "Prof. Caraher"
+institute: "Colby College"
+date: today
+format:
+  revealjs:
+    theme: colby-theme.scss
+    slide-number: true
+    incremental: true
+    embed-resources: true
+    fig-align: center
+    code-overflow: wrap
+    footer: "EC325 | Unit 11 | Panel Data & Fixed Effects"
+execute:
+  echo: false
+  message: false
+  warning: false
+  cache: true
+---
+
+```{r}
+#| label: setup
+
+library(tidyverse)
+library(wooldridge)
+library(fixest)
+library(modelsummary)
+library(patchwork)
+
+options(scipen = 999)
+
+theme_set(theme_minimal(base_size = 16) +
+          theme(plot.title = element_text(face = "bold", size = 18),
+                plot.subtitle = element_text(size = 13, color = "gray40"),
+                panel.grid.minor = element_blank()))
+```
+
+
+## Where We Are
+
+- Started with the "gold standard" of causal inference: **RCTs**
+- Next best alternative: **multivariate OLS** --- control for observable confounders
+- Last unit: **binary outcomes** --- more flexible models for real-life data
+- Central threat throughout: **omitted variable bias**
+- We can control for what we can observe... but what about **unobservable** confounders? Ability, motivation, culture, history?
+
+. . .
+
+Today: a new data structure --- **panel data** --- that lets us control for unobservables.
+
+
+## Cross-Sectional Data
+
+Most datasets we've looked at so far have been **cross-sectional**: units observed at a single point in time.
+
+- Housing prices in Ames, Iowa in 2010
+- Wages and education data from the CPS
+- Health outcomes in the Oregon Health Insurance Experiment
+- Women's labor force participation (`mroz`)
+
+## What We Can Do with Cross-Sectional Data
+
+With a snapshot from a single point in time, we can:
+
+- **Describe a population**: averages, medians, distributions
+- **Identify correlations**: do two variables move together?
+- **Control for observable confounders**: multivariate OLS, holding other measured factors constant
+
+. . .
+
+But there's a big limitation...
+
+## What Cross-Sectional Data Struggles With {.smaller}
+
+```{r}
+#| label: fig-cross-section
+#| fig-width: 8
+#| fig-height: 3.5
+
+cs_data <- tibble(
+    City = c("Boston", "Denver", "Miami"),
+    Year = 2020,
+    Unemployment = c(6.2, 5.1, 7.8),
+    Crime = c(312, 285, 410)
+)
+
+ggplot(cs_data, aes(x = Unemployment, y = Crime, label = City)) +
+    geom_point(size = 4, color = "steelblue") +
+    geom_text(vjust = -1, size = 5) +
+    coord_cartesian(xlim = c(4.5, 8.5), ylim = c(250, 450)) +
+    labs(x = "Unemployment Rate (%)", y = "Crime Rate",
+         title = "Cross-Sectional Data: Three Cities in 2020",
+         subtitle = "Each city observed once --- we can only compare across cities")
+```
+
+Miami has high unemployment **and** high crime. But is that because unemployment *causes* crime, or because Miami differs in many unobserved ways (geography, culture, history)?
+
+. . .
+
+We can't control for what we can't measure!
+
+
+## Panel Data {.smaller}
+
+This is in contrast to **panel data**: the same units observed at *multiple points in time*.
+
+- NBA players observed across multiple seasons
+- Employment and minimum wages in states across multiple quarters
+- Pre-period and post-period data in an experiment
+- Stock prices for multiple companies tracked daily for a year
+
+. . .
+
+| Example | Unit ($i$) | Time ($t$) |
+|:--------|:-----|:-----|
+| Workers tracked annually | Person | Year |
+| States observed quarterly | State | Quarter |
+| Firms reported monthly | Firm | Month |
+| Countries measured yearly | Country | Year |
+
+
+## What If We Followed Cities Over Time? {.smaller}
+
+```{r}
+#| label: fig-panel-intro
+#| fig-width: 9
+#| fig-height: 4
+
+panel_data <- tibble(
+    City = rep(c("Boston", "Denver", "Miami"), each = 3),
+    Year = rep(2018:2020, 3),
+    Unemployment = c(4.8, 5.5, 6.2, 4.0, 4.5, 5.1, 6.5, 7.0, 7.8),
+    Crime = c(298, 305, 312, 270, 278, 285, 390, 401, 410)
+)
+
+ggplot(panel_data, aes(x = Unemployment, y = Crime, color = City, group = City)) +
+    geom_point(size = 3) +
+    geom_line(linewidth = 1, arrow = arrow(length = unit(0.15, "inches"), type = "closed")) +
+    geom_text(data = panel_data |> filter(Year == 2020),
+              aes(label = City), vjust = -1.2, size = 4.5, show.legend = FALSE) +
+    scale_color_manual(values = c("Boston" = "steelblue", "Denver" = "#D55E00", "Miami" = "#009E73")) +
+    coord_cartesian(ylim = c(260, 430)) +
+    labs(x = "Unemployment Rate (%)", y = "Crime Rate",
+         title = "Panel Data: Three Cities Over Three Years",
+         subtitle = "Arrows show each city's trajectory over time") +
+    theme(legend.position = "none")
+```
+
+Now we can ask: when unemployment rises **within a given city**, does crime rise too?
+
+
+## Benefits of Panel Data
+
+1. **Controlling for Unobserved Heterogeneity**
+    - Observing units over time lets us control for all *time-invariant* characteristics --- both **observed and unobserved**!
+    - Geography, genetics, a firm's core industry, "culture" --- as long as they're stable, panel methods can remove their influence
+    - This is the **big one** and the focus of today's lecture
+
+## Benefits of Panel Data (cont.)
+
+2. **Analyzing Dynamics of Change**
+    - We can study how variables change over time and why
+    - Analyze the impact of events, policies, or treatments by comparing units before and after
+    - Examine lags and leads (does a change in $x$ today affect $y$ tomorrow?)
+
+. . .
+
+3. **Increased Statistical Power**
+    - Pooling data across units *and* time increases total sample size ($N \times T$)
+    - More data $\rightarrow$ more precise estimates (smaller standard errors)
+
+
+## The Key Insight
+
+::: {.highlight-box}
+Panel data lets us control for **all time-invariant characteristics** of each unit --- whether observed or unobserved --- by using only **within-unit** variation.
+:::
+
+. . .
+
+- **Between** variation: comparing *different* cities to each other (confounded by all ways cities differ)
+- **Within** variation: comparing *each city to itself* over time (city-level confounders cancel out)
+
+. . .
+
+The question shifts from "do cities with more unemployment have more crime?" to "when unemployment rises *within a city*, does crime rise too?"
+
+
+## The Fixed Effects Model
+
+We formalize this with the **fixed effects model**:
+
+$$y_{it} = \beta_0 + \beta_1 x_{it} + a_i + \mu_{it}$$
+
+. . .
+
+- $y_{it}$: outcome for unit $i$ at time $t$
+- $x_{it}$: explanatory variable (varies across units **and** time)
+- $a_i$: **unit fixed effect** --- captures all time-invariant characteristics of unit $i$
+- $\mu_{it}$: idiosyncratic error (the leftover)
+
+
+
+## What Does $a_i$ Capture? {.smaller}
+
+The unit fixed effect $a_i$ absorbs **everything** about unit $i$ that doesn't change over time:
+
+. . .
+
+- A city's geographic location
+- A city's historical legacy and founding conditions
+- Stable institutional features (legal system, political structure)
+- Baseline demographics (to the extent they're stable)
+- Measurement differences (how crime is recorded)
+- "Culture" and other hard-to-measure factors
+
+. . .
+
+We don't need to **observe** these things. We don't need to **measure** them. We just need them to be **stable** over the time periods we observe.
+
+
+## How Does It Work? The Within Transformation (1/3) {.smaller}
+
+We can't observe $a_i$ directly. But we can **eliminate** it.
+
+. . .
+
+**Step 1:** For each unit $i$, compute the time average of every variable:
+
+$$\bar{y}_i = \beta_0 + \beta_1 \bar{x}_i + a_i + \bar{\mu}_i$$
+
+
+## How Does It Work? The Within Transformation (2/3) {.smaller}
+
+**Step 2:** Subtract the time-average equation from the original:
+
+\begin{align}
+y_{it} - \bar{y}_i &= (\beta_0 - \beta_0) + \beta_1(x_{it} - \bar{x}_i) + (a_i - a_i) + (\mu_{it} - \bar{\mu}_i)
+\end{align}
+
+. . .
+
+What happened?
+
+- $\beta_0 - \beta_0 = 0$ --- the intercept drops out
+- $a_i - a_i = 0$ --- **the fixed effect drops out!** Since $a_i$ is constant over time, its time average is just itself
+
+. . .
+
+We're left with only **demeaned** variables:
+
+$$\ddot{y}_{it} = \beta_1 \ddot{x}_{it} + \ddot{\mu}_{it}$$
+
+where $\ddot{y}_{it} = y_{it} - \bar{y}_i$ (deviations from each unit's own average), and so on.
+
+
+## How Does It Work? The Within Transformation (3/3)
+
+::: {.highlight-box}
+**Why "within" transformation?**
+
+After demeaning, all cross-sectional differences between units are gone. The only variation left is how each unit **differs from its own average** over time.
+
+$\beta_1$ is identified purely from **within-unit changes**.
+:::
+
+. . .
+
+Let's see this in action with a concrete example...
+
+
+## Within Transformation: A Small Example (1/3) {.smaller}
+
+Suppose we have 3 cities observed over 2 years. Here's our **raw data**:
+
+```{r}
+#| echo: true
+
+example_df <- tibble(
+  city = rep(c("A", "B", "C"), each = 2),
+  year = rep(c(1, 2), times = 3),
+  unem = c(5, 7, 3, 5, 8, 6),
+  crime = c(30, 34, 20, 26, 40, 38)
+)
+example_df
+```
+
+. . .
+
+City A: unemployment went up (5 to 7), crime went up (30 to 34). City C: unemployment went *down* (8 to 6), crime went *down* (40 to 38). That's the within-unit variation we want to use.
+
+
+## Within Transformation: A Small Example (2/3) {.smaller}
+
+**Step 1:** Compute each city's time average, then subtract:
+
+```{r}
+#| echo: true
+
+example_df <- example_df |>
+  group_by(city) |>
+  mutate(
+    mean_unem = mean(unem),
+    mean_crime = mean(crime),
+    unem_demean = unem - mean_unem,
+    crime_demean = crime - mean_crime
+  ) |>
+  ungroup()
+
+example_df |> select(city, year, unem, mean_unem, unem_demean, crime, mean_crime, crime_demean)
+```
+
+. . .
+
+Notice: the **demeaned** values only reflect how each city differs from **its own** average --- all level differences between cities are gone.
+
+
+## Within Transformation: A Small Example (3/3) {.smaller}
+
+**Step 2:** Regress the demeaned variables:
+
+```{r}
+#| echo: true
+
+lm(crime_demean ~ unem_demean, data = example_df) |> coef()
+```
+
+. . .
+
+Now compare to a regression using *between* variation:
+
+```{r}
+#| echo: true
+
+lm(crime ~ unem, data = example_df) |> coef()
+```
+
+
+
+## Going Further: Time Fixed Effects {.smaller}
+
+- We removed **unit-level** confounders by demeaning across time. But what about shocks that hit **all** cities in a given year (e.g., a recession, a national policy change)? 
+- These are called **time-fixed effects**
+
+. . .
+
+We can go a step further: take our **unit-demeaned** data and demean it again --- this time across **units within each year**:
+
+```{r}
+#| echo: true
+
+example_df <- example_df |>
+  group_by(year) |>
+  mutate(
+    yr_mean_unem_dm = mean(unem_demean),
+    yr_mean_crime_dm = mean(crime_demean),
+    unem_dm2 = unem_demean - yr_mean_unem_dm,
+    crime_dm2 = crime_demean - yr_mean_crime_dm
+  ) |>
+  ungroup()
+
+example_df |> select(city, year, unem_demean, yr_mean_unem_dm, unem_dm2, crime_demean, yr_mean_crime_dm, crime_dm2)
+```
+
+
+## Time Fixed Effects: The Result {.smaller}
+
+Now regress the **doubly-demeaned** variables (no intercept needed):
+
+```{r}
+#| echo: true
+
+lm(crime_dm2 ~ unem_dm2 - 1, data = example_df) |> coef()
+```
+
+. . .
+
+Compare to a regression with dummies for **both** city and year:
+
+```{r}
+#| echo: true
+
+lm(crime ~ unem + factor(city) + factor(year), data = example_df) |> coef()
+```
+
+. . .
+
+::: {.highlight-box}
+Same coefficient on `unem`! Sequential demeaning --- first by unit, then by time --- is equivalent to including **both** unit and time fixed effects. The first demeaning removes time-invariant unit confounders; the second removes unit-invariant time shocks.
+:::
+
+
+## Equivalently: Dummy Variable Regression {.smaller}
+
+Instead of manually demeaning, we can estimate the same model using **dummy variable regression**:
+
+$$y_{it} = \beta_0 + \beta_1 x_{it} + a_i + \tau_t + \mu_{it}$$
+
+. . .
+
+Include a **dummy variable for each unit** $i$ (minus one omitted category) and a **dummy variable for each time** $t$ (minus one omitted period).
+
+. . .
+
+- This produces the **same** $\hat{\beta}_1$ as the within transformation
+- But also gives us estimates of each unit's and time period's dummy coefficient
+- Don't forget the *dummy variable trap*!
+
+. . .
+
+In R, we can use `factor()` to automatically create dummies, or --- much more efficiently --- use `feols()` from `fixest`.
+
+. . .
+
+::: {.callout-note}
+## A Variation You May See
+Some implementations **drop the intercept** and include a dummy for **every** unit (no omitted category). This yields a different $\hat{\beta}_0$ interpretation (each dummy captures the unit's own intercept), but $\hat{\beta}_1$ is **identical** either way.
+:::
+
+
+## Example: Unemployment and Crime {.smaller}
+
+```{r}
+#| label: crime-data-setup
+
+crime_data <- wooldridge::crime2 |>
+    mutate(city_id = rep(1:46, each = 2))
+```
+
+The `crime2` dataset: **46 cities** observed in **1982 and 1987**.
+
+. . .
+
+Let's start with a **cross-sectional** regression using just 1987:
+
+```{r}
+#| echo: true
+
+reg_cross <- lm(crmrte ~ unem, data = filter(crime_data, year == 87))
+coef(reg_cross)
+```
+
+. . .
+
+The coefficient on `unem` is **negative**: higher unemployment $\rightarrow$ *less* crime?
+
+This makes no intuitive sense. Almost certainly **OVB** --- cities with low unemployment also have other "good" characteristics (wealth, strong institutions) that reduce crime.
+
+
+## Now Use the Panel: Add Fixed Effects {.smaller}
+
+```{r}
+#| echo: true
+
+reg_fe <- feols(crmrte ~ unem | city_id + d87, data = crime_data)
+coef(reg_fe)
+```
+
+. . .
+
+Now the coefficient is **positive**: when unemployment rises *within a city*, crime rises too.
+
+. . .
+
+::: {.highlight-box}
+Fixed effects removed the bias from unobserved city characteristics, revealing the true positive relationship between unemployment and crime.
+:::
+
+
+## Side-by-Side Results {.smaller}
+
+```{r}
+#| echo: true
+
+modelsummary(list("Cross-Section" = reg_cross,
+                  "Fixed Effects" = reg_fe),
+             gof_map = c("adj.r.squared", "nobs"),
+             add_rows = tribble(
+                 ~term, ~`Cross-Section`, ~`Fixed Effects`,
+                 "City FE", "No", "Yes",
+                 "Year FE", "No", "Yes"
+             ))
+```
+
+. . .
+
+Notice the bottom of the table: researchers report which fixed effects are included as "Yes/No" rows rather than reporting every dummy coefficient.
+
+
+## Using `feols()` in Practice {.smaller}
+
+The `feols()` function from `fixest` puts fixed effects after a vertical bar `|`:
+
+```{r}
+#| echo: true
+#| eval: false
+
+feols(y ~ x1 + x2 | unit + time, data = mydata)
+```
+
+. . .
+
+**Left of `|`:** standard regression formula --- variables you want coefficients for.
+
+**Right of `|`:** fixed effects (absorbed) --- dummies created automatically, coefficients **not** reported.
+
+. . .
+
+This is equivalent to including a dummy for every unit and time period, but `feols()` is **much faster** and keeps the output clean.
+
+
+## A Worked Example: Police and Crime {.smaller}
+
+```{r}
+#| label: small-panel-setup
+
+city_panel <- tibble(
+    city = rep(c("Austin", "Baltimore", "Denver", "Portland", "Raleigh"), each = 4),
+    year = rep(2017:2020, times = 5),
+    police_spend = c(3.8, 4.0, 4.3, 4.1, 6.2, 6.5, 6.4, 6.0,
+                     4.5, 4.7, 5.0, 4.6, 3.5, 3.4, 3.2, 3.0,
+                     3.9, 4.2, 4.5, 4.3),
+    property_crime = c(35.2, 34.1, 32.8, 33.5, 48.6, 47.3, 47.9, 49.2,
+                       38.4, 37.1, 35.6, 37.8, 42.1, 43.5, 44.8, 46.2,
+                       30.1, 29.2, 27.8, 28.9)
+)
+```
+
+5 cities, 4 years. First, let's ignore the panel structure and look at the **cross-sectional** (between) relationship:
+
+```{r}
+#| label: fig-between-scatter
+#| fig-width: 8
+#| fig-height: 3.5
+
+ggplot(city_panel, aes(x = police_spend, y = property_crime)) +
+    geom_point(size = 3, color = "gray50") +
+    geom_smooth(method = "lm", se = FALSE, color = "darkred", linewidth = 1.2) +
+    labs(x = "Police Spending (per capita, $100s)",
+         y = "Property Crime Rate (per 1,000)",
+         title = "Cross-Sectional: Pooling All Observations",
+         subtitle = "Positive slope: cities that spend more on police have MORE crime?")
+```
+
+. . .
+
+This is the **between** comparison --- it looks like police spending *increases* crime.
+
+
+## Now Layer in the Panel Structure {.smaller}
+
+Same data, but now we connect observations **within** each city over time:
+
+```{r}
+#| label: fig-within-scatter
+#| fig-width: 8
+#| fig-height: 3.5
+
+ggplot(city_panel, aes(x = police_spend, y = property_crime, color = city)) +
+    geom_point(size = 3) +
+    geom_smooth(method = "lm", se = FALSE, linewidth = 0.8, alpha = 0.7) +
+    scale_color_brewer(palette = "Set1") +
+    labs(x = "Police Spending (per capita, $100s)",
+         y = "Property Crime Rate (per 1,000)",
+         title = "Within Cities: A Different Story",
+         subtitle = "Within each city, more spending is associated with LESS crime",
+         color = NULL) +
+    theme(legend.position = "bottom")
+```
+
+. . .
+
+The **within-city** slopes tell the opposite story from the cross-sectional one!
+
+
+## Why the Misleading Cross-Sectional Pattern? {.smaller}
+
+Baltimore spends the most on police **and** has the highest crime.
+
+. . .
+
+But this doesn't mean police spending *causes* crime. Cities with high crime invest more in policing precisely **because** they have high crime.
+
+. . .
+
+Those same cities also have persistent characteristics (poverty, density, historical disinvestment) that keep crime elevated regardless of spending.
+
+. . .
+
+::: {.caution-box}
+The cross-sectional comparison conflates the **effect of police spending** with all the other ways these cities differ. We need fixed effects to separate them.
+:::
+
+
+## Estimating with `feols()` {.smaller}
+
+```{r}
+#| echo: true
+
+fe_reg <- feols(property_crime ~ police_spend | city + year,
+                data = city_panel)
+summary(fe_reg)
+```
+
+. . .
+
+After absorbing city and year fixed effects, more police spending is associated with **lower** crime --- the opposite of what the cross-sectional data suggested.
+
+
+## Extracting the Fixed Effects {.smaller}
+
+- We can retrieve the estimated unit and time fixed effects with `fixef()`:
+
+```{r}
+#| echo: true
+
+fe_estimates <- fixef(fe_reg)
+fe_estimates$city
+fe_estimates$year
+```
+
+. . .
+
+- **City FE**: Baltimore has the highest baseline crime; Raleigh the lowest. These capture everything about each city that is stable over time.
+- **Year FE**: common year-to-year shocks affecting all cities.
+- We usually don't care about these coefficients *per se*, but they can give useful information:
+  - "Accounting for police spending, Baltimore has the highest baseline crime (relative to the omitted city)"
+  - "2020 had the highest crime across all cities (relative to the omitted year)"
+- The main point: they absorb confounders so $\hat{\beta}_1$ is unbiased.
+
+
+## What Do FE Control For? {.smaller}
+
+**Unit FE** control for anything specific to a unit that is **constant over time**: geography, historical legacy, stable institutions, baseline demographics, measurement differences, culture.
+
+. . .
+
+**Time FE** control for anything that hits **all units equally** in a given period: macroeconomic shocks, national policy changes, seasonal patterns, technology trends.
+
+. . .
+
+**Neither** controls for factors that vary **both across units and over time** --- for example, a city-specific economic boom or a policy change that only affects some cities. These are **unit-specific, time-varying confounders** and must be controlled for explicitly (or remain a source of potential bias).
+
+
+## A Classification Exercise {.smaller}
+
+::: {.nonincremental}
+For each confounder, is it absorbed by unit FE, time FE, or neither?
+
+- A city's geographic terrain?
+:::
+
+. . .
+
+**Unit FE** --- constant across time for a given city
+
+::: {.nonincremental}
+- National recession in 2020?
+:::
+
+. . .
+
+**Time FE** --- hits all cities equally in that year
+
+::: {.nonincremental}
+- City-specific economic boom in 2019?
+:::
+
+. . .
+
+**Neither** --- varies across cities *and* over time
+
+::: {.nonincremental}
+- Nationwide sentencing reform?
+:::
+
+. . .
+
+**Time FE** --- affects all cities in the same period
+
+::: {.nonincremental}
+- A city's founding history?
+:::
+
+. . .
+
+**Unit FE** --- permanent characteristic of that city
+
+
+## Classification Exercise (cont.) {.smaller}
+
+::: {.nonincremental}
+- A new mayor elected in one city in 2018?
+:::
+
+. . .
+
+**Neither** --- specific to one city at one point in time
+
+::: {.nonincremental}
+- A state's distance from the border?
+:::
+
+. . .
+
+**Unit FE** --- doesn't change over time
+
+::: {.nonincremental}
+- Nationwide COVID-19 lockdowns in 2020?
+:::
+
+. . .
+
+**Time FE** --- common shock across all units
+
+::: {.nonincremental}
+- A city-specific policing strategy introduced in 2019?
+:::
+
+. . .
+
+**Neither** --- unit-specific and time-varying
+
+. . .
+
+The "neither" cases are **unit-specific, time-varying confounders**. These require explicit control variables.
+
+
+## Adding Time-Varying Controls {.smaller}
+
+- One way to address the fact that FEs don'y account for **unit-specific, time-varying confounders** is to directly control for them!
+
+- Can do so by putting them in the RHS of our regression, like any other variable
+
+. . .
+
+$$y_{it} = \beta_1 x_{it} + \gamma z_{it} + a_i + \tau_t + \mu_{it}$$
+
+- Of course, this requires that you are directly able to observe these variables, so only a partial solution
+
+## Adding Time-Varying Controls {.smaller}
+
+In `feols()`, time-varying controls go on the **left** side of `|`:
+
+. . .
+
+```{r}
+#| echo: true
+
+city_panel <- city_panel |>
+    mutate(unem_rate = c(3.1, 2.8, 2.9, 5.0, 5.8, 5.5, 5.3, 7.6,
+                         3.0, 2.7, 2.8, 5.4, 3.8, 3.6, 3.9, 6.2,
+                         3.4, 3.1, 3.0, 5.1))
+
+fe_with_control <- feols(property_crime ~ police_spend + unem_rate | city + year,
+                         data = city_panel)
+```
+
+. . .
+
+```{r}
+#| echo: true
+
+modelsummary(list("No Control" = fe_reg, "With Unemployment" = fe_with_control),
+             gof_map = c("adj.r.squared"),
+             add_rows = tribble(
+                 ~term, ~`No Control`, ~`With Unemployment`,
+                 "City FE", "Yes", "Yes",
+                 "Year FE", "Yes", "Yes"
+             ))
+```
+
+
+
+## When Are Fixed Effects Most Useful? {.smaller}
+
+**Good fit for FE:**
+
+- Genuine panel data (same units, multiple periods)
+- Meaningful within-unit variation in $x$
+- Time-invariant confounders are a primary concern
+- Treatment effects are relatively immediate
+
+. . .
+
+**Less useful when:**
+
+- Little within-unit variation (everyone's $x$ is stable over time)
+- Treatment effects take a long time to materialize
+- Time-varying confounders are the main concern
+- Very few time periods (less precise estimates)
+
+
+## Summary {.smaller}
+
+1. **Panel data**: same units observed over multiple time periods
+2. The **within transformation** eliminates all time-invariant confounders by demeaning
+3. **Unit FE** absorb permanent unit characteristics (observed and unobserved)
+4. **Time FE** absorb shocks common to all units in a given period
+5. In R: `feols(y ~ x | unit + time, data = mydata)`
+6. Can add **time-varying controls** on the left side of `|`
+7. **Cannot** include time-invariant variables --- they're collinear with unit FE
+
+. . .
+
+::: {.highlight-box}
+Fixed effects $\neq$ no OVB. Unit-specific, time-varying confounders can still bias results. But FE is a **major improvement** over cross-sectional analysis when time-invariant confounders are the primary concern.
+:::
+
+
+## Try It Yourself {.smaller}
+
+The `wagepan` dataset in `wooldridge` is a balanced panel of 545 men observed annually from 1980--1987.
+
+```{r}
+#| echo: true
+#| eval: false
+
+wage_data <- wooldridge::wagepan
+```
+
+. . .
+
+**1.** How many workers? How many years? Confirm it's balanced. (*Hint:* `n_distinct()`)
+
+. . .
+
+**2.** Using only 1987 data, estimate: $\ln(wage) = \beta_0 + \beta_1 \cdot union + \mu$. Interpret $\hat{\beta}_1$.
+
+. . .
+
+**3.** Now estimate with worker and year FE: `feols(lwage ~ union | nr + year)`. How does $\hat{\beta}_1$ change? Why?
+
+. . .
+
+**4.** Try adding `educ` as a control in the FE model. What happens? Why?
+
+
