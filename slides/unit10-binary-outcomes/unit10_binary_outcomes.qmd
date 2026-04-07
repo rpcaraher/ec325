@@ -228,17 +228,17 @@ summary(reg_lpm)
 
 Each additional child under 6 **decreases** the probability of working by about 19 percentage points.
 
-### `educ`: $\hat{\beta}_4 \approx 0.04$
+### `educ`: $\hat{\beta}_4 \approx 0.06$
 
 Each additional year of education **increases** the probability of working by about 4 percentage points.
 :::
 
 ::: {.column width="50%"}
-### `kidsge6`: $\hat{\beta}_2 \approx 0.02$
+### `kidsge6`: $\hat{\beta}_2 \approx 0.01$
 
 Older children have little effect --- small and not significant.
 
-### `nwifeinc`: $\hat{\beta}_3 \approx -0.005$
+### `nwifeinc`: $\hat{\beta}_3 \approx -0.008$
 
 Each additional \$1,000 of husband's income reduces probability by about 0.5 pp.
 :::
@@ -459,6 +459,10 @@ logit_reg <- feglm(inlf ~ kidslt6 + kidsge6 + nwifeinc + educ,
 summary(logit_reg)
 ```
 
+. . .
+
+- The key argument is `family = binomial(link = "logit")`
+- This tells `feglm()` to use the logistic formula in the regression
 
 ## Side-by-Side Comparison {.smaller}
 
@@ -800,21 +804,20 @@ ggplot() +
 
 ## Practical Advice {.smaller}
 
+For causal analysis...
+
+. . .
+
 - **In economics**: the LPM is the workhorse. Most applied micro papers use it as the primary specification, sometimes reporting logit as a robustness check.
 
-. . .
-
-- **In health sciences/other fields**: logistic regression is the standard. Odds ratios are the lingua franca.
+- **In health sciences/comp sci/other fields**: logistic regression is the standard. Odds ratios are commonly references lingua franca.
 
 . . .
 
-- **But if focus is on prediction**: logit wins across fields --- its predictions are valid probabilities.
+But for Prediction...
 
-. . .
+- logit wins across fields --- its predictions are always valid probabilities.
 
-::: {.highlight-box}
-When both models give **similar marginal effects** (as they often do near the center), the choice matters less than getting the **research question** right. Start with the LPM for its simplicity; use logit when you need valid probabilities or when your audience expects it.
-:::
 
 ## When to Use Which? {.smaller}
 
@@ -840,33 +843,87 @@ When both models give **similar marginal effects** (as they often do near the ce
 7. Near the center of the distribution, the two models typically **agree closely**
 
 
-## Try It Yourself {.smaller}
+# Try It Yourself
+
+## Try It Yourself: Setup {.smaller}
 
 The `bwght` dataset in `wooldridge` has data on infant birthweight. Create a binary variable `low_bwght` equal to 1 if `bwght < 88` (below 2,500 grams).
 
 . . .
 
-**1.** Estimate an LPM (with robust SEs) and a logit model:
+```{r}
+#| echo: true
+#| eval: true
+
+bw_data <- wooldridge::bwght |>
+  mutate(low_bwght = ifelse(bwght < 88, 1, 0))
+```
+
+- We'll use this dataset for the next three questions.
+
+## Question 1: Estimate Two Models {.smaller}
+
+Estimate an LPM (with robust SEs) and a logit model of the form:
 
 $$low\_bwght = \beta_0 + \beta_1 \cdot cigs + \beta_2 \cdot faminc + \beta_3 \cdot motheduc + \mu$$
 
+. . .
+
 ```{r}
 #| echo: true
-#| eval: false
+#| eval: true
 
-bw_data <- wooldridge::bwght |> mutate(low_bwght = ifelse(bwght < 88, 1, 0))
+lpm_bw  <- feols(low_bwght ~ cigs + faminc + motheduc,
+                 vcov = "HC1", data = bw_data)
 
-lpm_bw  <- feols(low_bwght ~ cigs + faminc + motheduc, vcov = "HC1", data = bw_data)
 logit_bw <- feglm(low_bwght ~ cigs + faminc + motheduc,
-                   family = binomial(link = "logit"), data = bw_data)
+                  family = binomial(link = "logit"), data = bw_data)
+```
+
+## Question 2: Interpret the LPM {.smaller}
+
+Interpret the LPM coefficient on `cigs` in a sentence.
+
+```{r}
+#| echo: true
+#| eval: true
+
+summary(lpm_bw)
+
 ```
 
 . . .
 
-**2.** Interpret the LPM coefficient on `cigs` in a sentence.
+**Answer (template):**
+
+> "Holding family income and mother's education constant, smoking one additional cigarette per day during pregnancy is associated with a $0.3$ percentage-point change in the probability that the infant is born with low birthweight."
+
+- Remember: in the LPM, coefficients are interpreted in **percentage points** of probability.
+
+## Question 3: Marginal Effect from Logit {.smaller}
+
+Using `predict()`, compute the marginal effect of 1 additional cigarette for a woman at the **mean of all variables** using the logistic regression estimates. How does it compare to the LPM coefficient?
 
 . . .
 
-**3.** Using `predict()`, compute the marginal effect of 1 additional cigarette for a woman at the mean of all variables. How does it compare to the LPM coefficient?
+```{r}
+#| echo: true
+#| eval: true
+
+# Average woman in the sample
+avg_woman <- bw_data |>
+  summarize(cigs = mean(cigs, na.rm = TRUE),
+            faminc = mean(faminc, na.rm = TRUE),
+            motheduc = mean(motheduc, na.rm = TRUE))
+
+# Predicted probability at the mean, and at +1 cigarette
+p0 <- predict(logit_bw, newdata = avg_woman)
+p1 <- predict(logit_bw, newdata = avg_woman |> mutate(cigs = cigs + 1))
+
+# Marginal effect of one more cigarette at the mean
+p1 - p0
+```
+
+- Compare this number to $\hat{\beta_1}$ from the LPM — near the center of the distribution, the two should be very close.
 
 
