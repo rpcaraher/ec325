@@ -38,17 +38,20 @@ theme_set(theme_minimal(base_size = 16) +
 ```
 
 
-## Where We Are
+## Where We Are {.smaller}
 
-- Started with the "gold standard" of causal inference: **RCTs**
-- Next best alternative: **multivariate OLS** --- control for observable confounders
-- Last unit: **binary outcomes** --- more flexible models for real-life data
-- Central threat throughout: **omitted variable bias**
+- The **Fundamental Problem of Causal Inference**
+    - Cannot observe both the treated and untreated outcome for unit $i$ -- no multiverse!
+    - Need to control for **Selection Bias** to ensure **apples-to-apples** comparisons
+- Best method: the "gold standard" of the **RCT**
+    - Random assignment ensures comparable treatment and control groups
+- Next best alternative: **multivariate OLS**
+    - Control directly for omitted variables which may cause selection bias
 - We can control for what we can observe... but what about **unobservable** confounders? Ability, motivation, culture, history?
 
 . . .
 
-Today: a new data structure --- **panel data** --- that lets us control for unobservables.
+Today: a new data structure --- **panel data** --- that lets us control for (certain) unobservables.
 
 
 ## Cross-Sectional Data
@@ -237,16 +240,15 @@ $$\bar{y}_i = \beta_0 + \beta_1 \bar{x}_i + a_i + \bar{\mu}_i$$
 **Step 2:** Subtract the time-average equation from the original:
 
 \begin{align}
-y_{it} - \bar{y}_i &= (\beta_0 - \beta_0) + \beta_1(x_{it} - \bar{x}_i) + (a_i - a_i) + (\mu_{it} - \bar{\mu}_i)
+y_{it} - \bar{y}_i &= (\beta_0 - \bar{\beta}_0) + \beta_1(x_{it} - \bar{x}_i) + (a_i - \bar{a}_i) + (\mu_{it} - \bar{\mu}_i)
 \end{align}
 
 . . .
 
 What happened?
 
-- $\beta_0 - \beta_0 = 0$ --- the intercept drops out
-- $a_i - a_i = 0$ --- **the fixed effect drops out!** Since $a_i$ is constant over time, its time average is just itself
-
+- $a_i - \bar{a}_i = a_i - a_i = 0$ --- **the fixed effect drops out!** Since $a_i$ is constant over time, its time average is just itself
+- $\beta_0 - \bar{\beta}_0 = 0$ --- the intercept also drops out
 . . .
 
 We're left with only **demeaned** variables:
@@ -324,29 +326,31 @@ Notice: the **demeaned** values only reflect how each city differs from **its ow
 ```{r}
 #| echo: true
 
-lm(crime_demean ~ unem_demean, data = example_df) |> coef()
+summary(lm(crime_demean ~ unem_demean, data = example_df))
 ```
 
 . . .
 
-Now compare to a regression using *between* variation:
+Now compare to a regression using only *between* variation:
 
 ```{r}
 #| echo: true
 
-lm(crime ~ unem, data = example_df) |> coef()
+summary(lm(crime ~ unem, data = example_df) |> coef())
 ```
 
+. . .
 
+Whats the difference?
 
 ## Going Further: Time Fixed Effects {.smaller}
 
-- We removed **unit-level** confounders by demeaning across time. But what about shocks that hit **all** cities in a given year (e.g., a recession, a national policy change)? 
+- We removed unobserved, **unit-specific** confounders by demeaning by **unit-specific across-time averages**. But what about shocks that hit **all** cities in a given year (e.g., a recession, a national policy change)? 
 - These are called **time-fixed effects**
 
 . . .
 
-We can go a step further: take our **unit-demeaned** data and demean it again --- this time across **units within each year**:
+We can go a step further: take our **unit-demeaned** data and demean it again --- but now subtracting off **year-specific across-unit averages**:
 
 ```{r}
 #| echo: true
@@ -372,23 +376,14 @@ Now regress the **doubly-demeaned** variables (no intercept needed):
 ```{r}
 #| echo: true
 
-lm(crime_dm2 ~ unem_dm2 - 1, data = example_df) |> coef()
-```
-
-. . .
-
-Compare to a regression with dummies for **both** city and year:
-
-```{r}
-#| echo: true
-
-lm(crime ~ unem + factor(city) + factor(year), data = example_df) |> coef()
+lm(crime_dm2 ~ 0 + unem_dm2, data = example_df) |> coef()
 ```
 
 . . .
 
 ::: {.highlight-box}
-Same coefficient on `unem`! Sequential demeaning --- first by unit, then by time --- is equivalent to including **both** unit and time fixed effects. The first demeaning removes time-invariant unit confounders; the second removes unit-invariant time shocks.
+Sequential demeaning --- first by unit, then by time --- adds **both** unit and time fixed effects. 
+The first demeaning removes time-invariant unit confounders; the second removes unit-invariant time shocks.
 :::
 
 
@@ -623,7 +618,7 @@ fe_estimates$year
 
 . . .
 
-- **City FE**: Baltimore has the highest baseline crime; Raleigh the lowest. These capture everything about each city that is stable over time.
+- **City FE**: Baltimore has the highest average crime (conditional on police spending); Raleigh the lowest. These capture everything about each city that is stable over time.
 - **Year FE**: common year-to-year shocks affecting all cities.
 - We usually don't care about these coefficients *per se*, but they can give useful information:
   - "Accounting for police spending, Baltimore has the highest baseline crime (relative to the omitted city)"
