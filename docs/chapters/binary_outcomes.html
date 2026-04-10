@@ -2,13 +2,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.27">
+<meta name="generator" content="quarto-1.9.36">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
 <title>10&nbsp; Binary Outcomes – EC325 Lecture Notes</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -59,7 +62,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
-  margin-bottom: 0em;
 }
 .hanging-indent div.csl-entry {
   margin-left:2em;
@@ -89,15 +91,14 @@ div.csl-indent {
 <link href="../chapters/heteroskedasticity.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-5ccb035bea26c1e21f80f44cf7c27909.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -127,7 +128,7 @@ div.csl-indent {
 }</script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -529,8 +530,8 @@ function checkAnswer(selectElement, correctValue) {
 <div id="callout-2" class="callout-2-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ul>
-<li><span class="citation" data-cites="wooldridge_introductory_2019">Wooldridge (<a href="references.html#ref-wooldridge_introductory_2019" role="doc-biblioref">2019</a>)</span>, Ch. 7.5, 17.1</li>
-<li><span class="citation" data-cites="bailey_real_2020">Bailey (<a href="references.html#ref-bailey_real_2020" role="doc-biblioref">2020</a>)</span>, Ch. 12</li>
+<li><span class="citation" data-cites="wooldridge_introductory_2019">Wooldridge (<a href="#ref-wooldridge_introductory_2019" role="doc-biblioref">2019</a>)</span>, Ch. 7.5, 17.1</li>
+<li><span class="citation" data-cites="bailey_real_2020">Bailey (<a href="#ref-bailey_real_2020" role="doc-biblioref">2020</a>)</span>, Ch. 12</li>
 </ul>
 </div>
 </div>
@@ -569,7 +570,7 @@ Figure&nbsp;10.1: The distribution of a binary outcome: women’s labor force pa
 </div>
 </div>
 </div>
-<p>As <a href="#fig-binary-dist" class="quarto-xref">Figure&nbsp;<span>10.1</span></a> shows, about 57% of the women in the sample are in the labor force and 43% are not. This is fundamentally different from the continuous outcomes we have worked with before. There are no “in-between” values—a woman is either in the labor force or she isn’t.</p>
+<p>As <a href="#fig-binary-dist" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-binary-dist</span></a> shows, about 57% of the women in the sample are in the labor force and 43% are not. This is fundamentally different from the continuous outcomes we have worked with before. There are no “in-between” values—a woman is either in the labor force or she isn’t.</p>
 <p>So what happens if we try to use OLS to model this outcome? The answer leads us to the <strong>linear probability model</strong>.</p>
 </section>
 <section id="the-linear-probability-model" class="level2" data-number="10.2">
@@ -639,7 +640,7 @@ Figure&nbsp;10.2: Women with more young children are less likely to participate 
 </div>
 </div>
 </div>
-<p><a href="#fig-raw-relationship" class="quarto-xref">Figure&nbsp;<span>10.2</span></a> makes the pattern clear even before we run any regressions: women with no young children have the highest labor force participation rate, and the rate drops sharply with each additional young child. Now let’s see what OLS tells us after controlling for other factors:</p>
+<p><a href="#fig-raw-relationship" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-raw-relationship</span></a> makes the pattern clear even before we run any regressions: women with no young children have the highest labor force participation rate, and the rate drops sharply with each additional young child. Now let’s see what OLS tells us after controlling for other factors:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>reg <span class="ot">&lt;-</span> <span class="fu">lm</span>(inlf <span class="sc">~</span> kidslt6 <span class="sc">+</span> kidsge6 <span class="sc">+</span> nwifeinc <span class="sc">+</span> motheduc, <span class="at">data =</span> lf_data)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(reg)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -750,7 +751,7 @@ Figure&nbsp;10.4: LPM predicted probabilities by number of young children. Some 
 </div>
 </div>
 </div>
-<p>As <a href="#fig-lpm-scatter" class="quarto-xref">Figure&nbsp;<span>10.4</span></a> shows, some predicted probabilities fall below zero—particularly for women with multiple young children. The LPM simply cannot respect the fact that probabilities are bounded.</p>
+<p>As <a href="#fig-lpm-scatter" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-lpm-scatter</span></a> shows, some predicted probabilities fall below zero—particularly for women with multiple young children. The LPM simply cannot respect the fact that probabilities are bounded.</p>
 </section>
 <section id="problem-2-heteroskedasticity" class="level3" data-number="10.4.2">
 <h3 data-number="10.4.2" class="anchored" data-anchor-id="problem-2-heteroskedasticity"><span class="header-section-number">10.4.2</span> Problem 2: Heteroskedasticity</h3>
@@ -780,7 +781,7 @@ Figure&nbsp;10.5: The variance of the error term in a binary outcome model depen
 </div>
 </div>
 </div>
-<p>We can see this visually using a simple simulation. <a href="#fig-heterosk-scatter" class="quarto-xref">Figure&nbsp;<span>10.6</span></a> plots binary outcomes against a single explanatory variable <span class="math inline">\(x\)</span>, with the LPM fitted line overlaid and vertical segments showing each residual. Focus on the <strong>left side</strong> of the plot, where <span class="math inline">\(\hat{p}\)</span> is near 0: almost everyone has <span class="math inline">\(y = 0\)</span>, so the residuals are short. Now look at the <strong>middle</strong>, where <span class="math inline">\(\hat{p}\)</span> is near 0.5: the outcomes are a roughly even mix of 0s and 1s, so the residuals are long in both directions. This changing spread is heteroskedasticity—and it is inherent to binary data.</p>
+<p>We can see this visually using a simple simulation. <a href="#fig-heterosk-scatter" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-heterosk-scatter</span></a> plots binary outcomes against a single explanatory variable <span class="math inline">\(x\)</span>, with the LPM fitted line overlaid and vertical segments showing each residual. Focus on the <strong>left side</strong> of the plot, where <span class="math inline">\(\hat{p}\)</span> is near 0: almost everyone has <span class="math inline">\(y = 0\)</span>, so the residuals are short. Now look at the <strong>middle</strong>, where <span class="math inline">\(\hat{p}\)</span> is near 0.5: the outcomes are a roughly even mix of 0s and 1s, so the residuals are long in both directions. This changing spread is heteroskedasticity—and it is inherent to binary data.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-heterosk-scatter" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -840,7 +841,7 @@ Figure&nbsp;10.7: The logistic function maps any real number to the (0, 1) inter
 </div>
 </div>
 </div>
-<p>Several features of <a href="#fig-logistic-function" class="quarto-xref">Figure&nbsp;<span>10.7</span></a> are worth noting. When <span class="math inline">\(z\)</span> is very negative, <span class="math inline">\(G(z)\)</span> is close to 0; when <span class="math inline">\(z\)</span> is very positive, <span class="math inline">\(G(z)\)</span> is close to 1; and at <span class="math inline">\(z = 0\)</span>, <span class="math inline">\(G(z) = 0.5\)</span>. Crucially, <span class="math inline">\(G(z)\)</span> is <strong>strictly</strong> between 0 and 1 for all values of <span class="math inline">\(z\)</span>—so the logit model can never produce impossible predicted probabilities.</p>
+<p>Several features of <a href="#fig-logistic-function" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-logistic-function</span></a> are worth noting. When <span class="math inline">\(z\)</span> is very negative, <span class="math inline">\(G(z)\)</span> is close to 0; when <span class="math inline">\(z\)</span> is very positive, <span class="math inline">\(G(z)\)</span> is close to 1; and at <span class="math inline">\(z = 0\)</span>, <span class="math inline">\(G(z) = 0.5\)</span>. Crucially, <span class="math inline">\(G(z)\)</span> is <strong>strictly</strong> between 0 and 1 for all values of <span class="math inline">\(z\)</span>—so the logit model can never produce impossible predicted probabilities.</p>
 <p>Notice also that the logistic function is <strong>nearly linear in the middle</strong> of its range (roughly between <span class="math inline">\(z = -2\)</span> and <span class="math inline">\(z = 2\)</span>) but curves toward the boundaries at the extremes. This will be important later when we compare the LPM and logit results.</p>
 <p>There is an important consequence of wrapping the linear index inside <span class="math inline">\(G(\cdot)\)</span>: the model is now <strong>nonlinear in the parameters</strong> <span class="math inline">\(\beta\)</span>. In the LPM, we had <span class="math inline">\(P(y = 1 | \mathbf{x}) = \beta_0 + \beta_1 x_1 + \cdots + \beta_k x_k\)</span>, which is a linear function of the <span class="math inline">\(\beta\)</span>’s—exactly the kind of equation OLS is designed to estimate. In the logit model, we have <span class="math inline">\(P(y = 1 | \mathbf{x}) = G(\beta_0 + \beta_1 x_1 + \cdots + \beta_k x_k)\)</span>, where <span class="math inline">\(G(\cdot)\)</span> is the nonlinear logistic function. Because <span class="math inline">\(G(\cdot)\)</span> is nonlinear, there is no way to rearrange this equation into the <span class="math inline">\(y = X\beta + \mu\)</span> form that OLS requires. Instead, logistic regression is estimated by <strong>maximum likelihood estimation</strong> (MLE), which finds the values of <span class="math inline">\(\beta\)</span> that make the observed data most probable under the model. We won’t go into the details of MLE in this course, but the key point is that we need a fundamentally different estimation technique because the nonlinearity of <span class="math inline">\(G(\cdot)\)</span> takes us outside the world where OLS applies.</p>
 </section>
@@ -861,7 +862,7 @@ Figure&nbsp;10.8: The LPM (blue, dashed) predicts probability as a straight line
 </div>
 </div>
 </div>
-<p>In <a href="#fig-lpm-vs-logit-fit" class="quarto-xref">Figure&nbsp;<span>10.8</span></a>, the gray points show the actual data—all at <span class="math inline">\(y = 0\)</span> or <span class="math inline">\(y = 1\)</span>. The x-axis is the linear index, which combines all the explanatory variables into a single score for each woman. Women with low index values have characteristics that predict low labor force participation (e.g., many young children, high non-labor income); women with high index values have characteristics that predict high participation.</p>
+<p>In <a href="#fig-lpm-vs-logit-fit" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-lpm-vs-logit-fit</span></a>, the gray points show the actual data—all at <span class="math inline">\(y = 0\)</span> or <span class="math inline">\(y = 1\)</span>. The x-axis is the linear index, which combines all the explanatory variables into a single score for each woman. Women with low index values have characteristics that predict low labor force participation (e.g., many young children, high non-labor income); women with high index values have characteristics that predict high participation.</p>
 <p>The LPM maps this index to a predicted probability using a straight line, which inevitably extends beyond the [0, 1] bounds at the extremes. The logit wraps the same index through the S-shaped logistic function, keeping all predictions between 0 and 1. In the middle range—where most of the data sits—the two models agree closely. They diverge mainly at the tails, which is exactly where the LPM’s out-of-bounds problem arises.</p>
 </section>
 <section id="maximum-likelihood-estimation" class="level3" data-number="10.5.3">
@@ -984,161 +985,127 @@ Table&nbsp;10.1: Comparison of LPM and Logistic Regression estimates for women�
 <div class="cell-output-display">
 <!-- preamble start -->
 
+    <script src="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.js"></script>
+
     <script>
-
-      function styleCell_ghigt99x3opwli5oto18(i, j, css_id) {
-          var table = document.getElementById("tinytable_ghigt99x3opwli5oto18");
-          var cell = table.querySelector(`[data-row="${i}"][data-col="${j}"]`);
-          if (cell) {
-              console.log(`Styling cell at (${i}, ${j}) with class ${css_id}`);
-              cell.classList.add(css_id);
-          } else {
-              console.warn(`Cell at (${i}, ${j}) not found.`);
-          }
-      }
-      function spanCell_ghigt99x3opwli5oto18(i, j, rowspan, colspan) {
-        var table = document.getElementById("tinytable_ghigt99x3opwli5oto18");
-        const targetCell = table.querySelector(`[data-row="${i}"][data-col="${j}"]`);
-        if (!targetCell) {
-          console.warn(`Cell at (${i}, ${j}) not found.`);
-        }
-
-        // Get all cells that need to be removed
-        const cellsToRemove = [];
-        for (let r = 0; r < rowspan; r++) {
-          for (let c = 0; c < colspan; c++) {
-            if (r === 0 && c === 0) continue; // Skip the target cell
-            const cell = table.querySelector(`[data-row="${i + r}"][data-col="${j + c}"]`);
-            if (cell) {
-              cellsToRemove.push(cell);
-            }
-          }
-        }
-
-        // Remove all cells
-        cellsToRemove.forEach(cell => cell.remove());
-
-        // Set rowspan and colspan of the target cell if it exists
-        if (targetCell) {
-          targetCell.rowSpan = rowspan;
-          targetCell.colSpan = colspan;
-        }
-      }
+      // Create table-specific functions using external factory
+      const tableFns_r2wsj896rho98ie2ljxm = TinyTable.createTableFunctions("tinytable_r2wsj896rho98ie2ljxm");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: '14', j: 1 }, { i: '14', j: 2 },  ], css_id: 'tinytable_css_hgxbtyjpo7jrwkx4b2h0',}, 
-          { positions: [ { i: '10', j: 1 }, { i: '10', j: 2 },  ], css_id: 'tinytable_css_27i9ebyvx0c6aacxedpr',}, 
-          { positions: [ { i: '1', j: 1 }, { i: '3', j: 1 }, { i: '4', j: 1 }, { i: '5', j: 1 }, { i: '6', j: 1 }, { i: '7', j: 1 }, { i: '8', j: 1 }, { i: '9', j: 1 }, { i: '8', j: 2 }, { i: '11', j: 1 }, { i: '12', j: 1 }, { i: '13', j: 1 }, { i: '12', j: 2 }, { i: '2', j: 1 }, { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '4', j: 2 }, { i: '5', j: 2 }, { i: '6', j: 2 }, { i: '7', j: 2 }, { i: '9', j: 2 }, { i: '11', j: 2 }, { i: '13', j: 2 },  ], css_id: 'tinytable_css_le397uryj7v2achk4ujh',}, 
-          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 },  ], css_id: 'tinytable_css_mhkwad1yrff77um9aqmw',}, 
-          { positions: [ { i: '14', j: 0 },  ], css_id: 'tinytable_css_ff2vk29k6isnstyxkpw5',}, 
-          { positions: [ { i: '10', j: 0 },  ], css_id: 'tinytable_css_remi9c0ap9eg7z59qjon',}, 
-          { positions: [ { i: '1', j: 0 }, { i: '2', j: 0 }, { i: '3', j: 0 }, { i: '4', j: 0 }, { i: '5', j: 0 }, { i: '6', j: 0 }, { i: '7', j: 0 }, { i: '8', j: 0 }, { i: '9', j: 0 }, { i: '11', j: 0 }, { i: '12', j: 0 }, { i: '13', j: 0 },  ], css_id: 'tinytable_css_2uh9wj5s3q8mpb9mqxfo',}, 
-          { positions: [ { i: '0', j: 0 },  ], css_id: 'tinytable_css_a5u4d09bl0324jxmzj8q',}, 
+          { positions: [ { i: '14', j: 2 }, { i: '14', j: 3 } ], css_id: 'tinytable_css_27i9ebyvx0c6aacxedpr',}, 
+          { positions: [ { i: '10', j: 2 }, { i: '10', j: 3 } ], css_id: 'tinytable_css_le397uryj7v2achk4ujh',}, 
+          { positions: [ { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '4', j: 2 }, { i: '5', j: 2 }, { i: '6', j: 2 }, { i: '7', j: 2 }, { i: '8', j: 2 }, { i: '9', j: 2 }, { i: '11', j: 2 }, { i: '12', j: 2 }, { i: '13', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '3', j: 3 }, { i: '4', j: 3 }, { i: '5', j: 3 }, { i: '6', j: 3 }, { i: '7', j: 3 }, { i: '8', j: 3 }, { i: '9', j: 3 }, { i: '11', j: 3 }, { i: '12', j: 3 }, { i: '13', j: 3 } ], css_id: 'tinytable_css_mhkwad1yrff77um9aqmw',}, 
+          { positions: [ { i: '0', j: 2 }, { i: '0', j: 3 } ], css_id: 'tinytable_css_ff2vk29k6isnstyxkpw5',}, 
+          { positions: [ { i: '14', j: 1 } ], css_id: 'tinytable_css_remi9c0ap9eg7z59qjon',}, 
+          { positions: [ { i: '10', j: 1 } ], css_id: 'tinytable_css_2uh9wj5s3q8mpb9mqxfo',}, 
+          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '4', j: 1 }, { i: '5', j: 1 }, { i: '6', j: 1 }, { i: '7', j: 1 }, { i: '8', j: 1 }, { i: '9', j: 1 }, { i: '11', j: 1 }, { i: '12', j: 1 }, { i: '13', j: 1 } ], css_id: 'tinytable_css_a5u4d09bl0324jxmzj8q',}, 
+          { positions: [ { i: '0', j: 1 } ], css_id: 'tinytable_css_ghigt99x3opwli5oto18',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  styleCell_ghigt99x3opwli5oto18(cell.i, cell.j, group.css_id);
+                  tableFns_r2wsj896rho98ie2ljxm.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
     </script>
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
-      /* tinytable css entries after */
-      .table td.tinytable_css_hgxbtyjpo7jrwkx4b2h0, .table th.tinytable_css_hgxbtyjpo7jrwkx4b2h0 { text-align: center; border-bottom: solid #d3d8dc 0.1em; }
-      .table td.tinytable_css_27i9ebyvx0c6aacxedpr, .table th.tinytable_css_27i9ebyvx0c6aacxedpr { text-align: center; border-bottom: solid black 0.05em; }
-      .table td.tinytable_css_le397uryj7v2achk4ujh, .table th.tinytable_css_le397uryj7v2achk4ujh { text-align: center; }
-      .table td.tinytable_css_mhkwad1yrff77um9aqmw, .table th.tinytable_css_mhkwad1yrff77um9aqmw { text-align: center; border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
-      .table td.tinytable_css_ff2vk29k6isnstyxkpw5, .table th.tinytable_css_ff2vk29k6isnstyxkpw5 { text-align: left; border-bottom: solid #d3d8dc 0.1em; }
-      .table td.tinytable_css_remi9c0ap9eg7z59qjon, .table th.tinytable_css_remi9c0ap9eg7z59qjon { text-align: left; border-bottom: solid black 0.05em; }
-      .table td.tinytable_css_2uh9wj5s3q8mpb9mqxfo, .table th.tinytable_css_2uh9wj5s3q8mpb9mqxfo { text-align: left; }
-      .table td.tinytable_css_a5u4d09bl0324jxmzj8q, .table th.tinytable_css_a5u4d09bl0324jxmzj8q { text-align: left; border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
+    /* tinytable css entries after */
+    #tinytable_r2wsj896rho98ie2ljxm td.tinytable_css_27i9ebyvx0c6aacxedpr, #tinytable_r2wsj896rho98ie2ljxm th.tinytable_css_27i9ebyvx0c6aacxedpr {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_r2wsj896rho98ie2ljxm td.tinytable_css_le397uryj7v2achk4ujh, #tinytable_r2wsj896rho98ie2ljxm th.tinytable_css_le397uryj7v2achk4ujh {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_r2wsj896rho98ie2ljxm td.tinytable_css_mhkwad1yrff77um9aqmw, #tinytable_r2wsj896rho98ie2ljxm th.tinytable_css_mhkwad1yrff77um9aqmw { text-align: center }
+    #tinytable_r2wsj896rho98ie2ljxm td.tinytable_css_ff2vk29k6isnstyxkpw5, #tinytable_r2wsj896rho98ie2ljxm th.tinytable_css_ff2vk29k6isnstyxkpw5 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_r2wsj896rho98ie2ljxm td.tinytable_css_remi9c0ap9eg7z59qjon, #tinytable_r2wsj896rho98ie2ljxm th.tinytable_css_remi9c0ap9eg7z59qjon {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_r2wsj896rho98ie2ljxm td.tinytable_css_2uh9wj5s3q8mpb9mqxfo, #tinytable_r2wsj896rho98ie2ljxm th.tinytable_css_2uh9wj5s3q8mpb9mqxfo {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_r2wsj896rho98ie2ljxm td.tinytable_css_a5u4d09bl0324jxmzj8q, #tinytable_r2wsj896rho98ie2ljxm th.tinytable_css_a5u4d09bl0324jxmzj8q { text-align: left }
+    #tinytable_r2wsj896rho98ie2ljxm td.tinytable_css_ghigt99x3opwli5oto18, #tinytable_r2wsj896rho98ie2ljxm th.tinytable_css_ghigt99x3opwli5oto18 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
     </style>
     <div class="container">
-      <table class="table table-borderless" id="tinytable_ghigt99x3opwli5oto18" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="tinytable" id="tinytable_r2wsj896rho98ie2ljxm" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+        <caption>LPM vs. Logit: Women's Labor Force Participation</caption>
         <thead>
-        </thead><caption>LPM vs. Logit: Women's Labor Force Participation</caption>
-              <tbody><tr>
-                <th scope="col" data-row="0" data-col="0"> </th>
-                <th scope="col" data-row="0" data-col="1">LPM (OLS)</th>
-                <th scope="col" data-row="0" data-col="2">Logit</th>
+              <tr>
+                <th scope="col" data-row="0" data-col="1"> </th>
+                <th scope="col" data-row="0" data-col="2">LPM (OLS)</th>
+                <th scope="col" data-row="0" data-col="3">Logit</th>
               </tr>
-        
-        </tbody><tfoot><tr><td colspan="3">* p &lt; 0.1, ** p &lt; 0.05, *** p &lt; 0.01</td></tr></tfoot>
+        </thead>
+        <tfoot><tr><td colspan="3">* p &lt; 0.1, ** p &lt; 0.05, *** p &lt; 0.01</td></tr></tfoot>
         <tbody>
                 <tr>
-                  <td data-row="1" data-col="0">(Intercept)</td>
-                  <td data-row="1" data-col="1">0.542***</td>
-                  <td data-row="1" data-col="2">0.177</td>
+                  <td data-row="1" data-col="1">(Intercept)</td>
+                  <td data-row="1" data-col="2">0.542***</td>
+                  <td data-row="1" data-col="3">0.177</td>
                 </tr>
                 <tr>
-                  <td data-row="2" data-col="0"></td>
-                  <td data-row="2" data-col="1">(0.059)</td>
-                  <td data-row="2" data-col="2">(0.258)</td>
+                  <td data-row="2" data-col="1"></td>
+                  <td data-row="2" data-col="2">(0.059)</td>
+                  <td data-row="2" data-col="3">(0.258)</td>
                 </tr>
                 <tr>
-                  <td data-row="3" data-col="0">kidslt6</td>
-                  <td data-row="3" data-col="1">-0.212***</td>
-                  <td data-row="3" data-col="2">-0.965***</td>
+                  <td data-row="3" data-col="1">kidslt6</td>
+                  <td data-row="3" data-col="2">-0.212***</td>
+                  <td data-row="3" data-col="3">-0.965***</td>
                 </tr>
                 <tr>
-                  <td data-row="4" data-col="0"></td>
-                  <td data-row="4" data-col="1">(0.034)</td>
-                  <td data-row="4" data-col="2">(0.164)</td>
+                  <td data-row="4" data-col="1"></td>
+                  <td data-row="4" data-col="2">(0.034)</td>
+                  <td data-row="4" data-col="3">(0.164)</td>
                 </tr>
                 <tr>
-                  <td data-row="5" data-col="0">kidsge6</td>
-                  <td data-row="5" data-col="1">0.006</td>
-                  <td data-row="5" data-col="2">0.027</td>
+                  <td data-row="5" data-col="1">kidsge6</td>
+                  <td data-row="5" data-col="2">0.006</td>
+                  <td data-row="5" data-col="3">0.027</td>
                 </tr>
                 <tr>
-                  <td data-row="6" data-col="0"></td>
-                  <td data-row="6" data-col="1">(0.013)</td>
-                  <td data-row="6" data-col="2">(0.059)</td>
+                  <td data-row="6" data-col="1"></td>
+                  <td data-row="6" data-col="2">(0.013)</td>
+                  <td data-row="6" data-col="3">(0.059)</td>
                 </tr>
                 <tr>
-                  <td data-row="7" data-col="0">nwifeinc</td>
-                  <td data-row="7" data-col="1">-0.005***</td>
-                  <td data-row="7" data-col="2">-0.025***</td>
+                  <td data-row="7" data-col="1">nwifeinc</td>
+                  <td data-row="7" data-col="2">-0.005***</td>
+                  <td data-row="7" data-col="3">-0.025***</td>
                 </tr>
                 <tr>
-                  <td data-row="8" data-col="0"></td>
-                  <td data-row="8" data-col="1">(0.002)</td>
-                  <td data-row="8" data-col="2">(0.007)</td>
+                  <td data-row="8" data-col="1"></td>
+                  <td data-row="8" data-col="2">(0.002)</td>
+                  <td data-row="8" data-col="3">(0.007)</td>
                 </tr>
                 <tr>
-                  <td data-row="9" data-col="0">motheduc</td>
-                  <td data-row="9" data-col="1">0.019***</td>
-                  <td data-row="9" data-col="2">0.085***</td>
+                  <td data-row="9" data-col="1">motheduc</td>
+                  <td data-row="9" data-col="2">0.019***</td>
+                  <td data-row="9" data-col="3">0.085***</td>
                 </tr>
                 <tr>
-                  <td data-row="10" data-col="0"></td>
-                  <td data-row="10" data-col="1">(0.005)</td>
-                  <td data-row="10" data-col="2">(0.024)</td>
+                  <td data-row="10" data-col="1"></td>
+                  <td data-row="10" data-col="2">(0.005)</td>
+                  <td data-row="10" data-col="3">(0.024)</td>
                 </tr>
                 <tr>
-                  <td data-row="11" data-col="0">Num.Obs.</td>
-                  <td data-row="11" data-col="1">753</td>
+                  <td data-row="11" data-col="1">Num.Obs.</td>
                   <td data-row="11" data-col="2">753</td>
+                  <td data-row="11" data-col="3">753</td>
                 </tr>
                 <tr>
-                  <td data-row="12" data-col="0">R2</td>
-                  <td data-row="12" data-col="1">0.075</td>
-                  <td data-row="12" data-col="2">0.057</td>
+                  <td data-row="12" data-col="1">R2</td>
+                  <td data-row="12" data-col="2">0.075</td>
+                  <td data-row="12" data-col="3">0.057</td>
                 </tr>
                 <tr>
-                  <td data-row="13" data-col="0">Log.Lik.</td>
-                  <td data-row="13" data-col="1">-510.246</td>
-                  <td data-row="13" data-col="2"></td>
+                  <td data-row="13" data-col="1">Log.Lik.</td>
+                  <td data-row="13" data-col="2">-510.246</td>
+                  <td data-row="13" data-col="3"></td>
                 </tr>
                 <tr>
-                  <td data-row="14" data-col="0">AIC</td>
-                  <td data-row="14" data-col="1">1032.5</td>
-                  <td data-row="14" data-col="2">980.9</td>
+                  <td data-row="14" data-col="1">AIC</td>
+                  <td data-row="14" data-col="2">1032.5</td>
+                  <td data-row="14" data-col="3">980.9</td>
                 </tr>
         </tbody>
       </table>
@@ -1149,7 +1116,7 @@ Table&nbsp;10.1: Comparison of LPM and Logistic Regression estimates for women�
 </figure>
 </div>
 </div>
-<p>The key things to notice in <a href="#tbl-lpm-logit" class="quarto-xref">Table&nbsp;<span>10.1</span></a> are that the signs are the same across both models (both agree on the direction of each effect), but the magnitudes are different because the logit coefficients represent something different (changes in log-odds rather than changes in probability).</p>
+<p>The key things to notice in <a href="#tbl-lpm-logit" class="quarto-xref">Table&nbsp;<span class="quarto-unresolved-ref">tbl-lpm-logit</span></a> are that the signs are the same across both models (both agree on the direction of each effect), but the magnitudes are different because the logit coefficients represent something different (changes in log-odds rather than changes in probability).</p>
 </section>
 <section id="predicted-probabilities-stay-in-bounds" class="level3" data-number="10.6.2">
 <h3 data-number="10.6.2" class="anchored" data-anchor-id="predicted-probabilities-stay-in-bounds"><span class="header-section-number">10.6.2</span> Predicted Probabilities Stay In Bounds</h3>
@@ -1192,7 +1159,7 @@ Figure&nbsp;10.9: Comparing predicted probability distributions from the LPM (le
 </div>
 </div>
 </div>
-<p><a href="#fig-pred-comparison" class="quarto-xref">Figure&nbsp;<span>10.9</span></a> clearly shows the advantage of logistic regression: all predictions are squeezed into the valid [0, 1] range.</p>
+<p><a href="#fig-pred-comparison" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-pred-comparison</span></a> clearly shows the advantage of logistic regression: all predictions are squeezed into the valid [0, 1] range.</p>
 </section>
 </section>
 <section id="interpreting-logistic-regression" class="level2" data-number="10.7">
@@ -1253,7 +1220,7 @@ Figure&nbsp;10.10: Odds ratios from the logistic regression. Values below 1 (to 
 </div>
 </div>
 </div>
-<p><a href="#fig-odds-ratios" class="quarto-xref">Figure&nbsp;<span>10.10</span></a> shows the odds ratios with 95% confidence intervals. Here’s how to read them:</p>
+<p><a href="#fig-odds-ratios" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-odds-ratios</span></a> shows the odds ratios with 95% confidence intervals. Here’s how to read them:</p>
 <ul>
 <li><strong>Kids &lt; 6</strong>: The odds ratio is about <span class="math inline">\(\exp(-0.87) \approx 0.42\)</span>. Each additional child under 6 <strong>multiplies</strong> the odds of working by 0.42—reducing them by 58%. This is a large effect.</li>
 <li><strong>Mother’s Educ</strong>: The odds ratio is about <span class="math inline">\(\exp(0.10) \approx 1.10\)</span>. Each additional year of mother’s education multiplies the odds of working by 1.10—increasing them by 10%.</li>
@@ -1335,7 +1302,7 @@ Figure&nbsp;10.11: The marginal effect of one additional young child on labor fo
 </div>
 </div>
 </div>
-<p><a href="#fig-marginal-effects" class="quarto-xref">Figure&nbsp;<span>10.11</span></a> reveals a key property of the logit model: the marginal effect is not constant. The LPM assumes the same effect everywhere (the dashed line), but the logit marginal effect varies depending on the starting probability. The effect is largest when the predicted probability is near 0.5 (where the logistic curve is steepest) and smaller when the probability is near 0 or 1 (where the curve flattens out).</p>
+<p><a href="#fig-marginal-effects" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-marginal-effects</span></a> reveals a key property of the logit model: the marginal effect is not constant. The LPM assumes the same effect everywhere (the dashed line), but the logit marginal effect varies depending on the starting probability. The effect is largest when the predicted probability is near 0.5 (where the logistic curve is steepest) and smaller when the probability is near 0 or 1 (where the curve flattens out).</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1385,156 +1352,122 @@ Table&nbsp;10.2: LPM and Logit estimates for the probability of low birthweight.
 <div class="cell-output-display">
 <!-- preamble start -->
 
+    <script src="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.js"></script>
+
     <script>
-
-      function styleCell_0dvrvtxynxnrhtlpjut7(i, j, css_id) {
-          var table = document.getElementById("tinytable_0dvrvtxynxnrhtlpjut7");
-          var cell = table.querySelector(`[data-row="${i}"][data-col="${j}"]`);
-          if (cell) {
-              console.log(`Styling cell at (${i}, ${j}) with class ${css_id}`);
-              cell.classList.add(css_id);
-          } else {
-              console.warn(`Cell at (${i}, ${j}) not found.`);
-          }
-      }
-      function spanCell_0dvrvtxynxnrhtlpjut7(i, j, rowspan, colspan) {
-        var table = document.getElementById("tinytable_0dvrvtxynxnrhtlpjut7");
-        const targetCell = table.querySelector(`[data-row="${i}"][data-col="${j}"]`);
-        if (!targetCell) {
-          console.warn(`Cell at (${i}, ${j}) not found.`);
-        }
-
-        // Get all cells that need to be removed
-        const cellsToRemove = [];
-        for (let r = 0; r < rowspan; r++) {
-          for (let c = 0; c < colspan; c++) {
-            if (r === 0 && c === 0) continue; // Skip the target cell
-            const cell = table.querySelector(`[data-row="${i + r}"][data-col="${j + c}"]`);
-            if (cell) {
-              cellsToRemove.push(cell);
-            }
-          }
-        }
-
-        // Remove all cells
-        cellsToRemove.forEach(cell => cell.remove());
-
-        // Set rowspan and colspan of the target cell if it exists
-        if (targetCell) {
-          targetCell.rowSpan = rowspan;
-          targetCell.colSpan = colspan;
-        }
-      }
+      // Create table-specific functions using external factory
+      const tableFns_7tjxkihnsxl3mgj8ikgx = TinyTable.createTableFunctions("tinytable_7tjxkihnsxl3mgj8ikgx");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: '13', j: 1 }, { i: '13', j: 2 },  ], css_id: 'tinytable_css_fg1emq2x2lw2df9q7m8y',}, 
-          { positions: [ { i: '10', j: 1 }, { i: '10', j: 2 },  ], css_id: 'tinytable_css_63uy04g0nwh245fcw9dx',}, 
-          { positions: [ { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '4', j: 1 }, { i: '5', j: 1 }, { i: '6', j: 1 }, { i: '7', j: 1 }, { i: '8', j: 1 }, { i: '9', j: 1 }, { i: '9', j: 2 }, { i: '11', j: 1 }, { i: '12', j: 1 }, { i: '12', j: 2 }, { i: '1', j: 1 }, { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '4', j: 2 }, { i: '5', j: 2 }, { i: '6', j: 2 }, { i: '7', j: 2 }, { i: '8', j: 2 }, { i: '11', j: 2 },  ], css_id: 'tinytable_css_3hyodq9m9k5r7upnijaq',}, 
-          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 },  ], css_id: 'tinytable_css_q7b8n22p6qmvejyqi1lw',}, 
-          { positions: [ { i: '13', j: 0 },  ], css_id: 'tinytable_css_z7dggfvo2d88n2zywl3s',}, 
-          { positions: [ { i: '10', j: 0 },  ], css_id: 'tinytable_css_8qsqgxjpbnntlt9w6on1',}, 
-          { positions: [ { i: '1', j: 0 }, { i: '2', j: 0 }, { i: '3', j: 0 }, { i: '4', j: 0 }, { i: '5', j: 0 }, { i: '6', j: 0 }, { i: '7', j: 0 }, { i: '8', j: 0 }, { i: '9', j: 0 }, { i: '11', j: 0 }, { i: '12', j: 0 },  ], css_id: 'tinytable_css_wawx0th3e6d9y64n4ky2',}, 
-          { positions: [ { i: '0', j: 0 },  ], css_id: 'tinytable_css_oy0t3rw5jd8run5la8hi',}, 
+          { positions: [ { i: '13', j: 2 }, { i: '13', j: 3 } ], css_id: 'tinytable_css_3hyodq9m9k5r7upnijaq',}, 
+          { positions: [ { i: '10', j: 2 }, { i: '10', j: 3 } ], css_id: 'tinytable_css_q7b8n22p6qmvejyqi1lw',}, 
+          { positions: [ { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '4', j: 2 }, { i: '5', j: 2 }, { i: '6', j: 2 }, { i: '7', j: 2 }, { i: '8', j: 2 }, { i: '9', j: 2 }, { i: '11', j: 2 }, { i: '12', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '3', j: 3 }, { i: '4', j: 3 }, { i: '5', j: 3 }, { i: '6', j: 3 }, { i: '7', j: 3 }, { i: '8', j: 3 }, { i: '9', j: 3 }, { i: '11', j: 3 }, { i: '12', j: 3 } ], css_id: 'tinytable_css_z7dggfvo2d88n2zywl3s',}, 
+          { positions: [ { i: '0', j: 2 }, { i: '0', j: 3 } ], css_id: 'tinytable_css_8qsqgxjpbnntlt9w6on1',}, 
+          { positions: [ { i: '13', j: 1 } ], css_id: 'tinytable_css_wawx0th3e6d9y64n4ky2',}, 
+          { positions: [ { i: '10', j: 1 } ], css_id: 'tinytable_css_oy0t3rw5jd8run5la8hi',}, 
+          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '4', j: 1 }, { i: '5', j: 1 }, { i: '6', j: 1 }, { i: '7', j: 1 }, { i: '8', j: 1 }, { i: '9', j: 1 }, { i: '11', j: 1 }, { i: '12', j: 1 } ], css_id: 'tinytable_css_0dvrvtxynxnrhtlpjut7',}, 
+          { positions: [ { i: '0', j: 1 } ], css_id: 'tinytable_css_630rgzxqspkycxzr9vqw',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  styleCell_0dvrvtxynxnrhtlpjut7(cell.i, cell.j, group.css_id);
+                  tableFns_7tjxkihnsxl3mgj8ikgx.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
     </script>
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
-      /* tinytable css entries after */
-      .table td.tinytable_css_fg1emq2x2lw2df9q7m8y, .table th.tinytable_css_fg1emq2x2lw2df9q7m8y { text-align: center; border-bottom: solid #d3d8dc 0.1em; }
-      .table td.tinytable_css_63uy04g0nwh245fcw9dx, .table th.tinytable_css_63uy04g0nwh245fcw9dx { text-align: center; border-bottom: solid black 0.05em; }
-      .table td.tinytable_css_3hyodq9m9k5r7upnijaq, .table th.tinytable_css_3hyodq9m9k5r7upnijaq { text-align: center; }
-      .table td.tinytable_css_q7b8n22p6qmvejyqi1lw, .table th.tinytable_css_q7b8n22p6qmvejyqi1lw { text-align: center; border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
-      .table td.tinytable_css_z7dggfvo2d88n2zywl3s, .table th.tinytable_css_z7dggfvo2d88n2zywl3s { text-align: left; border-bottom: solid #d3d8dc 0.1em; }
-      .table td.tinytable_css_8qsqgxjpbnntlt9w6on1, .table th.tinytable_css_8qsqgxjpbnntlt9w6on1 { text-align: left; border-bottom: solid black 0.05em; }
-      .table td.tinytable_css_wawx0th3e6d9y64n4ky2, .table th.tinytable_css_wawx0th3e6d9y64n4ky2 { text-align: left; }
-      .table td.tinytable_css_oy0t3rw5jd8run5la8hi, .table th.tinytable_css_oy0t3rw5jd8run5la8hi { text-align: left; border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
+    /* tinytable css entries after */
+    #tinytable_7tjxkihnsxl3mgj8ikgx td.tinytable_css_3hyodq9m9k5r7upnijaq, #tinytable_7tjxkihnsxl3mgj8ikgx th.tinytable_css_3hyodq9m9k5r7upnijaq {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_7tjxkihnsxl3mgj8ikgx td.tinytable_css_q7b8n22p6qmvejyqi1lw, #tinytable_7tjxkihnsxl3mgj8ikgx th.tinytable_css_q7b8n22p6qmvejyqi1lw {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_7tjxkihnsxl3mgj8ikgx td.tinytable_css_z7dggfvo2d88n2zywl3s, #tinytable_7tjxkihnsxl3mgj8ikgx th.tinytable_css_z7dggfvo2d88n2zywl3s { text-align: center }
+    #tinytable_7tjxkihnsxl3mgj8ikgx td.tinytable_css_8qsqgxjpbnntlt9w6on1, #tinytable_7tjxkihnsxl3mgj8ikgx th.tinytable_css_8qsqgxjpbnntlt9w6on1 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_7tjxkihnsxl3mgj8ikgx td.tinytable_css_wawx0th3e6d9y64n4ky2, #tinytable_7tjxkihnsxl3mgj8ikgx th.tinytable_css_wawx0th3e6d9y64n4ky2 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_7tjxkihnsxl3mgj8ikgx td.tinytable_css_oy0t3rw5jd8run5la8hi, #tinytable_7tjxkihnsxl3mgj8ikgx th.tinytable_css_oy0t3rw5jd8run5la8hi {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_7tjxkihnsxl3mgj8ikgx td.tinytable_css_0dvrvtxynxnrhtlpjut7, #tinytable_7tjxkihnsxl3mgj8ikgx th.tinytable_css_0dvrvtxynxnrhtlpjut7 { text-align: left }
+    #tinytable_7tjxkihnsxl3mgj8ikgx td.tinytable_css_630rgzxqspkycxzr9vqw, #tinytable_7tjxkihnsxl3mgj8ikgx th.tinytable_css_630rgzxqspkycxzr9vqw {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
     </style>
     <div class="container">
-      <table class="table table-borderless" id="tinytable_0dvrvtxynxnrhtlpjut7" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="tinytable" id="tinytable_7tjxkihnsxl3mgj8ikgx" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+        <caption>Determinants of Low Birthweight</caption>
         <thead>
-        </thead><caption>Determinants of Low Birthweight</caption>
-              <tbody><tr>
-                <th scope="col" data-row="0" data-col="0"> </th>
-                <th scope="col" data-row="0" data-col="1">LPM</th>
-                <th scope="col" data-row="0" data-col="2">Logit</th>
+              <tr>
+                <th scope="col" data-row="0" data-col="1"> </th>
+                <th scope="col" data-row="0" data-col="2">LPM</th>
+                <th scope="col" data-row="0" data-col="3">Logit</th>
               </tr>
-        
-        </tbody><tfoot><tr><td colspan="3">* p &lt; 0.1, ** p &lt; 0.05, *** p &lt; 0.01</td></tr></tfoot>
+        </thead>
+        <tfoot><tr><td colspan="3">* p &lt; 0.1, ** p &lt; 0.05, *** p &lt; 0.01</td></tr></tfoot>
         <tbody>
                 <tr>
-                  <td data-row="1" data-col="0">(Intercept)</td>
-                  <td data-row="1" data-col="1">0.064*</td>
-                  <td data-row="1" data-col="2">-2.647***</td>
+                  <td data-row="1" data-col="1">(Intercept)</td>
+                  <td data-row="1" data-col="2">0.064*</td>
+                  <td data-row="1" data-col="3">-2.647***</td>
                 </tr>
                 <tr>
-                  <td data-row="2" data-col="0"></td>
-                  <td data-row="2" data-col="1">(0.038)</td>
-                  <td data-row="2" data-col="2">(0.682)</td>
+                  <td data-row="2" data-col="1"></td>
+                  <td data-row="2" data-col="2">(0.038)</td>
+                  <td data-row="2" data-col="3">(0.682)</td>
                 </tr>
                 <tr>
-                  <td data-row="3" data-col="0">cigs</td>
-                  <td data-row="3" data-col="1">0.003**</td>
-                  <td data-row="3" data-col="2">0.032**</td>
+                  <td data-row="3" data-col="1">cigs</td>
+                  <td data-row="3" data-col="2">0.003**</td>
+                  <td data-row="3" data-col="3">0.032**</td>
                 </tr>
                 <tr>
-                  <td data-row="4" data-col="0"></td>
-                  <td data-row="4" data-col="1">(0.001)</td>
-                  <td data-row="4" data-col="2">(0.015)</td>
+                  <td data-row="4" data-col="1"></td>
+                  <td data-row="4" data-col="2">(0.001)</td>
+                  <td data-row="4" data-col="3">(0.015)</td>
                 </tr>
                 <tr>
-                  <td data-row="5" data-col="0">faminc</td>
-                  <td data-row="5" data-col="1">-0.001</td>
-                  <td data-row="5" data-col="2">-0.010</td>
+                  <td data-row="5" data-col="1">faminc</td>
+                  <td data-row="5" data-col="2">-0.001</td>
+                  <td data-row="5" data-col="3">-0.010</td>
                 </tr>
                 <tr>
-                  <td data-row="6" data-col="0"></td>
-                  <td data-row="6" data-col="1">(0.000)</td>
-                  <td data-row="6" data-col="2">(0.007)</td>
+                  <td data-row="6" data-col="1"></td>
+                  <td data-row="6" data-col="2">(0.000)</td>
+                  <td data-row="6" data-col="3">(0.007)</td>
                 </tr>
                 <tr>
-                  <td data-row="7" data-col="0">motheduc</td>
-                  <td data-row="7" data-col="1">0.001</td>
-                  <td data-row="7" data-col="2">0.010</td>
+                  <td data-row="7" data-col="1">motheduc</td>
+                  <td data-row="7" data-col="2">0.001</td>
+                  <td data-row="7" data-col="3">0.010</td>
                 </tr>
                 <tr>
-                  <td data-row="8" data-col="0"></td>
-                  <td data-row="8" data-col="1">(0.003)</td>
-                  <td data-row="8" data-col="2">(0.056)</td>
+                  <td data-row="8" data-col="1"></td>
+                  <td data-row="8" data-col="2">(0.003)</td>
+                  <td data-row="8" data-col="3">(0.056)</td>
                 </tr>
                 <tr>
-                  <td data-row="9" data-col="0">male</td>
-                  <td data-row="9" data-col="1">-0.005</td>
-                  <td data-row="9" data-col="2">-0.090</td>
+                  <td data-row="9" data-col="1">male</td>
+                  <td data-row="9" data-col="2">-0.005</td>
+                  <td data-row="9" data-col="3">-0.090</td>
                 </tr>
                 <tr>
-                  <td data-row="10" data-col="0"></td>
-                  <td data-row="10" data-col="1">(0.013)</td>
-                  <td data-row="10" data-col="2">(0.228)</td>
+                  <td data-row="10" data-col="1"></td>
+                  <td data-row="10" data-col="2">(0.013)</td>
+                  <td data-row="10" data-col="3">(0.228)</td>
                 </tr>
                 <tr>
-                  <td data-row="11" data-col="0">Num.Obs.</td>
-                  <td data-row="11" data-col="1">1387</td>
+                  <td data-row="11" data-col="1">Num.Obs.</td>
                   <td data-row="11" data-col="2">1387</td>
+                  <td data-row="11" data-col="3">1387</td>
                 </tr>
                 <tr>
-                  <td data-row="12" data-col="0">R2</td>
-                  <td data-row="12" data-col="1">0.006</td>
-                  <td data-row="12" data-col="2">0.012</td>
+                  <td data-row="12" data-col="1">R2</td>
+                  <td data-row="12" data-col="2">0.006</td>
+                  <td data-row="12" data-col="3">0.012</td>
                 </tr>
                 <tr>
-                  <td data-row="13" data-col="0">AIC</td>
-                  <td data-row="13" data-col="1">-54.3</td>
-                  <td data-row="13" data-col="2">630.7</td>
+                  <td data-row="13" data-col="1">AIC</td>
+                  <td data-row="13" data-col="2">-54.3</td>
+                  <td data-row="13" data-col="3">630.7</td>
                 </tr>
         </tbody>
       </table>
@@ -1561,7 +1494,7 @@ Figure&nbsp;10.12: Predicted probability of low birthweight by number of cigaret
 </div>
 </div>
 </div>
-<p><a href="#fig-smoking-bwght" class="quarto-xref">Figure&nbsp;<span>10.12</span></a> illustrates several important points. For moderate levels of smoking (roughly 0–20 cigarettes per day, where most of the data lives), the two models give very similar predictions. At high levels of smoking, the LPM continues in a straight line—eventually predicting impossibly high probabilities—while the logit curve flattens out as it approaches 1. This is exactly the kind of situation where the logit model’s bounded predictions are an advantage.</p>
+<p><a href="#fig-smoking-bwght" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-smoking-bwght</span></a> illustrates several important points. For moderate levels of smoking (roughly 0–20 cigarettes per day, where most of the data lives), the two models give very similar predictions. At high levels of smoking, the LPM continues in a straight line—eventually predicting impossibly high probabilities—while the logit curve flattens out as it approaches 1. This is exactly the kind of situation where the logit model’s bounded predictions are an advantage.</p>
 </section>
 <section id="lpm-vs.-logistic-regression-when-to-use-which" class="level2" data-number="10.9">
 <h2 data-number="10.9" class="anchored" data-anchor-id="lpm-vs.-logistic-regression-when-to-use-which"><span class="header-section-number">10.9</span> LPM vs.&nbsp;Logistic Regression: When to Use Which?</h2>
@@ -1640,7 +1573,7 @@ Table&nbsp;10.3: LPM vs.&nbsp;Logistic Regression Comparison
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>For this course, you should be comfortable with both approaches. The LPM is typically sufficient for causal inference questions, and its coefficients are immediately interpretable. Use logistic regression when you need predictions that are guaranteed to be valid probabilities, and when the prediction itself (rather than the coefficients) are most important. We will see an example use-case of this in <a href="advanced_did.html" class="quarto-xref"><span>Chapter 13</span></a>.</p>
+<p>For this course, you should be comfortable with both approaches. The LPM is typically sufficient for causal inference questions, and its coefficients are immediately interpretable. Use logistic regression when you need predictions that are guaranteed to be valid probabilities, and when the prediction itself (rather than the coefficients) are most important. We will see an example use-case of this in <a href="#sec-advanced-did" class="quarto-xref"><span class="quarto-unresolved-ref">sec-advanced-did</span></a>.</p>
 </div>
 </div>
 </section>
@@ -1771,7 +1704,7 @@ Table&nbsp;10.3: LPM vs.&nbsp;Logistic Regression Comparison
 </div>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
 <div id="ref-bailey_real_2020" class="csl-entry" role="listitem">
 Bailey, Michael A. 2020. <em>Real Econometrics: The Right Tools to Answer Important Questions</em>. Oxford University Press.
 </div>

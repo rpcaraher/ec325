@@ -2,13 +2,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.27">
+<meta name="generator" content="quarto-1.9.36">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
 <title>12&nbsp; Difference-in-Differences – EC325 Lecture Notes</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -69,15 +72,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../chapters/panel_fe.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-5ccb035bea26c1e21f80f44cf7c27909.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -107,7 +109,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -332,46 +334,61 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#natural-experiments" id="toc-natural-experiments" class="nav-link active" data-scroll-target="#natural-experiments"><span class="header-section-number">12.1</span> Natural Experiments</a>
+  <li><a href="#from-control-variables-to-control-units" id="toc-from-control-variables-to-control-units" class="nav-link active" data-scroll-target="#from-control-variables-to-control-units"><span class="header-section-number">12.1</span> From Control Variables to Control Units</a>
   <ul class="collapse">
-  <li><a href="#the-problem-with-observational-data" id="toc-the-problem-with-observational-data" class="nav-link" data-scroll-target="#the-problem-with-observational-data"><span class="header-section-number">12.1.1</span> The Problem with Observational Data</a></li>
-  <li><a href="#natural-experiments-as-a-solution" id="toc-natural-experiments-as-a-solution" class="nav-link" data-scroll-target="#natural-experiments-as-a-solution"><span class="header-section-number">12.1.2</span> Natural Experiments as a Solution</a></li>
+  <li><a href="#the-limits-of-regression-based-approaches" id="toc-the-limits-of-regression-based-approaches" class="nav-link" data-scroll-target="#the-limits-of-regression-based-approaches"><span class="header-section-number">12.1.1</span> The Limits of Regression-Based Approaches</a></li>
+  <li><a href="#why-not-all-variation-is-useful" id="toc-why-not-all-variation-is-useful" class="nav-link" data-scroll-target="#why-not-all-variation-is-useful"><span class="header-section-number">12.1.2</span> Why Not All Variation is Useful</a></li>
   </ul></li>
-  <li><a href="#the-mariel-boatlift-a-classic-natural-experiment" id="toc-the-mariel-boatlift-a-classic-natural-experiment" class="nav-link" data-scroll-target="#the-mariel-boatlift-a-classic-natural-experiment"><span class="header-section-number">12.2</span> The Mariel Boatlift: A Classic Natural Experiment</a></li>
-  <li><a href="#the-difference-in-differences-approach" id="toc-the-difference-in-differences-approach" class="nav-link" data-scroll-target="#the-difference-in-differences-approach"><span class="header-section-number">12.3</span> The Difference-in-Differences Approach</a>
+  <li><a href="#natural-experiments" id="toc-natural-experiments" class="nav-link" data-scroll-target="#natural-experiments"><span class="header-section-number">12.2</span> Natural Experiments</a>
   <ul class="collapse">
-  <li><a href="#why-simple-before-after-comparisons-fail" id="toc-why-simple-before-after-comparisons-fail" class="nav-link" data-scroll-target="#why-simple-before-after-comparisons-fail"><span class="header-section-number">12.3.1</span> Why Simple Before-After Comparisons Fail</a></li>
-  <li><a href="#the-need-for-control-units" id="toc-the-need-for-control-units" class="nav-link" data-scroll-target="#the-need-for-control-units"><span class="header-section-number">12.3.2</span> The Need for Control Units</a></li>
+  <li><a href="#the-logic-of-experiments-revisited" id="toc-the-logic-of-experiments-revisited" class="nav-link" data-scroll-target="#the-logic-of-experiments-revisited"><span class="header-section-number">12.2.1</span> The Logic of Experiments, Revisited</a></li>
+  <li><a href="#natural-experiments-1" id="toc-natural-experiments-1" class="nav-link" data-scroll-target="#natural-experiments-1"><span class="header-section-number">12.2.2</span> Natural Experiments</a></li>
+  <li><a href="#where-natural-experiments-fit" id="toc-where-natural-experiments-fit" class="nav-link" data-scroll-target="#where-natural-experiments-fit"><span class="header-section-number">12.2.3</span> Where Natural Experiments Fit</a></li>
   </ul></li>
-  <li><a href="#the-parallel-trends-assumption" id="toc-the-parallel-trends-assumption" class="nav-link" data-scroll-target="#the-parallel-trends-assumption"><span class="header-section-number">12.4</span> The Parallel Trends Assumption</a>
+  <li><a href="#the-mariel-boatlift-a-classic-natural-experiment" id="toc-the-mariel-boatlift-a-classic-natural-experiment" class="nav-link" data-scroll-target="#the-mariel-boatlift-a-classic-natural-experiment"><span class="header-section-number">12.3</span> The Mariel Boatlift: A Classic Natural Experiment</a></li>
+  <li><a href="#the-difference-in-differences-approach" id="toc-the-difference-in-differences-approach" class="nav-link" data-scroll-target="#the-difference-in-differences-approach"><span class="header-section-number">12.4</span> The Difference-in-Differences Approach</a>
   <ul class="collapse">
-  <li><a href="#the-core-identifying-assumption" id="toc-the-core-identifying-assumption" class="nav-link" data-scroll-target="#the-core-identifying-assumption"><span class="header-section-number">12.4.1</span> The Core Identifying Assumption</a></li>
-  <li><a href="#visualizing-did" id="toc-visualizing-did" class="nav-link" data-scroll-target="#visualizing-did"><span class="header-section-number">12.4.2</span> Visualizing DiD</a></li>
+  <li><a href="#why-simple-before-after-comparisons-fail" id="toc-why-simple-before-after-comparisons-fail" class="nav-link" data-scroll-target="#why-simple-before-after-comparisons-fail"><span class="header-section-number">12.4.1</span> Why Simple Before-After Comparisons Fail</a></li>
+  <li><a href="#the-need-for-control-units" id="toc-the-need-for-control-units" class="nav-link" data-scroll-target="#the-need-for-control-units"><span class="header-section-number">12.4.2</span> The Need for Control Units</a></li>
   </ul></li>
-  <li><a href="#the-did-regression" id="toc-the-did-regression" class="nav-link" data-scroll-target="#the-did-regression"><span class="header-section-number">12.5</span> The DiD Regression</a>
+  <li><a href="#formalizing-the-treatment-effect" id="toc-formalizing-the-treatment-effect" class="nav-link" data-scroll-target="#formalizing-the-treatment-effect"><span class="header-section-number">12.5</span> Formalizing the Treatment Effect</a>
   <ul class="collapse">
-  <li><a href="#setting-up-the-model" id="toc-setting-up-the-model" class="nav-link" data-scroll-target="#setting-up-the-model"><span class="header-section-number">12.5.1</span> Setting Up the Model</a></li>
-  <li><a href="#how-it-works" id="toc-how-it-works" class="nav-link" data-scroll-target="#how-it-works"><span class="header-section-number">12.5.2</span> How It Works</a></li>
-  <li><a href="#example-estimating-the-mariel-boatlift-effect" id="toc-example-estimating-the-mariel-boatlift-effect" class="nav-link" data-scroll-target="#example-estimating-the-mariel-boatlift-effect"><span class="header-section-number">12.5.3</span> Example: Estimating the Mariel Boatlift Effect</a></li>
+  <li><a href="#the-potential-outcomes-framework-again" id="toc-the-potential-outcomes-framework-again" class="nav-link" data-scroll-target="#the-potential-outcomes-framework-again"><span class="header-section-number">12.5.1</span> The Potential Outcomes Framework, Again</a></li>
+  <li><a href="#the-average-treatment-effect-on-the-treated" id="toc-the-average-treatment-effect-on-the-treated" class="nav-link" data-scroll-target="#the-average-treatment-effect-on-the-treated"><span class="header-section-number">12.5.2</span> The Average Treatment Effect on the Treated</a></li>
+  <li><a href="#the-fundamental-problem-again" id="toc-the-fundamental-problem-again" class="nav-link" data-scroll-target="#the-fundamental-problem-again"><span class="header-section-number">12.5.3</span> The Fundamental Problem (Again)</a></li>
   </ul></li>
-  <li><a href="#two-way-fixed-effects" id="toc-two-way-fixed-effects" class="nav-link" data-scroll-target="#two-way-fixed-effects"><span class="header-section-number">12.6</span> Two-Way Fixed Effects</a>
+  <li><a href="#the-parallel-trends-assumption" id="toc-the-parallel-trends-assumption" class="nav-link" data-scroll-target="#the-parallel-trends-assumption"><span class="header-section-number">12.6</span> The Parallel Trends Assumption</a>
   <ul class="collapse">
-  <li><a href="#extending-to-multiple-units-and-time-periods" id="toc-extending-to-multiple-units-and-time-periods" class="nav-link" data-scroll-target="#extending-to-multiple-units-and-time-periods"><span class="header-section-number">12.6.1</span> Extending to Multiple Units and Time Periods</a></li>
-  <li><a href="#estimating-twfe-in-r" id="toc-estimating-twfe-in-r" class="nav-link" data-scroll-target="#estimating-twfe-in-r"><span class="header-section-number">12.6.2</span> Estimating TWFE in R</a></li>
+  <li><a href="#the-core-identifying-assumption" id="toc-the-core-identifying-assumption" class="nav-link" data-scroll-target="#the-core-identifying-assumption"><span class="header-section-number">12.6.1</span> The Core Identifying Assumption</a></li>
+  <li><a href="#from-parallel-trends-to-the-did-estimator" id="toc-from-parallel-trends-to-the-did-estimator" class="nav-link" data-scroll-target="#from-parallel-trends-to-the-did-estimator"><span class="header-section-number">12.6.2</span> From Parallel Trends to the DiD Estimator</a></li>
+  <li><a href="#visualizing-did" id="toc-visualizing-did" class="nav-link" data-scroll-target="#visualizing-did"><span class="header-section-number">12.6.3</span> Visualizing DiD</a></li>
   </ul></li>
-  <li><a href="#research-design-choosing-good-controls" id="toc-research-design-choosing-good-controls" class="nav-link" data-scroll-target="#research-design-choosing-good-controls"><span class="header-section-number">12.7</span> Research Design: Choosing Good Controls</a>
+  <li><a href="#the-did-regression" id="toc-the-did-regression" class="nav-link" data-scroll-target="#the-did-regression"><span class="header-section-number">12.7</span> The DiD Regression</a>
   <ul class="collapse">
-  <li><a href="#the-art-of-causal-inference" id="toc-the-art-of-causal-inference" class="nav-link" data-scroll-target="#the-art-of-causal-inference"><span class="header-section-number">12.7.1</span> The Art of Causal Inference</a></li>
-  <li><a href="#example-minimum-wages-and-employment" id="toc-example-minimum-wages-and-employment" class="nav-link" data-scroll-target="#example-minimum-wages-and-employment"><span class="header-section-number">12.7.2</span> Example: Minimum Wages and Employment</a></li>
-  <li><a href="#intuition-driven-vs.-data-driven-selection" id="toc-intuition-driven-vs.-data-driven-selection" class="nav-link" data-scroll-target="#intuition-driven-vs.-data-driven-selection"><span class="header-section-number">12.7.3</span> Intuition-Driven vs.&nbsp;Data-Driven Selection</a></li>
+  <li><a href="#setting-up-the-model" id="toc-setting-up-the-model" class="nav-link" data-scroll-target="#setting-up-the-model"><span class="header-section-number">12.7.1</span> Setting Up the Model</a></li>
+  <li><a href="#how-the-regression-recovers-the-did-effect" id="toc-how-the-regression-recovers-the-did-effect" class="nav-link" data-scroll-target="#how-the-regression-recovers-the-did-effect"><span class="header-section-number">12.7.2</span> How the Regression Recovers the DiD Effect</a></li>
+  <li><a href="#example-estimating-the-mariel-boatlift-effect" id="toc-example-estimating-the-mariel-boatlift-effect" class="nav-link" data-scroll-target="#example-estimating-the-mariel-boatlift-effect"><span class="header-section-number">12.7.3</span> Example: Estimating the Mariel Boatlift Effect</a></li>
   </ul></li>
-  <li><a href="#what-can-go-wrong" id="toc-what-can-go-wrong" class="nav-link" data-scroll-target="#what-can-go-wrong"><span class="header-section-number">12.8</span> What Can Go Wrong</a>
+  <li><a href="#two-way-fixed-effects" id="toc-two-way-fixed-effects" class="nav-link" data-scroll-target="#two-way-fixed-effects"><span class="header-section-number">12.8</span> Two-Way Fixed Effects</a>
   <ul class="collapse">
-  <li><a href="#violations-of-parallel-trends" id="toc-violations-of-parallel-trends" class="nav-link" data-scroll-target="#violations-of-parallel-trends"><span class="header-section-number">12.8.1</span> Violations of Parallel Trends</a></li>
-  <li><a href="#assessing-parallel-trends" id="toc-assessing-parallel-trends" class="nav-link" data-scroll-target="#assessing-parallel-trends"><span class="header-section-number">12.8.2</span> Assessing Parallel Trends</a></li>
+  <li><a href="#extending-to-multiple-units-and-time-periods" id="toc-extending-to-multiple-units-and-time-periods" class="nav-link" data-scroll-target="#extending-to-multiple-units-and-time-periods"><span class="header-section-number">12.8.1</span> Extending to Multiple Units and Time Periods</a></li>
+  <li><a href="#why-twfe-and-the-simple-did-regression-give-the-same-answer" id="toc-why-twfe-and-the-simple-did-regression-give-the-same-answer" class="nav-link" data-scroll-target="#why-twfe-and-the-simple-did-regression-give-the-same-answer"><span class="header-section-number">12.8.2</span> Why TWFE and the Simple DiD Regression Give the Same Answer</a></li>
+  <li><a href="#estimating-twfe-in-r" id="toc-estimating-twfe-in-r" class="nav-link" data-scroll-target="#estimating-twfe-in-r"><span class="header-section-number">12.8.3</span> Estimating TWFE in R</a></li>
   </ul></li>
-  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">12.9</span> Summary</a></li>
-  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">12.10</span> Check Your Understanding</a></li>
+  <li><a href="#research-design-choosing-good-controls" id="toc-research-design-choosing-good-controls" class="nav-link" data-scroll-target="#research-design-choosing-good-controls"><span class="header-section-number">12.9</span> Research Design: Choosing Good Controls</a>
+  <ul class="collapse">
+  <li><a href="#why-controls-matter" id="toc-why-controls-matter" class="nav-link" data-scroll-target="#why-controls-matter"><span class="header-section-number">12.9.1</span> Why Controls Matter</a></li>
+  <li><a href="#example-the-effect-of-minimum-wages-on-employment" id="toc-example-the-effect-of-minimum-wages-on-employment" class="nav-link" data-scroll-target="#example-the-effect-of-minimum-wages-on-employment"><span class="header-section-number">12.9.2</span> Example: The Effect of Minimum Wages on Employment</a></li>
+  <li><a href="#card-and-krueger-1994-a-better-research-design" id="toc-card-and-krueger-1994-a-better-research-design" class="nav-link" data-scroll-target="#card-and-krueger-1994-a-better-research-design"><span class="header-section-number">12.9.3</span> Card and Krueger (1994): A Better Research Design</a></li>
+  <li><a href="#intuition-driven-vs.-data-driven-selection" id="toc-intuition-driven-vs.-data-driven-selection" class="nav-link" data-scroll-target="#intuition-driven-vs.-data-driven-selection"><span class="header-section-number">12.9.4</span> Intuition-Driven vs.&nbsp;Data-Driven Selection</a></li>
+  </ul></li>
+  <li><a href="#what-can-go-wrong" id="toc-what-can-go-wrong" class="nav-link" data-scroll-target="#what-can-go-wrong"><span class="header-section-number">12.10</span> What Can Go Wrong</a>
+  <ul class="collapse">
+  <li><a href="#violations-of-parallel-trends" id="toc-violations-of-parallel-trends" class="nav-link" data-scroll-target="#violations-of-parallel-trends"><span class="header-section-number">12.10.1</span> Violations of Parallel Trends</a></li>
+  <li><a href="#assessing-parallel-trends" id="toc-assessing-parallel-trends" class="nav-link" data-scroll-target="#assessing-parallel-trends"><span class="header-section-number">12.10.2</span> Assessing Parallel Trends</a></li>
+  </ul></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">12.11</span> Summary</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">12.12</span> Check Your Understanding</a></li>
   </ul>
 </nav>
     </div>
@@ -492,6 +509,7 @@ function checkAnswer(selectElement, correctValue) {
 <div class="callout-body-container callout-body">
 <ul>
 <li>What is a natural experiment and how does it help with causal inference?</li>
+<li>Why can’t we just use any source of variation to estimate causal effects?</li>
 <li>What is the parallel trends assumption and why is it crucial for DiD?</li>
 <li>How do we estimate the average treatment effect on the treated (ATT) using DiD?</li>
 <li>What is two-way fixed effects and how does it relate to DiD?</li>
@@ -518,18 +536,66 @@ function checkAnswer(selectElement, correctValue) {
 </div>
 </div>
 </div>
-<p>We have built up an increasingly powerful toolkit for causal inference. Randomized controlled trials remain the gold standard, but are often infeasible. Multivariate OLS allows us to control for observable confounders, and fixed effects extend this to control for unobserved time-invariant factors. But what if even fixed effects aren’t enough?</p>
-<p>This chapter introduces <strong>difference-in-differences (DiD)</strong>, a method that combines the logic of experiments with the practicality of observational data. Instead of relying solely on control <em>variables</em>, DiD uses control <em>units</em>—a comparison group that shows us what would have happened to the treated group in the absence of treatment.</p>
-<section id="natural-experiments" class="level2" data-number="12.1">
-<h2 data-number="12.1" class="anchored" data-anchor-id="natural-experiments"><span class="header-section-number">12.1</span> Natural Experiments</h2>
-<section id="the-problem-with-observational-data" class="level3" data-number="12.1.1">
-<h3 data-number="12.1.1" class="anchored" data-anchor-id="the-problem-with-observational-data"><span class="header-section-number">12.1.1</span> The Problem with Observational Data</h3>
-<p>Suppose we want to estimate the effect of immigration on native workers’ wages. A naive approach might compare wages in cities with high immigration to wages in cities with low immigration. But this comparison is confounded: immigrants tend to move to cities with strong economies, creating a spurious positive correlation between immigration and wages.</p>
-<p>Even with control variables, we may miss important unobserved factors like a city’s economic trajectory or its attractiveness to both immigrants and high-wage employers. Fixed effects help with time-invariant confounders, but cannot address factors that change differently across cities over time.</p>
+<p>Over the past several chapters we have built up an increasingly useful set of tools for causal inference. We started with <strong>randomized controlled trials (RCTs)</strong>—the gold standard—where random assignment eliminates selection bias. But RCTs are often infeasible, so we turned to <strong>multivariate OLS</strong>, controlling for observable confounders to reduce omitted variable bias. When that was not enough, we introduced <strong>panel data with fixed effects</strong>, which control for unobserved time-invariant factors (like innate ability or geography) without directly measuring them.</p>
+<p>Each step has been an improvement, but each still has limits. OLS only controls for variables we can observe and include. Fixed effects handle time-invariant unobservables, but cannot address factors that change differently across units over time. What if even fixed effects leave us with confounders we cannot account for?</p>
+<p>This chapter introduces <strong>difference-in-differences (DiD)</strong>, a method that takes a different approach. Rather than relying on control <em>variables</em> to isolate causal effects, DiD relies on control <em>units</em>—a comparison group that approximates what would have happened to the treated group absent treatment. This shift from controlling for variables to finding appropriate comparison groups is at the heart of modern applied economics.</p>
+<section id="from-control-variables-to-control-units" class="level2" data-number="12.1">
+<h2 data-number="12.1" class="anchored" data-anchor-id="from-control-variables-to-control-units"><span class="header-section-number">12.1</span> From Control Variables to Control Units</h2>
+<section id="the-limits-of-regression-based-approaches" class="level3" data-number="12.1.1">
+<h3 data-number="12.1.1" class="anchored" data-anchor-id="the-limits-of-regression-based-approaches"><span class="header-section-number">12.1.1</span> The Limits of Regression-Based Approaches</h3>
+<p>To see why we need a new approach, consider the challenge of estimating the effect of immigration on native workers’ wages. A naive approach might simply regress wages on a measure of immigrant share across cities:</p>
+<p><span class="math display">\[
+native\_wage_i = \beta_0 + \beta_1(immigrant\_share_i) + \mu_i
+\]</span></p>
+<p>The problem with this regression is obvious once you think about it. Immigrants tend to move to cities that are <em>already</em> economically prosperous—places with strong job markets, growing industries, and rising wages. This means <span class="math inline">\(immigrant\_share\)</span> is positively correlated with the error term <span class="math inline">\(\mu\)</span> (which contains economic vitality, industry composition, and many other wage determinants), creating classic omitted variable bias. We might find a positive correlation between immigration and wages, but this would reflect the fact that immigrants choose thriving cities, not that immigration <em>causes</em> higher wages.</p>
+<p>We could try to fix this with control variables—perhaps adding measures of industry composition, city population, or education levels. But there will always be important unobservable factors we cannot include. What is the <em>economic trajectory</em> of a city? How attractive is it to both immigrants and high-wage employers? These factors are difficult or impossible to measure, yet they drive both immigration patterns and wages.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-selection-bias" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-selection-bias-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12.1: A naive comparison of cities with high vs.&nbsp;low immigration confounds the effect of immigration with the fact that immigrants select into economically thriving cities.
+</figcaption>
+<div aria-describedby="fig-selection-bias-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="did_files/figure-html/fig-selection-bias-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p><a href="#fig-selection-bias" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-selection-bias</span></a> illustrates this problem with simulated data. In this simulation, immigration has <strong>zero</strong> true causal effect on wages, but the naive OLS regression line slopes upward because more prosperous cities (shown in green) attract both more immigrants and have higher wages. The OLS estimate is picking up the <em>selection of immigrants into better cities</em>, not any actual effect of immigration.</p>
+<p>Even if we added control variables for education levels, industry mix, and population size, we would still miss the unobservable components of city prosperity. And while fixed effects could help if we had panel data—absorbing time-invariant city characteristics—they still cannot handle factors that change <em>differently</em> across cities over time (e.g., one city’s tech boom attracting both immigrants and driving up wages simultaneously).</p>
 </section>
-<section id="natural-experiments-as-a-solution" class="level3" data-number="12.1.2">
-<h3 data-number="12.1.2" class="anchored" data-anchor-id="natural-experiments-as-a-solution"><span class="header-section-number">12.1.2</span> Natural Experiments as a Solution</h3>
-<p>A <strong>natural experiment</strong> occurs when some external force—nature, policy, or historical accident—assigns units to treatment and control groups in a way that resembles random assignment.</p>
+<section id="why-not-all-variation-is-useful" class="level3" data-number="12.1.2">
+<h3 data-number="12.1.2" class="anchored" data-anchor-id="why-not-all-variation-is-useful"><span class="header-section-number">12.1.2</span> Why Not All Variation is Useful</h3>
+<p>This brings us to a point that is easy to overlook: <strong>not all variation in a treatment variable is good for estimating causal effects.</strong></p>
+<p>When we run a regression of wages on immigrant share, the variation in immigrant share across cities comes from many sources: immigrants choosing prosperous cities, historical migration networks, geographic proximity to sending countries, local immigration policies, and random chance. Most of these sources are <strong>endogenous</strong>—they are correlated with the very factors that also affect wages. Using this variation to estimate causal effects is no better than the naive comparison we started with.</p>
+<p>This is where regression-based approaches hit a wall. No matter how many control variables or fixed effects we include, if the remaining variation in our treatment variable is driven by endogenous factors, our estimates will be biased. What we need is variation in treatment that is <strong>exogenous</strong>—driven by factors unrelated to the outcome.</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Not All Variation is Created Equal
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The key challenge in causal inference is not just <em>whether</em> treatment varies across units, but <em>why</em> it varies. If the variation in treatment is driven by the same factors that affect the outcome (endogenous variation), regression estimates will be biased regardless of how many controls we include. We need variation that is driven by factors <strong>unrelated</strong> to the outcome (exogenous variation).</p>
+</div>
+</div>
+</section>
+</section>
+<section id="natural-experiments" class="level2" data-number="12.2">
+<h2 data-number="12.2" class="anchored" data-anchor-id="natural-experiments"><span class="header-section-number">12.2</span> Natural Experiments</h2>
+<section id="the-logic-of-experiments-revisited" class="level3" data-number="12.2.1">
+<h3 data-number="12.2.1" class="anchored" data-anchor-id="the-logic-of-experiments-revisited"><span class="header-section-number">12.2.1</span> The Logic of Experiments, Revisited</h3>
+<p>Recall why randomization works so well in an RCT: when units are <em>randomly assigned</em> to treatment and control groups, there can be no systematic differences between the groups—in either observable or unobservable characteristics. Random assignment eliminates the selection bias term, so any difference in outcomes between the groups reflects the causal effect of treatment.</p>
+<p>The problem is that we usually cannot randomly assign the treatments we care about in economics. We cannot randomly assign immigration levels to cities, or minimum wage increases to states, or health insurance to families. The variation in these treatments is driven by economic, political, and social forces that are themselves correlated with outcomes.</p>
+</section>
+<section id="natural-experiments-1" class="level3" data-number="12.2.2">
+<h3 data-number="12.2.2" class="anchored" data-anchor-id="natural-experiments-1"><span class="header-section-number">12.2.2</span> Natural Experiments</h3>
+<p>But sometimes nature, a policy change, or a historical accident generates variation in treatment that is <strong>as good as random</strong>. If the reason some units are treated and others are not has nothing to do with the factors that affect our outcome, then we are in essentially the same situation as an RCT, even though no one actually randomized anything.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -540,23 +606,44 @@ function checkAnswer(selectElement, correctValue) {
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>A <strong>natural experiment</strong> is a study based on observational data where “treatment” is assigned by forces outside the researcher’s control, such as policy changes, geographic boundaries, or historical events. Natural experiments create conditions that <em>resemble</em> random assignment, allowing us to make causal inferences without actually randomizing.</p>
+<p>A <strong>natural experiment</strong> is a study based on observational data where “treatment” is assigned by forces outside the researcher’s control—such as policy changes, geographic boundaries, or historical events—in a way that <em>resembles</em> random assignment. The key requirement is that the source of variation in treatment is <strong>unrelated to the factors that determine outcomes</strong>, making the treatment assignment “as good as random.”</p>
 </div>
 </div>
-<p>The key insight is that if treatment assignment is “as good as random,” then comparing treated and control units can identify causal effects—just like in an RCT.</p>
+<p>This is a high bar. It is not enough to find variation in a treatment variable. The variation must come from a source that is plausibly exogenous—unrelated to the outcome except through its effect on treatment. A natural experiment gives us a specific, identifiable reason why some units received treatment and others did not, where that reason has nothing to do with the outcome.</p>
+</section>
+<section id="where-natural-experiments-fit" class="level3" data-number="12.2.3">
+<h3 data-number="12.2.3" class="anchored" data-anchor-id="where-natural-experiments-fit"><span class="header-section-number">12.2.3</span> Where Natural Experiments Fit</h3>
+<p>Think of natural experiments as sitting on a spectrum between observational studies and RCTs:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-research-spectrum" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-research-spectrum-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12.2: Natural experiments occupy a middle ground between observational studies and RCTs, using external events to approximate random assignment.
+</figcaption>
+<div aria-describedby="fig-research-spectrum-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="did_files/figure-html/fig-research-spectrum-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Naive OLS</strong> uses all the variation in treatment—endogenous and exogenous alike—and is susceptible to bias. <strong>OLS with controls</strong> tries to strip out some of the endogenous variation, but can only control for observables. An <strong>RCT</strong> generates purely exogenous variation through randomization. A <strong>natural experiment</strong> falls close to the RCT end: it identifies a specific, external source of variation that is plausibly unrelated to the outcome.</p>
+<p>What separates a natural experiment from “controlling for things” is that a natural experiment tells a <em>specific story</em> about <strong>why</strong> treatment varies. It is not enough to say “I controlled for everything I could think of.” You need to say: “Here is a specific event or policy that determined who was treated and who was not, and here is why that assignment is unrelated to outcomes.”</p>
 </section>
 </section>
-<section id="the-mariel-boatlift-a-classic-natural-experiment" class="level2" data-number="12.2">
-<h2 data-number="12.2" class="anchored" data-anchor-id="the-mariel-boatlift-a-classic-natural-experiment"><span class="header-section-number">12.2</span> The Mariel Boatlift: A Classic Natural Experiment</h2>
-<p>One of the most famous natural experiments in economics involves the Mariel Boatlift. In 1980, Cuba experienced severe economic turmoil, and Fidel Castro announced that anyone who wished to leave could do so. Between April and October, approximately 125,000 Cubans departed from Mariel Harbor and arrived in Miami.</p>
-<p>This mass migration had nothing to do with labor market conditions in Miami. It was driven entirely by Cuban politics and Miami’s geographic proximity to Cuba. In other words, the “treatment” of a sudden large increase in labor supply was essentially randomly assigned to Miami.</p>
-<p>David Card’s seminal 1990 study used this natural experiment to estimate the effect of immigration on native wages. But how exactly do we use such an event to identify causal effects?</p>
+<section id="the-mariel-boatlift-a-classic-natural-experiment" class="level2" data-number="12.3">
+<h2 data-number="12.3" class="anchored" data-anchor-id="the-mariel-boatlift-a-classic-natural-experiment"><span class="header-section-number">12.3</span> The Mariel Boatlift: A Classic Natural Experiment</h2>
+<p>One of the most famous natural experiments in economics involves the Mariel Boatlift. In 1980, Cuba experienced severe economic turmoil, and Fidel Castro announced that anyone who wished to leave could do so. Between April and October, approximately 125,000 Cubans departed from Mariel Harbor and arrived in Miami, increasing Miami’s labor force by roughly 7% almost overnight.</p>
+<p>Why is this a natural experiment? Because the reason Miami received this influx of immigrants had <em>nothing to do with Miami’s labor market conditions</em>. The boatlift was driven by two factors: political upheaval in Cuba and Miami’s geographic proximity to Cuba. Miami didn’t receive these immigrants because its economy was doing well or poorly, or because its wages were high or low. It received them because it was the closest major American city to Cuba.</p>
+<p>The “treatment”—a sudden, large increase in labor supply—was <strong>as good as randomly assigned</strong> to Miami. The immigrants didn’t choose Miami because of its wage levels, and Miami didn’t recruit them because it needed workers.</p>
+<p>David Card’s 1990 study used this natural experiment to estimate the effect of immigration on native wages. But having exogenous variation alone is not enough. We still need a <em>method</em> to extract the causal effect from the data. The natural experiment tells us <em>who</em> was treated and <em>why</em> the treatment is plausibly exogenous. The question is: how do we turn that into a number? Specifically, how do we separate the effect of the boatlift from all the other things that were changing in Miami at the same time?</p>
 </section>
-<section id="the-difference-in-differences-approach" class="level2" data-number="12.3">
-<h2 data-number="12.3" class="anchored" data-anchor-id="the-difference-in-differences-approach"><span class="header-section-number">12.3</span> The Difference-in-Differences Approach</h2>
-<section id="why-simple-before-after-comparisons-fail" class="level3" data-number="12.3.1">
-<h3 data-number="12.3.1" class="anchored" data-anchor-id="why-simple-before-after-comparisons-fail"><span class="header-section-number">12.3.1</span> Why Simple Before-After Comparisons Fail</h3>
-<p>Card first compared wages in Miami before the boatlift (1979) to wages after (1980-1985):</p>
+<section id="the-difference-in-differences-approach" class="level2" data-number="12.4">
+<h2 data-number="12.4" class="anchored" data-anchor-id="the-difference-in-differences-approach"><span class="header-section-number">12.4</span> The Difference-in-Differences Approach</h2>
+<section id="why-simple-before-after-comparisons-fail" class="level3" data-number="12.4.1">
+<h3 data-number="12.4.1" class="anchored" data-anchor-id="why-simple-before-after-comparisons-fail"><span class="header-section-number">12.4.1</span> Why Simple Before-After Comparisons Fail</h3>
+<p>A first pass might be to compare wages in Miami <em>before</em> the boatlift to wages <em>after</em>:</p>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -575,13 +662,44 @@ function checkAnswer(selectElement, correctValue) {
 </tr>
 </tbody>
 </table>
-<p>Wages fell slightly. Can we interpret this as the causal effect of immigration?</p>
-<p><strong>No.</strong> Wages might have fallen everywhere during this period due to recession or other macroeconomic factors. Looking only at the treated unit’s change over time confuses the treatment effect with broader trends.</p>
+<p>Wages fell by $0.02 (in log terms). Can we interpret this as the causal effect of immigration?</p>
+<p><strong>No.</strong> The problem is that <em>many things changed between 1979 and the early 1980s besides the Mariel Boatlift</em>. The United States experienced a significant recession in the early 1980s. Interest rates rose sharply. Oil prices fluctuated. All of these macroeconomic forces would have affected wages in Miami regardless of whether the boatlift occurred.</p>
+<p>Looking only at changes in our <em>treated unit</em> (Miami) may mislead us into thinking that those changes were <strong>caused</strong> by our treatment (the boatlift), when in reality they reflect broader trends affecting the entire economy. A simple before-after comparison confounds the treatment effect with these common time trends.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-before-after-problem" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-before-after-problem-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12.3: A simple before-after comparison in Miami (left) suggests wages fell. But was this caused by the boatlift, or by a broader economic downturn? Without a comparison group, we cannot tell.
+</figcaption>
+<div aria-describedby="fig-before-after-problem-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="did_files/figure-html/fig-before-after-problem-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p><a href="#fig-before-after-problem" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-before-after-problem</span></a> illustrates why this is a problem. In Scenario A, Miami’s wages fell while the rest of the country’s wages stayed flat—suggesting the boatlift really did depress wages. In Scenario B, Miami’s wages fell, but so did everyone else’s—suggesting the decline had nothing to do with the boatlift and everything to do with a national recession. From Miami’s data alone, both scenarios look identical. We need a <strong>comparison group</strong> to tell them apart.</p>
 </section>
-<section id="the-need-for-control-units" class="level3" data-number="12.3.2">
-<h3 data-number="12.3.2" class="anchored" data-anchor-id="the-need-for-control-units"><span class="header-section-number">12.3.2</span> The Need for Control Units</h3>
-<p>To isolate the treatment effect, we need to know what <em>would have happened</em> to Miami’s wages if the boatlift had never occurred. This <strong>counterfactual</strong> is inherently unobservable—we cannot see the parallel universe where Cuba didn’t open its borders.</p>
-<p>But we can approximate it using <strong>control units</strong>: cities similar to Miami that were not affected by the boatlift. Card chose Atlanta, Los Angeles, Houston, and Tampa-St.&nbsp;Petersburg as controls, arguing they had similar demographics and economic trajectories to Miami.</p>
+<section id="the-need-for-control-units" class="level3" data-number="12.4.2">
+<h3 data-number="12.4.2" class="anchored" data-anchor-id="the-need-for-control-units"><span class="header-section-number">12.4.2</span> The Need for Control Units</h3>
+<p>To isolate the causal effect of the boatlift, we need to know what <em>would have happened</em> to Miami’s wages if the boatlift had never occurred—the <strong>counterfactual</strong>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Counterfactuals
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A <strong>counterfactual</strong> is a “what if” scenario used to measure the causal impact of a policy, event, or decision. It compares the actual outcome (what really happened) to a hypothetical outcome (what <em>would have</em> happened without the event). This hypothetical, “do-nothing” scenario is the counterfactual. In Card’s study, the counterfactual is: what would Miami’s wages have looked like if the boatlift had never occurred?</p>
+</div>
+</div>
+<p>We cannot observe the counterfactual directly—there is no parallel universe where Cuba kept its borders closed. But we can <em>approximate</em> it by finding <strong>control units</strong>: cities similar to Miami that were not affected by the boatlift. If we pick good controls, their wage trajectory should tell us roughly what Miami’s wages <em>would have done</em> absent the boatlift.</p>
+<p>Card chose <strong>Atlanta, Los Angeles, Houston, and Tampa-St.&nbsp;Petersburg</strong> as control cities. He argued these cities shared important characteristics with Miami: they had relatively large populations of Blacks and Hispanics, and they exhibited patterns of economic growth similar to Miami’s in the late 1970s and early 1980s.</p>
+<p>Now we can compare the <em>change</em> in Miami to the <em>change</em> in these controls:</p>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -605,25 +723,61 @@ function checkAnswer(selectElement, correctValue) {
 <td style="text-align: center;">-0.02</td>
 </tr>
 <tr class="odd">
-<td style="text-align: center;"><strong>Difference</strong></td>
+<td style="text-align: center;"><strong>Treated - Control</strong></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"></td>
 <td style="text-align: center;"><strong>0.00</strong></td>
 </tr>
 </tbody>
 </table>
-<p>The control cities experienced the <em>same</em> wage decline as Miami. This suggests the wage drop in Miami was not caused by the boatlift but by broader economic trends affecting all cities.</p>
-<p>The <strong>difference-in-differences</strong> estimate is the change in Miami minus the change in controls: <span class="math display">\[
-(-0.02) - (-0.02) = 0.00
+<p>The control cities experienced the <em>exact same</em> wage decline as Miami. This tells us something important: the $0.02 decline in Miami was not caused by the boatlift—it was part of a broader economic trend affecting all similar cities. The boatlift’s causal effect, isolated by subtracting the control group’s change from Miami’s change, is essentially zero.</p>
+<p>The <strong>difference-in-differences</strong> estimate is: <span class="math display">\[
+\underbrace{(-0.02)}_{\text{Miami's change}} - \underbrace{(-0.02)}_{\text{Controls' change}} = 0.00
 \]</span></p>
-<p>Card concluded that the Mariel Boatlift had essentially no effect on native wages—a surprising and influential finding.</p>
+<p>Card concluded that the Mariel Boatlift had no meaningful effect on native wages—a result that challenged the common intuition that large immigration inflows depress wages.</p>
+<p>Note an important subtlety here: the two groups do not need to have the <em>same level</em> of wages—Miami’s wages are consistently lower than the controls’. What matters for DiD is that both groups move in the <strong>same direction</strong> by roughly the <strong>same amount</strong> over time. This is the parallel trends assumption, which we will formalize shortly.</p>
 </section>
 </section>
-<section id="the-parallel-trends-assumption" class="level2" data-number="12.4">
-<h2 data-number="12.4" class="anchored" data-anchor-id="the-parallel-trends-assumption"><span class="header-section-number">12.4</span> The Parallel Trends Assumption</h2>
-<section id="the-core-identifying-assumption" class="level3" data-number="12.4.1">
-<h3 data-number="12.4.1" class="anchored" data-anchor-id="the-core-identifying-assumption"><span class="header-section-number">12.4.1</span> The Core Identifying Assumption</h3>
-<p>The DiD approach rests on one critical assumption:</p>
+<section id="formalizing-the-treatment-effect" class="level2" data-number="12.5">
+<h2 data-number="12.5" class="anchored" data-anchor-id="formalizing-the-treatment-effect"><span class="header-section-number">12.5</span> Formalizing the Treatment Effect</h2>
+<section id="the-potential-outcomes-framework-again" class="level3" data-number="12.5.1">
+<h3 data-number="12.5.1" class="anchored" data-anchor-id="the-potential-outcomes-framework-again"><span class="header-section-number">12.5.1</span> The Potential Outcomes Framework, Again</h3>
+<p>We first encountered the potential outcomes framework back in our discussion of RCTs and causality. The same framework applies here, and seeing where DiD fits into it will clarify both what we are estimating and what assumptions we need.</p>
+<p>Recall that every unit <span class="math inline">\(i\)</span> has two potential outcomes: a <strong>treated outcome</strong> <span class="math inline">\(Y_i(1)\)</span>—what happens if the unit receives treatment—and an <strong>untreated outcome</strong> <span class="math inline">\(Y_i(0)\)</span>—what happens if it does not. The causal effect for unit <span class="math inline">\(i\)</span> is the difference: <span class="math inline">\(Y_i(1) - Y_i(0)\)</span>. We can never observe both for the same unit (the fundamental problem of causal inference), so we need some strategy to estimate average causal effects.</p>
+<p>In the RCT chapter, random assignment solved this problem by making the treatment and control groups comparable <em>in expectation</em>. Because assignment was random, the control group’s average outcome was a valid stand-in for what the treatment group <em>would have experienced</em> without treatment. This eliminated the <strong>selection bias</strong> term:</p>
+<p><span class="math display">\[
+\underbrace{E[Y_i(1) \mid D_i = 1] - E[Y_i(0) \mid D_i = 0]}_{\text{observed difference}} = \underbrace{ATT}_{\text{causal effect}} + \underbrace{E[Y_i(0) \mid D_i = 1] - E[Y_i(0) \mid D_i = 0]}_{\text{selection bias} = 0 \text{ under randomization}}
+\]</span></p>
+<p>With random assignment, the selection bias term is zero because treated and control units are drawn from the same population.</p>
+<p>DiD faces the same problem, but in a panel data setting. We have treated and control units observed before and after treatment. The question is the same: how do we ensure that comparing these groups gives us a causal effect rather than a causal effect <em>plus</em> selection bias?</p>
+</section>
+<section id="the-average-treatment-effect-on-the-treated" class="level3" data-number="12.5.2">
+<h3 data-number="12.5.2" class="anchored" data-anchor-id="the-average-treatment-effect-on-the-treated"><span class="header-section-number">12.5.2</span> The Average Treatment Effect on the Treated</h3>
+<p>In the DiD setting, our target is the <strong>Average Treatment Effect on the Treated (ATT)</strong>: the average causal effect specifically for those units that were actually treated, measured in the post-treatment period.</p>
+<p><span id="eq-att"><span class="math display">\[
+ATT = E[Y_{i,1}(1) \mid D_i = 1] - E[Y_{i,1}(0) \mid D_i = 1]
+\tag{12.1}\]</span></span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(Y_{i,1}(1)\)</span> is the treated potential outcome for unit <span class="math inline">\(i\)</span> in the post-period</li>
+<li><span class="math inline">\(Y_{i,1}(0)\)</span> is the untreated potential outcome for unit <span class="math inline">\(i\)</span> in the post-period</li>
+<li><span class="math inline">\(D_i = 1\)</span> indicates that unit <span class="math inline">\(i\)</span> is in the treated group</li>
+</ul>
+<p>The ATT asks: how do the treated group’s actual post-treatment outcomes compare to what they <em>would have experienced</em> without treatment? In Card’s study, this is the difference between Miami’s actual wages after 1980 and “parallel universe” Miami where the boatlift never happened.</p>
+</section>
+<section id="the-fundamental-problem-again" class="level3" data-number="12.5.3">
+<h3 data-number="12.5.3" class="anchored" data-anchor-id="the-fundamental-problem-again"><span class="header-section-number">12.5.3</span> The Fundamental Problem (Again)</h3>
+<p>We can observe the first term, <span class="math inline">\(E[Y_{i,1}(1) \mid D_i = 1]\)</span>. It is just the average post-treatment outcome for the treated group—Miami’s wages after 1980.</p>
+<p>But the second term, <span class="math inline">\(E[Y_{i,1}(0) \mid D_i = 1]\)</span>, is unobservable. We cannot rewind time and re-run history without the boatlift.</p>
+<p>In an RCT, we solved this by using the control group’s outcome as a stand-in, and random assignment guaranteed this was valid. But DiD is not an RCT. Even with a natural experiment giving us “as good as random” treatment assignment, treated and control units may have different <em>levels</em> of the outcome (Miami had lower wages than the control cities even before the boatlift). So we cannot simply substitute the control group’s post-treatment level for the treated group’s counterfactual.</p>
+<p>What DiD does instead is more subtle: rather than using the control group’s <em>level</em>, it uses the control group’s <em>change over time</em> to approximate what the treated group’s change would have been. The assumption that makes this work is parallel trends.</p>
+</section>
+</section>
+<section id="the-parallel-trends-assumption" class="level2" data-number="12.6">
+<h2 data-number="12.6" class="anchored" data-anchor-id="the-parallel-trends-assumption"><span class="header-section-number">12.6</span> The Parallel Trends Assumption</h2>
+<section id="the-core-identifying-assumption" class="level3" data-number="12.6.1">
+<h3 data-number="12.6.1" class="anchored" data-anchor-id="the-core-identifying-assumption"><span class="header-section-number">12.6.1</span> The Core Identifying Assumption</h3>
+<p>The DiD approach rests on one critical, non-provable assumption:</p>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -634,24 +788,42 @@ function checkAnswer(selectElement, correctValue) {
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>In the absence of treatment, the average outcome for the treated group would have followed the <strong>same trend</strong> as the average outcome for the control group.</p>
-</div>
-</div>
-<p>Mathematically: <span class="math display">\[
-E[Y_{i,post} - Y_{i,pre} | Treated] = E[Y_{i,post} - Y_{i,pre} | Control]
+<p>In the absence of treatment, the average outcome for the treated group would have followed the <strong>same trend</strong> as the average outcome for the control group: <span class="math display">\[
+E[Y_{i,1}(0) - Y_{i,0}(0) \mid D_i = 1] = E[Y_{i,1}(0) - Y_{i,0}(0) \mid D_i = 0]
 \]</span></p>
-<p>in the counterfactual world where treatment never occurred.</p>
-<p>This assumption is <strong>not testable</strong> directly because we never observe the treated group’s counterfactual trend. However, we can assess its plausibility by examining whether treated and control groups followed similar trends <em>before</em> treatment began. If pre-treatment trends are parallel, it’s more credible that they would have remained parallel absent treatment.</p>
+</div>
+</div>
+<p>The left-hand side is the <em>unobservable</em> trend the treated group would have experienced without treatment—the counterfactual trend we need but cannot see. The right-hand side is the <em>observable</em> trend of the control group, which we can compute from the data.</p>
+<p>If treatment had never occurred, the treated group’s outcomes would have changed by the same amount as the control group’s. This lets us <strong>replace the unobservable counterfactual</strong> with the control group’s actual change over time.</p>
+<p>Notice what this assumption does <em>not</em> require:</p>
+<ul>
+<li>It does <strong>not</strong> require that treated and control groups have the same <em>level</em> of the outcome. Miami can have lower wages than the control cities—what matters is that the <em>changes</em> would have been the same.</li>
+<li>It does <strong>not</strong> require that treatment is randomly assigned in the traditional sense. It only requires that the <em>trends</em> would have been parallel absent treatment.</li>
+</ul>
+<p>But it <em>does</em> require that the control group is on the same trajectory that the treated group would have been on absent treatment. If the control group was trending differently—for reasons unrelated to treatment—then the DiD estimate will be biased. This is why the <em>choice of control units</em> is so important, and why we spend considerable time on research design later in this chapter.</p>
 </section>
-<section id="visualizing-did" class="level3" data-number="12.4.2">
-<h3 data-number="12.4.2" class="anchored" data-anchor-id="visualizing-did"><span class="header-section-number">12.4.2</span> Visualizing DiD</h3>
-<p>The logic of DiD is best understood graphically:</p>
+<section id="from-parallel-trends-to-the-did-estimator" class="level3" data-number="12.6.2">
+<h3 data-number="12.6.2" class="anchored" data-anchor-id="from-parallel-trends-to-the-did-estimator"><span class="header-section-number">12.6.2</span> From Parallel Trends to the DiD Estimator</h3>
+<p>We can now derive the DiD estimator. We want to estimate the ATT from <a href="#eq-att" class="quarto-xref">Equation&nbsp;<span class="quarto-unresolved-ref">eq-att</span></a>, but we cannot observe <span class="math inline">\(E[Y_{i,1}(0) \mid D_i = 1]\)</span>—the counterfactual.</p>
+<p>The parallel trends assumption gives us a way to express this unobservable term. If the trends would have been the same:</p>
+<p><span class="math display">\[
+E[Y_{i,1}(0) \mid D_i = 1] = E[Y_{i,0}(0) \mid D_i = 1] + \underbrace{(E[Y_{i,1}(0) \mid D_i = 0] - E[Y_{i,0}(0) \mid D_i = 0])}_{\text{control group's observed change}}
+\]</span></p>
+<p>That is, the treated group’s counterfactual post-treatment level equals their pre-treatment level plus the control group’s change. Substituting this into the ATT formula and simplifying, we get the <strong>DiD estimator</strong>:</p>
+<p><span id="eq-did-estimator"><span class="math display">\[
+\underbrace{ATT}_{\text{treatment effect}} = \underbrace{\left(E[Y_{i,1} \mid D_i = 1] - E[Y_{i,0} \mid D_i = 1]\right)}_{\text{change for treated group}} - \underbrace{\left(E[Y_{i,1} \mid D_i = 0] - E[Y_{i,0} \mid D_i = 0]\right)}_{\text{change for control group}}
+\tag{12.2}\]</span></span></p>
+<p>This is the <strong>difference-in-differences</strong>: the first difference is the change over time for the treated group, the second difference is the change over time for the control group, and we take the <em>difference</em> between these two differences. The control group’s change “nets out” any common trends that would have occurred even without treatment, leaving only the causal effect of the treatment on the treated group.</p>
+</section>
+<section id="visualizing-did" class="level3" data-number="12.6.3">
+<h3 data-number="12.6.3" class="anchored" data-anchor-id="visualizing-did"><span class="header-section-number">12.6.3</span> Visualizing DiD</h3>
+<p>The logic of DiD is best understood graphically. <a href="#fig-did-visual" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-did-visual</span></a> shows a stylized example with treatment beginning between periods 2 and 3:</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-did-visual" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-did-visual-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;12.1: The DiD estimate is the gap between the observed treatment outcome and the counterfactual (dashed line) based on the control group’s trend.
+Figure&nbsp;12.4: The DiD estimate is the gap between the observed treatment outcome and the counterfactual (dashed line). The counterfactual is constructed by applying the control group’s trend to the treated group’s pre-treatment level.
 </figcaption>
 <div aria-describedby="fig-did-visual-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="did_files/figure-html/fig-did-visual-1.png" class="img-fluid figure-img" width="672">
@@ -660,77 +832,98 @@ Figure&nbsp;12.1: The DiD estimate is the gap between the observed treatment out
 </div>
 </div>
 </div>
-<p>The <strong>Average Treatment Effect on the Treated (ATT)</strong> is the vertical distance between:</p>
-<ol type="1">
-<li>The observed outcome for the treated group after treatment</li>
-<li>The counterfactual: where the treated group <em>would have been</em> if it had followed the control group’s trend</li>
-</ol>
-<p>The dashed line represents this counterfactual—the treated group’s hypothetical trajectory without treatment.</p>
+<p>In <a href="#fig-did-visual" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-did-visual</span></a>, the solid lines show the actual observed outcomes for both groups. Before treatment (periods 1 and 2), both groups trend upward at the same rate—they follow parallel trends. The treated group starts higher, but both increase by 1 unit per period.</p>
+<p>After treatment (periods 3 and 4), the control group continues its same upward trend (from 11 to 12 to 13). The dashed line shows where the treated group <em>would have been</em> if it had continued along this same trend (from 16 to 17 to 18). But the treated group’s <em>actual</em> outcome jumps to 20 and 21—well above the counterfactual.</p>
+<p>The <strong>ATT</strong> is the vertical gap between the observed treatment outcome and the dashed counterfactual line. In this example, <span class="math inline">\(ATT = 21 - 18 = 3\)</span> (or equivalently, <span class="math inline">\(20 - 17 = 3\)</span>). This is what DiD is estimating: the treatment effect is <em>not</em> the raw difference in levels between the two groups (which also reflects pre-existing differences), but rather the <em>additional</em> change the treated group experienced beyond what the control group experienced.</p>
 </section>
 </section>
-<section id="the-did-regression" class="level2" data-number="12.5">
-<h2 data-number="12.5" class="anchored" data-anchor-id="the-did-regression"><span class="header-section-number">12.5</span> The DiD Regression</h2>
-<section id="setting-up-the-model" class="level3" data-number="12.5.1">
-<h3 data-number="12.5.1" class="anchored" data-anchor-id="setting-up-the-model"><span class="header-section-number">12.5.1</span> Setting Up the Model</h3>
-<p>We typically estimate DiD using regression. For the simple 2×2 case (two groups, two time periods), the model is:</p>
+<section id="the-did-regression" class="level2" data-number="12.7">
+<h2 data-number="12.7" class="anchored" data-anchor-id="the-did-regression"><span class="header-section-number">12.7</span> The DiD Regression</h2>
+<section id="setting-up-the-model" class="level3" data-number="12.7.1">
+<h3 data-number="12.7.1" class="anchored" data-anchor-id="setting-up-the-model"><span class="header-section-number">12.7.1</span> Setting Up the Model</h3>
+<p>We usually estimate the DiD effect using regression rather than manual calculations. Regression gives us standard errors, lets us add control variables if desired, and extends naturally to more complex settings.</p>
+<p>For the simple 2x2 case (two groups, two time periods), the <strong>DiD regression</strong> is:</p>
 <p><span id="eq-did-reg"><span class="math display">\[
 y_{it} = \beta_0 + \beta_1 D_i + \beta_2 P_t + \delta(D_i \times P_t) + \mu_{it}
-\tag{12.1}\]</span></span></p>
+\tag{12.3}\]</span></span></p>
 <p>where:</p>
 <ul>
-<li><span class="math inline">\(D_i\)</span> is a <strong>treatment group indicator</strong> (1 if treated, 0 if control)</li>
-<li><span class="math inline">\(P_t\)</span> is a <strong>post-period indicator</strong> (1 if post-treatment, 0 if pre-treatment)</li>
-<li><span class="math inline">\(D_i \times P_t\)</span> is the interaction term (1 only for treated units in the post period)</li>
+<li><span class="math inline">\(y_{it}\)</span> is the outcome for unit <span class="math inline">\(i\)</span> at time <span class="math inline">\(t\)</span></li>
+<li><span class="math inline">\(D_i\)</span> is the <strong>treatment group indicator</strong>: a dummy variable equal to 1 if unit <span class="math inline">\(i\)</span> is in the treated group, and 0 if in the control group</li>
+<li><span class="math inline">\(P_t\)</span> is the <strong>post-period indicator</strong>: a dummy variable equal to 1 in the post-treatment period, and 0 in the pre-treatment period</li>
+<li><span class="math inline">\(D_i \times P_t\)</span> is the <strong>interaction term</strong>: equal to 1 <em>only</em> for treated units in the post-treatment period</li>
 <li><span class="math inline">\(\delta\)</span> is the <strong>DiD estimate</strong>—our estimate of the ATT</li>
 </ul>
+<p>Each component of this regression has a specific interpretation: <span class="math inline">\(\beta_0\)</span> captures the baseline level (control group in the pre-period), <span class="math inline">\(\beta_1\)</span> captures the pre-existing level difference between treated and control groups, <span class="math inline">\(\beta_2\)</span> captures the common time trend (the change both groups would have experienced), and <span class="math inline">\(\delta\)</span> captures the <em>additional</em> change experienced by the treated group beyond the common trend.</p>
 </section>
-<section id="how-it-works" class="level3" data-number="12.5.2">
-<h3 data-number="12.5.2" class="anchored" data-anchor-id="how-it-works"><span class="header-section-number">12.5.2</span> How It Works</h3>
-<p>To see why <span class="math inline">\(\delta\)</span> captures the DiD effect, consider the predicted outcomes for each group-period combination:</p>
+<section id="how-the-regression-recovers-the-did-effect" class="level3" data-number="12.7.2">
+<h3 data-number="12.7.2" class="anchored" data-anchor-id="how-the-regression-recovers-the-did-effect"><span class="header-section-number">12.7.2</span> How the Regression Recovers the DiD Effect</h3>
+<p>To see exactly why <span class="math inline">\(\delta\)</span> captures the DiD effect, consider the predicted outcome <span class="math inline">\(\hat{y}_{it}\)</span> for each of the four group-period combinations. We simply plug in the appropriate values of <span class="math inline">\(D_i\)</span> and <span class="math inline">\(P_t\)</span>:</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 20%">
-<col style="width: 23%">
-<col style="width: 55%">
+<col style="width: 29%">
+<col style="width: 31%">
+<col style="width: 39%">
 </colgroup>
 <thead>
 <tr class="header">
-<th style="text-align: center;">Group</th>
-<th style="text-align: center;">Period</th>
-<th style="text-align: center;">Predicted Outcome</th>
+<th style="text-align: center;">Group (<span class="math inline">\(D_i\)</span>)</th>
+<th style="text-align: center;">Period (<span class="math inline">\(P_t\)</span>)</th>
+<th style="text-align: center;">Predicted Outcome (<span class="math inline">\(\hat{y}_{it}\)</span>)</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: center;">Control</td>
-<td style="text-align: center;">Pre</td>
-<td style="text-align: center;">β<sub>0</sub></td>
+<td style="text-align: center;">Control (<span class="math inline">\(D_i = 0\)</span>)</td>
+<td style="text-align: center;">Pre (<span class="math inline">\(P_t = 0\)</span>)</td>
+<td style="text-align: center;"><span class="math inline">\(\beta_0\)</span></td>
 </tr>
 <tr class="even">
-<td style="text-align: center;">Control</td>
-<td style="text-align: center;">Post</td>
-<td style="text-align: center;">β<sub>0</sub> + β<sub>2</sub></td>
+<td style="text-align: center;">Control (<span class="math inline">\(D_i = 0\)</span>)</td>
+<td style="text-align: center;">Post (<span class="math inline">\(P_t = 1\)</span>)</td>
+<td style="text-align: center;"><span class="math inline">\(\beta_0 + \beta_2\)</span></td>
 </tr>
 <tr class="odd">
-<td style="text-align: center;">Treated</td>
-<td style="text-align: center;">Pre</td>
-<td style="text-align: center;">β<sub>0</sub> + β<sub>1</sub></td>
+<td style="text-align: center;">Treated (<span class="math inline">\(D_i = 1\)</span>)</td>
+<td style="text-align: center;">Pre (<span class="math inline">\(P_t = 0\)</span>)</td>
+<td style="text-align: center;"><span class="math inline">\(\beta_0 + \beta_1\)</span></td>
 </tr>
 <tr class="even">
-<td style="text-align: center;">Treated</td>
-<td style="text-align: center;">Post</td>
-<td style="text-align: center;">β<sub>0</sub> + β<sub>1</sub> + β<sub>2</sub> + δ</td>
+<td style="text-align: center;">Treated (<span class="math inline">\(D_i = 1\)</span>)</td>
+<td style="text-align: center;">Post (<span class="math inline">\(P_t = 1\)</span>)</td>
+<td style="text-align: center;"><span class="math inline">\(\beta_0 + \beta_1 + \beta_2 + \delta\)</span></td>
 </tr>
 </tbody>
 </table>
-<p>Now compute the differences:</p>
-<p><strong>Change for treated group:</strong> (β<sub>0</sub> + β<sub>1</sub> + β<sub>2</sub> + δ) − (β<sub>0</sub> + β<sub>1</sub>) = β<sub>2</sub> + δ</p>
-<p><strong>Change for control group:</strong> (β<sub>0</sub> + β<sub>2</sub>) − β<sub>0</sub> = β<sub>2</sub></p>
-<p><strong>DiD estimate:</strong> (β<sub>2</sub> + δ) − β<sub>2</sub> = <strong>δ</strong></p>
-<p>The coefficient on the interaction term exactly equals the difference-in-differences!</p>
+<p>Now we can verify that <span class="math inline">\(\delta\)</span> equals the DiD estimator from <a href="#eq-did-estimator" class="quarto-xref">Equation&nbsp;<span class="quarto-unresolved-ref">eq-did-estimator</span></a> by computing the two “differences”:</p>
+<p><strong>Change for the treated group</strong> (post minus pre): <span class="math display">\[
+(\beta_0 + \beta_1 + \beta_2 + \delta) - (\beta_0 + \beta_1) = \beta_2 + \delta
+\]</span></p>
+<p><strong>Change for the control group</strong> (post minus pre): <span class="math display">\[
+(\beta_0 + \beta_2) - \beta_0 = \beta_2
+\]</span></p>
+<p><strong>DiD estimate</strong> (treated change minus control change): <span class="math display">\[
+(\beta_2 + \delta) - \beta_2 = \delta
+\]</span></p>
+<p>The <span class="math inline">\(\beta_2\)</span> terms—representing the common time trend—cancel out, leaving <em>only</em> <span class="math inline">\(\delta\)</span>: the additional change experienced by the treated group beyond the common trend. This is the coefficient on the interaction term <span class="math inline">\(D_i \times P_t\)</span> in our regression, and it is exactly the difference-in-differences!</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-did-regression-anatomy" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-did-regression-anatomy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12.5: Anatomy of the DiD regression. Each coefficient captures a specific component: the baseline level, the group difference, the common time trend, and the treatment effect.
+</figcaption>
+<div aria-describedby="fig-did-regression-anatomy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="did_files/figure-html/fig-did-regression-anatomy-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
 </section>
-<section id="example-estimating-the-mariel-boatlift-effect" class="level3" data-number="12.5.3">
-<h3 data-number="12.5.3" class="anchored" data-anchor-id="example-estimating-the-mariel-boatlift-effect"><span class="header-section-number">12.5.3</span> Example: Estimating the Mariel Boatlift Effect</h3>
+<section id="example-estimating-the-mariel-boatlift-effect" class="level3" data-number="12.7.3">
+<h3 data-number="12.7.3" class="anchored" data-anchor-id="example-estimating-the-mariel-boatlift-effect"><span class="header-section-number">12.7.3</span> Example: Estimating the Mariel Boatlift Effect</h3>
+<p>We can re-estimate Card’s (1990) results using the DiD regression. First, we create the dataset with the appropriate indicator variables:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the Card (1990) data</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>miami_wages <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
@@ -772,30 +965,48 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 RMSE: 0.008522   Adj. R2: 0.947329</code></pre>
 </div>
 </div>
-<p>The coefficient on <code>post_treat</code> (approximately 0.01) is our DiD estimate. It suggests the Mariel Boatlift had essentially no effect on wages—consistent with Card’s original findings.</p>
+<p>How should we read this output? The coefficient on <code>treated</code> (<span class="math inline">\(\hat{\beta}_1\)</span>) tells us that Miami’s wages were about <span class="math inline">\(0.08 lower than the control cities in the pre-period---a pre-existing level difference.
+The coefficient on `post` (\)</span>_2$) tells us that control cities’ wages fell by about <span class="math inline">\(0.02 from the pre- to the post-period---the common time trend.
+And the coefficient on `post_treat` (\)</span>$) is our DiD estimate: the <em>additional</em> change Miami experienced beyond the common trend. At approximately 0.01 and statistically insignificant, it suggests the Mariel Boatlift had essentially no effect on native wages—consistent with Card’s original findings.</p>
 </section>
 </section>
-<section id="two-way-fixed-effects" class="level2" data-number="12.6">
-<h2 data-number="12.6" class="anchored" data-anchor-id="two-way-fixed-effects"><span class="header-section-number">12.6</span> Two-Way Fixed Effects</h2>
-<section id="extending-to-multiple-units-and-time-periods" class="level3" data-number="12.6.1">
-<h3 data-number="12.6.1" class="anchored" data-anchor-id="extending-to-multiple-units-and-time-periods"><span class="header-section-number">12.6.1</span> Extending to Multiple Units and Time Periods</h3>
-<p>The simple 2×2 DiD works well for clean natural experiments with one treated unit and one control unit observed before and after. But what if we have many treated units, many control units, and many time periods?</p>
-<p>The <strong>Two-Way Fixed Effects (TWFE)</strong> model extends DiD to these more complex settings:</p>
+<section id="two-way-fixed-effects" class="level2" data-number="12.8">
+<h2 data-number="12.8" class="anchored" data-anchor-id="two-way-fixed-effects"><span class="header-section-number">12.8</span> Two-Way Fixed Effects</h2>
+<section id="extending-to-multiple-units-and-time-periods" class="level3" data-number="12.8.1">
+<h3 data-number="12.8.1" class="anchored" data-anchor-id="extending-to-multiple-units-and-time-periods"><span class="header-section-number">12.8.1</span> Extending to Multiple Units and Time Periods</h3>
+<p>The simple 2x2 DiD regression works well for clean natural experiments with one treated unit and one control group observed at two points in time. But many real-world applications involve <strong>many treated units, many control units, and many time periods</strong>. For example, we might want to study the effect of minimum wage increases across dozens of states over several decades.</p>
+<p>The <strong>Two-Way Fixed Effects (TWFE)</strong> model extends DiD to these richer settings:</p>
 <p><span id="eq-twfe"><span class="math display">\[
 y_{it} = \delta D_{it} + \alpha_i + \tau_t + \mu_{it}
-\tag{12.2}\]</span></span></p>
+\tag{12.4}\]</span></span></p>
 <p>where:</p>
 <ul>
-<li><span class="math inline">\(D_{it}\)</span> equals 1 if unit <span class="math inline">\(i\)</span> is treated at time <span class="math inline">\(t\)</span>, and 0 otherwise</li>
-<li><span class="math inline">\(\alpha_i\)</span> are <strong>unit fixed effects</strong> (one for each unit)</li>
-<li><span class="math inline">\(\tau_t\)</span> are <strong>time fixed effects</strong> (one for each time period)</li>
-<li><span class="math inline">\(\delta\)</span> is the treatment effect</li>
+<li><span class="math inline">\(y_{it}\)</span> is the outcome for unit <span class="math inline">\(i\)</span> at time <span class="math inline">\(t\)</span></li>
+<li><span class="math inline">\(D_{it}\)</span> is a treatment indicator equal to 1 if unit <span class="math inline">\(i\)</span> is treated at time <span class="math inline">\(t\)</span>, and 0 otherwise</li>
+<li><span class="math inline">\(\alpha_i\)</span> are <strong>unit fixed effects</strong>—a separate intercept for each unit, capturing all time-invariant differences between units</li>
+<li><span class="math inline">\(\tau_t\)</span> are <strong>time fixed effects</strong>—a separate intercept for each time period, capturing all common shocks affecting all units</li>
+<li><span class="math inline">\(\delta\)</span> is the treatment effect (our estimate of the ATT)</li>
 </ul>
-<p>This model subsumes the simple DiD: unit fixed effects capture permanent differences between groups (like <span class="math inline">\(\beta_1 D_i\)</span>), and time fixed effects capture common shocks to all units (like <span class="math inline">\(\beta_2 P_t\)</span>).</p>
+<p>The model is called “two-way” because it includes fixed effects along two dimensions: across units (the <span class="math inline">\(\alpha_i\)</span>) and across time (the <span class="math inline">\(\tau_t\)</span>). Together, these fixed effects absorb both permanent level differences between units and common time trends—precisely the two components that the simple DiD regression handled with <span class="math inline">\(\beta_1 D_i\)</span> and <span class="math inline">\(\beta_2 P_t\)</span>.</p>
 </section>
-<section id="estimating-twfe-in-r" class="level3" data-number="12.6.2">
-<h3 data-number="12.6.2" class="anchored" data-anchor-id="estimating-twfe-in-r"><span class="header-section-number">12.6.2</span> Estimating TWFE in R</h3>
-<p>The <code>fixest</code> package makes TWFE estimation straightforward. The syntax <code>| unit + time</code> specifies the fixed effects:</p>
+<section id="why-twfe-and-the-simple-did-regression-give-the-same-answer" class="level3" data-number="12.8.2">
+<h3 data-number="12.8.2" class="anchored" data-anchor-id="why-twfe-and-the-simple-did-regression-give-the-same-answer"><span class="header-section-number">12.8.2</span> Why TWFE and the Simple DiD Regression Give the Same Answer</h3>
+<p>If TWFE looks different from the simple DiD regression, why do they give the same answer? In the 2x2 case (two groups, two time periods), the TWFE model is <strong>algebraically identical</strong> to the simple DiD regression. To see why, start with the TWFE model and simplify:</p>
+<p><span class="math display">\[
+y_{it} = \delta D_{it} + \alpha_i + \tau_t + \mu_{it}
+\]</span></p>
+<p>In the 2x2 case, we have only two units (or groups of units): treated and control. The unit fixed effects <span class="math inline">\(\alpha_i\)</span> therefore reduce to a single dummy variable distinguishing the two groups. If we let the control group be the reference category (absorbed into the constant), the unit fixed effect is simply <span class="math inline">\(\alpha_1 D_i\)</span>, where <span class="math inline">\(D_i = 1\)</span> for the treated group.</p>
+<p>Similarly, we have only two time periods: pre and post. The time fixed effects <span class="math inline">\(\tau_t\)</span> reduce to a single dummy variable distinguishing the two periods. If we let the pre-period be the reference category (absorbed into the constant), the time fixed effect is simply <span class="math inline">\(\tau_1 P_t\)</span>, where <span class="math inline">\(P_t = 1\)</span> for the post-period.</p>
+<p>Finally, in the 2x2 case, <span class="math inline">\(D_{it}\)</span>—the indicator for being treated at time <span class="math inline">\(t\)</span>—equals 1 <em>only</em> for treated units in the post-period. This is <em>exactly</em> the same as the interaction term <span class="math inline">\(D_i \times P_t\)</span> from the simple DiD regression.</p>
+<p>Substituting all of this in, the TWFE model becomes: <span class="math display">\[
+y_{it} = \underbrace{(\alpha_0 + \tau_0)}_{\beta_0} + \underbrace{\alpha_1}_{\beta_1} D_i + \underbrace{\tau_1}_{\beta_2} P_t + \delta(D_i \times P_t) + \mu_{it}
+\]</span></p>
+<p>This is the simple DiD regression from <a href="#eq-did-reg" class="quarto-xref">Equation&nbsp;<span class="quarto-unresolved-ref">eq-did-reg</span></a>. The unit fixed effect becomes <span class="math inline">\(\beta_1 D_i\)</span>, the time fixed effect becomes <span class="math inline">\(\beta_2 P_t\)</span>, and the treatment effect <span class="math inline">\(\delta\)</span> is the same in both models.</p>
+<p>The advantage of TWFE is that it <em>generalizes</em> naturally: when you have many units and many time periods, you simply add more fixed effects rather than rewriting the entire model. The <code>fixest</code> package handles this automatically.</p>
+</section>
+<section id="estimating-twfe-in-r" class="level3" data-number="12.8.3">
+<h3 data-number="12.8.3" class="anchored" data-anchor-id="estimating-twfe-in-r"><span class="header-section-number">12.8.3</span> Estimating TWFE in R</h3>
+<p>In <code>fixest</code>, we specify the fixed effects after a <code>|</code> symbol:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># TWFE estimation</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>twfe_reg <span class="ot">&lt;-</span> <span class="fu">feols</span>(wages <span class="sc">~</span> post_treat <span class="sc">|</span> city <span class="sc">+</span> year,</span>
@@ -816,70 +1027,260 @@ RMSE: 0.00622     Adj. R2: 0.943875
                 Within R2: 0.002193</code></pre>
 </div>
 </div>
-<p>The coefficient on <code>post_treat</code> is identical to our simple DiD regression—as expected, since TWFE and the 2×2 DiD model are equivalent in this simple case.</p>
+<p>As expected, the coefficient on <code>post_treat</code> is identical to our simple DiD regression. This confirms that the two approaches are equivalent in the 2x2 case.</p>
+<p>We can verify this by comparing the estimates side by side:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">modelsummary</span>(<span class="fu">list</span>(<span class="st">"Simple DiD"</span> <span class="ot">=</span> did_reg, <span class="st">"TWFE"</span> <span class="ot">=</span> twfe_reg),</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>             <span class="at">stars =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">gof_omit =</span> <span class="st">"AIC|BIC|Log|RMSE|Std"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="fig-did-vs-twfe" class="cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-did-vs-twfe-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12.6: Side-by-side comparison of the simple DiD regression and the TWFE model. The treatment effect estimates are identical in the 2x2 case.
+</figcaption>
+<div aria-describedby="fig-did-vs-twfe-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<!-- preamble start -->
+
+    <script src="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.js"></script>
+
+    <script>
+      // Create table-specific functions using external factory
+      const tableFns_6qt4ljar8mpairkzlotk = TinyTable.createTableFunctions("tinytable_6qt4ljar8mpairkzlotk");
+      // tinytable span after
+      window.addEventListener('load', function () {
+          var cellsToStyle = [
+            // tinytable style arrays after
+          { positions: [ { i: '15', j: 2 }, { i: '15', j: 3 } ], css_id: 'tinytable_css_vk29k6isnstyxkpw5mhk',}, 
+          { positions: [ { i: '8', j: 2 }, { i: '8', j: 3 } ], css_id: 'tinytable_css_i9c0ap9eg7z59qjonff2',}, 
+          { positions: [ { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '4', j: 2 }, { i: '5', j: 2 }, { i: '6', j: 2 }, { i: '7', j: 2 }, { i: '9', j: 2 }, { i: '10', j: 2 }, { i: '11', j: 2 }, { i: '12', j: 2 }, { i: '13', j: 2 }, { i: '14', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '3', j: 3 }, { i: '4', j: 3 }, { i: '5', j: 3 }, { i: '6', j: 3 }, { i: '7', j: 3 }, { i: '9', j: 3 }, { i: '10', j: 3 }, { i: '11', j: 3 }, { i: '12', j: 3 }, { i: '13', j: 3 }, { i: '14', j: 3 } ], css_id: 'tinytable_css_9wj5s3q8mpb9mqxforem',}, 
+          { positions: [ { i: '0', j: 2 }, { i: '0', j: 3 } ], css_id: 'tinytable_css_4d09bl0324jxmzj8q2uh',}, 
+          { positions: [ { i: '15', j: 1 } ], css_id: 'tinytable_css_gt99x3opwli5oto18a5u',}, 
+          { positions: [ { i: '8', j: 1 } ], css_id: 'tinytable_css_sj896rho98ie2ljxmghi',}, 
+          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '4', j: 1 }, { i: '5', j: 1 }, { i: '6', j: 1 }, { i: '7', j: 1 }, { i: '9', j: 1 }, { i: '10', j: 1 }, { i: '11', j: 1 }, { i: '12', j: 1 }, { i: '13', j: 1 }, { i: '14', j: 1 } ], css_id: 'tinytable_css_awdrwszvl64uvhct1r2w',}, 
+          { positions: [ { i: '0', j: 1 } ], css_id: 'tinytable_css_k59n6db9o1yxquqfznkj',}, 
+          ];
+
+          // Loop over the arrays to style the cells
+          cellsToStyle.forEach(function (group) {
+              group.positions.forEach(function (cell) {
+                  tableFns_6qt4ljar8mpairkzlotk.styleCell(cell.i, cell.j, group.css_id);
+              });
+          });
+      });
+    </script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
+    <style>
+    /* tinytable css entries after */
+    #tinytable_6qt4ljar8mpairkzlotk td.tinytable_css_vk29k6isnstyxkpw5mhk, #tinytable_6qt4ljar8mpairkzlotk th.tinytable_css_vk29k6isnstyxkpw5mhk {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_6qt4ljar8mpairkzlotk td.tinytable_css_i9c0ap9eg7z59qjonff2, #tinytable_6qt4ljar8mpairkzlotk th.tinytable_css_i9c0ap9eg7z59qjonff2 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_6qt4ljar8mpairkzlotk td.tinytable_css_9wj5s3q8mpb9mqxforem, #tinytable_6qt4ljar8mpairkzlotk th.tinytable_css_9wj5s3q8mpb9mqxforem { text-align: center }
+    #tinytable_6qt4ljar8mpairkzlotk td.tinytable_css_4d09bl0324jxmzj8q2uh, #tinytable_6qt4ljar8mpairkzlotk th.tinytable_css_4d09bl0324jxmzj8q2uh {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_6qt4ljar8mpairkzlotk td.tinytable_css_gt99x3opwli5oto18a5u, #tinytable_6qt4ljar8mpairkzlotk th.tinytable_css_gt99x3opwli5oto18a5u {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_6qt4ljar8mpairkzlotk td.tinytable_css_sj896rho98ie2ljxmghi, #tinytable_6qt4ljar8mpairkzlotk th.tinytable_css_sj896rho98ie2ljxmghi {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_6qt4ljar8mpairkzlotk td.tinytable_css_awdrwszvl64uvhct1r2w, #tinytable_6qt4ljar8mpairkzlotk th.tinytable_css_awdrwszvl64uvhct1r2w { text-align: left }
+    #tinytable_6qt4ljar8mpairkzlotk td.tinytable_css_k59n6db9o1yxquqfznkj, #tinytable_6qt4ljar8mpairkzlotk th.tinytable_css_k59n6db9o1yxquqfznkj {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    </style>
+    <div class="container">
+      <table class="tinytable" id="tinytable_6qt4ljar8mpairkzlotk" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+        
+        <thead>
+              <tr>
+                <th scope="col" data-row="0" data-col="1"> </th>
+                <th scope="col" data-row="0" data-col="2">Simple DiD</th>
+                <th scope="col" data-row="0" data-col="3">TWFE</th>
+              </tr>
+        </thead>
+        <tfoot><tr><td colspan="3">+ p &lt; 0.1, * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001</td></tr></tfoot>
+        <tbody>
+                <tr>
+                  <td data-row="1" data-col="1">(Intercept)</td>
+                  <td data-row="1" data-col="2">1.930***</td>
+                  <td data-row="1" data-col="3"></td>
+                </tr>
+                <tr>
+                  <td data-row="2" data-col="1"></td>
+                  <td data-row="2" data-col="2">(0.000)</td>
+                  <td data-row="2" data-col="3"></td>
+                </tr>
+                <tr>
+                  <td data-row="3" data-col="1">treated</td>
+                  <td data-row="3" data-col="2">-0.080***</td>
+                  <td data-row="3" data-col="3"></td>
+                </tr>
+                <tr>
+                  <td data-row="4" data-col="1"></td>
+                  <td data-row="4" data-col="2">(0.000)</td>
+                  <td data-row="4" data-col="3"></td>
+                </tr>
+                <tr>
+                  <td data-row="5" data-col="1">post</td>
+                  <td data-row="5" data-col="2">-0.022***</td>
+                  <td data-row="5" data-col="3"></td>
+                </tr>
+                <tr>
+                  <td data-row="6" data-col="1"></td>
+                  <td data-row="6" data-col="2">(0.003)</td>
+                  <td data-row="6" data-col="3"></td>
+                </tr>
+                <tr>
+                  <td data-row="7" data-col="1">post_treat</td>
+                  <td data-row="7" data-col="2">-0.002</td>
+                  <td data-row="7" data-col="3">-0.002</td>
+                </tr>
+                <tr>
+                  <td data-row="8" data-col="1"></td>
+                  <td data-row="8" data-col="2">(0.006)</td>
+                  <td data-row="8" data-col="3">(0.006)</td>
+                </tr>
+                <tr>
+                  <td data-row="9" data-col="1">Num.Obs.</td>
+                  <td data-row="9" data-col="2">14</td>
+                  <td data-row="9" data-col="3">14</td>
+                </tr>
+                <tr>
+                  <td data-row="10" data-col="1">R2</td>
+                  <td data-row="10" data-col="2">0.959</td>
+                  <td data-row="10" data-col="3">0.978</td>
+                </tr>
+                <tr>
+                  <td data-row="11" data-col="1">R2 Adj.</td>
+                  <td data-row="11" data-col="2">0.947</td>
+                  <td data-row="11" data-col="3">0.944</td>
+                </tr>
+                <tr>
+                  <td data-row="12" data-col="1">R2 Within</td>
+                  <td data-row="12" data-col="2"></td>
+                  <td data-row="12" data-col="3">0.002</td>
+                </tr>
+                <tr>
+                  <td data-row="13" data-col="1">R2 Within Adj.</td>
+                  <td data-row="13" data-col="2"></td>
+                  <td data-row="13" data-col="3">-0.197</td>
+                </tr>
+                <tr>
+                  <td data-row="14" data-col="1">FE: city</td>
+                  <td data-row="14" data-col="2"></td>
+                  <td data-row="14" data-col="3">X</td>
+                </tr>
+                <tr>
+                  <td data-row="15" data-col="1">FE: year</td>
+                  <td data-row="15" data-col="2"></td>
+                  <td data-row="15" data-col="3">X</td>
+                </tr>
+        </tbody>
+      </table>
+    </div>
+<!-- hack to avoid NA insertion in last line -->
+</div>
+</figure>
+</div>
+</div>
+<p>The treatment effect (<code>post_treat</code>) is the same in both models. The TWFE model simply absorbs the group and time effects into fixed effects rather than estimating them as explicit coefficients.</p>
 </section>
 </section>
-<section id="research-design-choosing-good-controls" class="level2" data-number="12.7">
-<h2 data-number="12.7" class="anchored" data-anchor-id="research-design-choosing-good-controls"><span class="header-section-number">12.7</span> Research Design: Choosing Good Controls</h2>
-<section id="the-art-of-causal-inference" class="level3" data-number="12.7.1">
-<h3 data-number="12.7.1" class="anchored" data-anchor-id="the-art-of-causal-inference"><span class="header-section-number">12.7.1</span> The Art of Causal Inference</h3>
-<p>Your DiD estimate is only as good as your research design. The goal is to find control units that make the parallel trends assumption credible.</p>
-<p><strong>Good Controls → Good Counterfactual → Credible DiD Estimate</strong></p>
-<p><strong>Bad Controls → Bad Counterfactual → Misleading DiD Estimate</strong></p>
+<section id="research-design-choosing-good-controls" class="level2" data-number="12.9">
+<h2 data-number="12.9" class="anchored" data-anchor-id="research-design-choosing-good-controls"><span class="header-section-number">12.9</span> Research Design: Choosing Good Controls</h2>
+<section id="why-controls-matter" class="level3" data-number="12.9.1">
+<h3 data-number="12.9.1" class="anchored" data-anchor-id="why-controls-matter"><span class="header-section-number">12.9.1</span> Why Controls Matter</h3>
+<p>The DiD estimator gives us a formula for recovering the treatment effect. But the formula is only as good as the <strong>parallel trends assumption</strong>, and parallel trends is only as credible as our <strong>choice of control units</strong>.</p>
+<p>The same DiD estimator can give very different answers depending on which units you choose as controls. The goal of your research design is to build a believable counterfactual—a comparison group that persuasively shows what <em>would have happened</em> to your treated group absent treatment.</p>
+<p><strong>Good Controls <span class="math inline">\(\rightarrow\)</span> Good Counterfactual <span class="math inline">\(\rightarrow\)</span> Credible DiD Estimate</strong></p>
+<p><strong>Bad Controls <span class="math inline">\(\rightarrow\)</span> Bad Counterfactual <span class="math inline">\(\rightarrow\)</span> Misleading DiD Estimate</strong></p>
 </section>
-<section id="example-minimum-wages-and-employment" class="level3" data-number="12.7.2">
-<h3 data-number="12.7.2" class="anchored" data-anchor-id="example-minimum-wages-and-employment"><span class="header-section-number">12.7.2</span> Example: Minimum Wages and Employment</h3>
-<p>Consider estimating the effect of minimum wage increases on employment. One approach might compare all states that raised their minimum wage to all states that didn’t.</p>
-<p>But states that raise minimum wages are systematically different: they tend to be more politically liberal, have stronger labor markets, different industries, and many other characteristics that affect employment. These differences violate parallel trends—minimum-wage states may have been on different employment trajectories regardless of the policy.</p>
-<p>Card and Krueger (1994) proposed a more compelling research design. When New Jersey raised its minimum wage in 1992 and neighboring Pennsylvania did not, they compared fast-food restaurants in counties <em>right next to each other</em> on opposite sides of the NJ-PA border.</p>
-<p>The identifying assumption: restaurants separated only by a state border are similar in all relevant ways except the minimum wage policy. Geographic proximity makes parallel trends much more plausible than comparing NJ to distant states with very different economies.</p>
+<section id="example-the-effect-of-minimum-wages-on-employment" class="level3" data-number="12.9.2">
+<h3 data-number="12.9.2" class="anchored" data-anchor-id="example-the-effect-of-minimum-wages-on-employment"><span class="header-section-number">12.9.2</span> Example: The Effect of Minimum Wages on Employment</h3>
+<p>To see why control group choice matters so much, consider the long-running debate about the effect of minimum wage increases on employment. Economic theory suggests that a minimum wage above the equilibrium wage should reduce employment. But is this what we find empirically?</p>
+<p>Suppose we want to estimate the effect of state minimum wage increases on teen employment using a TWFE DiD model:</p>
+<p><span class="math display">\[
+y_{it} = \delta D_{it} + \alpha_i + \tau_t + \mu_{it}
+\]</span></p>
+<p>where <span class="math inline">\(y_{it}\)</span> is teen employment in state <span class="math inline">\(i\)</span> at time <span class="math inline">\(t\)</span>, <span class="math inline">\(D_{it}\)</span> equals 1 if state <span class="math inline">\(i\)</span> has increased its minimum wage above the federal level at time <span class="math inline">\(t\)</span>, and we include state and time fixed effects.</p>
+<p>A natural first approach is to use <strong>all states that don’t increase their minimum wage</strong> as controls. But this is problematic. States that pass higher minimum wages are not randomly selected—they tend to be concentrated in the Northeast and on the West Coast. These states differ from non-MW-hiking states in many ways: they tend to lean more Democratic, have higher education levels, less de-unionization, more generous social safety nets, different industrial compositions, and lower population growth.</p>
+<p>All of these differences seriously undermine the parallel trends assumption. States that choose to raise minimum wages may have been on very different employment trajectories than states that don’t, <em>regardless</em> of the minimum wage policy. Using all non-hiking states as controls means we are comparing very different types of places and attributing any difference in trends to the minimum wage—when it may just reflect these underlying structural differences.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-bad-controls" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-bad-controls-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12.7: Why bad controls lead to biased DiD estimates. If the control group was already on a different trajectory than the treated group, the DiD estimator will confuse the pre-existing differential trend with the treatment effect.
+</figcaption>
+<div aria-describedby="fig-bad-controls-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="did_files/figure-html/fig-bad-controls-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p><a href="#fig-bad-controls" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-bad-controls</span></a> shows what goes wrong. Before treatment, the treated group (blue) was trending <em>upward faster</em> than the control group (grey). After treatment starts (between periods 3 and 4), the treated group’s outcome levels off. The true counterfactual (dashed blue line) follows the treated group’s <em>actual</em> pre-treatment trend—the steeper one. But the DiD estimator uses the <em>control group’s flatter trend</em> (dotted orange line) as the counterfactual.</p>
+<p>Because the control group was on a flatter trajectory, the DiD estimate understates the true treatment effect: it attributes some of the treatment-induced decline to the (assumed) common trend, when in fact the treated group would have continued rising faster. The gap between the “Biased DiD” and the “True ATT” labels shows this bias.</p>
 </section>
-<section id="intuition-driven-vs.-data-driven-selection" class="level3" data-number="12.7.3">
-<h3 data-number="12.7.3" class="anchored" data-anchor-id="intuition-driven-vs.-data-driven-selection"><span class="header-section-number">12.7.3</span> Intuition-Driven vs.&nbsp;Data-Driven Selection</h3>
+<section id="card-and-krueger-1994-a-better-research-design" class="level3" data-number="12.9.3">
+<h3 data-number="12.9.3" class="anchored" data-anchor-id="card-and-krueger-1994-a-better-research-design"><span class="header-section-number">12.9.3</span> Card and Krueger (1994): A Better Research Design</h3>
+<p>Card and Krueger (1994) took a different approach. In 1992, New Jersey raised its minimum wage from $4.25 to $5.05, while neighboring Pennsylvania did not. Rather than comparing NJ to all other states, Card and Krueger compared fast-food employment in counties <strong>right next to each other but separated by the NJ-PA state border</strong>.</p>
+<p>Why is this a better research design? Restaurants that are just a few miles apart—one in NJ, one in PA—face nearly identical economic conditions. They serve the same customers, draw from the same labor pool, experience the same weather and regional economic shocks. The <em>only</em> difference between them is which side of the state border they sit on, which determines which state’s minimum wage law applies.</p>
+<p>The identifying assumption is that these restaurants are so similar that assignment to the “treated” group (NJ) versus the “control” group (PA) is essentially <strong>as good as random</strong>. This makes the parallel trends assumption far more credible than comparing NJ to distant states with very different economies and demographics.</p>
+<p>Card and Krueger found that the minimum wage increase in NJ did <em>not</em> reduce employment at fast-food restaurants relative to PA.</p>
+</section>
+<section id="intuition-driven-vs.-data-driven-selection" class="level3" data-number="12.9.4">
+<h3 data-number="12.9.4" class="anchored" data-anchor-id="intuition-driven-vs.-data-driven-selection"><span class="header-section-number">12.9.4</span> Intuition-Driven vs.&nbsp;Data-Driven Selection</h3>
 <p>There are two broad approaches to choosing control units:</p>
-<p><strong>Intuition-driven selection</strong> relies on substantive knowledge to identify appropriate comparisons. Card’s choice of control cities for Miami was based on demographic and economic similarities. Card and Krueger’s border design was based on geographic proximity. The advantage is transparency and interpretability.</p>
-<p><strong>Data-driven selection</strong> uses algorithms to find control units that match the treated unit on pre-treatment outcomes. Methods like synthetic control construct a weighted average of potential controls that best reproduces the treated unit’s pre-treatment trajectory. The advantage is objectivity; the disadvantage is complexity and potential overfitting.</p>
-<p>In practice, the best research designs often combine both approaches: use substantive knowledge to identify a reasonable set of potential controls, then verify that pre-treatment trends are indeed parallel.</p>
+<p><strong>Intuition-driven selection</strong> relies on substantive knowledge, economic theory, and institutional understanding to identify appropriate comparisons. Card’s choice of control cities for Miami was based on demographic and economic similarities that he could justify on substantive grounds. Card and Krueger’s border design was based on the insight that geographic proximity makes units more comparable. The advantage of this approach is transparency: the researcher provides a clear, substantive argument for why the control group is appropriate, and readers can evaluate this argument using their own knowledge.</p>
+<p><strong>Data-driven selection</strong> uses algorithms to find the control group that best matches the treated unit’s observable characteristics, particularly pre-treatment outcomes. Methods like <strong>synthetic control</strong> construct a weighted average of potential control units that best reproduces the treated unit’s pre-treatment trajectory. The advantage is objectivity—the algorithm is not influenced by the researcher’s priors. The disadvantage is that it can sometimes produce confusing or hard-to-interpret counterfactuals, and it risks overfitting to noise in the pre-treatment data rather than capturing meaningful trends.</p>
+<p>In practice, the best research designs often combine both approaches: use substantive knowledge to identify a reasonable set of potential controls, then verify with data that pre-treatment trends are indeed parallel. Intuition-driven methods may confirm your data-driven results, and vice versa.</p>
 </section>
 </section>
-<section id="what-can-go-wrong" class="level2" data-number="12.8">
-<h2 data-number="12.8" class="anchored" data-anchor-id="what-can-go-wrong"><span class="header-section-number">12.8</span> What Can Go Wrong</h2>
-<section id="violations-of-parallel-trends" class="level3" data-number="12.8.1">
-<h3 data-number="12.8.1" class="anchored" data-anchor-id="violations-of-parallel-trends"><span class="header-section-number">12.8.1</span> Violations of Parallel Trends</h3>
-<p>The most serious threat to DiD is violation of the parallel trends assumption. This can happen when:</p>
+<section id="what-can-go-wrong" class="level2" data-number="12.10">
+<h2 data-number="12.10" class="anchored" data-anchor-id="what-can-go-wrong"><span class="header-section-number">12.10</span> What Can Go Wrong</h2>
+<section id="violations-of-parallel-trends" class="level3" data-number="12.10.1">
+<h3 data-number="12.10.1" class="anchored" data-anchor-id="violations-of-parallel-trends"><span class="header-section-number">12.10.1</span> Violations of Parallel Trends</h3>
+<p>The most serious threat to any DiD analysis is a violation of the parallel trends assumption. If the treated and control groups were on different trajectories <em>before</em> treatment—for reasons unrelated to the treatment itself—then the DiD estimate will be biased.</p>
+<p>There are several common ways parallel trends can be violated:</p>
+<p><strong>Differential pre-trends.</strong> Treated and control units were already diverging before treatment began. For example, if minimum-wage-hiking states already had faster employment growth than non-hiking states (perhaps because they have stronger economies overall), DiD would attribute some of that pre-existing growth differential to the minimum wage increase.</p>
+<p><strong>Anticipation effects.</strong> If units know treatment is coming and change their behavior before it actually arrives, the “pre-treatment” period is contaminated. For example, if restaurants started hiring fewer workers <em>before</em> the minimum wage increase took effect (in anticipation of higher costs), the pre-treatment data would understate the true pre-trend, biasing the DiD estimate.</p>
+<p><strong>Spillovers.</strong> If treatment affects control units as well—a violation of the Stable Unit Treatment Value Assumption (SUTVA)—then the control group’s trajectory no longer reflects a valid “no treatment” counterfactual. For example, if workers displaced by a minimum wage increase in NJ move to PA, PA’s employment would rise, making the treatment effect look larger than it truly is.</p>
+<p><strong>Composition changes.</strong> If the mix of units in the treated or control group changes over time in ways correlated with treatment, the DiD estimate can be biased. For example, if the minimum wage causes some low-wage restaurants to close, the surviving restaurants may look like they have <em>higher</em> average employment, even though total employment fell.</p>
+</section>
+<section id="assessing-parallel-trends" class="level3" data-number="12.10.2">
+<h3 data-number="12.10.2" class="anchored" data-anchor-id="assessing-parallel-trends"><span class="header-section-number">12.10.2</span> Assessing Parallel Trends</h3>
+<p>While we cannot directly test the parallel trends assumption—it is a statement about what <em>would have happened</em> in a world we never observe—we can assess its plausibility in several ways:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-pretrends" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-pretrends-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12.8: Assessing parallel trends by examining pre-treatment data. Left panel: parallel pre-trends support the assumption. Right panel: diverging pre-trends (a red flag) suggest the DiD estimate may be biased.
+</figcaption>
+<div aria-describedby="fig-pretrends-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="did_files/figure-html/fig-pretrends-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p><a href="#fig-pretrends" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-pretrends</span></a> shows two scenarios. In the left panel, the treated and control groups move together in the pre-treatment period (periods 1–3), providing visual support for the parallel trends assumption. In the right panel, the treated group is trending <em>upward faster</em> than the control group even before treatment, which is a red flag: if this differential trend continued after treatment, the DiD estimate would confuse the pre-existing trend with the treatment effect.</p>
+<p>Beyond visual inspection, common diagnostic tools include:</p>
+<p><strong>Placebo tests:</strong> Estimate “effects” at times when no treatment occurred. If you find significant effects in periods before treatment actually began, this suggests your control group is not a valid comparison and the DiD design is flawed.</p>
+<p><strong>Event studies:</strong> Estimate separate treatment effects for each time period relative to the treatment date. In the pre-treatment periods, all estimates should be close to zero (confirming parallel pre-trends). In the post-treatment periods, the estimates show the dynamic treatment effect.</p>
+<p>If pre-treatment trends are not parallel, the DiD estimate will be biased. The direction of bias depends on the direction of the differential trend: if the treated group was trending <em>upward</em> faster than controls, DiD will <em>overstate</em> the treatment effect (or show a positive effect when the true effect is zero). If the treated group was trending <em>downward</em> faster, DiD will <em>understate</em> the effect.</p>
+</section>
+</section>
+<section id="summary" class="level2" data-number="12.11">
+<h2 data-number="12.11" class="anchored" data-anchor-id="summary"><span class="header-section-number">12.11</span> Summary</h2>
+<p>Difference-in-differences is one of the workhorses of causal inference in applied economics.</p>
+<p>The main ideas:</p>
 <ol type="1">
-<li><strong>Differential trends:</strong> Treated and control units were already on different trajectories before treatment</li>
-<li><strong>Anticipation effects:</strong> Units change behavior before treatment actually begins</li>
-<li><strong>Spillovers:</strong> Treatment affects control units (e.g., workers move from treated to control areas)</li>
-<li><strong>Composition changes:</strong> The mix of units changes over time in ways correlated with treatment</li>
+<li><strong>Natural experiments</strong> give us plausibly exogenous variation in treatment. Not all variation is useful—we need variation driven by forces <em>unrelated</em> to the outcome.</li>
+<li><strong>Control units</strong> approximate the treated group’s counterfactual. The choice of controls determines the credibility of the whole analysis.</li>
+<li><strong>The parallel trends assumption</strong> is the core identifying assumption: absent treatment, the treated and control groups would have followed the same trend. We cannot test this directly, but we can check whether pre-treatment trends look parallel.</li>
+<li><strong>The ATT</strong> is our target. The DiD estimator recovers it by subtracting the control group’s change from the treated group’s change, netting out common trends.</li>
+<li><strong>The DiD regression</strong> <span class="math inline">\(y_{it} = \beta_0 + \beta_1 D_i + \beta_2 P_t + \delta(D_i \times P_t) + \mu_{it}\)</span> estimates the ATT as <span class="math inline">\(\delta\)</span>.</li>
+<li><strong>TWFE</strong> generalizes DiD to many units and time periods. In the 2x2 case, it collapses to the simple DiD regression because unit fixed effects reduce to <span class="math inline">\(\beta_1 D_i\)</span> and time fixed effects reduce to <span class="math inline">\(\beta_2 P_t\)</span>.</li>
 </ol>
+<p>The credibility of any DiD analysis rests on the parallel trends assumption. Good <strong>research design</strong>—choosing appropriate control units, checking pre-trends, and telling a clear story about why the comparison is valid—is what separates convincing DiD papers from unconvincing ones.</p>
 </section>
-<section id="assessing-parallel-trends" class="level3" data-number="12.8.2">
-<h3 data-number="12.8.2" class="anchored" data-anchor-id="assessing-parallel-trends"><span class="header-section-number">12.8.2</span> Assessing Parallel Trends</h3>
-<p>While we cannot test parallel trends directly, we can assess plausibility by:</p>
-<ol type="1">
-<li><strong>Examining pre-treatment trends:</strong> Do treated and control groups move together before treatment? Diverging pre-trends are a red flag.</li>
-<li><strong>Placebo tests:</strong> Estimate “effects” at times when no treatment occurred. Significant placebo effects suggest the design is flawed.</li>
-<li><strong>Event studies:</strong> Estimate treatment effects for each time period separately to visualize the dynamic pattern.</li>
-</ol>
-<p>If pre-treatment trends are not parallel, the DiD estimate will be biased. The direction of bias depends on whether the treated group was trending upward or downward relative to controls.</p>
-</section>
-</section>
-<section id="summary" class="level2" data-number="12.9">
-<h2 data-number="12.9" class="anchored" data-anchor-id="summary"><span class="header-section-number">12.9</span> Summary</h2>
-<p>Difference-in-differences is one of the most widely used methods for causal inference in economics and social science. It combines the intuition of experimental design with the practicality of observational data.</p>
-<p>The key elements are:</p>
-<ol type="1">
-<li><strong>Natural experiments</strong> provide plausibly exogenous variation in treatment assignment</li>
-<li><strong>Control units</strong> approximate what would have happened to treated units absent treatment</li>
-<li><strong>The parallel trends assumption</strong> requires that treated and control groups would have followed the same trajectory without treatment</li>
-<li><strong>The DiD estimator</strong> subtracts the control group’s change from the treated group’s change to isolate the treatment effect</li>
-<li><strong>TWFE</strong> extends DiD to multiple units and time periods using unit and time fixed effects</li>
-</ol>
-<p>The credibility of any DiD analysis rests entirely on the parallel trends assumption. Careful research design—choosing appropriate control units and verifying parallel pre-trends—is essential for producing convincing causal estimates.</p>
-</section>
-<section id="check-your-understanding" class="level2" data-number="12.10">
-<h2 data-number="12.10" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">12.10</span> Check Your Understanding</h2>
+<section id="check-your-understanding" class="level2" data-number="12.12">
+<h2 data-number="12.12" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">12.12</span> Check Your Understanding</h2>
 <p>For each question below, select the best answer from the dropdown menu.</p>
 <div class="question">
 <div class="answer-row">
@@ -938,7 +1339,18 @@ RMSE: 0.00622     Adj. R2: 0.943875
 </div>
 
 <div class="answer-row">
-    <label>vi. <strong>(Challenge)</strong> If pre-treatment trends show the treated group's outcome was rising faster than the control group's, what does this imply for the DiD estimate? </label>
+    <label>vi. Why does the TWFE model give the same estimate as the simple DiD regression in the 2×2 case? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">They use different data</option>
+        <option value="b">With two groups and two periods, unit and time fixed effects reduce to the same dummy variables as the simple DiD regression</option>
+        <option value="c">TWFE always gives the same answer as any other regression</option>
+        <option value="d">The parallel trends assumption guarantees identical estimates</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>vii. <strong>(Challenge)</strong> If pre-treatment trends show the treated group's outcome was rising faster than the control group's, what does this imply for the DiD estimate? </label>
     <select onchange="checkAnswer(this, 'c')">
         <option value="">-- Select Answer --</option>
         <option value="a">The DiD estimate will be unbiased</option>
@@ -950,7 +1362,7 @@ RMSE: 0.00622     Adj. R2: 0.943875
 </div>
 
 <div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -959,15 +1371,16 @@ RMSE: 0.00622     Adj. R2: 0.943875
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="i">
-<li><p>A natural experiment occurs when external forces—policy changes, geographic features, historical events—assign units to treatment in a way that resembles random assignment. This allows researchers to make causal inferences without actually conducting an experiment.</p></li>
-<li><p>A simple before-after comparison for Miami alone would confound the boatlift’s effect with any other changes happening at the same time (macroeconomic conditions, national trends, etc.). We need a control group to show what would have happened to Miami <em>without</em> the boatlift.</p></li>
-<li><p>Parallel trends is the core assumption of DiD. It requires that, in the hypothetical world where treatment never occurred, the treated group’s outcome would have changed by the same amount as the control group’s. This allows us to use the control group’s actual change as the counterfactual for the treated group.</p></li>
-<li><p>In the DiD regression, δ (delta) is the coefficient on the interaction term D<sub>i</sub>×P<sub>t</sub>. This interaction equals 1 only for treated units in the post-period, so its coefficient captures the additional change for treated units beyond what control units experienced—exactly the DiD estimate.</p></li>
-<li><p>States that raise minimum wages differ systematically from states that don’t in many ways (politics, industries, labor markets). These differences make parallel trends implausible. Restaurants right next to each other across a state border share local economic conditions and differ mainly in which state’s minimum wage applies—a much more credible comparison.</p></li>
-<li><p>If the treated group was already trending upward faster than controls before treatment, the DiD will attribute that pre-existing differential trend to the treatment. The estimate will be <strong>biased upward</strong>—showing a more positive effect than the true causal impact (or showing a positive effect when the true effect is zero or negative).</p></li>
+<li><p>A natural experiment occurs when external forces—policy changes, geographic features, historical events—assign units to treatment in a way that resembles random assignment. The key is that the source of variation in treatment is unrelated to the outcome, making it “as good as random.” This is fundamentally different from simply having variation in a treatment variable, which may be driven by endogenous factors.</p></li>
+<li><p>A simple before-after comparison for Miami alone would confound the boatlift’s effect with any other changes happening at the same time (macroeconomic conditions, national trends, etc.). Without a control group, we cannot distinguish between “wages fell because of the boatlift” and “wages fell because of a national recession.” We need a comparison group to isolate what <em>would have happened</em> to Miami without the boatlift.</p></li>
+<li><p>Parallel trends is the core identifying assumption of DiD. It requires that, in the hypothetical world where treatment never occurred, the treated group’s outcome would have changed by the same amount as the control group’s. This allows us to use the control group’s actual change as the counterfactual for the treated group. Importantly, it does <em>not</em> require that the two groups have the same level of the outcome—only the same <em>trend</em>.</p></li>
+<li><p>In the DiD regression, <span class="math inline">\(\delta\)</span> is the coefficient on the interaction term <span class="math inline">\(D_i \times P_t\)</span>. This interaction equals 1 only for treated units in the post-period. When we compute the double difference—(treated post - treated pre) minus (control post - control pre)—the <span class="math inline">\(\beta_0\)</span>, <span class="math inline">\(\beta_1\)</span>, and <span class="math inline">\(\beta_2\)</span> terms all cancel out, leaving only <span class="math inline">\(\delta\)</span>.</p></li>
+<li><p>States that raise minimum wages differ systematically from states that don’t in many ways (politics, industries, demographics, labor markets). These differences make the parallel trends assumption implausible. Restaurants right next to each other across a state border share local economic conditions, weather, customer base, and labor pool. They differ mainly in which state’s minimum wage applies, making parallel trends far more credible.</p></li>
+<li><p>In the 2x2 case, unit fixed effects reduce to a single dummy variable for the treated group (<span class="math inline">\(D_i\)</span>), and time fixed effects reduce to a single dummy variable for the post-period (<span class="math inline">\(P_t\)</span>). The treatment indicator <span class="math inline">\(D_{it}\)</span> is equivalent to the interaction <span class="math inline">\(D_i \times P_t\)</span>. Substituting these into the TWFE equation gives exactly the simple DiD regression: <span class="math inline">\(y_{it} = \beta_0 + \beta_1 D_i + \beta_2 P_t + \delta(D_i \times P_t) + \mu_{it}\)</span>.</p></li>
+<li><p>If the treated group was already trending upward faster than controls before treatment, the DiD will attribute that pre-existing differential trend to the treatment. The estimate will be <strong>biased upward</strong>—showing a more positive effect than the true causal impact (or showing a positive effect when the true effect is zero or negative). The control group’s flatter trend is not a valid counterfactual for the treated group’s steeper trajectory.</p></li>
 </ol>
 </div>
 </div>

@@ -2,13 +2,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.27">
+<meta name="generator" content="quarto-1.9.36">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
 <title>8&nbsp; Interaction Effects – EC325 Lecture Notes</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -59,7 +62,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
-  margin-bottom: 0em;
 }
 .hanging-indent div.csl-entry {
   margin-left:2em;
@@ -89,15 +91,14 @@ div.csl-indent {
 <link href="../chapters/dummies_nonlins.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-5ccb035bea26c1e21f80f44cf7c27909.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -127,7 +128,7 @@ div.csl-indent {
 }</script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -513,18 +514,18 @@ function checkAnswer(selectElement, correctValue) {
 <div id="callout-2" class="callout-2-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ul>
-<li><span class="citation" data-cites="wooldridge_introductory_2019">Wooldridge (<a href="references.html#ref-wooldridge_introductory_2019" role="doc-biblioref">2019</a>)</span> Ch. 7.4</li>
-<li><span class="citation" data-cites="bailey_real_2020">Bailey (<a href="references.html#ref-bailey_real_2020" role="doc-biblioref">2020</a>)</span>, Ch. 5</li>
+<li><span class="citation" data-cites="wooldridge_introductory_2019">Wooldridge (<a href="#ref-wooldridge_introductory_2019" role="doc-biblioref">2019</a>)</span> Ch. 7.4</li>
+<li><span class="citation" data-cites="bailey_real_2020">Bailey (<a href="#ref-bailey_real_2020" role="doc-biblioref">2020</a>)</span>, Ch. 5</li>
 </ul>
 </div>
 </div>
 </div>
-<p>In <a href="dummies_nonlins.html" class="quarto-xref"><span>Chapter 7</span></a>, we saw how dummy variables allow us to include categorical information in regression models. A dummy variable shifts the <strong>intercept</strong> of the regression line up or down for different groups, while keeping the <strong>slope</strong> the same. But is that always realistic?</p>
+<p>In <a href="#sec-dummy-nonlinear" class="quarto-xref"><span class="quarto-unresolved-ref">sec-dummy-nonlinear</span></a>, we saw how dummy variables allow us to include categorical information in regression models. A dummy variable shifts the <strong>intercept</strong> of the regression line up or down for different groups, while keeping the <strong>slope</strong> the same. But is that always realistic?</p>
 <p>Consider the gender wage gap. A simple model with a <code>female</code> dummy variable assumes that the return to education, experience, and every other variable is <strong>identical</strong> for men and women—the only difference is a level shift in wages. In reality, we might expect that the <em>returns</em> to these characteristics differ across groups. For example, an additional year of education might increase wages by a different amount for men than for women.</p>
 <p><strong>Interaction effects</strong> allow us to model exactly this kind of complexity. By including the <em>product</em> of two variables in our regression, we can allow the effect of one variable to depend on the value of another.</p>
 <section id="why-interactions-matter" class="level2" data-number="8.1">
 <h2 data-number="8.1" class="anchored" data-anchor-id="why-interactions-matter"><span class="header-section-number">8.1</span> Why Interactions Matter</h2>
-<p>Recall the dummy variable model from <a href="dummies_nonlins.html" class="quarto-xref"><span>Chapter 7</span></a>. When we estimated:</p>
+<p>Recall the dummy variable model from <a href="#sec-dummy-nonlinear" class="quarto-xref"><span class="quarto-unresolved-ref">sec-dummy-nonlinear</span></a>. When we estimated:</p>
 <p><span class="math display">\[
 score = \beta_0 + \beta_1(hsgpa) + \beta_2(calculus) + \mu
 \]</span></p>
@@ -541,7 +542,7 @@ score = \beta_0 + \beta_1(hsgpa) + \beta_2(calculus) + \mu
 <section id="how-to-interpret-the-coefficients" class="level3" data-number="8.2.1">
 <h3 data-number="8.2.1" class="anchored" data-anchor-id="how-to-interpret-the-coefficients"><span class="header-section-number">8.2.1</span> How to Interpret the Coefficients</h3>
 <p>With an interaction between two dummy variables, we need to think carefully about what each coefficient represents. The trick is to recognize that each coefficient in this model has a very specific meaning that depends on the values of the <em>other</em> variables in the model.</p>
-<p>Before diving in, recall from <a href="dummies_nonlins.html" class="quarto-xref"><span>Chapter 7</span></a> that whenever we include dummy variables, there is always a <strong>baseline group</strong>—the group for which all dummy variables equal zero. In this model, the baseline group is <strong>unmarried men</strong> (<span class="math inline">\(female = 0\)</span>, <span class="math inline">\(married = 0\)</span>). The intercept <span class="math inline">\(\beta_0\)</span> represents the average <span class="math inline">\(\ln(wage)\)</span> for this baseline group, and every other coefficient measures an effect <em>relative to</em> unmarried men. Keeping this baseline in mind is essential for interpreting every other coefficient.</p>
+<p>Before diving in, recall from <a href="#sec-dummy-nonlinear" class="quarto-xref"><span class="quarto-unresolved-ref">sec-dummy-nonlinear</span></a> that whenever we include dummy variables, there is always a <strong>baseline group</strong>—the group for which all dummy variables equal zero. In this model, the baseline group is <strong>unmarried men</strong> (<span class="math inline">\(female = 0\)</span>, <span class="math inline">\(married = 0\)</span>). The intercept <span class="math inline">\(\beta_0\)</span> represents the average <span class="math inline">\(\ln(wage)\)</span> for this baseline group, and every other coefficient measures an effect <em>relative to</em> unmarried men. Keeping this baseline in mind is essential for interpreting every other coefficient.</p>
 <p>Let’s start with <span class="math inline">\(\beta_1\)</span>, the coefficient on <code>female</code>. In a model <em>without</em> the interaction term, <span class="math inline">\(\beta_1\)</span> would represent the effect of being female on wages, holding marital status constant. But once we add the interaction term, <span class="math inline">\(\beta_1\)</span> takes on a more specific meaning: it represents the effect of being female <strong>when <code>married</code> equals zero</strong>—that is, the gender wage gap <em>among unmarried workers only</em> (relative to our baseline of unmarried men). Why? Because when <span class="math inline">\(married = 0\)</span>, the interaction term <span class="math inline">\(female \times married\)</span> drops out entirely (it equals zero), and we are left with just the main effect of <code>female</code>.</p>
 <p>The same logic applies to <span class="math inline">\(\beta_2\)</span>, the coefficient on <code>married</code>. It represents the effect of being married <strong>when <code>female</code> equals zero</strong>—in other words, the marriage premium <em>for men only</em>. When <span class="math inline">\(female = 0\)</span>, the interaction term vanishes, and <span class="math inline">\(\beta_2\)</span> captures the full effect of marriage.</p>
 <p>Now for the key coefficient: <span class="math inline">\(\beta_3\)</span>, the interaction term. This tells us <strong>how much the effect of one variable changes depending on the value of the other</strong>. In other words, <span class="math inline">\(\beta_3\)</span> answers the question: <em>is the marriage premium different for women than for men?</em> Or equivalently: <em>is the gender wage gap different for married workers than for unmarried workers?</em></p>
@@ -591,7 +592,7 @@ Table&nbsp;8.1: Predicted values by group in a model with two interacted dummy v
 </div>
 </figure>
 </div>
-<p>Notice in <a href="#tbl-interaction-groups" class="quarto-xref">Table&nbsp;<span>8.1</span></a> that the predicted wage for married women includes <em>all four</em> terms: <span class="math inline">\(\beta_0\)</span> (the baseline), <span class="math inline">\(\beta_1\)</span> (the female effect among unmarried workers), <span class="math inline">\(\beta_2\)</span> (the marriage effect for men), and <span class="math inline">\(\beta_3\)</span> (the additional interaction effect). The total effect of being a married woman (relative to an unmarried man) is therefore <span class="math inline">\(\beta_1 + \beta_2 + \beta_3\)</span>—<strong>not</strong> just <span class="math inline">\(\beta_1 + \beta_2\)</span>.</p>
+<p>Notice in <a href="#tbl-interaction-groups" class="quarto-xref">Table&nbsp;<span class="quarto-unresolved-ref">tbl-interaction-groups</span></a> that the predicted wage for married women includes <em>all four</em> terms: <span class="math inline">\(\beta_0\)</span> (the baseline), <span class="math inline">\(\beta_1\)</span> (the female effect among unmarried workers), <span class="math inline">\(\beta_2\)</span> (the marriage effect for men), and <span class="math inline">\(\beta_3\)</span> (the additional interaction effect). The total effect of being a married woman (relative to an unmarried man) is therefore <span class="math inline">\(\beta_1 + \beta_2 + \beta_3\)</span>—<strong>not</strong> just <span class="math inline">\(\beta_1 + \beta_2\)</span>.</p>
 <p>Why does this matter? If <span class="math inline">\(\beta_3 = 0\)</span>, then being married has the same effect on wages for men and women, and being female has the same effect regardless of marital status. In that case, we could drop the interaction term and the simpler model would suffice. But if <span class="math inline">\(\beta_3 \neq 0\)</span>, the combined effect of being female and married is different from what we would get by simply adding the individual effects together. The interaction term captures this “extra” (or “less”) effect.</p>
 </section>
 <section id="example-the-marriage-premium-by-gender" class="level3" data-number="8.2.2">
@@ -693,7 +694,7 @@ Multiple R-squared:  0.2132,    Adjusted R-squared:  0.2087
 F-statistic: 47.15 on 3 and 522 DF,  p-value: &lt; 0.00000000000000022</code></pre>
 </div>
 </div>
-<p>Let’s interpret these results using the framework from <a href="#tbl-interaction-groups" class="quarto-xref">Table&nbsp;<span>8.1</span></a>:</p>
+<p>Let’s interpret these results using the framework from <a href="#tbl-interaction-groups" class="quarto-xref">Table&nbsp;<span class="quarto-unresolved-ref">tbl-interaction-groups</span></a>:</p>
 <div class="cell">
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -736,7 +737,7 @@ F-statistic: 47.15 on 3 and 522 DF,  p-value: &lt; 0.00000000000000022</code></p
 </div>
 </div>
 <p>Several interesting patterns emerge. First, there is a substantial <strong>marriage premium</strong> for men: married men earn about 53.2% more than unmarried men. Second, unmarried women earn about 12.3% less than unmarried men (the gender wage gap among unmarried workers). Third, and most importantly, the interaction term (<span class="math inline">\(\hat{\beta}_3 \approx -0.375\)</span>) tells us that the marriage premium is <strong>very different</strong> for women than for men. While married men earn substantially more than unmarried men, married women do not enjoy the same premium—in fact, the large negative interaction term nearly wipes out the marriage premium for women.</p>
-<p><a href="#fig-waterfall-interaction" class="quarto-xref">Figure&nbsp;<span>8.1</span></a> visualizes this decomposition. Each bar shows how a group’s predicted <span class="math inline">\(\ln(wage)\)</span> is built up from the individual coefficients, starting from the baseline intercept <span class="math inline">\(\beta_0\)</span>. Notice how the married women’s bar includes all four components: the positive marriage effect (<span class="math inline">\(\beta_2\)</span>, in blue) is largely offset by the negative interaction term (<span class="math inline">\(\beta_3\)</span>, in gold).</p>
+<p><a href="#fig-waterfall-interaction" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-waterfall-interaction</span></a> visualizes this decomposition. Each bar shows how a group’s predicted <span class="math inline">\(\ln(wage)\)</span> is built up from the individual coefficients, starting from the baseline intercept <span class="math inline">\(\beta_0\)</span>. Notice how the married women’s bar includes all four components: the positive marriage effect (<span class="math inline">\(\beta_2\)</span>, in blue) is largely offset by the negative interaction term (<span class="math inline">\(\beta_3\)</span>, in gold).</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-waterfall-interaction" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -767,7 +768,7 @@ Figure&nbsp;8.1: Each group’s predicted ln(wage) decomposed into its coefficie
 <p>For <strong>women</strong> (<span class="math inline">\(female = 1\)</span>): <span class="math display">\[
 \ln(wage) = (\beta_0 + \beta_1) + (\beta_2 + \beta_3)(educ)
 \]</span></p>
-<p>Notice that this model gives each group its own intercept <strong>and</strong> its own slope. Men have intercept <span class="math inline">\(\beta_0\)</span> and slope <span class="math inline">\(\beta_2\)</span>. Women have intercept <span class="math inline">\((\beta_0 + \beta_1)\)</span> and slope <span class="math inline">\((\beta_2 + \beta_3)\)</span>. This is a crucial difference from the dummy-only model in <a href="dummies_nonlins.html" class="quarto-xref"><span>Chapter 7</span></a>, which gave each group a different intercept but forced them to share the same slope. With the interaction term, we now have <strong>two completely separate regression lines</strong>—one for each group—that can start at different levels <em>and</em> change at different rates.</p>
+<p>Notice that this model gives each group its own intercept <strong>and</strong> its own slope. Men have intercept <span class="math inline">\(\beta_0\)</span> and slope <span class="math inline">\(\beta_2\)</span>. Women have intercept <span class="math inline">\((\beta_0 + \beta_1)\)</span> and slope <span class="math inline">\((\beta_2 + \beta_3)\)</span>. This is a crucial difference from the dummy-only model in <a href="#sec-dummy-nonlinear" class="quarto-xref"><span class="quarto-unresolved-ref">sec-dummy-nonlinear</span></a>, which gave each group a different intercept but forced them to share the same slope. With the interaction term, we now have <strong>two completely separate regression lines</strong>—one for each group—that can start at different levels <em>and</em> change at different rates.</p>
 <p>The coefficient <span class="math inline">\(\beta_1\)</span> captures the <strong>difference in intercepts</strong> (the level shift for women when education is zero), while <span class="math inline">\(\beta_3\)</span> captures the <strong>difference in slopes</strong> (how much more or less women gain from each additional year of education compared to men).</p>
 <section id="example-returns-to-education-by-gender-simulated-data" class="level3" data-number="8.3.1">
 <h3 data-number="8.3.1" class="anchored" data-anchor-id="example-returns-to-education-by-gender-simulated-data"><span class="header-section-number">8.3.1</span> Example: Returns to Education by Gender (Simulated Data)</h3>
@@ -893,7 +894,7 @@ F-statistic: 172.7 on 3 and 496 DF,  p-value: &lt; 0.00000000000000022</code></p
 </section>
 <section id="visualizing-different-slopes" class="level3" data-number="8.3.2">
 <h3 data-number="8.3.2" class="anchored" data-anchor-id="visualizing-different-slopes"><span class="header-section-number">8.3.2</span> Visualizing Different Slopes</h3>
-<p>The figure below shows the predicted regression lines for men and women, along with the simulated data points. Notice that unlike the dummy variable model from <a href="dummies_nonlins.html" class="quarto-xref"><span>Chapter 7</span></a> (which produced parallel lines), the interaction model produces lines with <strong>different slopes</strong>:</p>
+<p>The figure below shows the predicted regression lines for men and women, along with the simulated data points. Notice that unlike the dummy variable model from <a href="#sec-dummy-nonlinear" class="quarto-xref"><span class="quarto-unresolved-ref">sec-dummy-nonlinear</span></a> (which produced parallel lines), the interaction model produces lines with <strong>different slopes</strong>:</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-interaction-slopes" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -908,7 +909,7 @@ Figure&nbsp;8.2: With an interaction term, the regression lines for men and wome
 </div>
 </div>
 </div>
-<p><a href="#fig-interaction-slopes" class="quarto-xref">Figure&nbsp;<span>8.2</span></a> makes the key point visually clear: the two regression lines are <strong>not parallel</strong>. Men start with higher predicted wages at low education levels, but because women have a steeper slope, the gap narrows as education increases. At very high levels of education, the lines cross and women are predicted to earn more than men. This is exactly the kind of pattern that a model <em>without</em> an interaction term would completely miss—it would force both groups to have the same slope and report only an average level difference.</p>
+<p><a href="#fig-interaction-slopes" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-interaction-slopes</span></a> makes the key point visually clear: the two regression lines are <strong>not parallel</strong>. Men start with higher predicted wages at low education levels, but because women have a steeper slope, the gap narrows as education increases. At very high levels of education, the lines cross and women are predicted to earn more than men. This is exactly the kind of pattern that a model <em>without</em> an interaction term would completely miss—it would force both groups to have the same slope and report only an average level difference.</p>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1054,146 +1055,112 @@ Figure&nbsp;8.2: With an interaction term, the regression lines for men and wome
 <div class="cell-output-display">
 <!-- preamble start -->
 
+    <script src="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.js"></script>
+
     <script>
-
-      function styleCell_kgy9rxl4nbepwrmdbh6f(i, j, css_id) {
-          var table = document.getElementById("tinytable_kgy9rxl4nbepwrmdbh6f");
-          var cell = table.querySelector(`[data-row="${i}"][data-col="${j}"]`);
-          if (cell) {
-              console.log(`Styling cell at (${i}, ${j}) with class ${css_id}`);
-              cell.classList.add(css_id);
-          } else {
-              console.warn(`Cell at (${i}, ${j}) not found.`);
-          }
-      }
-      function spanCell_kgy9rxl4nbepwrmdbh6f(i, j, rowspan, colspan) {
-        var table = document.getElementById("tinytable_kgy9rxl4nbepwrmdbh6f");
-        const targetCell = table.querySelector(`[data-row="${i}"][data-col="${j}"]`);
-        if (!targetCell) {
-          console.warn(`Cell at (${i}, ${j}) not found.`);
-        }
-
-        // Get all cells that need to be removed
-        const cellsToRemove = [];
-        for (let r = 0; r < rowspan; r++) {
-          for (let c = 0; c < colspan; c++) {
-            if (r === 0 && c === 0) continue; // Skip the target cell
-            const cell = table.querySelector(`[data-row="${i + r}"][data-col="${j + c}"]`);
-            if (cell) {
-              cellsToRemove.push(cell);
-            }
-          }
-        }
-
-        // Remove all cells
-        cellsToRemove.forEach(cell => cell.remove());
-
-        // Set rowspan and colspan of the target cell if it exists
-        if (targetCell) {
-          targetCell.rowSpan = rowspan;
-          targetCell.colSpan = colspan;
-        }
-      }
+      // Create table-specific functions using external factory
+      const tableFns_xaj1uo9vzemnoaix4im4 = TinyTable.createTableFunctions("tinytable_xaj1uo9vzemnoaix4im4");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: '14', j: 1 },  ], css_id: 'tinytable_css_setfg0i7a9qr1p7trfvm',}, 
-          { positions: [ { i: '12', j: 1 },  ], css_id: 'tinytable_css_v0vdwj22mw55dj78zze6',}, 
-          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '4', j: 1 }, { i: '5', j: 1 }, { i: '6', j: 1 }, { i: '7', j: 1 }, { i: '8', j: 1 }, { i: '9', j: 1 }, { i: '10', j: 1 }, { i: '11', j: 1 }, { i: '13', j: 1 },  ], css_id: 'tinytable_css_jry2byujm9pu0yc4dqqw',}, 
-          { positions: [ { i: '0', j: 1 },  ], css_id: 'tinytable_css_kpsc37y8c4b3o92gpjjb',}, 
-          { positions: [ { i: '14', j: 0 },  ], css_id: 'tinytable_css_rz1b0bu09u2g3oa9f6yu',}, 
-          { positions: [ { i: '12', j: 0 },  ], css_id: 'tinytable_css_o2rfkquw8qy4ra7k34nb',}, 
-          { positions: [ { i: '1', j: 0 }, { i: '2', j: 0 }, { i: '3', j: 0 }, { i: '4', j: 0 }, { i: '5', j: 0 }, { i: '6', j: 0 }, { i: '7', j: 0 }, { i: '8', j: 0 }, { i: '9', j: 0 }, { i: '10', j: 0 }, { i: '11', j: 0 }, { i: '13', j: 0 },  ], css_id: 'tinytable_css_pqhktawt9i57fg7aeuim',}, 
-          { positions: [ { i: '0', j: 0 },  ], css_id: 'tinytable_css_b5i17nkworow5izk000e',}, 
+          { positions: [ { i: '14', j: 2 } ], css_id: 'tinytable_css_v0vdwj22mw55dj78zze6',}, 
+          { positions: [ { i: '12', j: 2 } ], css_id: 'tinytable_css_jry2byujm9pu0yc4dqqw',}, 
+          { positions: [ { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '4', j: 2 }, { i: '5', j: 2 }, { i: '6', j: 2 }, { i: '7', j: 2 }, { i: '8', j: 2 }, { i: '9', j: 2 }, { i: '10', j: 2 }, { i: '11', j: 2 }, { i: '13', j: 2 } ], css_id: 'tinytable_css_kpsc37y8c4b3o92gpjjb',}, 
+          { positions: [ { i: '0', j: 2 } ], css_id: 'tinytable_css_rz1b0bu09u2g3oa9f6yu',}, 
+          { positions: [ { i: '14', j: 1 } ], css_id: 'tinytable_css_o2rfkquw8qy4ra7k34nb',}, 
+          { positions: [ { i: '12', j: 1 } ], css_id: 'tinytable_css_pqhktawt9i57fg7aeuim',}, 
+          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '4', j: 1 }, { i: '5', j: 1 }, { i: '6', j: 1 }, { i: '7', j: 1 }, { i: '8', j: 1 }, { i: '9', j: 1 }, { i: '10', j: 1 }, { i: '11', j: 1 }, { i: '13', j: 1 } ], css_id: 'tinytable_css_b5i17nkworow5izk000e',}, 
+          { positions: [ { i: '0', j: 1 } ], css_id: 'tinytable_css_kgy9rxl4nbepwrmdbh6f',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  styleCell_kgy9rxl4nbepwrmdbh6f(cell.i, cell.j, group.css_id);
+                  tableFns_xaj1uo9vzemnoaix4im4.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
     </script>
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
-      /* tinytable css entries after */
-      .table td.tinytable_css_setfg0i7a9qr1p7trfvm, .table th.tinytable_css_setfg0i7a9qr1p7trfvm { text-align: center; border-bottom: solid #d3d8dc 0.1em; }
-      .table td.tinytable_css_v0vdwj22mw55dj78zze6, .table th.tinytable_css_v0vdwj22mw55dj78zze6 { text-align: center; border-bottom: solid black 0.05em; }
-      .table td.tinytable_css_jry2byujm9pu0yc4dqqw, .table th.tinytable_css_jry2byujm9pu0yc4dqqw { text-align: center; }
-      .table td.tinytable_css_kpsc37y8c4b3o92gpjjb, .table th.tinytable_css_kpsc37y8c4b3o92gpjjb { text-align: center; border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
-      .table td.tinytable_css_rz1b0bu09u2g3oa9f6yu, .table th.tinytable_css_rz1b0bu09u2g3oa9f6yu { text-align: left; border-bottom: solid #d3d8dc 0.1em; }
-      .table td.tinytable_css_o2rfkquw8qy4ra7k34nb, .table th.tinytable_css_o2rfkquw8qy4ra7k34nb { text-align: left; border-bottom: solid black 0.05em; }
-      .table td.tinytable_css_pqhktawt9i57fg7aeuim, .table th.tinytable_css_pqhktawt9i57fg7aeuim { text-align: left; }
-      .table td.tinytable_css_b5i17nkworow5izk000e, .table th.tinytable_css_b5i17nkworow5izk000e { text-align: left; border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
+    /* tinytable css entries after */
+    #tinytable_xaj1uo9vzemnoaix4im4 td.tinytable_css_v0vdwj22mw55dj78zze6, #tinytable_xaj1uo9vzemnoaix4im4 th.tinytable_css_v0vdwj22mw55dj78zze6 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_xaj1uo9vzemnoaix4im4 td.tinytable_css_jry2byujm9pu0yc4dqqw, #tinytable_xaj1uo9vzemnoaix4im4 th.tinytable_css_jry2byujm9pu0yc4dqqw {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_xaj1uo9vzemnoaix4im4 td.tinytable_css_kpsc37y8c4b3o92gpjjb, #tinytable_xaj1uo9vzemnoaix4im4 th.tinytable_css_kpsc37y8c4b3o92gpjjb { text-align: center }
+    #tinytable_xaj1uo9vzemnoaix4im4 td.tinytable_css_rz1b0bu09u2g3oa9f6yu, #tinytable_xaj1uo9vzemnoaix4im4 th.tinytable_css_rz1b0bu09u2g3oa9f6yu {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_xaj1uo9vzemnoaix4im4 td.tinytable_css_o2rfkquw8qy4ra7k34nb, #tinytable_xaj1uo9vzemnoaix4im4 th.tinytable_css_o2rfkquw8qy4ra7k34nb {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_xaj1uo9vzemnoaix4im4 td.tinytable_css_pqhktawt9i57fg7aeuim, #tinytable_xaj1uo9vzemnoaix4im4 th.tinytable_css_pqhktawt9i57fg7aeuim {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_xaj1uo9vzemnoaix4im4 td.tinytable_css_b5i17nkworow5izk000e, #tinytable_xaj1uo9vzemnoaix4im4 th.tinytable_css_b5i17nkworow5izk000e { text-align: left }
+    #tinytable_xaj1uo9vzemnoaix4im4 td.tinytable_css_kgy9rxl4nbepwrmdbh6f, #tinytable_xaj1uo9vzemnoaix4im4 th.tinytable_css_kgy9rxl4nbepwrmdbh6f {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
     </style>
     <div class="container">
-      <table class="table table-borderless" id="tinytable_kgy9rxl4nbepwrmdbh6f" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="tinytable" id="tinytable_xaj1uo9vzemnoaix4im4" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+        <caption>OLS Regression of Sacramento Home Prices</caption>
         <thead>
-        </thead><caption>OLS Regression of Sacramento Home Prices</caption>
-              <tbody><tr>
-                <th scope="col" data-row="0" data-col="0"> </th>
-                <th scope="col" data-row="0" data-col="1">log(Sale Price)</th>
+              <tr>
+                <th scope="col" data-row="0" data-col="1"> </th>
+                <th scope="col" data-row="0" data-col="2">log(Sale Price)</th>
               </tr>
-        
-        </tbody><tfoot><tr><td colspan="2">* p &lt; 0.1, ** p &lt; 0.05, *** p &lt; 0.01</td></tr></tfoot>
+        </thead>
+        <tfoot><tr><td colspan="2">* p &lt; 0.1, ** p &lt; 0.05, *** p &lt; 0.01</td></tr></tfoot>
         <tbody>
                 <tr>
-                  <td data-row="1" data-col="0">Square Feet</td>
-                  <td data-row="1" data-col="1">0.0005***</td>
+                  <td data-row="1" data-col="1">Square Feet</td>
+                  <td data-row="1" data-col="2">0.0005***</td>
                 </tr>
                 <tr>
-                  <td data-row="2" data-col="0"></td>
-                  <td data-row="2" data-col="1">(0.0000)</td>
+                  <td data-row="2" data-col="1"></td>
+                  <td data-row="2" data-col="2">(0.0000)</td>
                 </tr>
                 <tr>
-                  <td data-row="3" data-col="0">Suburb</td>
-                  <td data-row="3" data-col="1">0.1824*</td>
+                  <td data-row="3" data-col="1">Suburb</td>
+                  <td data-row="3" data-col="2">0.1824*</td>
                 </tr>
                 <tr>
-                  <td data-row="4" data-col="0"></td>
-                  <td data-row="4" data-col="1">(0.0951)</td>
+                  <td data-row="4" data-col="1"></td>
+                  <td data-row="4" data-col="2">(0.0951)</td>
                 </tr>
                 <tr>
-                  <td data-row="5" data-col="0">Type: Multi-Family</td>
-                  <td data-row="5" data-col="1">-0.0341</td>
+                  <td data-row="5" data-col="1">Type: Multi-Family</td>
+                  <td data-row="5" data-col="2">-0.0341</td>
                 </tr>
                 <tr>
-                  <td data-row="6" data-col="0"></td>
-                  <td data-row="6" data-col="1">(0.1302)</td>
+                  <td data-row="6" data-col="1"></td>
+                  <td data-row="6" data-col="2">(0.1302)</td>
                 </tr>
                 <tr>
-                  <td data-row="7" data-col="0">Type: Residential</td>
-                  <td data-row="7" data-col="1">0.1832***</td>
+                  <td data-row="7" data-col="1">Type: Residential</td>
+                  <td data-row="7" data-col="2">0.1832***</td>
                 </tr>
                 <tr>
-                  <td data-row="8" data-col="0"></td>
-                  <td data-row="8" data-col="1">(0.0706)</td>
+                  <td data-row="8" data-col="1"></td>
+                  <td data-row="8" data-col="2">(0.0706)</td>
                 </tr>
                 <tr>
-                  <td data-row="9" data-col="0">Multi-Family x Suburb</td>
-                  <td data-row="9" data-col="1">0.2366</td>
+                  <td data-row="9" data-col="1">Multi-Family x Suburb</td>
+                  <td data-row="9" data-col="2">0.2366</td>
                 </tr>
                 <tr>
-                  <td data-row="10" data-col="0"></td>
-                  <td data-row="10" data-col="1">(0.2469)</td>
+                  <td data-row="10" data-col="1"></td>
+                  <td data-row="10" data-col="2">(0.2469)</td>
                 </tr>
                 <tr>
-                  <td data-row="11" data-col="0">Residential x Suburb</td>
-                  <td data-row="11" data-col="1">0.0010</td>
+                  <td data-row="11" data-col="1">Residential x Suburb</td>
+                  <td data-row="11" data-col="2">0.0010</td>
                 </tr>
                 <tr>
-                  <td data-row="12" data-col="0"></td>
-                  <td data-row="12" data-col="1">(0.0981)</td>
+                  <td data-row="12" data-col="1"></td>
+                  <td data-row="12" data-col="2">(0.0981)</td>
                 </tr>
                 <tr>
-                  <td data-row="13" data-col="0">Num.Obs.</td>
-                  <td data-row="13" data-col="1">932</td>
+                  <td data-row="13" data-col="1">Num.Obs.</td>
+                  <td data-row="13" data-col="2">932</td>
                 </tr>
                 <tr>
-                  <td data-row="14" data-col="0">R2 Adj.</td>
-                  <td data-row="14" data-col="1">0.567</td>
+                  <td data-row="14" data-col="1">R2 Adj.</td>
+                  <td data-row="14" data-col="2">0.567</td>
                 </tr>
         </tbody>
       </table>
@@ -1285,131 +1252,97 @@ Figure&nbsp;8.2: With an interaction term, the regression lines for men and wome
 <div class="cell-output-display">
 <!-- preamble start -->
 
+    <script src="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.js"></script>
+
     <script>
-
-      function styleCell_gba4cvkiqq1qb3r6urcp(i, j, css_id) {
-          var table = document.getElementById("tinytable_gba4cvkiqq1qb3r6urcp");
-          var cell = table.querySelector(`[data-row="${i}"][data-col="${j}"]`);
-          if (cell) {
-              console.log(`Styling cell at (${i}, ${j}) with class ${css_id}`);
-              cell.classList.add(css_id);
-          } else {
-              console.warn(`Cell at (${i}, ${j}) not found.`);
-          }
-      }
-      function spanCell_gba4cvkiqq1qb3r6urcp(i, j, rowspan, colspan) {
-        var table = document.getElementById("tinytable_gba4cvkiqq1qb3r6urcp");
-        const targetCell = table.querySelector(`[data-row="${i}"][data-col="${j}"]`);
-        if (!targetCell) {
-          console.warn(`Cell at (${i}, ${j}) not found.`);
-        }
-
-        // Get all cells that need to be removed
-        const cellsToRemove = [];
-        for (let r = 0; r < rowspan; r++) {
-          for (let c = 0; c < colspan; c++) {
-            if (r === 0 && c === 0) continue; // Skip the target cell
-            const cell = table.querySelector(`[data-row="${i + r}"][data-col="${j + c}"]`);
-            if (cell) {
-              cellsToRemove.push(cell);
-            }
-          }
-        }
-
-        // Remove all cells
-        cellsToRemove.forEach(cell => cell.remove());
-
-        // Set rowspan and colspan of the target cell if it exists
-        if (targetCell) {
-          targetCell.rowSpan = rowspan;
-          targetCell.colSpan = colspan;
-        }
-      }
+      // Create table-specific functions using external factory
+      const tableFns_6b5tgmr0lkh0bysu0n20 = TinyTable.createTableFunctions("tinytable_6b5tgmr0lkh0bysu0n20");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: '8', j: 1 }, { i: '8', j: 2 },  ], css_id: 'tinytable_css_9qt5wvt4ss55ipgb1lxq',}, 
-          { positions: [ { i: '6', j: 1 }, { i: '6', j: 2 },  ], css_id: 'tinytable_css_82mvx9s3brjmsqxk2pbi',}, 
-          { positions: [ { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '4', j: 1 }, { i: '1', j: 1 }, { i: '1', j: 2 }, { i: '7', j: 1 }, { i: '3', j: 2 }, { i: '5', j: 1 }, { i: '5', j: 2 }, { i: '2', j: 2 }, { i: '7', j: 2 }, { i: '4', j: 2 },  ], css_id: 'tinytable_css_5dpx2ygz0hgl1pj61ya5',}, 
-          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 },  ], css_id: 'tinytable_css_47b1wibem0ct1y052wb5',}, 
-          { positions: [ { i: '8', j: 0 },  ], css_id: 'tinytable_css_jdum5xtt6d7u2ovbiocf',}, 
-          { positions: [ { i: '6', j: 0 },  ], css_id: 'tinytable_css_sq8rebhefmbahce33mcr',}, 
-          { positions: [ { i: '1', j: 0 }, { i: '2', j: 0 }, { i: '3', j: 0 }, { i: '4', j: 0 }, { i: '5', j: 0 }, { i: '7', j: 0 },  ], css_id: 'tinytable_css_qbdbvjml3c4zjwt88cxu',}, 
-          { positions: [ { i: '0', j: 0 },  ], css_id: 'tinytable_css_9020681dkshblroyp8wd',}, 
+          { positions: [ { i: '8', j: 2 }, { i: '8', j: 3 } ], css_id: 'tinytable_css_5dpx2ygz0hgl1pj61ya5',}, 
+          { positions: [ { i: '6', j: 2 }, { i: '6', j: 3 } ], css_id: 'tinytable_css_47b1wibem0ct1y052wb5',}, 
+          { positions: [ { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '4', j: 2 }, { i: '5', j: 2 }, { i: '7', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '3', j: 3 }, { i: '4', j: 3 }, { i: '5', j: 3 }, { i: '7', j: 3 } ], css_id: 'tinytable_css_jdum5xtt6d7u2ovbiocf',}, 
+          { positions: [ { i: '0', j: 2 }, { i: '0', j: 3 } ], css_id: 'tinytable_css_sq8rebhefmbahce33mcr',}, 
+          { positions: [ { i: '8', j: 1 } ], css_id: 'tinytable_css_qbdbvjml3c4zjwt88cxu',}, 
+          { positions: [ { i: '6', j: 1 } ], css_id: 'tinytable_css_9020681dkshblroyp8wd',}, 
+          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '4', j: 1 }, { i: '5', j: 1 }, { i: '7', j: 1 } ], css_id: 'tinytable_css_gba4cvkiqq1qb3r6urcp',}, 
+          { positions: [ { i: '0', j: 1 } ], css_id: 'tinytable_css_1c5l6bs0cuyooeaniywo',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  styleCell_gba4cvkiqq1qb3r6urcp(cell.i, cell.j, group.css_id);
+                  tableFns_6b5tgmr0lkh0bysu0n20.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
     </script>
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
-      /* tinytable css entries after */
-      .table td.tinytable_css_9qt5wvt4ss55ipgb1lxq, .table th.tinytable_css_9qt5wvt4ss55ipgb1lxq { text-align: center; border-bottom: solid #d3d8dc 0.1em; }
-      .table td.tinytable_css_82mvx9s3brjmsqxk2pbi, .table th.tinytable_css_82mvx9s3brjmsqxk2pbi { text-align: center; border-bottom: solid black 0.05em; }
-      .table td.tinytable_css_5dpx2ygz0hgl1pj61ya5, .table th.tinytable_css_5dpx2ygz0hgl1pj61ya5 { text-align: center; }
-      .table td.tinytable_css_47b1wibem0ct1y052wb5, .table th.tinytable_css_47b1wibem0ct1y052wb5 { text-align: center; border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
-      .table td.tinytable_css_jdum5xtt6d7u2ovbiocf, .table th.tinytable_css_jdum5xtt6d7u2ovbiocf { text-align: left; border-bottom: solid #d3d8dc 0.1em; }
-      .table td.tinytable_css_sq8rebhefmbahce33mcr, .table th.tinytable_css_sq8rebhefmbahce33mcr { text-align: left; border-bottom: solid black 0.05em; }
-      .table td.tinytable_css_qbdbvjml3c4zjwt88cxu, .table th.tinytable_css_qbdbvjml3c4zjwt88cxu { text-align: left; }
-      .table td.tinytable_css_9020681dkshblroyp8wd, .table th.tinytable_css_9020681dkshblroyp8wd { text-align: left; border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
+    /* tinytable css entries after */
+    #tinytable_6b5tgmr0lkh0bysu0n20 td.tinytable_css_5dpx2ygz0hgl1pj61ya5, #tinytable_6b5tgmr0lkh0bysu0n20 th.tinytable_css_5dpx2ygz0hgl1pj61ya5 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_6b5tgmr0lkh0bysu0n20 td.tinytable_css_47b1wibem0ct1y052wb5, #tinytable_6b5tgmr0lkh0bysu0n20 th.tinytable_css_47b1wibem0ct1y052wb5 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_6b5tgmr0lkh0bysu0n20 td.tinytable_css_jdum5xtt6d7u2ovbiocf, #tinytable_6b5tgmr0lkh0bysu0n20 th.tinytable_css_jdum5xtt6d7u2ovbiocf { text-align: center }
+    #tinytable_6b5tgmr0lkh0bysu0n20 td.tinytable_css_sq8rebhefmbahce33mcr, #tinytable_6b5tgmr0lkh0bysu0n20 th.tinytable_css_sq8rebhefmbahce33mcr {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_6b5tgmr0lkh0bysu0n20 td.tinytable_css_qbdbvjml3c4zjwt88cxu, #tinytable_6b5tgmr0lkh0bysu0n20 th.tinytable_css_qbdbvjml3c4zjwt88cxu {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_6b5tgmr0lkh0bysu0n20 td.tinytable_css_9020681dkshblroyp8wd, #tinytable_6b5tgmr0lkh0bysu0n20 th.tinytable_css_9020681dkshblroyp8wd {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_6b5tgmr0lkh0bysu0n20 td.tinytable_css_gba4cvkiqq1qb3r6urcp, #tinytable_6b5tgmr0lkh0bysu0n20 th.tinytable_css_gba4cvkiqq1qb3r6urcp { text-align: left }
+    #tinytable_6b5tgmr0lkh0bysu0n20 td.tinytable_css_1c5l6bs0cuyooeaniywo, #tinytable_6b5tgmr0lkh0bysu0n20 th.tinytable_css_1c5l6bs0cuyooeaniywo {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
     </style>
     <div class="container">
-      <table class="table table-borderless" id="tinytable_gba4cvkiqq1qb3r6urcp" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="tinytable" id="tinytable_6b5tgmr0lkh0bysu0n20" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+        <caption>Comparing Models With and Without Main Effects</caption>
         <thead>
-        </thead><caption>Comparing Models With and Without Main Effects</caption>
-              <tbody><tr>
-                <th scope="col" data-row="0" data-col="0"> </th>
-                <th scope="col" data-row="0" data-col="1">Correct (with main effects)</th>
-                <th scope="col" data-row="0" data-col="2">Incorrect (interaction only)</th>
+              <tr>
+                <th scope="col" data-row="0" data-col="1"> </th>
+                <th scope="col" data-row="0" data-col="2">Correct (with main effects)</th>
+                <th scope="col" data-row="0" data-col="3">Incorrect (interaction only)</th>
               </tr>
-        
-        </tbody><tfoot><tr><td colspan="3">* p &lt; 0.1, ** p &lt; 0.05, *** p &lt; 0.01</td></tr></tfoot>
+        </thead>
+        <tfoot><tr><td colspan="3">* p &lt; 0.1, ** p &lt; 0.05, *** p &lt; 0.01</td></tr></tfoot>
         <tbody>
                 <tr>
-                  <td data-row="1" data-col="0">Female</td>
-                  <td data-row="1" data-col="1">-0.1316**</td>
-                  <td data-row="1" data-col="2"></td>
+                  <td data-row="1" data-col="1">Female</td>
+                  <td data-row="1" data-col="2">-0.1316**</td>
+                  <td data-row="1" data-col="3"></td>
                 </tr>
                 <tr>
-                  <td data-row="2" data-col="0"></td>
-                  <td data-row="2" data-col="1">(0.0668)</td>
-                  <td data-row="2" data-col="2"></td>
+                  <td data-row="2" data-col="1"></td>
+                  <td data-row="2" data-col="2">(0.0668)</td>
+                  <td data-row="2" data-col="3"></td>
                 </tr>
                 <tr>
-                  <td data-row="3" data-col="0">Married</td>
-                  <td data-row="3" data-col="1">0.4267***</td>
-                  <td data-row="3" data-col="2"></td>
+                  <td data-row="3" data-col="1">Married</td>
+                  <td data-row="3" data-col="2">0.4267***</td>
+                  <td data-row="3" data-col="3"></td>
                 </tr>
                 <tr>
-                  <td data-row="4" data-col="0"></td>
-                  <td data-row="4" data-col="1">(0.0616)</td>
-                  <td data-row="4" data-col="2"></td>
+                  <td data-row="4" data-col="1"></td>
+                  <td data-row="4" data-col="2">(0.0616)</td>
+                  <td data-row="4" data-col="3"></td>
                 </tr>
                 <tr>
-                  <td data-row="5" data-col="0">Female × Married</td>
-                  <td data-row="5" data-col="1">-0.3748***</td>
-                  <td data-row="5" data-col="2">-0.2432***</td>
+                  <td data-row="5" data-col="1">Female × Married</td>
+                  <td data-row="5" data-col="2">-0.3748***</td>
+                  <td data-row="5" data-col="3">-0.2432***</td>
                 </tr>
                 <tr>
-                  <td data-row="6" data-col="0"></td>
-                  <td data-row="6" data-col="1">(0.0857)</td>
-                  <td data-row="6" data-col="2">(0.0524)</td>
+                  <td data-row="6" data-col="1"></td>
+                  <td data-row="6" data-col="2">(0.0857)</td>
+                  <td data-row="6" data-col="3">(0.0524)</td>
                 </tr>
                 <tr>
-                  <td data-row="7" data-col="0">Num.Obs.</td>
-                  <td data-row="7" data-col="1">526</td>
+                  <td data-row="7" data-col="1">Num.Obs.</td>
                   <td data-row="7" data-col="2">526</td>
+                  <td data-row="7" data-col="3">526</td>
                 </tr>
                 <tr>
-                  <td data-row="8" data-col="0">R2 Adj.</td>
-                  <td data-row="8" data-col="1">0.209</td>
-                  <td data-row="8" data-col="2">0.038</td>
+                  <td data-row="8" data-col="1">R2 Adj.</td>
+                  <td data-row="8" data-col="2">0.209</td>
+                  <td data-row="8" data-col="3">0.038</td>
                 </tr>
         </tbody>
       </table>
@@ -1592,7 +1525,7 @@ Figure&nbsp;8.2: With an interaction term, the regression lines for men and wome
 </div>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
 <div id="ref-bailey_real_2020" class="csl-entry" role="listitem">
 Bailey, Michael A. 2020. <em>Real Econometrics: The Right Tools to Answer Important Questions</em>. Oxford University Press.
 </div>

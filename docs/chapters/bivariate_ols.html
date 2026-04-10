@@ -2,13 +2,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.27">
+<meta name="generator" content="quarto-1.9.36">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
 <title>4&nbsp; Bivariate Regression and Ordinary Least Squares – EC325 Lecture Notes</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -59,7 +62,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
-  margin-bottom: 0em;
 }
 .hanging-indent div.csl-entry {
   margin-left:2em;
@@ -89,15 +91,14 @@ div.csl-indent {
 <link href="../chapters/rcts.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-5ccb035bea26c1e21f80f44cf7c27909.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -127,7 +128,7 @@ div.csl-indent {
 }</script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -571,12 +572,12 @@ function checkAnswer(selectElement, correctValue) {
 <div id="callout-2" class="callout-2-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ul>
-<li><span class="citation" data-cites="wooldridge_introductory_2019">Wooldridge (<a href="references.html#ref-wooldridge_introductory_2019" role="doc-biblioref">2019</a>)</span>, Ch. 2</li>
+<li><span class="citation" data-cites="wooldridge_introductory_2019">Wooldridge (<a href="#ref-wooldridge_introductory_2019" role="doc-biblioref">2019</a>)</span>, Ch. 2</li>
 </ul>
 </div>
 </div>
 </div>
-<p>In <a href="rcts.html" class="quarto-xref"><span>Chapter 3</span></a>, we learned that randomized control trials provide the gold standard for causal inference by eliminating selection bias through random assignment. But most economic questions cannot be answered with experiments. We typically work with observational data where “treatment” is not randomly assigned. This chapter introduces <strong>Ordinary Least Squares (OLS)</strong> regression, the workhorse tool of econometrics. We focus here on the <strong>bivariate</strong> case—a single independent variable—to build intuition before extending to multiple variables.</p>
+<p>In <a href="#sec-rcts" class="quarto-xref"><span class="quarto-unresolved-ref">sec-rcts</span></a>, we learned that randomized control trials provide the gold standard for causal inference by eliminating selection bias through random assignment. But most economic questions cannot be answered with experiments. We typically work with observational data where “treatment” is not randomly assigned. This chapter introduces <strong>Ordinary Least Squares (OLS)</strong> regression, the workhorse tool of econometrics. We focus here on the <strong>bivariate</strong> case—a single independent variable—to build intuition before extending to multiple variables.</p>
 <section id="modeling-relationships-between-variables" class="level2" data-number="4.1">
 <h2 data-number="4.1" class="anchored" data-anchor-id="modeling-relationships-between-variables"><span class="header-section-number">4.1</span> Modeling Relationships Between Variables</h2>
 <p>Suppose we have two variables, <span class="math inline">\(y\)</span> and <span class="math inline">\(x\)</span>. In econometrics, we are often interested in one of several related goals: estimating the <strong>causal effect</strong> of <span class="math inline">\(x\)</span> on <span class="math inline">\(y\)</span>, explaining variation in <span class="math inline">\(y\)</span> using <span class="math inline">\(x\)</span>, or simply describing how <span class="math inline">\(y\)</span> varies with <span class="math inline">\(x\)</span>. OLS is a tool that can help with all of these—though as we’ll see, whether we can interpret results causally depends on assumptions that may or may not hold.</p>
@@ -608,7 +609,7 @@ Figure&nbsp;4.1: Wages by education level. Each point represents an individual. 
 </div>
 </div>
 </div>
-<p><a href="#fig-cond-exp-example" class="quarto-xref">Figure&nbsp;<span>4.1</span></a> is a scatterplot with an indiviudal’s wage on the y-axis and their education level on the x-axis, with each point plotted in blue. The red points in <a href="#fig-cond-exp-example" class="quarto-xref">Figure&nbsp;<span>4.1</span></a> show the conditional expectations—the average wage for individuals <em>within each education category,</em> i.e., <span class="math inline">\(E[Y|X=HS], E[Y|X=College], \text{and} E[Y|X=Prof]\)</span>.</p>
+<p><a href="#fig-cond-exp-example" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-cond-exp-example</span></a> is a scatterplot with an indiviudal’s wage on the y-axis and their education level on the x-axis, with each point plotted in blue. The red points in <a href="#fig-cond-exp-example" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-cond-exp-example</span></a> show the conditional expectations—the average wage for individuals <em>within each education category,</em> i.e., <span class="math inline">\(E[Y|X=HS], E[Y|X=College], \text{and} E[Y|X=Prof]\)</span>.</p>
 <p>These averages tell us how we can expect wages to change when we increase education, which is precisely what we set out to measure.</p>
 </section>
 </section>
@@ -652,7 +653,7 @@ E[y | x] = E[\beta_0 + \beta_1 x + \mu | x] = \beta_0 + \beta_1 x + E[\mu | x] =
 </section>
 <section id="interpreting-the-coefficients" class="level3" data-number="4.2.3">
 <h3 data-number="4.2.3" class="anchored" data-anchor-id="interpreting-the-coefficients"><span class="header-section-number">4.2.3</span> Interpreting the Coefficients</h3>
-<p>The coefficients in <a href="#eq-pop-reg" class="quarto-xref">Equation&nbsp;<span>4.1</span></a> have specific interpretations:</p>
+<p>The coefficients in <a href="#eq-pop-reg" class="quarto-xref">Equation&nbsp;<span class="quarto-unresolved-ref">eq-pop-reg</span></a> have specific interpretations:</p>
 <ul>
 <li><p><strong><span class="math inline">\(\beta_0\)</span> (the intercept):</strong> The predicted value of <span class="math inline">\(y\)</span> when <span class="math inline">\(x = 0\)</span>. Depending on the context, this may or may not have a meaningful interpretation.</p></li>
 <li><p><strong><span class="math inline">\(\beta_1\)</span> (the slope):</strong> The <strong>marginal effect</strong> of <span class="math inline">\(x\)</span> on <span class="math inline">\(y\)</span>. Mathematically, it is the derivative:</p></li>
@@ -717,7 +718,7 @@ Table&nbsp;4.1: Example regression data showing actual values, predicted values,
 </figcaption>
 <div aria-describedby="tbl-regression-example-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
+<table class="cell caption-top table table-sm table-striped small">
 <colgroup>
 <col style="width: 25%">
 <col style="width: 22%">
@@ -845,7 +846,7 @@ SSR = \sum_{i=1}^{n} \hat{\mu}_i^2 = \sum_{i=1}^{n} (y_i - \hat{\beta}_0 - \hat{
 </section>
 <section id="solving-for-the-slope" class="level3" data-number="4.4.4">
 <h3 data-number="4.4.4" class="anchored" data-anchor-id="solving-for-the-slope"><span class="header-section-number">4.4.4</span> Solving for the Slope</h3>
-<p>Substituting <a href="#eq-b0-formula" class="quarto-xref">Equation&nbsp;<span>4.2</span></a> into the second first-order condition and working through the algebra (using summation properties from <a href="statsreview.html" class="quarto-xref"><span>Appendix B</span></a>):</p>
+<p>Substituting <a href="#eq-b0-formula" class="quarto-xref">Equation&nbsp;<span class="quarto-unresolved-ref">eq-b0-formula</span></a> into the second first-order condition and working through the algebra (using summation properties from <a href="#sec-stats-review" class="quarto-xref"><span class="quarto-unresolved-ref">sec-stats-review</span></a>):</p>
 <p><span class="math display">\[
 \sum_{i=1}^{n} x_i[y_i - (\bar{y} - \hat{\beta}_1\bar{x}) - \hat{\beta}_1 x_i] = 0
 \]</span></p>
@@ -888,7 +889,7 @@ SSR = \sum_{i=1}^{n} \hat{\mu}_i^2 = \sum_{i=1}^{n} (y_i - \hat{\beta}_0 - \hat{
 \]</span></p>
 </div>
 </div>
-<p>This last expression reveals something important: bivariate OLS is essentially a scaled version of the correlation between <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>. And as we discussed in <a href="intro.html" class="quarto-xref"><span>Chapter 1</span></a>, correlation does not imply causation! We must be very careful about interpreting bivariate OLS results causally.</p>
+<p>This last expression reveals something important: bivariate OLS is essentially a scaled version of the correlation between <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>. And as we discussed in <a href="#sec-introduction" class="quarto-xref"><span class="quarto-unresolved-ref">sec-introduction</span></a>, correlation does not imply causation! We must be very careful about interpreting bivariate OLS results causally.</p>
 </section>
 </section>
 <section id="a-worked-example-by-hand" class="level2" data-number="4.5">
@@ -1012,11 +1013,11 @@ SSR = \sum_{i=1}^{n} \hat{\mu}_i^2 = \sum_{i=1}^{n} (y_i - \hat{\beta}_0 - \hat{
 </tr>
 </tbody>
 </table>
-<p>Notice that the deviations <span class="math inline">\((x_i - \bar{x})\)</span> sum to zero, just as Result 1 in <a href="statsreview.html" class="quarto-xref"><span>Appendix B</span></a> promises.</p>
+<p>Notice that the deviations <span class="math inline">\((x_i - \bar{x})\)</span> sum to zero, just as Result 1 in <a href="#sec-stats-review" class="quarto-xref"><span class="quarto-unresolved-ref">sec-stats-review</span></a> promises.</p>
 </section>
 <section id="step-3-compute-the-slope" class="level3" data-number="4.5.3">
 <h3 data-number="4.5.3" class="anchored" data-anchor-id="step-3-compute-the-slope"><span class="header-section-number">4.5.3</span> Step 3: Compute the Slope</h3>
-<p>Applying <a href="#eq-b1-formula" class="quarto-xref">Equation&nbsp;<span>4.3</span></a>:</p>
+<p>Applying <a href="#eq-b1-formula" class="quarto-xref">Equation&nbsp;<span class="quarto-unresolved-ref">eq-b1-formula</span></a>:</p>
 <p><span class="math display">\[
 \hat{\beta}_1 = \frac{\sum(x_i - \bar{x})(y_i - \bar{y})}{\sum(x_i - \bar{x})^2} = \frac{62}{40} = 1.55
 \]</span></p>
@@ -1024,7 +1025,7 @@ SSR = \sum_{i=1}^{n} \hat{\mu}_i^2 = \sum_{i=1}^{n} (y_i - \hat{\beta}_0 - \hat{
 </section>
 <section id="step-4-compute-the-intercept" class="level3" data-number="4.5.4">
 <h3 data-number="4.5.4" class="anchored" data-anchor-id="step-4-compute-the-intercept"><span class="header-section-number">4.5.4</span> Step 4: Compute the Intercept</h3>
-<p>Applying <a href="#eq-b0-formula" class="quarto-xref">Equation&nbsp;<span>4.2</span></a>:</p>
+<p>Applying <a href="#eq-b0-formula" class="quarto-xref">Equation&nbsp;<span class="quarto-unresolved-ref">eq-b0-formula</span></a>:</p>
 <p><span class="math display">\[
 \hat{\beta}_0 = \bar{y} - \hat{\beta}_1 \bar{x} = 18 - 1.55 \times 14 = 18 - 21.7 = -3.7
 \]</span></p>
@@ -1276,7 +1277,7 @@ R^2 = \frac{SSE}{SST} = 1 - \frac{SSR}{SST}
 <p><span class="math display">\[E[\mu | educ = 8] = E[\mu | educ = 12] = E[\mu | educ = 16] = 0\]</span></p>
 <p>Is this plausible? Probably not. People with higher ability tend to get more education (because school is easier for them, or because they enjoy learning). So among people with 16 years of education, average ability is probably higher than among people with 8 years. This means <span class="math inline">\(E[\mu | educ = 16] &gt; E[\mu | educ = 8]\)</span>, violating the assumption.</p>
 <p><strong>Why it matters:</strong> When this assumption fails, OLS is <strong>biased</strong>. The estimate <span class="math inline">\(\hat{\beta}_1\)</span> will systematically overshoot or undershoot the true <span class="math inline">\(\beta_1\)</span>. In the education example, if high-ability people get more education, our estimate of the “return to education” will partly capture the “return to ability,” making education look more valuable than it really is.</p>
-<p>This is the essence of <strong>omitted variable bias</strong>, which we’ll explore in more detail in <a href="multivariate_ols.html" class="quarto-xref"><span>Chapter 5</span></a>.</p>
+<p>This is the essence of <strong>omitted variable bias</strong>, which we’ll explore in more detail in <a href="#sec-multivariate" class="quarto-xref"><span class="quarto-unresolved-ref">sec-multivariate</span></a>.</p>
 </section>
 <section id="assumption-5-homoskedasticity" class="level3" data-number="4.8.5">
 <h3 data-number="4.8.5" class="anchored" data-anchor-id="assumption-5-homoskedasticity"><span class="header-section-number">4.8.5</span> Assumption 5: Homoskedasticity</h3>
@@ -1337,7 +1338,7 @@ Figure&nbsp;4.3: Left: Homoskedasticity—the spread of points around the line i
 <h2 data-number="4.9" class="anchored" data-anchor-id="unbiasedness-of-ols"><span class="header-section-number">4.9</span> Unbiasedness of OLS</h2>
 <section id="population-parameters-vs.-sample-estimates" class="level3" data-number="4.9.1">
 <h3 data-number="4.9.1" class="anchored" data-anchor-id="population-parameters-vs.-sample-estimates"><span class="header-section-number">4.9.1</span> Population Parameters vs.&nbsp;Sample Estimates</h3>
-<p>Before discussing unbiasedness, recall an important distinction we introduced in <a href="statsreview.html" class="quarto-xref"><span>Appendix B</span></a>: the difference between the <strong>population</strong> and the <strong>sample</strong>.</p>
+<p>Before discussing unbiasedness, recall an important distinction we introduced in <a href="#sec-stats-review" class="quarto-xref"><span class="quarto-unresolved-ref">sec-stats-review</span></a>: the difference between the <strong>population</strong> and the <strong>sample</strong>.</p>
 <p>The <strong>population</strong> represents the entire group we’re interested in studying. In our wage-education example, the population might be all workers in the U.S. economy. The population regression model describes the <em>true</em> relationship in this population:</p>
 <p><span class="math display">\[
 y = \beta_0 + \beta_1 x + \mu
@@ -1365,7 +1366,7 @@ E[\hat{\theta}] = \theta
 </section>
 <section id="proof-sketch" class="level3" data-number="4.9.3">
 <h3 data-number="4.9.3" class="anchored" data-anchor-id="proof-sketch"><span class="header-section-number">4.9.3</span> Proof Sketch</h3>
-<p>We start from the OLS slope formula (<a href="#eq-b1-formula" class="quarto-xref">Equation&nbsp;<span>4.3</span></a>):</p>
+<p>We start from the OLS slope formula (<a href="#eq-b1-formula" class="quarto-xref">Equation&nbsp;<span class="quarto-unresolved-ref">eq-b1-formula</span></a>):</p>
 <p><span class="math display">\[
 \hat{\beta}_1 = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{\sum_{i=1}^{n}(x_i - \bar{x})^2}
 \]</span></p>
@@ -1381,7 +1382,7 @@ E[\hat{\theta}] = \theta
 <p><span id="eq-decomposition"><span class="math display">\[
 \hat{\beta}_1 = \beta_1 + \frac{\sum_{i=1}^{n}(x_i - \bar{x})\mu_i}{\sum_{i=1}^{n}(x_i - \bar{x})^2}
 \tag{4.4}\]</span></span></p>
-<p>where the <span class="math inline">\(\bar{\mu}\)</span> term drops out because <span class="math inline">\(\sum(x_i - \bar{x}) = 0\)</span> (Result 1 from <a href="statsreview.html" class="quarto-xref"><span>Appendix B</span></a>).</p>
+<p>where the <span class="math inline">\(\bar{\mu}\)</span> term drops out because <span class="math inline">\(\sum(x_i - \bar{x}) = 0\)</span> (Result 1 from <a href="#sec-stats-review" class="quarto-xref"><span class="quarto-unresolved-ref">sec-stats-review</span></a>).</p>
 <p>This is a powerful decomposition. It says: <strong>our estimate = the truth + estimation error</strong>. The estimation error depends on how the unobserved errors <span class="math inline">\(\mu_i\)</span> happen to line up with the <span class="math inline">\(x_i\)</span> values in our particular sample.</p>
 <p>Now take expectations. Treating the <span class="math inline">\(x_i\)</span> as fixed (Assumption 2), the only random part is the <span class="math inline">\(\mu_i\)</span> terms. Under the zero conditional mean assumption (<span class="math inline">\(E[\mu_i | x_i] = 0\)</span>):</p>
 <p><span class="math display">\[
@@ -1454,7 +1455,7 @@ Figure&nbsp;4.4: Distribution of OLS slope estimates across 500 samples. The gre
 </div>
 </div>
 </div>
-<p>The simulation in <a href="#fig-unbiasedness" class="quarto-xref">Figure&nbsp;<span>4.4</span></a> confirms the theory. Each of the 500 samples of size 25 produces a different estimate of <span class="math inline">\(\beta_1\)</span>—some too high, some too low—because each sample is a different random draw from the population. This spread is <strong>sampling variability</strong>, and it is completely normal. The key thing about unbiasedness is that these estimates are centered on the true value of 2.21: the overestimates and underestimates cancel out on average, so the mean across all 500 estimates lands right on the truth.</p>
+<p>The simulation in <a href="#fig-unbiasedness" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-unbiasedness</span></a> confirms the theory. Each of the 500 samples of size 25 produces a different estimate of <span class="math inline">\(\beta_1\)</span>—some too high, some too low—because each sample is a different random draw from the population. This spread is <strong>sampling variability</strong>, and it is completely normal. The key thing about unbiasedness is that these estimates are centered on the true value of 2.21: the overestimates and underestimates cancel out on average, so the mean across all 500 estimates lands right on the truth.</p>
 </section>
 <section id="when-can-we-interpret-hatbeta_1-causally" class="level3" data-number="4.9.5">
 <h3 data-number="4.9.5" class="anchored" data-anchor-id="when-can-we-interpret-hatbeta_1-causally"><span class="header-section-number">4.9.5</span> When Can We Interpret <span class="math inline">\(\hat{\beta}_1\)</span> Causally?</h3>
@@ -1547,8 +1548,8 @@ Var(\hat{\beta}_1) = \frac{\sigma^2}{SST_x}
 <p><span class="math display">\[
 se(\hat{\beta}_1) = \frac{\hat{\sigma}}{\sqrt{SST_x}}
 \]</span></p>
-<p>where <span class="math inline">\(\hat{\sigma} = \sqrt{\frac{SSR}{n-2}}\)</span> is the estimated standard deviation of the errors (more about this in <a href="multivariate_ols.html" class="quarto-xref"><span>Chapter 5</span></a>).</p>
-<p>Standard errors quantify the precision of our estimates and are essential for hypothesis testing and confidence intervals (which we’ll cover in <a href="statistical_inference.html" class="quarto-xref"><span>Chapter 6</span></a>).</p>
+<p>where <span class="math inline">\(\hat{\sigma} = \sqrt{\frac{SSR}{n-2}}\)</span> is the estimated standard deviation of the errors (more about this in <a href="#sec-multivariate" class="quarto-xref"><span class="quarto-unresolved-ref">sec-multivariate</span></a>).</p>
+<p>Standard errors quantify the precision of our estimates and are essential for hypothesis testing and confidence intervals (which we’ll cover in <a href="#sec-inference" class="quarto-xref"><span class="quarto-unresolved-ref">sec-inference</span></a>).</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># R reports standard errors automatically</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm_mpg)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -1819,7 +1820,7 @@ n = 48, R-squared = 0.21
 <p>::::</p>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
 <div id="ref-wooldridge_introductory_2019" class="csl-entry" role="listitem">
 Wooldridge, Jeffrey M. 2019. <em>Introductory Econometrics: A Modern Approach</em>. 7th ed. Cengage Learning.
 </div>
@@ -1829,7 +1830,7 @@ Wooldridge, Jeffrey M. 2019. <em>Introductory Econometrics: A Modern Approach</e
 <section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
 <hr>
 <ol>
-<li id="fn1"><p>Why can we replace <span class="math inline">\(\sum x_i(y_i - \bar{y})\)</span> with <span class="math inline">\(\sum (x_i - \bar{x})(y_i - \bar{y})\)</span>? Expand the second expression: <span class="math inline">\(\sum (x_i - \bar{x})(y_i - \bar{y}) = \sum x_i(y_i - \bar{y}) - \bar{x}\sum(y_i - \bar{y})\)</span>. But from Result 1 in <a href="statsreview.html" class="quarto-xref"><span>Appendix B</span></a>, deviations from the mean always sum to zero, so <span class="math inline">\(\sum(y_i - \bar{y}) = 0\)</span>. The second term vanishes and the two expressions are equal. The same logic applies to <span class="math inline">\(\sum x_i(x_i - \bar{x}) = \sum(x_i - \bar{x})^2\)</span>.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p>Why can we replace <span class="math inline">\(\sum x_i(y_i - \bar{y})\)</span> with <span class="math inline">\(\sum (x_i - \bar{x})(y_i - \bar{y})\)</span>? Expand the second expression: <span class="math inline">\(\sum (x_i - \bar{x})(y_i - \bar{y}) = \sum x_i(y_i - \bar{y}) - \bar{x}\sum(y_i - \bar{y})\)</span>. But from Result 1 in <a href="#sec-stats-review" class="quarto-xref"><span class="quarto-unresolved-ref">sec-stats-review</span></a>, deviations from the mean always sum to zero, so <span class="math inline">\(\sum(y_i - \bar{y}) = 0\)</span>. The second term vanishes and the two expressions are equal. The same logic applies to <span class="math inline">\(\sum x_i(x_i - \bar{x}) = \sum(x_i - \bar{x})^2\)</span>.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
 

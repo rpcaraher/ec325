@@ -2,13 +2,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.27">
+<meta name="generator" content="quarto-1.9.36">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
 <title>5&nbsp; Multivariate Regression – EC325 Lecture Notes</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -59,7 +62,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
-  margin-bottom: 0em;
 }
 .hanging-indent div.csl-entry {
   margin-left:2em;
@@ -89,15 +91,14 @@ div.csl-indent {
 <link href="../chapters/bivariate_ols.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-5ccb035bea26c1e21f80f44cf7c27909.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -127,7 +128,7 @@ div.csl-indent {
 }</script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -566,12 +567,12 @@ function checkAnswer(selectElement, correctValue) {
 <div id="callout-2" class="callout-2-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ul>
-<li><span class="citation" data-cites="wooldridge_introductory_2019">Wooldridge (<a href="references.html#ref-wooldridge_introductory_2019" role="doc-biblioref">2019</a>)</span>, Ch. 3</li>
+<li><span class="citation" data-cites="wooldridge_introductory_2019">Wooldridge (<a href="#ref-wooldridge_introductory_2019" role="doc-biblioref">2019</a>)</span>, Ch. 3</li>
 </ul>
 </div>
 </div>
 </div>
-<p>In <a href="bivariate_ols.html" class="quarto-xref"><span>Chapter 4</span></a>, we introduced bivariate OLS and saw that causal interpretation requires the zero conditional mean assumption: <span class="math inline">\(E[\mu | x] = 0\)</span>. We also saw that this assumption is <em>very</em> difficult to justify.</p>
+<p>In <a href="#sec-ols" class="quarto-xref"><span class="quarto-unresolved-ref">sec-ols</span></a>, we introduced bivariate OLS and saw that causal interpretation requires the zero conditional mean assumption: <span class="math inline">\(E[\mu | x] = 0\)</span>. We also saw that this assumption is <em>very</em> difficult to justify.</p>
 <p>This chapter introduces <strong>multivariate OLS</strong>, which allows us to explicitly control for confounding variables. By including additional variables on the right-hand side of our regression, we can make the zero conditional mean assumption more plausible and get closer to causal estimates.</p>
 <section id="the-problem-with-bivariate-ols" class="level2" data-number="5.1">
 <h2 data-number="5.1" class="anchored" data-anchor-id="the-problem-with-bivariate-ols"><span class="header-section-number">5.1</span> The Problem with Bivariate OLS</h2>
@@ -916,7 +917,7 @@ Table&nbsp;5.1: Average wages by education and industry
 </figcaption>
 <div aria-describedby="tbl-matching-detailed-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
+<table class="cell caption-top table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th style="text-align: left;">Industry</th>
@@ -1411,7 +1412,7 @@ Var(\hat{\beta}_j) = \frac{\sigma^2}{SST_j (1 - R_j^2)}
 </ul>
 <section id="what-increases-variance" class="level3" data-number="5.10.1">
 <h3 data-number="5.10.1" class="anchored" data-anchor-id="what-increases-variance"><span class="header-section-number">5.10.1</span> What Increases Variance?</h3>
-<p>From <a href="#eq-multivar-variance" class="quarto-xref">Equation&nbsp;<span>5.4</span></a>, the variance of <span class="math inline">\(\hat{\beta}_j\)</span> increases when:</p>
+<p>From <a href="#eq-multivar-variance" class="quarto-xref">Equation&nbsp;<span class="quarto-unresolved-ref">eq-multivar-variance</span></a>, the variance of <span class="math inline">\(\hat{\beta}_j\)</span> increases when:</p>
 <ol type="1">
 <li><strong>More noise (<span class="math inline">\(\sigma^2\)</span>):</strong> Higher error variance means less precise estimates</li>
 <li><strong>Less variation in <span class="math inline">\(x_j\)</span> (<span class="math inline">\(SST_j\)</span>):</strong> Less information about how <span class="math inline">\(x_j\)</span> relates to <span class="math inline">\(y\)</span></li>
@@ -1425,7 +1426,7 @@ Var(\hat{\beta}_j) = \frac{\sigma^2}{SST_j (1 - R_j^2)}
 <p>Look carefully at the variance formula above. The denominator contains quantities we can compute directly from our sample: <span class="math inline">\(SST_j\)</span> (the total variation in <span class="math inline">\(x_j\)</span>) and <span class="math inline">\(R^2_j\)</span> (how much of <span class="math inline">\(x_j\)</span> is explained by the other regressors). But the numerator contains <span class="math inline">\(\sigma^2\)</span>—the <strong>variance of the population error term</strong>. This is a population parameter that we cannot observe directly.</p>
 <p>So how do we estimate <span class="math inline">\(\sigma^2\)</span>?</p>
 <p>Recall from the homoskedasticity assumption (GM.5) that <span class="math inline">\(Var(\mu_i | \mathbf{x}_i) = \sigma^2\)</span> for all observations <span class="math inline">\(i\)</span>. Combined with the zero conditional mean assumption (GM.4), which gives us <span class="math inline">\(E[\mu_i | \mathbf{x}_i] = 0\)</span>, we can show that <span class="math inline">\(\sigma^2 = E[\mu_i^2]\)</span>. Let’s work through why.</p>
-<p>From <a href="statsreview.html" class="quarto-xref"><span>Appendix B</span></a>, the definition of variance is <span class="math inline">\(Var(X) = E[(X - \mu)^2]\)</span>—the expected squared deviation from the mean. Applying this to <span class="math inline">\(\mu_i\)</span> and using the fact that <span class="math inline">\(E[\mu_i] = 0\)</span> from GM.4:</p>
+<p>From <a href="#sec-stats-review" class="quarto-xref"><span class="quarto-unresolved-ref">sec-stats-review</span></a>, the definition of variance is <span class="math inline">\(Var(X) = E[(X - \mu)^2]\)</span>—the expected squared deviation from the mean. Applying this to <span class="math inline">\(\mu_i\)</span> and using the fact that <span class="math inline">\(E[\mu_i] = 0\)</span> from GM.4:</p>
 <p><span class="math display">\[Var(\mu_i) = E[(\mu_i - 0)^2] = E[\mu_i^2]\]</span></p>
 <p>And from GM.5, <span class="math inline">\(Var(\mu_i) = \sigma^2\)</span>, giving us:</p>
 <p><span class="math display">\[\sigma^2 = E[\mu_i^2]\]</span></p>
@@ -1921,7 +1922,7 @@ n = 1,200, Adjusted R-squared = 0.23
 </div>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
 <div id="ref-wooldridge_introductory_2019" class="csl-entry" role="listitem">
 Wooldridge, Jeffrey M. 2019. <em>Introductory Econometrics: A Modern Approach</em>. 7th ed. Cengage Learning.
 </div>

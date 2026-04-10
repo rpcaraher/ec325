@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DiD Controls Simulation — EC 325</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:wght@400;600;700&display=swap');
+
+  :root {
+    --navy: #1E2761;
+    --ice: #CADCFC;
+    --treated: #0072B2;
+    --good1: #009E73;
+    --good2: #56B4E9;
+    --good3: #2D8E6F;
+    --bad1: #D55E00;
+    --bad2: #CC79A7;
+    --bad3: #E69F00;
+    --bg: #F8F9FC;
+    --card: #FFFFFF;
+    --text: #1a1a2e;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --success: #059669;
+    --danger: #DC2626;
+    --warning: #D97706;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .header {
+    background: var(--navy);
+    color: white;
+    padding: 1.5rem 2rem;
+    text-align: center;
+  }
+  .header h1 {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+  .header p {
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem;
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 1.5rem;
+  }
+
+  .panel {
+    background: var(--card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 1.25rem;
+  }
+
+  .panel h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--navy);
+  }
+
+  .scenario-box {
+    background: #F0F4FF;
+    border-left: 4px solid var(--navy);
+    border-radius: 0 8px 8px 0;
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+    font-size: 0.85rem;
+    line-height: 1.55;
+  }
+  .scenario-box strong { color: var(--navy); }
+
+  .control-group {
+    margin-bottom: 0.75rem;
+  }
+  .control-group-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .control-group-label .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .good-label { color: var(--success); }
+  .bad-label { color: var(--danger); }
+
+  .control-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 8px;
+    margin-bottom: 0.35rem;
+    cursor: pointer;
+    transition: background 0.15s;
+    border: 1px solid transparent;
+  }
+  .control-item:hover { background: #f3f4f6; }
+  .control-item.selected { background: #f0fdf4; border-color: #bbf7d0; }
+  .control-item.selected.bad { background: #fef2f2; border-color: #fecaca; }
+
+  .control-item input[type="checkbox"] {
+    margin-top: 2px;
+    width: 16px; height: 16px;
+    accent-color: var(--navy);
+    cursor: pointer;
+  }
+
+  .control-info { flex: 1; }
+  .control-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .control-name .swatch {
+    width: 12px; height: 12px;
+    border-radius: 3px;
+    display: inline-block;
+  }
+  .control-desc {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 0.1rem;
+  }
+  .control-trend {
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-top: 0.15rem;
+  }
+  .trend-good { color: var(--success); }
+  .trend-bad { color: var(--danger); }
+
+  .right-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .results-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+  }
+  .result-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    text-align: center;
+  }
+  .result-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    margin-bottom: 0.3rem;
+  }
+  .result-value {
+    font-size: 2rem;
+    font-weight: 700;
+    font-family: 'Source Serif 4', Georgia, serif;
+  }
+  .result-sub {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 0.15rem;
+  }
+  .true-att .result-value { color: var(--navy); }
+  .your-estimate .result-value { color: var(--treated); }
+  .bias-card .result-value.low-bias { color: var(--success); }
+  .bias-card .result-value.med-bias { color: var(--warning); }
+  .bias-card .result-value.high-bias { color: var(--danger); }
+
+  .chart-panel { flex: 1; min-height: 0; }
+  .chart-panel canvas { width: 100% !important; }
+
+  .interpretation {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    min-height: 64px;
+  }
+  .interpretation strong { color: var(--navy); }
+  .interp-good { border-left: 4px solid var(--success); }
+  .interp-bad { border-left: 4px solid var(--danger); }
+  .interp-mixed { border-left: 4px solid var(--warning); }
+  .interp-none { border-left: 4px solid var(--muted); }
+
+  .btn-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  .btn {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: white;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--text);
+  }
+  .btn:hover { background: #f3f4f6; }
+  .btn-good { border-color: #86efac; color: var(--success); }
+  .btn-good:hover { background: #f0fdf4; }
+  .btn-bad { border-color: #fca5a5; color: var(--danger); }
+  .btn-bad:hover { background: #fef2f2; }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0.75rem 0;
+  }
+
+  .legend-note {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 0.75rem;
+    padding: 0.6rem 0.75rem;
+    background: #f9fafb;
+    border-radius: 8px;
+    line-height: 1.5;
+  }
+
+  .no-selection {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--muted);
+    font-style: italic;
+    font-size: 0.95rem;
+  }
+
+  @media (max-width: 900px) {
+    .container {
+      grid-template-columns: 1fr;
+    }
+    .results-bar {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Good Controls vs. Bad Controls in DiD</h1>
+  <p>EC 325: Econometrics &mdash; Interactive Simulation Exercise</p>
+</div>
+
+<div class="container">
+  <!-- LEFT PANEL -->
+  <div>
+    <div class="panel">
+      <div class="scenario-box">
+        <strong>Scenario:</strong> In 2015, <strong>State A</strong> expanded Medicaid.
+        We want to estimate the effect on the <strong>uninsured rate</strong> using Difference-in-Differences.
+        The <strong>true treatment effect is &minus;4.0 pp</strong> (a 4 percentage-point drop in uninsurance).
+        <br><br>
+        Select which states to use as controls and see how your DiD estimate changes.
+      </div>
+
+      <h2>Select Control States</h2>
+
+      <div class="control-group">
+        <div class="control-group-label good-label">
+          <span class="dot" style="background:var(--success)"></span> Parallel Pre-Trends
+        </div>
+
+        <label class="control-item" id="item-B">
+          <input type="checkbox" data-state="B" onchange="updateSimulation()">
+          <div class="control-info">
+            <div class="control-name"><span class="swatch" style="background:var(--good1)"></span> State B</div>
+            <div class="control-desc">Similar demographics, neighboring state</div>
+            <div class="control-trend trend-good">Pre-trend: &minus;0.5 pp/yr (same as A)</div>
+          </div>
+        </label>
+
+        <label class="control-item" id="item-C">
+          <input type="checkbox" data-state="C" onchange="updateSimulation()">
+          <div class="control-info">
+            <div class="control-name"><span class="swatch" style="background:var(--good2)"></span> State C</div>
+            <div class="control-desc">Comparable economy, different region</div>
+            <div class="control-trend trend-good">Pre-trend: &minus;0.5 pp/yr (same as A)</div>
+          </div>
+        </label>
+
+        <label class="control-item" id="item-D">
+          <input type="checkbox" data-state="D" onchange="updateSimulation()">
+          <div class="control-info">
+            <div class="control-name"><span class="swatch" style="background:var(--good3)"></span> State D</div>
+            <div class="control-desc">Similar insurance market structure</div>
+            <div class="control-trend trend-good">Pre-trend: &minus;0.5 pp/yr (same as A)</div>
+          </div>
+        </label>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="control-group">
+        <div class="control-group-label bad-label">
+          <span class="dot" style="background:var(--danger)"></span> Non-Parallel Pre-Trends
+        </div>
+
+        <label class="control-item" id="item-E">
+          <input type="checkbox" data-state="E" onchange="updateSimulation()">
+          <div class="control-info">
+            <div class="control-name"><span class="swatch" style="background:var(--bad1)"></span> State E</div>
+            <div class="control-desc">Booming economy, rapidly falling uninsurance</div>
+            <div class="control-trend trend-bad">Pre-trend: &minus;1.5 pp/yr (faster decline)</div>
+          </div>
+        </label>
+
+        <label class="control-item" id="item-F">
+          <input type="checkbox" data-state="F" onchange="updateSimulation()">
+          <div class="control-info">
+            <div class="control-name"><span class="swatch" style="background:var(--bad2)"></span> State F</div>
+            <div class="control-desc">Stagnant economy, flat uninsurance trend</div>
+            <div class="control-trend trend-bad">Pre-trend: +0.0 pp/yr (flat)</div>
+          </div>
+        </label>
+
+        <label class="control-item" id="item-G">
+          <input type="checkbox" data-state="G" onchange="updateSimulation()">
+          <div class="control-info">
+            <div class="control-name"><span class="swatch" style="background:var(--bad3)"></span> State G</div>
+            <div class="control-desc">Rising poverty, increasing uninsurance</div>
+            <div class="control-trend trend-bad">Pre-trend: +0.8 pp/yr (rising)</div>
+          </div>
+        </label>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-good" onclick="selectGroup('good')">Select Good</button>
+        <button class="btn btn-bad" onclick="selectGroup('bad')">Select Bad</button>
+        <button class="btn" onclick="selectGroup('all')">All</button>
+        <button class="btn" onclick="selectGroup('none')">Clear</button>
+      </div>
+
+      <div class="legend-note">
+        <strong>Key insight:</strong> "Good" controls have the same pre-treatment trend as the treated state (parallel trends holds).
+        "Bad" controls have different pre-trends, which violates the identifying assumption and biases the DiD estimate.
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT COLUMN -->
+  <div class="right-col">
+    <div class="results-bar">
+      <div class="result-card true-att">
+        <div class="result-label">True ATT</div>
+        <div class="result-value">&minus;4.0</div>
+        <div class="result-sub">percentage points</div>
+      </div>
+      <div class="result-card your-estimate">
+        <div class="result-label">Your DiD Estimate</div>
+        <div class="result-value" id="did-estimate">&mdash;</div>
+        <div class="result-sub" id="did-sub">select controls</div>
+      </div>
+      <div class="result-card bias-card">
+        <div class="result-label">Bias</div>
+        <div class="result-value" id="bias-value">&mdash;</div>
+        <div class="result-sub" id="bias-sub">&nbsp;</div>
+      </div>
+    </div>
+
+    <div class="panel chart-panel">
+      <canvas id="chart"></canvas>
+    </div>
+
+    <div class="interpretation interp-none" id="interpretation">
+      <strong>Select one or more control states</strong> from the left panel to estimate the DiD and see how your choice of controls affects the estimate.
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+// ============================================================
+// DATA GENERATING PROCESS
+// ============================================================
+
+const TRUE_ATT = -4.0;
+const TREATMENT_YEAR = 2015;
+const YEARS = [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019];
+const PRE_YEARS = YEARS.filter(y => y < TREATMENT_YEAR);
+const POST_YEARS = YEARS.filter(y => y >= TREATMENT_YEAR);
+
+// Generate outcome data for a state
+// baseLevel: uninsured rate in 2010
+// preTrend: annual change in pre-period (pp/yr)
+// postTrend: annual change in post-period (pp/yr) — for controls, same as pre-trend
+// treatmentEffect: added in post-period for treated unit only
+function generateData(baseLevel, preTrend, postTrend, treatmentEffect = 0) {
+  return YEARS.map((yr, i) => {
+    const yearsFromBase = yr - 2010;
+    if (yr < TREATMENT_YEAR) {
+      return baseLevel + preTrend * yearsFromBase;
+    } else {
+      const preEnd = baseLevel + preTrend * (TREATMENT_YEAR - 2010);
+      const postYears = yr - TREATMENT_YEAR;
+      return preEnd + postTrend * postYears + treatmentEffect;
+    }
+  });
+}
+
+// State definitions
+const STATES = {
+  A: {
+    name: "State A (Treated)",
+    color: "#0072B2",
+    type: "treated",
+    data: generateData(18.0, -0.5, -0.5, TRUE_ATT),
+    // Counterfactual (what would have happened without treatment)
+    counterfactual: generateData(18.0, -0.5, -0.5, 0),
+    preTrend: -0.5,
+    postTrend: -0.5
+  },
+  B: {
+    name: "State B",
+    color: "#009E73",
+    type: "good",
+    data: generateData(16.0, -0.5, -0.5),
+    preTrend: -0.5
+  },
+  C: {
+    name: "State C",
+    color: "#56B4E9",
+    type: "good",
+    data: generateData(20.5, -0.5, -0.5),
+    preTrend: -0.5
+  },
+  D: {
+    name: "State D",
+    color: "#2D8E6F",
+    type: "good",
+    data: generateData(14.0, -0.5, -0.5),
+    preTrend: -0.5
+  },
+  E: {
+    name: "State E",
+    color: "#D55E00",
+    type: "bad",
+    data: generateData(19.0, -1.5, -1.5),
+    preTrend: -1.5
+  },
+  F: {
+    name: "State F",
+    color: "#CC79A7",
+    type: "bad",
+    data: generateData(15.0, 0.0, 0.0),
+    preTrend: 0.0
+  },
+  G: {
+    name: "State G",
+    color: "#E69F00",
+    type: "bad",
+    data: generateData(12.0, 0.8, 0.8),
+    preTrend: 0.8
+  }
+};
+
+// ============================================================
+// DiD ESTIMATION
+// ============================================================
+
+function computeDiD(selectedKeys) {
+  if (selectedKeys.length === 0) return null;
+
+  const treated = STATES.A;
+
+  // Average pre and post for treated
+  const treatedPre = PRE_YEARS.reduce((s, y) => s + treated.data[YEARS.indexOf(y)], 0) / PRE_YEARS.length;
+  const treatedPost = POST_YEARS.reduce((s, y) => s + treated.data[YEARS.indexOf(y)], 0) / POST_YEARS.length;
+  const treatedDiff = treatedPost - treatedPre;
+
+  // Average pre and post for controls (average across selected controls)
+  let controlPre = 0, controlPost = 0;
+  selectedKeys.forEach(k => {
+    const st = STATES[k];
+    controlPre += PRE_YEARS.reduce((s, y) => s + st.data[YEARS.indexOf(y)], 0) / PRE_YEARS.length;
+    controlPost += POST_YEARS.reduce((s, y) => s + st.data[YEARS.indexOf(y)], 0) / POST_YEARS.length;
+  });
+  controlPre /= selectedKeys.length;
+  controlPost /= selectedKeys.length;
+  const controlDiff = controlPost - controlPre;
+
+  return {
+    did: treatedDiff - controlDiff,
+    treatedPre, treatedPost, treatedDiff,
+    controlPre, controlPost, controlDiff
+  };
+}
+
+// ============================================================
+// CHART
+// ============================================================
+
+let chart = null;
+
+function buildChart(selectedKeys) {
+  const ctx = document.getElementById('chart').getContext('2d');
+
+  const datasets = [];
+
+  // Treated state — always shown
+  datasets.push({
+    label: STATES.A.name,
+    data: YEARS.map((y, i) => ({ x: y, y: STATES.A.data[i] })),
+    borderColor: STATES.A.color,
+    backgroundColor: STATES.A.color + '20',
+    borderWidth: 3,
+    pointRadius: 4,
+    pointHoverRadius: 6,
+    tension: 0.1,
+    order: 0
+  });
+
+  // Counterfactual (dashed)
+  datasets.push({
+    label: "Counterfactual (State A w/o treatment)",
+    data: YEARS.map((y, i) => {
+      if (y < TREATMENT_YEAR) return null;
+      return { x: y, y: STATES.A.counterfactual[i] };
+    }).filter(d => d !== null),
+    borderColor: STATES.A.color,
+    borderDash: [8, 4],
+    borderWidth: 2,
+    pointRadius: 0,
+    pointHoverRadius: 4,
+    tension: 0.1,
+    order: 1
+  });
+
+  // Selected control states
+  selectedKeys.forEach(k => {
+    const st = STATES[k];
+    datasets.push({
+      label: st.name,
+      data: YEARS.map((y, i) => ({ x: y, y: st.data[i] })),
+      borderColor: st.color,
+      backgroundColor: st.color + '20',
+      borderWidth: 2,
+      pointRadius: 3,
+      pointHoverRadius: 5,
+      tension: 0.1,
+      order: 2
+    });
+  });
+
+  // Average control line if multiple selected
+  if (selectedKeys.length > 0) {
+    const avgData = YEARS.map((y, i) => {
+      const avg = selectedKeys.reduce((s, k) => s + STATES[k].data[i], 0) / selectedKeys.length;
+      return { x: y, y: avg };
+    });
+    datasets.push({
+      label: "Avg. Control",
+      data: avgData,
+      borderColor: "#6b7280",
+      borderDash: [4, 3],
+      borderWidth: 2.5,
+      pointRadius: 0,
+      tension: 0.1,
+      order: 1
+    });
+  }
+
+  if (chart) chart.destroy();
+
+  chart = new Chart(ctx, {
+    type: 'line',
+    data: { datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            usePointStyle: true,
+            padding: 16,
+            font: { size: 12, family: "'Inter', sans-serif" }
+          }
+        },
+        annotation: undefined
+      },
+      scales: {
+        x: {
+          type: 'linear',
+          title: { display: true, text: 'Year', font: { size: 13, family: "'Inter', sans-serif", weight: '600' } },
+          ticks: {
+            stepSize: 1,
+            callback: v => v.toString(),
+            font: { size: 11 }
+          },
+          min: 2009.5,
+          max: 2019.5,
+          grid: { color: '#f0f0f0' }
+        },
+        y: {
+          title: { display: true, text: 'Uninsured Rate (%)', font: { size: 13, family: "'Inter', sans-serif", weight: '600' } },
+          ticks: { font: { size: 11 }, callback: v => v.toFixed(0) + '%' },
+          grid: { color: '#f0f0f0' }
+        }
+      }
+    },
+    plugins: [{
+      id: 'treatmentLine',
+      beforeDraw(chart) {
+        const { ctx, chartArea, scales } = chart;
+        const xPos = scales.x.getPixelForValue(2014.5);
+        if (xPos < chartArea.left || xPos > chartArea.right) return;
+        ctx.save();
+        ctx.beginPath();
+        ctx.setLineDash([6, 4]);
+        ctx.strokeStyle = '#9ca3af';
+        ctx.lineWidth = 1.5;
+        ctx.moveTo(xPos, chartArea.top);
+        ctx.lineTo(xPos, chartArea.bottom);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.font = '600 12px Inter, sans-serif';
+        ctx.fillStyle = '#6b7280';
+        ctx.textAlign = 'center';
+        ctx.fillText('Treatment (2015)', xPos, chartArea.top - 6);
+        ctx.restore();
+      }
+    }]
+  });
+}
+
+// ============================================================
+// UI UPDATE
+// ============================================================
+
+function getSelectedKeys() {
+  const checks = document.querySelectorAll('input[data-state]');
+  const keys = [];
+  checks.forEach(cb => {
+    if (cb.checked) keys.push(cb.dataset.state);
+  });
+  return keys;
+}
+
+function updateSimulation() {
+  const selected = getSelectedKeys();
+
+  // Update checkbox item styling
+  document.querySelectorAll('.control-item').forEach(el => {
+    const cb = el.querySelector('input[data-state]');
+    if (!cb) return;
+    const k = cb.dataset.state;
+    el.classList.toggle('selected', cb.checked);
+    el.classList.toggle('bad', STATES[k].type === 'bad' && cb.checked);
+  });
+
+  // Compute DiD
+  const result = computeDiD(selected);
+
+  const estEl = document.getElementById('did-estimate');
+  const estSub = document.getElementById('did-sub');
+  const biasEl = document.getElementById('bias-value');
+  const biasSub = document.getElementById('bias-sub');
+  const interpEl = document.getElementById('interpretation');
+
+  if (!result) {
+    estEl.innerHTML = '&mdash;';
+    estSub.textContent = 'select controls';
+    biasEl.innerHTML = '&mdash;';
+    biasEl.className = 'result-value';
+    biasSub.innerHTML = '&nbsp;';
+    interpEl.className = 'interpretation interp-none';
+    interpEl.innerHTML = '<strong>Select one or more control states</strong> from the left panel to estimate the DiD and see how your choice of controls affects the estimate.';
+  } else {
+    const did = result.did;
+    const bias = did - TRUE_ATT;
+    const absBias = Math.abs(bias);
+
+    estEl.textContent = (did >= 0 ? '+' : '') + did.toFixed(2);
+    estSub.textContent = 'percentage points';
+
+    biasEl.textContent = (bias >= 0 ? '+' : '') + bias.toFixed(2);
+    if (absBias < 0.3) {
+      biasEl.className = 'result-value low-bias';
+      biasSub.textContent = 'minimal bias';
+    } else if (absBias < 1.5) {
+      biasEl.className = 'result-value med-bias';
+      biasSub.textContent = 'moderate bias';
+    } else {
+      biasEl.className = 'result-value high-bias';
+      biasSub.textContent = 'severe bias';
+    }
+
+    // Determine composition
+    const goodSelected = selected.filter(k => STATES[k].type === 'good');
+    const badSelected = selected.filter(k => STATES[k].type === 'bad');
+    const allGood = badSelected.length === 0 && goodSelected.length > 0;
+    const allBad = goodSelected.length === 0 && badSelected.length > 0;
+
+    let interpClass, interpText;
+
+    if (allGood) {
+      interpClass = 'interp-good';
+      interpText = `<strong>Excellent choice!</strong> You selected only states with parallel pre-trends. ` +
+        `Your DiD estimate of <strong>${did.toFixed(2)} pp</strong> is very close to the true ATT of <strong>&minus;4.0 pp</strong>. ` +
+        `Because these controls were on the same trend as State A before treatment, the parallel trends assumption holds and the DiD identifies the causal effect. ` +
+        `The bias is only <strong>${bias.toFixed(2)} pp</strong>.`;
+    } else if (allBad) {
+      interpClass = 'interp-bad';
+      const direction = bias > 0 ? 'overestimates (toward zero)' : 'overstates (away from zero)';
+
+      let explanation = '';
+      if (badSelected.includes('E') && badSelected.length === 1) {
+        explanation = `State E's uninsured rate was declining <em>faster</em> than State A's before treatment. ` +
+          `So the control group's post-treatment decline looks large, making the DiD <em>smaller in magnitude</em> than the true effect. ` +
+          `The estimator attributes some of the treatment effect to the "natural" trend.`;
+      } else if (badSelected.includes('F') && badSelected.length === 1) {
+        explanation = `State F's uninsured rate was <em>flat</em> before treatment, while State A's was declining. ` +
+          `The control barely changes post-treatment, so the DiD captures both the treatment effect <em>and</em> State A's pre-existing downward trend, overstating the effect.`;
+      } else if (badSelected.includes('G') && badSelected.length === 1) {
+        explanation = `State G's uninsured rate was <em>rising</em> before treatment, the opposite of State A's trend. ` +
+          `This makes the control group's "change" look like an increase, dramatically exaggerating the estimated treatment effect.`;
+      } else {
+        explanation = `These controls have pre-trends that differ from State A's, violating the parallel trends assumption. ` +
+          `The DiD estimate of <strong>${did.toFixed(2)} pp</strong> is biased by <strong>${bias.toFixed(2)} pp</strong> relative to the true effect.`;
+      }
+
+      interpText = `<strong>Biased estimate!</strong> Your DiD estimate ${direction} the treatment effect. ` + explanation;
+    } else {
+      interpClass = 'interp-mixed';
+      interpText = `<strong>Mixed controls.</strong> You selected ${goodSelected.length} state(s) with parallel trends and ${badSelected.length} with non-parallel trends. ` +
+        `The good controls pull the estimate toward the true ATT, but the bad controls introduce bias. ` +
+        `Your estimate of <strong>${did.toFixed(2)} pp</strong> has a bias of <strong>${bias.toFixed(2)} pp</strong>. ` +
+        `Try selecting <em>only</em> good controls to see the unbiased estimate, or <em>only</em> bad controls to see how much damage they do.`;
+    }
+
+    interpEl.className = 'interpretation ' + interpClass;
+    interpEl.innerHTML = interpText;
+  }
+
+  buildChart(selected);
+}
+
+// ============================================================
+// BUTTON HELPERS
+// ============================================================
+
+function selectGroup(group) {
+  document.querySelectorAll('input[data-state]').forEach(cb => {
+    const k = cb.dataset.state;
+    const type = STATES[k].type;
+    if (group === 'all') cb.checked = true;
+    else if (group === 'none') cb.checked = false;
+    else if (group === 'good') cb.checked = (type === 'good');
+    else if (group === 'bad') cb.checked = (type === 'bad');
+  });
+  updateSimulation();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  updateSimulation();
+});
+</script>
+</body>
+</html>
