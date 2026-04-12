@@ -363,7 +363,7 @@ A first pass might be to compare wages in Miami *before* the boatlift to wages *
 |:----:|:----------:|:----------------:|:----------:|
 | Miami | 1.85 | 1.83 | -0.02 |
 
-Wages fell by $0.02 (in log terms).
+Wages fell by \$0.02 (in log terms).
 Can we interpret this as the causal effect of immigration?
 
 **No.**
@@ -451,7 +451,7 @@ Now we can compare the *change* in Miami to the *change* in these controls:
 
 The control cities experienced the *exact same* wage decline as Miami.
 This tells us something important:
-the $0.02 decline in Miami was not caused by the boatlift---it was part of a broader economic trend affecting all similar cities.
+the \$0.02 decline in Miami was not caused by the boatlift---it was part of a broader economic trend affecting all similar cities.
 The boatlift's causal effect, isolated by subtracting the control group's change from Miami's change, is essentially zero.
 
 The **difference-in-differences** estimate is:
@@ -589,7 +589,10 @@ Substituting this into the ATT formula and simplifying,
 we get the **DiD estimator**:
 
 $$
-\underbrace{ATT}_{\text{treatment effect}} = \underbrace{\left(E[Y_{i,1} \mid D_i = 1] - E[Y_{i,0} \mid D_i = 1]\right)}_{\text{change for treated group}} - \underbrace{\left(E[Y_{i,1} \mid D_i = 0] - E[Y_{i,0} \mid D_i = 0]\right)}_{\text{change for control group}}
+\begin{aligned}
+\underbrace{ATT}_{\text{treatment effect}} &= \underbrace{\left(E[Y_{i,1} \mid D_i = 1] - E[Y_{i,0} \mid D_i = 1]\right)}_{\text{change for treated group}} \\
+&\quad - \underbrace{\left(E[Y_{i,1} \mid D_i = 0] - E[Y_{i,0} \mid D_i = 0]\right)}_{\text{change for control group}}
+\end{aligned}
 $$ {#eq-did-estimator}
 
 This is the **difference-in-differences**:
@@ -837,8 +840,8 @@ summary(did_reg)
 ```
 
 How should we read this output?
-The coefficient on `treated` ($\hat{\beta}_1$) tells us that Miami's wages were about $0.08 lower than the control cities in the pre-period---a pre-existing level difference.
-The coefficient on `post` ($\hat{\beta}_2$) tells us that control cities' wages fell by about $0.02 from the pre- to the post-period---the common time trend.
+The coefficient on `treated` ($\hat{\beta}_1$) tells us that Miami's wages were about 0.08 lower than the control cities in the pre-period---a pre-existing level difference.
+The coefficient on `post` ($\hat{\beta}_2$) tells us that control cities' wages fell by about 0.02 from the pre- to the post-period---the common time trend.
 And the coefficient on `post_treat` ($\hat{\delta}$) is our DiD estimate:
 the *additional* change Miami experienced beyond the common trend.
 At approximately 0.01 and statistically insignificant,
@@ -1063,7 +1066,7 @@ The gap between the "Biased DiD" and the "True ATT" labels shows this bias.
 
 Card and Krueger (1994) took a different approach.
 In 1992,
-New Jersey raised its minimum wage from $4.25 to $5.05,
+New Jersey raised its minimum wage from \$4.25 to \$5.05,
 while neighboring Pennsylvania did not.
 Rather than comparing NJ to all other states,
 Card and Krueger compared fast-food employment in counties **right next to each other but separated by the NJ-PA state border**.
