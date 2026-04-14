@@ -98,8 +98,8 @@ $$
 - What are some of the issues with this regression?
   - OVB: immigrants probably move to cities which are **economically doing well**
 - Even if we were to include **control variables** we may not be able to account for really important unobservable factors
-  - E.g., what is the economic **trajectory** like in our cities?
-- So what can we do since a regression won't give us a plausible causal estimate?
+  - E.g., what is the economic **trajectory** like in our cities (can't be fixed using city FEs)?
+- So what can we do when control variables won't give us a plausible causal estimate?
 
 
 # The Mariel Boatlift
@@ -161,14 +161,14 @@ $$
 
 - We have to compare the changes in our **treated unit** to changes in **control units**
   - Otherwise, we may confuse the effects of a **broader trend** with our **specific treatment**
-- Miami (Card argues) would have had the **same change in LM outcomes** as a set of control cities had it not experienced the Boatlift (i.e., was not "treated")
+- Miami (Card argues) would have had the **same change in LM outcomes** as a set of **similar "control" cities** had it not experienced the Boatlift (i.e., was not "treated")
 - Which cities do you think might be good "controls" for Miami?
 
 
 ## Control Cities and Counter-Factuals {.smaller}
 
 - Card (1990) uses **Atlanta, Los Angeles, Houston, and Tampa-St. Petersburg** as the control cities
-- He uses the average of LM outcomes in these cities as the **controls** for the "randomly treated" Miami
+- He uses the average of LM outcomes in these cities as the **controls** for the "psuedo-randomly treated" Miami
 - In other words, he is assuming that Atlanta, Los Angeles, Houston, and Tampa-St. Petersburg form a good **counter-factual** group for Miami
 
 . . .
@@ -203,13 +203,6 @@ A **counter-factual** is a "what if" scenario used to measure the causal impact 
 - This difference between the pre-post changes between the two groups nets out any difference in employment that would have happened *had the treatment not occurred*
 - This method of **double differencing** is called the **difference-in-differences**
 
-
-## Levels vs. Trends
-
-- Notice: Miami's wages are *lower* than the controls' in both periods
-- DiD does **not** require equal levels across groups
-- It only requires that the *changes* would have been the same absent treatment
-- This is the **parallel trends assumption** --- more on this shortly
 
 
 # DiD: The Formal Framework
@@ -290,7 +283,10 @@ $$
 . . .
 
 $$
-\underbrace{ATT}_{\text{treatment effect}} = \underbrace{(E[Y_{i1} | D_i = 1] - E[Y_{i0} | D_i = 1])}_{\text{trend for treated group}} - \underbrace{(E[Y_{i1} | D_i = 0] - E[Y_{i0} | D_i = 0])}_{\text{trend for control group}}
+\begin{aligned}
+\underbrace{ATT}_{\text{treatment effect}} = &\underbrace{(E[Y_{i1} | D_i = 1] - E[Y_{i0} | D_i = 1])}_{\text{trend for treated group}} \\
+& - \underbrace{(E[Y_{i1} | D_i = 0] - E[Y_{i0} | D_i = 0])}_{\text{trend for control group}}
+\end{aligned}
 $$
 
 
@@ -370,47 +366,6 @@ where:
   - (Trend for treatment group) = (treated, post) - (treated, pre) = ($\beta_0 + \beta_1 + \beta_2 + \delta) - (\beta_0 + \beta_1) = \beta_2 + \delta$
   - (Trend for control group) = (control, post) - (control, pre) = ($\beta_0 + \beta_2$) - ($\beta_0$) = $\beta_2$
   - ATT = (Trend for treatment group) - (Trend for control group) = ($\beta_2 + \delta) - (\beta_2) = \delta$
-
-
-## Anatomy of the DiD Regression
-
-```{r}
-#| fig-height: 5
-
-reg_data <- tibble(
-  group = factor(rep(c("Control", "Treated"), each = 2), levels = c("Control", "Treated")),
-  x = c(1, 2, 1, 2), y = c(10, 12, 15, 20))
-
-ggplot(reg_data, aes(x = x, y = y, color = group, group = group)) +
-  geom_line(linewidth = 1.2) + geom_point(size = 4) +
-  annotate("segment", x = 0.6, xend = 0.95, y = 10, yend = 10,
-           linetype = "dotted", color = "grey50") +
-  annotate("text", x = 0.5, y = 10, label = "\u03b2\u2080",
-           size = 6, hjust = 1, color = "grey30") +
-  annotate("segment", x = 0.85, xend = 0.85, y = 10.1, yend = 14.9,
-           arrow = arrow(type = "closed", length = unit(0.15, "cm"), ends = "both"),
-           color = "#7570b3") +
-  annotate("text", x = 0.75, y = 12.5, label = "\u03b2\u2081",
-           size = 6, hjust = 1, color = "#7570b3") +
-  annotate("segment", x = 1.5, xend = 1.5, y = 10.1, yend = 11.9,
-           arrow = arrow(type = "closed", length = unit(0.15, "cm"), ends = "both"),
-           color = "#d95f02") +
-  annotate("text", x = 1.4, y = 11, label = "\u03b2\u2082",
-           size = 6, hjust = 1, color = "#d95f02") +
-  annotate("segment", x = 2.15, xend = 2.15, y = 17.1, yend = 19.9,
-           arrow = arrow(type = "closed", length = unit(0.15, "cm"), ends = "both"),
-           color = "#e7298a") +
-  annotate("text", x = 2.25, y = 18.5, label = "\u03b4 (ATT)",
-           size = 6, hjust = 0, color = "#e7298a") +
-  geom_point(aes(x = 2, y = 17), color = "#0072B2", shape = 1, size = 4, stroke = 1.5,
-             inherit.aes = FALSE) +
-  annotate("text", x = 2.25, y = 17, label = "Counterfactual",
-           size = 4, hjust = 0, color = "#0072B2", fontface = "italic") +
-  scale_x_continuous(breaks = c(1, 2), labels = c("Pre", "Post"), limits = c(0.3, 2.8)) +
-  scale_color_manual(values = c("Control" = "grey50", "Treated" = "#0072B2")) +
-  labs(x = "Period", y = "Average Outcome", color = "Group") +
-  theme(legend.position = "bottom")
-```
 
 
 ## Estimating the DiD Regression {.smaller}
@@ -514,7 +469,7 @@ summary(twfe_reg)
 
 modelsummary(list("Simple DiD" = did_reg, "TWFE" = twfe_reg),
              stars = TRUE,
-             gof_omit = "AIC|BIC|Log|RMSE|Std")
+             gof_omit = "AIC|BIC|Log|RMSE|Std|R2$|Num|F|Within")
 ```
 
 
