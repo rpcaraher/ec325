@@ -563,7 +563,7 @@ Figure&nbsp;12.1: A naive comparison of cities with high vs.&nbsp;low immigratio
 </div>
 </div>
 </div>
-<p><a href="#fig-selection-bias" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-selection-bias</span></a> illustrates this problem with simulated data. In this simulation, immigration has <strong>zero</strong> true causal effect on wages, but the naive OLS regression line slopes upward because more prosperous cities (shown in green) attract both more immigrants and have higher wages. The OLS estimate is picking up the <em>selection of immigrants into better cities</em>, not any actual effect of immigration.</p>
+<p><a href="#fig-selection-bias" class="quarto-xref">Figure&nbsp;<span>12.1</span></a> illustrates this problem with simulated data. In this simulation, immigration has <strong>zero</strong> true causal effect on wages, but the naive OLS regression line slopes upward because more prosperous cities (shown in green) attract both more immigrants and have higher wages. The OLS estimate is picking up the <em>selection of immigrants into better cities</em>, not any actual effect of immigration.</p>
 <p>Even if we added control variables for education levels, industry mix, and population size, we would still miss the unobservable components of city prosperity. And while fixed effects could help if we had panel data—absorbing time-invariant city characteristics—they still cannot handle factors that change <em>differently</em> across cities over time (e.g., one city’s tech boom attracting both immigrants and driving up wages simultaneously).</p>
 </section>
 <section id="why-not-all-variation-is-useful" class="level3" data-number="12.1.2">
@@ -679,7 +679,7 @@ Figure&nbsp;12.3: A simple before-after comparison in Miami (left) suggests wage
 </div>
 </div>
 </div>
-<p><a href="#fig-before-after-problem" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-before-after-problem</span></a> illustrates why this is a problem. In Scenario A, Miami’s wages fell while the rest of the country’s wages stayed flat—suggesting the boatlift really did depress wages. In Scenario B, Miami’s wages fell, but so did everyone else’s—suggesting the decline had nothing to do with the boatlift and everything to do with a national recession. From Miami’s data alone, both scenarios look identical. We need a <strong>comparison group</strong> to tell them apart.</p>
+<p><a href="#fig-before-after-problem" class="quarto-xref">Figure&nbsp;<span>12.3</span></a> illustrates why this is a problem. In Scenario A, Miami’s wages fell while the rest of the country’s wages stayed flat—suggesting the boatlift really did depress wages. In Scenario B, Miami’s wages fell, but so did everyone else’s—suggesting the decline had nothing to do with the boatlift and everything to do with a national recession. From Miami’s data alone, both scenarios look identical. We need a <strong>comparison group</strong> to tell them apart.</p>
 </section>
 <section id="the-need-for-control-units" class="level3" data-number="12.4.2">
 <h3 data-number="12.4.2" class="anchored" data-anchor-id="the-need-for-control-units"><span class="header-section-number">12.4.2</span> The Need for Control Units</h3>
@@ -804,7 +804,7 @@ E[Y_{i,1}(0) - Y_{i,0}(0) \mid D_i = 1] = E[Y_{i,1}(0) - Y_{i,0}(0) \mid D_i = 0
 </section>
 <section id="from-parallel-trends-to-the-did-estimator" class="level3" data-number="12.6.2">
 <h3 data-number="12.6.2" class="anchored" data-anchor-id="from-parallel-trends-to-the-did-estimator"><span class="header-section-number">12.6.2</span> From Parallel Trends to the DiD Estimator</h3>
-<p>We can now derive the DiD estimator. We want to estimate the ATT from <a href="#eq-att" class="quarto-xref">Equation&nbsp;<span class="quarto-unresolved-ref">eq-att</span></a>, but we cannot observe <span class="math inline">\(E[Y_{i,1}(0) \mid D_i = 1]\)</span>—the counterfactual.</p>
+<p>We can now derive the DiD estimator. We want to estimate the ATT from <a href="#eq-att" class="quarto-xref">Equation&nbsp;<span>12.1</span></a>, but we cannot observe <span class="math inline">\(E[Y_{i,1}(0) \mid D_i = 1]\)</span>—the counterfactual.</p>
 <p>The parallel trends assumption gives us a way to express this unobservable term. If the trends would have been the same:</p>
 <p><span class="math display">\[
 E[Y_{i,1}(0) \mid D_i = 1] = E[Y_{i,0}(0) \mid D_i = 1] + \underbrace{(E[Y_{i,1}(0) \mid D_i = 0] - E[Y_{i,0}(0) \mid D_i = 0])}_{\text{control group's observed change}}
@@ -820,7 +820,7 @@ E[Y_{i,1}(0) \mid D_i = 1] = E[Y_{i,0}(0) \mid D_i = 1] + \underbrace{(E[Y_{i,1}
 </section>
 <section id="visualizing-did" class="level3" data-number="12.6.3">
 <h3 data-number="12.6.3" class="anchored" data-anchor-id="visualizing-did"><span class="header-section-number">12.6.3</span> Visualizing DiD</h3>
-<p>The logic of DiD is best understood graphically. <a href="#fig-did-visual" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-did-visual</span></a> shows a stylized example with treatment beginning between periods 2 and 3:</p>
+<p>The logic of DiD is best understood graphically. <a href="#fig-did-visual" class="quarto-xref">Figure&nbsp;<span>12.4</span></a> shows a stylized example with treatment beginning between periods 2 and 3:</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-did-visual" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -835,7 +835,7 @@ Figure&nbsp;12.4: The DiD estimate is the gap between the observed treatment out
 </div>
 </div>
 </div>
-<p>In <a href="#fig-did-visual" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-did-visual</span></a>, the solid lines show the actual observed outcomes for both groups. Before treatment (periods 1 and 2), both groups trend upward at the same rate—they follow parallel trends. The treated group starts higher, but both increase by 1 unit per period.</p>
+<p>In <a href="#fig-did-visual" class="quarto-xref">Figure&nbsp;<span>12.4</span></a>, the solid lines show the actual observed outcomes for both groups. Before treatment (periods 1 and 2), both groups trend upward at the same rate—they follow parallel trends. The treated group starts higher, but both increase by 1 unit per period.</p>
 <p>After treatment (periods 3 and 4), the control group continues its same upward trend (from 11 to 12 to 13). The dashed line shows where the treated group <em>would have been</em> if it had continued along this same trend (from 16 to 17 to 18). But the treated group’s <em>actual</em> outcome jumps to 20 and 21—well above the counterfactual.</p>
 <p>The <strong>ATT</strong> is the vertical gap between the observed treatment outcome and the dashed counterfactual line. In this example, <span class="math inline">\(ATT = 21 - 18 = 3\)</span> (or equivalently, <span class="math inline">\(20 - 17 = 3\)</span>). This is what DiD is estimating: the treatment effect is <em>not</em> the raw difference in levels between the two groups (which also reflects pre-existing differences), but rather the <em>additional</em> change the treated group experienced beyond what the control group experienced.</p>
 </section>
@@ -898,7 +898,7 @@ y_{it} = \beta_0 + \beta_1 D_i + \beta_2 P_t + \delta(D_i \times P_t) + \mu_{it}
 </tr>
 </tbody>
 </table>
-<p>Now we can verify that <span class="math inline">\(\delta\)</span> equals the DiD estimator from <a href="#eq-did-estimator" class="quarto-xref">Equation&nbsp;<span class="quarto-unresolved-ref">eq-did-estimator</span></a> by computing the two “differences”:</p>
+<p>Now we can verify that <span class="math inline">\(\delta\)</span> equals the DiD estimator from <a href="#eq-did-estimator" class="quarto-xref">Equation&nbsp;<span>12.2</span></a> by computing the two “differences”:</p>
 <p><strong>Change for the treated group</strong> (post minus pre): <span class="math display">\[
 (\beta_0 + \beta_1 + \beta_2 + \delta) - (\beta_0 + \beta_1) = \beta_2 + \delta
 \]</span></p>
@@ -1002,7 +1002,7 @@ y_{it} = \delta D_{it} + \alpha_i + \tau_t + \mu_{it}
 <p>Substituting all of this in, the TWFE model becomes: <span class="math display">\[
 y_{it} = \underbrace{(\alpha_0 + \tau_0)}_{\beta_0} + \underbrace{\alpha_1}_{\beta_1} D_i + \underbrace{\tau_1}_{\beta_2} P_t + \delta(D_i \times P_t) + \mu_{it}
 \]</span></p>
-<p>This is the simple DiD regression from <a href="#eq-did-reg" class="quarto-xref">Equation&nbsp;<span class="quarto-unresolved-ref">eq-did-reg</span></a>. The unit fixed effect becomes <span class="math inline">\(\beta_1 D_i\)</span>, the time fixed effect becomes <span class="math inline">\(\beta_2 P_t\)</span>, and the treatment effect <span class="math inline">\(\delta\)</span> is the same in both models.</p>
+<p>This is the simple DiD regression from <a href="#eq-did-reg" class="quarto-xref">Equation&nbsp;<span>12.3</span></a>. The unit fixed effect becomes <span class="math inline">\(\beta_1 D_i\)</span>, the time fixed effect becomes <span class="math inline">\(\beta_2 P_t\)</span>, and the treatment effect <span class="math inline">\(\delta\)</span> is the same in both models.</p>
 <p>The advantage of TWFE is that it <em>generalizes</em> naturally: when you have many units and many time periods, you simply add more fixed effects rather than rewriting the entire model. The <code>fixest</code> package handles this automatically.</p>
 </section>
 <section id="estimating-twfe-in-r" class="level3" data-number="12.8.3">
@@ -1034,12 +1034,13 @@ RMSE: 0.00622     Adj. R2: 0.943875
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">modelsummary</span>(<span class="fu">list</span>(<span class="st">"Simple DiD"</span> <span class="ot">=</span> did_reg, <span class="st">"TWFE"</span> <span class="ot">=</span> twfe_reg),</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>             <span class="at">stars =</span> <span class="cn">TRUE</span>,</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">gof_omit =</span> <span class="st">"AIC|BIC|Log|RMSE|Std"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div id="fig-did-vs-twfe" class="cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-did-vs-twfe-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;12.6: Side-by-side comparison of the simple DiD regression and the TWFE model. The treatment effect estimates are identical in the 2x2 case.
+<div id="tbl-did-vs-twfe" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-did-vs-twfe-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;12.1: Side-by-side comparison of the simple DiD regression and the TWFE model. The treatment effect estimates are identical in the 2x2 case.
 </figcaption>
-<div aria-describedby="fig-did-vs-twfe-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div aria-describedby="tbl-did-vs-twfe-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
 <!-- preamble start -->
 
     <script src="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.js"></script>
@@ -1174,6 +1175,7 @@ Figure&nbsp;12.6: Side-by-side comparison of the simple DiD regression and the T
     </div>
 <!-- hack to avoid NA insertion in last line -->
 </div>
+</div>
 </figure>
 </div>
 </div>
@@ -1204,7 +1206,7 @@ y_{it} = \delta D_{it} + \alpha_i + \tau_t + \mu_{it}
 <div id="fig-bad-controls" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-bad-controls-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;12.7: Why bad controls lead to biased DiD estimates. If the control group was already on a different trajectory than the treated group, the DiD estimator will confuse the pre-existing differential trend with the treatment effect.
+Figure&nbsp;12.6: Why bad controls lead to biased DiD estimates. If the control group was already on a different trajectory than the treated group, the DiD estimator will confuse the pre-existing differential trend with the treatment effect.
 </figcaption>
 <div aria-describedby="fig-bad-controls-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="did_files/figure-html/fig-bad-controls-1.png" class="img-fluid figure-img" width="672">
@@ -1213,7 +1215,7 @@ Figure&nbsp;12.7: Why bad controls lead to biased DiD estimates. If the control 
 </div>
 </div>
 </div>
-<p><a href="#fig-bad-controls" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-bad-controls</span></a> shows what goes wrong. Before treatment, the treated group (blue) was trending <em>upward faster</em> than the control group (grey). After treatment starts (between periods 3 and 4), the treated group’s outcome levels off. The true counterfactual (dashed blue line) follows the treated group’s <em>actual</em> pre-treatment trend—the steeper one. But the DiD estimator uses the <em>control group’s flatter trend</em> (dotted orange line) as the counterfactual.</p>
+<p><a href="#fig-bad-controls" class="quarto-xref">Figure&nbsp;<span>12.6</span></a> shows what goes wrong. Before treatment, the treated group (blue) was trending <em>upward faster</em> than the control group (grey). After treatment starts (between periods 3 and 4), the treated group’s outcome levels off. The true counterfactual (dashed blue line) follows the treated group’s <em>actual</em> pre-treatment trend—the steeper one. But the DiD estimator uses the <em>control group’s flatter trend</em> (dotted orange line) as the counterfactual.</p>
 <p>Because the control group was on a flatter trajectory, the DiD estimate understates the true treatment effect: it attributes some of the treatment-induced decline to the (assumed) common trend, when in fact the treated group would have continued rising faster. The gap between the “Biased DiD” and the “True ATT” labels shows this bias.</p>
 </section>
 <section id="card-and-krueger-1994-a-better-research-design" class="level3" data-number="12.9.3">
@@ -1250,7 +1252,7 @@ Figure&nbsp;12.7: Why bad controls lead to biased DiD estimates. If the control 
 <div id="fig-pretrends" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-pretrends-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;12.8: Assessing parallel trends by examining pre-treatment data. Left panel: parallel pre-trends support the assumption. Right panel: diverging pre-trends (a red flag) suggest the DiD estimate may be biased.
+Figure&nbsp;12.7: Assessing parallel trends by examining pre-treatment data. Left panel: parallel pre-trends support the assumption. Right panel: diverging pre-trends (a red flag) suggest the DiD estimate may be biased.
 </figcaption>
 <div aria-describedby="fig-pretrends-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="did_files/figure-html/fig-pretrends-1.png" class="img-fluid figure-img" width="672">
@@ -1259,7 +1261,7 @@ Figure&nbsp;12.8: Assessing parallel trends by examining pre-treatment data. Lef
 </div>
 </div>
 </div>
-<p><a href="#fig-pretrends" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-pretrends</span></a> shows two scenarios. In the left panel, the treated and control groups move together in the pre-treatment period (periods 1–3), providing visual support for the parallel trends assumption. In the right panel, the treated group is trending <em>upward faster</em> than the control group even before treatment, which is a red flag: if this differential trend continued after treatment, the DiD estimate would confuse the pre-existing trend with the treatment effect.</p>
+<p><a href="#fig-pretrends" class="quarto-xref">Figure&nbsp;<span>12.7</span></a> shows two scenarios. In the left panel, the treated and control groups move together in the pre-treatment period (periods 1–3), providing visual support for the parallel trends assumption. In the right panel, the treated group is trending <em>upward faster</em> than the control group even before treatment, which is a red flag: if this differential trend continued after treatment, the DiD estimate would confuse the pre-existing trend with the treatment effect.</p>
 <p>Beyond visual inspection, common diagnostic tools include:</p>
 <p><strong>Placebo tests:</strong> Estimate “effects” at times when no treatment occurred. If you find significant effects in periods before treatment actually began, this suggests your control group is not a valid comparison and the DiD design is flawed.</p>
 <p><strong>Event studies:</strong> Estimate separate treatment effects for each time period relative to the treatment date. In the pre-treatment periods, all estimates should be close to zero (confirming parallel pre-trends). In the post-treatment periods, the estimates show the dynamic treatment effect.</p>

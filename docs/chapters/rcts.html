@@ -524,12 +524,12 @@ function checkAnswer(selectElement, correctValue) {
 <div id="callout-2" class="callout-2-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ul>
-<li><span class="citation" data-cites="angrist_mastering_2014">Angrist and Pischke (<a href="#ref-angrist_mastering_2014" role="doc-biblioref">2014</a>)</span>, Ch. 1</li>
+<li><span class="citation" data-cites="angrist_mastering_2014">Angrist and Pischke (<a href="references.html#ref-angrist_mastering_2014" role="doc-biblioref">2014</a>)</span>, Ch. 1</li>
 </ul>
 </div>
 </div>
 </div>
-<p>In <a href="#sec-introduction" class="quarto-xref"><span class="quarto-unresolved-ref">sec-introduction</span></a>, we discussed how econometrics focuses on identifying <strong>causal effects</strong> rather than mere correlations. We used the example of health insurance: while people with health insurance tend to be healthier than people without insurance, we cannot immediately conclude that health insurance <em>causes</em> better health. This chapter develops the conceptual and mathematical tools we need to think rigorously about causality, and introduces the randomized control trial (RCT) as the gold standard for causal inference.</p>
+<p>In <a href="intro.html" class="quarto-xref"><span>Chapter 1</span></a>, we discussed how econometrics focuses on identifying <strong>causal effects</strong> rather than mere correlations. We used the example of health insurance: while people with health insurance tend to be healthier than people without insurance, we cannot immediately conclude that health insurance <em>causes</em> better health. This chapter develops the conceptual and mathematical tools we need to think rigorously about causality, and introduces the randomized control trial (RCT) as the gold standard for causal inference.</p>
 <section id="the-problem-with-simple-comparisons" class="level2" data-number="3.1">
 <h2 data-number="3.1" class="anchored" data-anchor-id="the-problem-with-simple-comparisons"><span class="header-section-number">3.1</span> The Problem with Simple Comparisons</h2>
 <p>Let’s return to our health insurance example. People with health insurance are, on average, healthier than people without it. This correlation is undeniable. But can we interpret this as evidence that insurance <em>causes</em> better health?</p>
@@ -705,7 +705,7 @@ Figure&nbsp;3.2: Morty C-137 (left) and College Morty (right). The wage differen
 </div>
 </div>
 <p>Notice how the average tends to get closer to 3.5 as we increase the number of rolls. This isn’t guaranteed on any single attempt (randomness still plays a role), but the general tendency is clear.</p>
-<p>Now let’s see what happens when we roll the die many times and track the running average at each step. In <a href="#fig-lln-dice" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-lln-dice</span></a>, I plot the <em>sample average</em> of our dice rolls on the y-axis, and the number of times I roll the dice on the x-axis. The population mean, 3.5, is plotted with a dashed red line.</p>
+<p>Now let’s see what happens when we roll the die many times and track the running average at each step. In <a href="#fig-lln-dice" class="quarto-xref">Figure&nbsp;<span>3.3</span></a>, I plot the <em>sample average</em> of our dice rolls on the y-axis, and the number of times I roll the dice on the x-axis. The population mean, 3.5, is plotted with a dashed red line.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -754,7 +754,7 @@ Figure&nbsp;3.3: The Law of Large Numbers in action. As we roll a die more times
 </div>
 </div>
 </div>
-<p>Notice several key features about <a href="#fig-lln-dice" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-lln-dice</span></a>:</p>
+<p>Notice several key features about <a href="#fig-lln-dice" class="quarto-xref">Figure&nbsp;<span>3.3</span></a>:</p>
 <ul>
 <li><strong>Early volatility</strong>: In the first few rolls, the running average bounces around wildly. After just 10 rolls, we might be at 4.2 or 2.9.</li>
 <li><strong>Gradual stabilization</strong>: As we accumulate more rolls (say, 100 or 200), the average starts to settle down closer to 3.5.</li>
@@ -906,7 +906,7 @@ Figure&nbsp;3.4: Baseline differences between treated and untreated groups witho
 </div>
 </div>
 </div>
-<p>Notice in <a href="#fig-baseline-diffs" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-baseline-diffs</span></a> how the treated and untreated groups look very different! The treated group has a higher proportion of people with light eyes and dark hair. Most importantly, the treated group has a higher mean outcome—even though <strong>we know the true causal effect is zero</strong>. This is selection bias in action: people who “select into” treatment have characteristics that also lead to better outcomes.</p>
+<p>Notice in <a href="#fig-baseline-diffs" class="quarto-xref">Figure&nbsp;<span>3.4</span></a> how the treated and untreated groups look very different! The treated group has a higher proportion of people with light eyes and dark hair. Most importantly, the treated group has a higher mean outcome—even though <strong>we know the true causal effect is zero</strong>. This is selection bias in action: people who “select into” treatment have characteristics that also lead to better outcomes.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -969,7 +969,7 @@ Figure&nbsp;3.4: Baseline differences between treated and untreated groups witho
 <span id="cb16-57"><a href="#cb16-57" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<p>Now let’s see what happens when we randomly assign treatment. Starting with a small sample (N=10), we see in <a href="#fig-random-n10" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-random-n10</span></a> that random assignment reduces but doesn’t eliminate the differences between groups. With such a small sample, random chance can still produce imbalanced groups. With only 10 people, we still see noticeable differences between the randomly assigned treatment and control groups.</p>
+<p>Now let’s see what happens when we randomly assign treatment. Starting with a small sample (N=10), we see in <a href="#fig-random-n10" class="quarto-xref">Figure&nbsp;<span>3.5</span></a> that random assignment reduces but doesn’t eliminate the differences between groups. With such a small sample, random chance can still produce imbalanced groups. With only 10 people, we still see noticeable differences between the randomly assigned treatment and control groups.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-random-n10" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -984,7 +984,7 @@ Figure&nbsp;3.5: Random assignment with N=10. Some imbalance remains due to smal
 </div>
 </div>
 </div>
-<p>As we increase the sample size to N=25 and N=50, as shown in <a href="#fig-random-n25" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-random-n25</span></a> and <a href="#fig-random-n50" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-random-n50</span></a>, the differences between treatment and control groups shrink. The LLN is at work: larger samples produce more balanced groups in terms of their background characteristics.</p>
+<p>As we increase the sample size to N=25 and N=50, as shown in <a href="#fig-random-n25" class="quarto-xref">Figure&nbsp;<span>3.6</span></a> and <a href="#fig-random-n50" class="quarto-xref">Figure&nbsp;<span>3.7</span></a>, the differences between treatment and control groups shrink. The LLN is at work: larger samples produce more balanced groups in terms of their background characteristics.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-random-n25" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1027,7 +1027,7 @@ Figure&nbsp;3.8: Random assignment with N=500. The treatment and control groups 
 </div>
 </div>
 </div>
-<p>By N=500, as show in <a href="#fig-random-n500" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-random-n500</span></a>, the treatment and control groups are nearly identical across all characteristics. The difference in outcomes between groups is now close to zero—the true causal effect! Any remaining difference is just random variation, not systematic selection bias.</p>
+<p>By N=500, as show in <a href="#fig-random-n500" class="quarto-xref">Figure&nbsp;<span>3.8</span></a>, the treatment and control groups are nearly identical across all characteristics. The difference in outcomes between groups is now close to zero—the true causal effect! Any remaining difference is just random variation, not systematic selection bias.</p>
 </section>
 <section id="the-potential-outcomes-framework" class="level2" data-number="3.6">
 <h2 data-number="3.6" class="anchored" data-anchor-id="the-potential-outcomes-framework"><span class="header-section-number">3.6</span> The Potential Outcomes Framework</h2>
@@ -1259,7 +1259,7 @@ E[Y_i | D_i = 1] - E[Y_i | D_i = 0] = \kappa + \{E[Y_{0i} | D_i = 1] - E[Y_{0i} 
 </div>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
 <div id="ref-angrist_mastering_2014" class="csl-entry" role="listitem">
 Angrist, Joshua D., and Jörn-Steffen Pischke. 2014. <em>Mastering ’Metrics: The Path from Cause to Effect</em>. Princeton University Press.
 </div>

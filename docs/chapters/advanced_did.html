@@ -334,32 +334,49 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#data-driven-control-selection" id="toc-data-driven-control-selection" class="nav-link active" data-scroll-target="#data-driven-control-selection"><span class="header-section-number">13.1</span> Data-Driven Control Selection</a>
+  <li><a href="#choosing-good-controls" id="toc-choosing-good-controls" class="nav-link active" data-scroll-target="#choosing-good-controls"><span class="header-section-number">13.1</span> Choosing Good Controls</a>
   <ul class="collapse">
-  <li><a href="#the-problem-systematically-different-treatment-and-control-groups" id="toc-the-problem-systematically-different-treatment-and-control-groups" class="nav-link" data-scroll-target="#the-problem-systematically-different-treatment-and-control-groups"><span class="header-section-number">13.1.1</span> The Problem: Systematically Different Treatment and Control Groups</a></li>
-  <li><a href="#propensity-score-weighting-the-intuition" id="toc-propensity-score-weighting-the-intuition" class="nav-link" data-scroll-target="#propensity-score-weighting-the-intuition"><span class="header-section-number">13.1.2</span> Propensity Score Weighting: The Intuition</a></li>
-  <li><a href="#the-ipw-did-algorithm" id="toc-the-ipw-did-algorithm" class="nav-link" data-scroll-target="#the-ipw-did-algorithm"><span class="header-section-number">13.1.3</span> The IPW-DiD Algorithm</a></li>
-  <li><a href="#comparing-results" id="toc-comparing-results" class="nav-link" data-scroll-target="#comparing-results"><span class="header-section-number">13.1.4</span> Comparing Results</a></li>
+  <li><a href="#why-control-selection-matters" id="toc-why-control-selection-matters" class="nav-link" data-scroll-target="#why-control-selection-matters"><span class="header-section-number">13.1.1</span> Why Control Selection Matters</a></li>
+  <li><a href="#method-1-intuitive-selection-based-on-institutional-knowledge" id="toc-method-1-intuitive-selection-based-on-institutional-knowledge" class="nav-link" data-scroll-target="#method-1-intuitive-selection-based-on-institutional-knowledge"><span class="header-section-number">13.1.2</span> Method 1: Intuitive Selection Based on Institutional Knowledge</a></li>
+  <li><a href="#method-2-data-driven-control-selection" id="toc-method-2-data-driven-control-selection" class="nav-link" data-scroll-target="#method-2-data-driven-control-selection"><span class="header-section-number">13.1.3</span> Method 2: Data-Driven Control Selection</a></li>
   </ul></li>
-  <li><a href="#dynamic-did-and-event-studies" id="toc-dynamic-did-and-event-studies" class="nav-link" data-scroll-target="#dynamic-did-and-event-studies"><span class="header-section-number">13.2</span> Dynamic DiD and Event Studies</a>
+  <li><a href="#ipw-did-propensity-score-weighting" id="toc-ipw-did-propensity-score-weighting" class="nav-link" data-scroll-target="#ipw-did-propensity-score-weighting"><span class="header-section-number">13.2</span> IPW-DiD: Propensity Score Weighting</a>
   <ul class="collapse">
-  <li><a href="#why-treatment-effects-may-change-over-time" id="toc-why-treatment-effects-may-change-over-time" class="nav-link" data-scroll-target="#why-treatment-effects-may-change-over-time"><span class="header-section-number">13.2.1</span> Why Treatment Effects May Change Over Time</a></li>
-  <li><a href="#relative-time" id="toc-relative-time" class="nav-link" data-scroll-target="#relative-time"><span class="header-section-number">13.2.2</span> Relative Time</a></li>
-  <li><a href="#the-dynamic-did-model" id="toc-the-dynamic-did-model" class="nav-link" data-scroll-target="#the-dynamic-did-model"><span class="header-section-number">13.2.3</span> The Dynamic DiD Model</a></li>
-  <li><a href="#example-environmental-policy-and-manufacturing-employment" id="toc-example-environmental-policy-and-manufacturing-employment" class="nav-link" data-scroll-target="#example-environmental-policy-and-manufacturing-employment"><span class="header-section-number">13.2.4</span> Example: Environmental Policy and Manufacturing Employment</a></li>
-  <li><a href="#estimating-the-dynamic-model" id="toc-estimating-the-dynamic-model" class="nav-link" data-scroll-target="#estimating-the-dynamic-model"><span class="header-section-number">13.2.5</span> Estimating the Dynamic Model</a></li>
-  <li><a href="#the-event-study-plot" id="toc-the-event-study-plot" class="nav-link" data-scroll-target="#the-event-study-plot"><span class="header-section-number">13.2.6</span> The Event Study Plot</a></li>
-  <li><a href="#interpreting-the-event-study" id="toc-interpreting-the-event-study" class="nav-link" data-scroll-target="#interpreting-the-event-study"><span class="header-section-number">13.2.7</span> Interpreting the Event Study</a></li>
+  <li><a href="#setting-up-the-problem" id="toc-setting-up-the-problem" class="nav-link" data-scroll-target="#setting-up-the-problem"><span class="header-section-number">13.2.1</span> Setting Up the Problem</a></li>
+  <li><a href="#the-intuition-behind-propensity-score-weighting" id="toc-the-intuition-behind-propensity-score-weighting" class="nav-link" data-scroll-target="#the-intuition-behind-propensity-score-weighting"><span class="header-section-number">13.2.2</span> The Intuition Behind Propensity Score Weighting</a></li>
+  <li><a href="#step-1-estimate-propensity-scores" id="toc-step-1-estimate-propensity-scores" class="nav-link" data-scroll-target="#step-1-estimate-propensity-scores"><span class="header-section-number">13.2.3</span> Step 1: Estimate Propensity Scores</a></li>
+  <li><a href="#step-2-calculate-inverse-propensity-weights" id="toc-step-2-calculate-inverse-propensity-weights" class="nav-link" data-scroll-target="#step-2-calculate-inverse-propensity-weights"><span class="header-section-number">13.2.4</span> Step 2: Calculate Inverse Propensity Weights</a></li>
+  <li><a href="#visualizing-the-weighting" id="toc-visualizing-the-weighting" class="nav-link" data-scroll-target="#visualizing-the-weighting"><span class="header-section-number">13.2.5</span> Visualizing the Weighting</a></li>
+  <li><a href="#step-3-run-the-weighted-twfe-regression" id="toc-step-3-run-the-weighted-twfe-regression" class="nav-link" data-scroll-target="#step-3-run-the-weighted-twfe-regression"><span class="header-section-number">13.2.6</span> Step 3: Run the Weighted TWFE Regression</a></li>
+  <li><a href="#comparing-results" id="toc-comparing-results" class="nav-link" data-scroll-target="#comparing-results"><span class="header-section-number">13.2.7</span> Comparing Results</a></li>
+  <li><a href="#summary-of-the-ipw-did-algorithm" id="toc-summary-of-the-ipw-did-algorithm" class="nav-link" data-scroll-target="#summary-of-the-ipw-did-algorithm"><span class="header-section-number">13.2.8</span> Summary of the IPW-DiD Algorithm</a></li>
   </ul></li>
-  <li><a href="#cluster-robust-standard-errors" id="toc-cluster-robust-standard-errors" class="nav-link" data-scroll-target="#cluster-robust-standard-errors"><span class="header-section-number">13.3</span> Cluster-Robust Standard Errors</a>
+  <li><a href="#dynamic-did-and-event-studies" id="toc-dynamic-did-and-event-studies" class="nav-link" data-scroll-target="#dynamic-did-and-event-studies"><span class="header-section-number">13.3</span> Dynamic DiD and Event Studies</a>
   <ul class="collapse">
-  <li><a href="#the-problem-non-independent-observations" id="toc-the-problem-non-independent-observations" class="nav-link" data-scroll-target="#the-problem-non-independent-observations"><span class="header-section-number">13.3.1</span> The Problem: Non-Independent Observations</a></li>
-  <li><a href="#visualizing-the-problem" id="toc-visualizing-the-problem" class="nav-link" data-scroll-target="#visualizing-the-problem"><span class="header-section-number">13.3.2</span> Visualizing the Problem</a></li>
-  <li><a href="#simulation-the-dangers-of-ignoring-clustering" id="toc-simulation-the-dangers-of-ignoring-clustering" class="nav-link" data-scroll-target="#simulation-the-dangers-of-ignoring-clustering"><span class="header-section-number">13.3.3</span> Simulation: The Dangers of Ignoring Clustering</a></li>
-  <li><a href="#implementing-cluster-robust-standard-errors" id="toc-implementing-cluster-robust-standard-errors" class="nav-link" data-scroll-target="#implementing-cluster-robust-standard-errors"><span class="header-section-number">13.3.4</span> Implementing Cluster-Robust Standard Errors</a></li>
+  <li><a href="#why-treatment-effects-may-change-over-time" id="toc-why-treatment-effects-may-change-over-time" class="nav-link" data-scroll-target="#why-treatment-effects-may-change-over-time"><span class="header-section-number">13.3.1</span> Why Treatment Effects May Change Over Time</a></li>
+  <li><a href="#relative-time" id="toc-relative-time" class="nav-link" data-scroll-target="#relative-time"><span class="header-section-number">13.3.2</span> Relative Time</a></li>
+  <li><a href="#the-dynamic-did-model" id="toc-the-dynamic-did-model" class="nav-link" data-scroll-target="#the-dynamic-did-model"><span class="header-section-number">13.3.3</span> The Dynamic DiD Model</a></li>
+  <li><a href="#constructing-the-data-for-dynamic-did" id="toc-constructing-the-data-for-dynamic-did" class="nav-link" data-scroll-target="#constructing-the-data-for-dynamic-did"><span class="header-section-number">13.3.4</span> Constructing the Data for Dynamic DiD</a></li>
+  <li><a href="#example-environmental-policy-and-manufacturing-employment" id="toc-example-environmental-policy-and-manufacturing-employment" class="nav-link" data-scroll-target="#example-environmental-policy-and-manufacturing-employment"><span class="header-section-number">13.3.5</span> Example: Environmental Policy and Manufacturing Employment</a></li>
+  <li><a href="#estimating-the-dynamic-model" id="toc-estimating-the-dynamic-model" class="nav-link" data-scroll-target="#estimating-the-dynamic-model"><span class="header-section-number">13.3.6</span> Estimating the Dynamic Model</a></li>
+  <li><a href="#the-event-study-plot" id="toc-the-event-study-plot" class="nav-link" data-scroll-target="#the-event-study-plot"><span class="header-section-number">13.3.7</span> The Event Study Plot</a></li>
+  <li><a href="#interpreting-the-event-study" id="toc-interpreting-the-event-study" class="nav-link" data-scroll-target="#interpreting-the-event-study"><span class="header-section-number">13.3.8</span> Interpreting the Event Study</a></li>
+  <li><a href="#a-note-on-staggered-adoption" id="toc-a-note-on-staggered-adoption" class="nav-link" data-scroll-target="#a-note-on-staggered-adoption"><span class="header-section-number">13.3.9</span> A Note on Staggered Adoption</a></li>
   </ul></li>
-  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">13.4</span> Summary</a></li>
-  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">13.5</span> Check Your Understanding</a></li>
+  <li><a href="#cluster-robust-standard-errors" id="toc-cluster-robust-standard-errors" class="nav-link" data-scroll-target="#cluster-robust-standard-errors"><span class="header-section-number">13.4</span> Cluster-Robust Standard Errors</a>
+  <ul class="collapse">
+  <li><a href="#the-problem-non-independent-observations" id="toc-the-problem-non-independent-observations" class="nav-link" data-scroll-target="#the-problem-non-independent-observations"><span class="header-section-number">13.4.1</span> The Problem: Non-Independent Observations</a></li>
+  <li><a href="#an-intuitive-example" id="toc-an-intuitive-example" class="nav-link" data-scroll-target="#an-intuitive-example"><span class="header-section-number">13.4.2</span> An Intuitive Example</a></li>
+  <li><a href="#what-is-a-cluster" id="toc-what-is-a-cluster" class="nav-link" data-scroll-target="#what-is-a-cluster"><span class="header-section-number">13.4.3</span> What Is a “Cluster”?</a></li>
+  <li><a href="#visualizing-clustered-data" id="toc-visualizing-clustered-data" class="nav-link" data-scroll-target="#visualizing-clustered-data"><span class="header-section-number">13.4.4</span> Visualizing Clustered Data</a></li>
+  <li><a href="#the-statistical-violation" id="toc-the-statistical-violation" class="nav-link" data-scroll-target="#the-statistical-violation"><span class="header-section-number">13.4.5</span> The Statistical Violation</a></li>
+  <li><a href="#simulation-type-i-error-rates-with-and-without-clustering" id="toc-simulation-type-i-error-rates-with-and-without-clustering" class="nav-link" data-scroll-target="#simulation-type-i-error-rates-with-and-without-clustering"><span class="header-section-number">13.4.6</span> Simulation: Type I Error Rates With and Without Clustering</a></li>
+  <li><a href="#how-cluster-robust-standard-errors-work" id="toc-how-cluster-robust-standard-errors-work" class="nav-link" data-scroll-target="#how-cluster-robust-standard-errors-work"><span class="header-section-number">13.4.7</span> How Cluster-Robust Standard Errors Work</a></li>
+  <li><a href="#implementing-cluster-robust-standard-errors-in-r" id="toc-implementing-cluster-robust-standard-errors-in-r" class="nav-link" data-scroll-target="#implementing-cluster-robust-standard-errors-in-r"><span class="header-section-number">13.4.8</span> Implementing Cluster-Robust Standard Errors in R</a></li>
+  <li><a href="#choosing-the-right-cluster-level" id="toc-choosing-the-right-cluster-level" class="nav-link" data-scroll-target="#choosing-the-right-cluster-level"><span class="header-section-number">13.4.9</span> Choosing the Right Cluster Level</a></li>
+  </ul></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">13.5</span> Summary</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">13.6</span> Check Your Understanding</a></li>
   </ul>
 </nav>
     </div>
@@ -501,25 +518,61 @@ function checkAnswer(selectElement, correctValue) {
 <div id="callout-2" class="callout-2-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ul>
-<li>TBD</li>
+<li>Cunningham, <em>Causal Inference: The Mixtape</em>, Chapter 9 (Difference-in-Differences)</li>
+<li>Angrist and Pischke, <em>Mostly Harmless Econometrics</em>, Chapter 5</li>
+<li>Abadie, Alberto (2005). “Semiparametric Difference-in-Differences Estimators.” <em>Review of Economic Studies</em> 72(1): 1-19.</li>
+<li>Callaway, Brantly and Pedro H.C. Sant’Anna (2021). “Difference-in-Differences with Multiple Time Periods.” <em>Journal of Econometrics</em> 225(2): 200-230.</li>
 </ul>
 </div>
 </div>
 </div>
-<p>The basic difference-in-differences framework is powerful, but real-world applications often require more sophisticated tools. This chapter covers three important extensions: <strong>data-driven control selection</strong> using propensity scores, <strong>dynamic DiD</strong> for effects that evolve over time, and <strong>cluster-robust standard errors</strong> for proper inference with grouped data.</p>
-<section id="data-driven-control-selection" class="level2" data-number="13.1">
-<h2 data-number="13.1" class="anchored" data-anchor-id="data-driven-control-selection"><span class="header-section-number">13.1</span> Data-Driven Control Selection</h2>
-<section id="the-problem-systematically-different-treatment-and-control-groups" class="level3" data-number="13.1.1">
-<h3 data-number="13.1.1" class="anchored" data-anchor-id="the-problem-systematically-different-treatment-and-control-groups"><span class="header-section-number">13.1.1</span> The Problem: Systematically Different Treatment and Control Groups</h3>
-<p>In the previous chapter, we emphasized that your DiD estimate is only as good as your counterfactual. When treated and control groups are systematically different, the parallel trends assumption becomes implausible.</p>
-<p>Consider estimating the effect of the Affordable Care Act (ACA) Medicaid expansion on uninsured rates. States that expanded Medicaid are very different from states that didn’t: they tend to be more politically liberal, have different demographics, different industries, and different baseline health care systems.</p>
-<p>Using all non-expanding states as controls produces biased estimates because these states were on different trajectories <em>even before</em> the policy.</p>
+<p>The basic difference-in-differences framework from <a href="did.html" class="quarto-xref"><span>Chapter 12</span></a> gets us a long way, but real-world applications often demand more sophisticated tools. In that chapter, we assumed that our treated and control groups were already on parallel paths before the policy—an assumption that rarely holds without effort on the part of the researcher. We also estimated a single, constant treatment effect across all post-treatment periods, when in practice, the impact of a policy often grows, shrinks, or shifts as time passes.</p>
+<p>This chapter tackles three important extensions to the basic DiD framework. First, we discuss how researchers <strong>choose good control groups</strong>, both through institutional knowledge and through data-driven methods like propensity score weighting. Second, we introduce <strong>dynamic DiD and event studies</strong>, which let treatment effects vary over time and provide a visual test for pre-trends. Finally, we cover <strong>cluster-robust standard errors</strong>, which fix a common inferential problem in panel data that can badly inflate Type I error rates.</p>
+<section id="choosing-good-controls" class="level2" data-number="13.1">
+<h2 data-number="13.1" class="anchored" data-anchor-id="choosing-good-controls"><span class="header-section-number">13.1</span> Choosing Good Controls</h2>
+<section id="why-control-selection-matters" class="level3" data-number="13.1.1">
+<h3 data-number="13.1.1" class="anchored" data-anchor-id="why-control-selection-matters"><span class="header-section-number">13.1.1</span> Why Control Selection Matters</h3>
+<p>As we discussed in the previous chapter, a DiD estimate is only as credible as the counterfactual it relies on. The whole enterprise rests on the parallel trends assumption: in the absence of treatment, the treated units would have followed the same trajectory as the control units. If the control group is on a fundamentally different path, your DiD estimate picks up those diverging trends and attributes them—incorrectly—to the policy.</p>
+<p>The chain of logic is simple:</p>
+<ul>
+<li><strong>Good controls</strong> <span class="math inline">\(\rightarrow\)</span> <strong>Good counterfactual</strong> <span class="math inline">\(\rightarrow\)</span> <strong>Credible DiD estimate</strong></li>
+<li><strong>Bad controls</strong> <span class="math inline">\(\rightarrow\)</span> <strong>Bad counterfactual</strong> <span class="math inline">\(\rightarrow\)</span> <strong>Biased DiD estimate</strong></li>
+</ul>
+<p>So how do researchers go about choosing good controls? There are broadly two approaches: selecting controls based on institutional knowledge, and selecting controls using statistical methods.</p>
+</section>
+<section id="method-1-intuitive-selection-based-on-institutional-knowledge" class="level3" data-number="13.1.2">
+<h3 data-number="13.1.2" class="anchored" data-anchor-id="method-1-intuitive-selection-based-on-institutional-knowledge"><span class="header-section-number">13.1.2</span> Method 1: Intuitive Selection Based on Institutional Knowledge</h3>
+<p>The most traditional approach is to choose controls based on what you know about the institutional setting. The researcher identifies comparison units that, for reasons grounded in the context of the problem, should have been on similar trajectories to the treated units.</p>
+<p>A classic example is the <strong>border discontinuity design</strong>. Imagine two counties that sit right next to each other, straddling a state border. The people who live in these counties shop at the same stores, watch the same local news, face the same weather patterns, and work in the same labor markets. They are, for most purposes, very similar—except that they are governed by different state legislatures. When one state changes a policy and the other does not, the untreated county just across the border is a natural control.</p>
+<p>Card and Krueger (1994) used exactly this logic to study New Jersey’s 1992 minimum wage increase. They compared fast-food employment in New Jersey counties to employment in adjacent Pennsylvania counties. The idea is that restaurants on either side of the border faced the same local economic conditions, so any divergence in employment after the minimum wage hike could be attributed to the policy itself.</p>
+<p>Dube, Lester, and Reich (2010) extended this idea to <em>all</em> contiguous county pairs along state borders where the two states had different minimum wages. Rather than relying on a single natural experiment, they exploited hundreds of such pairs simultaneously, greatly increasing statistical power while maintaining the logic that neighboring counties are good controls for one another.</p>
+<p>This approach works well when the institutional setting provides a clear reason why certain untreated units should track treated units. But it requires detailed knowledge of the specific context, and it is not always possible to find such “natural” comparison groups.</p>
+</section>
+<section id="method-2-data-driven-control-selection" class="level3" data-number="13.1.3">
+<h3 data-number="13.1.3" class="anchored" data-anchor-id="method-2-data-driven-control-selection"><span class="header-section-number">13.1.3</span> Method 2: Data-Driven Control Selection</h3>
+<p>An alternative is to let the data guide the choice of controls. The idea is to use an algorithm to find untreated units that are similar to treated units based on observable characteristics. The hope is that if units share observable traits, they are also similar on the unobservable factors that drive trends in the outcome.</p>
+<p>There are many data-driven methods for selecting controls: synthetic controls (which construct a weighted combination of untreated units to match the treated unit’s pre-treatment trajectory), nearest-neighbor matching (which pairs each treated unit with the most similar untreated unit), and propensity score methods (which reweight the control group based on predicted probability of treatment). All share the same goal—building a better counterfactual using data—but they differ in how they define “similar.”</p>
+<p>We will focus on one method that combines naturally with the TWFE framework: <strong>Inverse Propensity Score Weighted DiD (IPW-DiD)</strong>.</p>
+</section>
+</section>
+<section id="ipw-did-propensity-score-weighting" class="level2" data-number="13.2">
+<h2 data-number="13.2" class="anchored" data-anchor-id="ipw-did-propensity-score-weighting"><span class="header-section-number">13.2</span> IPW-DiD: Propensity Score Weighting</h2>
+<section id="setting-up-the-problem" class="level3" data-number="13.2.1">
+<h3 data-number="13.2.1" class="anchored" data-anchor-id="setting-up-the-problem"><span class="header-section-number">13.2.1</span> Setting Up the Problem</h3>
+<p>Consider estimating the effect of the Affordable Care Act (ACA) Medicaid expansion on health insurance coverage rates. In 2014, a number of states expanded Medicaid eligibility under the ACA, while others did not. A natural DiD approach would compare uninsured rates in expansion states (treated) to non-expansion states (control), before and after 2014.</p>
+<p>The TWFE DiD model would be:</p>
+<p><span class="math display">\[
+y_{it} = \beta_0 + \beta_1 D_{it} + \alpha_i + \tau_t + \mu_{it}
+\]</span></p>
+<p>where <span class="math inline">\(y_{it}\)</span> is the uninsured rate in state <span class="math inline">\(i\)</span> in year <span class="math inline">\(t\)</span>, <span class="math inline">\(D_{it}\)</span> is a treatment indicator equal to 1 in expansion states after 2014, <span class="math inline">\(\alpha_i\)</span> are state fixed effects, <span class="math inline">\(\tau_t\)</span> are year fixed effects, and <span class="math inline">\(\mu_{it}\)</span> is the error term.</p>
+<p>The problem is that states which expanded Medicaid are <em>very different</em> from states that did not. Expansion states tend to be more politically liberal, have different demographic profiles, different industry compositions, and different baseline health care systems. These are not random differences—they are systematically related to the decision to expand. And if these same characteristics also affect trends in uninsured rates, then parallel trends will fail.</p>
+<p>The figure below plots average uninsured rates over time for expansion states and all non-expansion states, using our simulated data.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-naive-trends" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-naive-trends-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;13.1: Without adjustment, treated and control states show diverging pre-trends, violating the parallel trends assumption.
+Figure&nbsp;13.1: Without adjustment, treated and control states show diverging pre-trends. The control states are declining more slowly than the treated states even before the policy begins, which violates parallel trends.
 </figcaption>
 <div aria-describedby="fig-naive-trends-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="advanced_did_files/figure-html/fig-naive-trends-1.png" class="img-fluid figure-img" width="672">
@@ -528,33 +581,38 @@ Figure&nbsp;13.1: Without adjustment, treated and control states show diverging 
 </div>
 </div>
 </div>
-<p>The figure shows that even <em>before</em> the ACA expansion in 2014, treated states had steeper downward trends in uninsured rates. This pre-existing difference would be incorrectly attributed to the policy in a naive DiD analysis.</p>
+<p>Even <em>before</em> the ACA expansion in 2014, expansion states had steeper downward trends in uninsured rates. That pre-existing divergence would be incorrectly attributed to the policy if we ran a naive DiD. The treated states were already “improving” faster—perhaps because they had more liberal politics, invested more in public health, or had demographics that were trending toward higher coverage for other reasons.</p>
+<p>Using all non-expanding states as controls gives us a bad counterfactual.</p>
 </section>
-<section id="propensity-score-weighting-the-intuition" class="level3" data-number="13.1.2">
-<h3 data-number="13.1.2" class="anchored" data-anchor-id="propensity-score-weighting-the-intuition"><span class="header-section-number">13.1.2</span> Propensity Score Weighting: The Intuition</h3>
-<p>The solution is to find control units that are <em>similar</em> to treated units. If we could compare only states that were “on the verge” of expanding but didn’t, we would have a much better counterfactual.</p>
-<p><strong>Propensity score methods</strong> formalize this intuition. The idea is:</p>
+<section id="the-intuition-behind-propensity-score-weighting" class="level3" data-number="13.2.2">
+<h3 data-number="13.2.2" class="anchored" data-anchor-id="the-intuition-behind-propensity-score-weighting"><span class="header-section-number">13.2.2</span> The Intuition Behind Propensity Score Weighting</h3>
+<p>So what can we do? One approach is to find untreated states that are <em>similar</em> to treated states—states that, based on their observable characteristics, looked like they <em>should have</em> expanded Medicaid but didn’t. The logic is straightforward: if a state had a high Democratic vote share, high poverty rates, and other features that strongly predicted expansion, yet it <em>didn’t</em> expand, then that state is probably a better counterfactual for expansion states than, say, a deep-red state that was never going to expand.</p>
+<p><strong>Propensity score methods</strong> formalize this intuition. The procedure works in three steps:</p>
 <ol type="1">
-<li>Estimate each unit’s probability of being treated based on observable characteristics</li>
-<li>Give more weight to control units that “look like” they should have been treated</li>
-<li>Use these weights in the DiD regression</li>
+<li>Estimate each state’s probability of being treated, based on observable characteristics.</li>
+<li>Give more weight to control states that “look like” they should have been treated.</li>
+<li>Use these weights in the TWFE DiD regression.</li>
 </ol>
-<p>Control units with high propensity scores (high predicted probability of treatment) but who weren’t actually treated become our primary comparison group. They’re similar to treated units on observables, making parallel trends more plausible.</p>
+<p>Control units with high propensity scores—high predicted probability of treatment—that were <em>not</em> actually treated become the primary comparison group. They are observably similar to treated units, which makes the parallel trends assumption more plausible among this reweighted comparison.</p>
 </section>
-<section id="the-ipw-did-algorithm" class="level3" data-number="13.1.3">
-<h3 data-number="13.1.3" class="anchored" data-anchor-id="the-ipw-did-algorithm"><span class="header-section-number">13.1.3</span> The IPW-DiD Algorithm</h3>
-<p><strong>Inverse Propensity Score Weighted DiD (IPW-DiD)</strong> proceeds in three steps:</p>
-<p><strong>Step 1: Estimate the Propensity Score</strong></p>
-<p>We estimate a logistic regression predicting treatment status from pre-treatment characteristics:</p>
+<section id="step-1-estimate-propensity-scores" class="level3" data-number="13.2.3">
+<h3 data-number="13.2.3" class="anchored" data-anchor-id="step-1-estimate-propensity-scores"><span class="header-section-number">13.2.3</span> Step 1: Estimate Propensity Scores</h3>
+<p>The <strong>propensity score</strong> is the predicted probability that a unit receives treatment, conditional on a set of observable characteristics. We estimate it with a logistic regression:</p>
 <p><span class="math display">\[
-P(D_i = 1 | X) = G(\beta_0 + \beta_1 X_1 + \beta_2 X_2 + ... + \beta_k X_k)
+P(D_i = 1 \mid X) = G(\beta_0 + \beta_1 X_1 + \beta_2 X_2 + \ldots + \beta_k X_k)
 \]</span></p>
-<p>where <span class="math inline">\(G()\)</span> is the logistic function and the <span class="math inline">\(X\)</span> variables are characteristics that predict treatment.</p>
-<p>For the ACA example, we might include political leaning (Democratic vote share), region, and baseline poverty rates.</p>
+<p>where <span class="math inline">\(D_i\)</span> is the treatment indicator (1 if the state expanded, 0 otherwise), <span class="math inline">\(G(\cdot)\)</span> is the logistic function, and the <span class="math inline">\(X\)</span> variables are pre-treatment characteristics that predict treatment.</p>
+<p>For the ACA expansion example, we might include:</p>
+<ul>
+<li><span class="math inline">\(X_1\)</span>: Democratic vote share (political leaning)</li>
+<li><span class="math inline">\(X_2\)</span>: Region of the country</li>
+<li><span class="math inline">\(X_3\)</span>: Baseline poverty rates</li>
+</ul>
+<p>We estimate this using only pre-treatment data (i.e., data from before 2014), because we want characteristics that predict treatment <em>assignment</em>, not characteristics that were themselves affected by the treatment.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Aggregate to state level for propensity score estimation</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Aggregate to state level using only pre-treatment data</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>state_data <span class="ot">&lt;-</span> panel_data <span class="sc">|&gt;</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(post <span class="sc">==</span> <span class="dv">0</span>) <span class="sc">|&gt;</span>  <span class="co"># Use only pre-treatment data</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(post <span class="sc">==</span> <span class="dv">0</span>) <span class="sc">|&gt;</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(state_id, is_expanded) <span class="sc">|&gt;</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">dem_share =</span> <span class="fu">mean</span>(X1),</span>
@@ -568,20 +626,74 @@ P(D_i = 1 | X) = G(\beta_0 + \beta_1 X_1 + \beta_2 X_2 + ... + \beta_k X_k)
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>                <span class="at">data =</span> state_data,</span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>                <span class="at">family =</span> <span class="fu">binomial</span>(<span class="st">"logit"</span>))</span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Get predicted probabilities</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Get predicted probabilities (the propensity scores)</span></span>
 <span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>state_data <span class="ot">&lt;-</span> state_data <span class="sc">|&gt;</span></span>
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">ps_score =</span> <span class="fu">predict</span>(ps_model, <span class="at">type =</span> <span class="st">"response"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p><strong>Step 2: Calculate IPW Weights</strong></p>
-<p>The inverse propensity weights are:</p>
+</section>
+<section id="step-2-calculate-inverse-propensity-weights" class="level3" data-number="13.2.4">
+<h3 data-number="13.2.4" class="anchored" data-anchor-id="step-2-calculate-inverse-propensity-weights"><span class="header-section-number">13.2.4</span> Step 2: Calculate Inverse Propensity Weights</h3>
+<p>Once we have propensity scores, we compute the <strong>inverse propensity weights (IPW)</strong>. The formula is:</p>
 <p><span class="math display">\[
 IPW_i = D_i + (1 - D_i) \times \frac{\hat{P}_i}{1 - \hat{P}_i}
 \]</span></p>
+<p>What does this formula do?</p>
 <ul>
-<li>For treated units (<span class="math inline">\(D_i = 1\)</span>): weight = 1</li>
-<li>For control units (<span class="math inline">\(D_i = 0\)</span>): weight = <span class="math inline">\(\frac{\hat{P}_i}{1 - \hat{P}_i}\)</span></li>
+<li><strong>If a unit is treated</strong> (<span class="math inline">\(D_i = 1\)</span>): the weight is simply <span class="math inline">\(IPW_i = 1\)</span>. All treated units get equal weight.</li>
+<li><strong>If a unit is untreated</strong> (<span class="math inline">\(D_i = 0\)</span>): the weight is <span class="math inline">\(IPW_i = \frac{\hat{P}_i}{1 - \hat{P}_i}\)</span>.</li>
 </ul>
-<p>Control units with high propensity scores get large weights; those with low propensity scores get small weights.</p>
+<p>That second case is where the action is. The ratio <span class="math inline">\(\frac{\hat{P}_i}{1 - \hat{P}_i}\)</span> is the <em>odds</em> that the unit would have been treated. When the predicted probability is high (say, <span class="math inline">\(\hat{P}_i = 0.87\)</span>), the weight is large (<span class="math inline">\(\frac{0.87}{0.13} = 6.69\)</span>). When the predicted probability is low (say, <span class="math inline">\(\hat{P}_i = 0.16\)</span>), the weight is small (<span class="math inline">\(\frac{0.16}{0.84} = 0.19\)</span>).</p>
+<p>The bottom line: <strong>control units that look like they should have been treated get a lot of weight; control units that look nothing like treated units get very little weight.</strong></p>
+<p>A concrete example with specific states makes this clearer:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">State</th>
+<th style="text-align: center;">Treatment Status</th>
+<th style="text-align: center;"><span class="math inline">\(\hat{P}_i\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(IPW_i\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">MI</td>
+<td style="text-align: center;"><span class="math inline">\(D_i = 1\)</span> (Treated)</td>
+<td style="text-align: center;">0.91</td>
+<td style="text-align: center;">1.00</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">WI</td>
+<td style="text-align: center;"><span class="math inline">\(D_i = 0\)</span> (Control)</td>
+<td style="text-align: center;">0.87</td>
+<td style="text-align: center;">6.69</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">TX</td>
+<td style="text-align: center;"><span class="math inline">\(D_i = 0\)</span> (Control)</td>
+<td style="text-align: center;">0.16</td>
+<td style="text-align: center;">0.19</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">PA</td>
+<td style="text-align: center;"><span class="math inline">\(D_i = 0\)</span> (Control)</td>
+<td style="text-align: center;">0.79</td>
+<td style="text-align: center;">3.76</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">MA</td>
+<td style="text-align: center;"><span class="math inline">\(D_i = 1\)</span> (Treated)</td>
+<td style="text-align: center;">0.98</td>
+<td style="text-align: center;">1.00</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">LA</td>
+<td style="text-align: center;"><span class="math inline">\(D_i = 0\)</span> (Control)</td>
+<td style="text-align: center;">0.28</td>
+<td style="text-align: center;">0.38</td>
+</tr>
+</tbody>
+</table>
+<p>Wisconsin and Pennsylvania—control states with high propensity scores—get weights of 6.69 and 3.76 respectively. They will dominate the weighted control group. Texas and Louisiana—control states with low propensity scores—get weights of 0.19 and 0.38. They barely contribute to the comparison. The effect is to build a weighted control group that is observably similar to the treated group.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate IPW weights</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>state_data <span class="ot">&lt;-</span> state_data <span class="sc">|&gt;</span></span>
@@ -592,15 +704,20 @@ IPW_i = D_i + (1 - D_i) \times \frac{\hat{P}_i}{1 - \hat{P}_i}
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        )</span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Show example weights</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Show a sample of weights</span></span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>state_data <span class="sc">|&gt;</span></span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(state_id, is_expanded, ps_score, ipw) <span class="sc">|&gt;</span></span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(<span class="fu">desc</span>(ipw)) <span class="sc">|&gt;</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">head</span>(<span class="dv">8</span>) <span class="sc">|&gt;</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">2</span>, <span class="at">caption =</span> <span class="st">"Example IPW Weights"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">head</span>(<span class="dv">10</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="tbl-ipw-weights" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-ipw-weights-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;13.1: Top 10 states by IPW weight. Control states with high propensity scores receive large weights.
+</figcaption>
+<div aria-describedby="tbl-ipw-weights-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<caption>Example IPW Weights</caption>
+<table class="cell caption-top table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th style="text-align: right;">state_id</th>
@@ -658,12 +775,47 @@ IPW_i = D_i + (1 - D_i) \times \frac{\hat{P}_i}{1 - \hat{P}_i}
 <td style="text-align: right;">0.59</td>
 <td style="text-align: right;">1.41</td>
 </tr>
+<tr class="odd">
+<td style="text-align: right;">87</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.54</td>
+<td style="text-align: right;">1.15</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">152</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.53</td>
+<td style="text-align: right;">1.13</td>
+</tr>
 </tbody>
 </table>
 </div>
 </div>
-<p><strong>Step 3: Estimate Weighted TWFE</strong></p>
-<p>Finally, we estimate the standard TWFE DiD regression but using the IPW weights:</p>
+</figure>
+</div>
+</div>
+</section>
+<section id="visualizing-the-weighting" class="level3" data-number="13.2.5">
+<h3 data-number="13.2.5" class="anchored" data-anchor-id="visualizing-the-weighting"><span class="header-section-number">13.2.5</span> Visualizing the Weighting</h3>
+<p>We should also check how the propensity score distribution differs between treated and control units. We want good <strong>overlap</strong>—treated and control units should have propensity scores in the same range. If the distributions barely overlap, then there are few untreated units that resemble treated units, and IPW will rely heavily on a handful of extreme weights.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-ps-overlap" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-ps-overlap-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.2: Distribution of propensity scores by treatment status. Good overlap between the two distributions means we can find control units that resemble treated units.
+</figcaption>
+<div aria-describedby="fig-ps-overlap-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="advanced_did_files/figure-html/fig-ps-overlap-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="step-3-run-the-weighted-twfe-regression" class="level3" data-number="13.2.6">
+<h3 data-number="13.2.6" class="anchored" data-anchor-id="step-3-run-the-weighted-twfe-regression"><span class="header-section-number">13.2.6</span> Step 3: Run the Weighted TWFE Regression</h3>
+<p>Finally, we estimate the standard TWFE DiD regression, but using the IPW weights. In <code>fixest</code>, this is done by passing the weights to the <code>weights</code> argument of <code>feols()</code>:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge weights into panel data</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>panel_weighted <span class="ot">&lt;-</span> panel_data <span class="sc">|&gt;</span></span>
@@ -681,14 +833,15 @@ IPW_i = D_i + (1 - D_i) \times \frac{\hat{P}_i}{1 - \hat{P}_i}
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>                 <span class="at">data =</span> panel_weighted)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
-<section id="comparing-results" class="level3" data-number="13.1.4">
-<h3 data-number="13.1.4" class="anchored" data-anchor-id="comparing-results"><span class="header-section-number">13.1.4</span> Comparing Results</h3>
+<section id="comparing-results" class="level3" data-number="13.2.7">
+<h3 data-number="13.2.7" class="anchored" data-anchor-id="comparing-results"><span class="header-section-number">13.2.7</span> Comparing Results</h3>
+<p>Let’s see what IPW weighting does to the parallel trends picture. The figure below shows the IPW-weighted average uninsured rates for treated and control states.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-ipw-comparison" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-ipw-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;13.2: IPW weighting restores parallel pre-trends by up-weighting control units similar to treated units.
+Figure&nbsp;13.3: After IPW weighting, the control group’s pre-trends closely track the treated group’s pre-trends. Compare this to the naive comparison in the earlier figure.
 </figcaption>
 <div aria-describedby="fig-ipw-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="advanced_did_files/figure-html/fig-ipw-comparison-1.png" class="img-fluid figure-img" width="672">
@@ -697,119 +850,448 @@ Figure&nbsp;13.2: IPW weighting restores parallel pre-trends by up-weighting con
 </div>
 </div>
 </div>
-<p>The IPW-weighted trends are much more parallel in the pre-period! This gives us greater confidence in the parallel trends assumption.</p>
+<p>After reweighting, the control group tracks the treated group much more closely in the pre-treatment period. If the groups are on parallel paths before the policy, we can be more confident that the post-treatment divergence reflects the causal effect of the policy rather than pre-existing differences.</p>
+<p>Now let’s compare the actual coefficient estimates side-by-side. Recall that the true ATT in our simulated data is <span class="math inline">\(-5\)</span> percentage points.</p>
 <div class="cell">
 <div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<caption>Comparing Naive and IPW-DiD Estimates (True effect = -5)</caption>
+<div id="fig-side-by-side" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-side-by-side-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.4: Naive vs.&nbsp;IPW-weighted trends side by side. The left panel shows diverging pre-trends; the right panel shows the improvement after reweighting.
+</figcaption>
+<div aria-describedby="fig-side-by-side-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="advanced_did_files/figure-html/fig-side-by-side-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div id="tbl-ipw-comparison" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-ipw-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;13.2: The naive estimate overshoots the true effect because it attributes pre-existing trends to the policy. The IPW estimate is much closer to the truth. Note how the naive 95% confidence interval does not even contain the true effect of -5.
+</figcaption>
+<div aria-describedby="tbl-ipw-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="cell caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 45%">
+<col style="width: 10%">
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 13%">
+</colgroup>
 <thead>
 <tr class="header">
 <th style="text-align: left;">Method</th>
 <th style="text-align: right;">Estimate</th>
+<th style="text-align: right;">95% CI Lower</th>
+<th style="text-align: right;">95% CI Upper</th>
 <th style="text-align: right;">True Effect</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Naive DiD (all controls equal weight)</td>
+<td style="text-align: left;">Naive DiD (all controls, equal weight)</td>
 <td style="text-align: right;">-10.91</td>
+<td style="text-align: right;">-11.50</td>
+<td style="text-align: right;">-10.32</td>
 <td style="text-align: right;">-5</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">IPW-Weighted DiD</td>
 <td style="text-align: right;">-6.24</td>
+<td style="text-align: right;">-6.99</td>
+<td style="text-align: right;">-5.50</td>
 <td style="text-align: right;">-5</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<p>The naive estimate is substantially biased (too negative) because it attributes pre-existing trends to the policy. The IPW-weighted estimate is much closer to the true effect of -5 percentage points.</p>
+</figure>
+</div>
+</div>
+<p>The naive DiD estimate is substantially biased—it is too negative because it confounds the policy effect with the pre-existing trend differences. The IPW estimate is much closer to the true effect of <span class="math inline">\(-5\)</span> percentage points.</p>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Important</span>Key Insight
+<span class="screen-reader-only">Important</span>The IPW Estimate Is Only as Good as the Propensity Score Model
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>IPW-DiD works by reweighting the control group so that it looks more like the treatment group on observable characteristics. This makes parallel trends more plausible—but the method is only as good as your propensity score model. If important confounders are omitted, bias remains.</p>
+<p>IPW-DiD works by reweighting the control group to look more like the treatment group on observables. If you omit an important confounder from the propensity score model—something that predicts both treatment and the outcome trend—the bias remains. There is no free lunch here: the method corrects for the observable differences you model, not the ones you miss.</p>
 </div>
 </div>
 </section>
+<section id="summary-of-the-ipw-did-algorithm" class="level3" data-number="13.2.8">
+<h3 data-number="13.2.8" class="anchored" data-anchor-id="summary-of-the-ipw-did-algorithm"><span class="header-section-number">13.2.8</span> Summary of the IPW-DiD Algorithm</h3>
+<p>The full IPW-DiD procedure is:</p>
+<ol type="1">
+<li><strong>Estimate propensity scores.</strong> Run a logistic regression of treatment status on pre-treatment covariates. The predicted probabilities are the propensity scores.</li>
+<li><strong>Compute IPW weights.</strong> Treated units get weight 1. Untreated units get weight <span class="math inline">\(\hat{P}_i / (1 - \hat{P}_i)\)</span>.</li>
+<li><strong>Check overlap.</strong> Make sure the propensity score distributions for treated and control units overlap. If there are regions with no overlap, those units cannot be compared.</li>
+<li><strong>Run the weighted TWFE regression.</strong> Use the IPW weights in your standard <code>feols()</code> call.</li>
+</ol>
 </section>
-<section id="dynamic-did-and-event-studies" class="level2" data-number="13.2">
-<h2 data-number="13.2" class="anchored" data-anchor-id="dynamic-did-and-event-studies"><span class="header-section-number">13.2</span> Dynamic DiD and Event Studies</h2>
-<section id="why-treatment-effects-may-change-over-time" class="level3" data-number="13.2.1">
-<h3 data-number="13.2.1" class="anchored" data-anchor-id="why-treatment-effects-may-change-over-time"><span class="header-section-number">13.2.1</span> Why Treatment Effects May Change Over Time</h3>
-<p>The basic DiD model estimates a single treatment effect that applies to all post-treatment periods. But many policies have effects that <strong>evolve over time</strong>:</p>
+</section>
+<section id="dynamic-did-and-event-studies" class="level2" data-number="13.3">
+<h2 data-number="13.3" class="anchored" data-anchor-id="dynamic-did-and-event-studies"><span class="header-section-number">13.3</span> Dynamic DiD and Event Studies</h2>
+<section id="why-treatment-effects-may-change-over-time" class="level3" data-number="13.3.1">
+<h3 data-number="13.3.1" class="anchored" data-anchor-id="why-treatment-effects-may-change-over-time"><span class="header-section-number">13.3.1</span> Why Treatment Effects May Change Over Time</h3>
+<p>The basic TWFE DiD model estimates a single treatment effect <span class="math inline">\(\hat{\beta}\)</span> that applies to every post-treatment period equally. This is a strong restriction. In practice, many policies have effects that <strong>evolve over time</strong>:</p>
 <ul>
-<li>A job training program might have small initial effects that grow as workers gain experience</li>
-<li>A minimum wage increase might have immediate disemployment effects that fade as firms adjust</li>
-<li>An environmental regulation might have growing effects as compliance increases</li>
+<li>A job training program might have small effects initially that grow as participants gain experience and find better jobs.</li>
+<li>A minimum wage increase might cause immediate disemployment effects that fade as firms adjust their production processes.</li>
+<li>An environmental regulation might have mounting effects as firms gradually come into compliance.</li>
+<li>A public health intervention might show a burst of impact that then diminishes as the population adjusts.</li>
 </ul>
-<p><strong>Dynamic DiD</strong> allows us to estimate separate treatment effects for each time period, capturing how the policy impact unfolds.</p>
+<p>If the treatment effect is changing over time, a single coefficient averages over these different effects and may miss important dynamics. Worse, it might obscure the fact that the effect is growing, or that it peaked early and then faded.</p>
+<p><strong>Dynamic DiD</strong> (sometimes called an <strong>event study</strong>) solves this by estimating separate treatment effects for each period relative to the treatment date.</p>
 </section>
-<section id="relative-time" class="level3" data-number="13.2.2">
-<h3 data-number="13.2.2" class="anchored" data-anchor-id="relative-time"><span class="header-section-number">13.2.2</span> Relative Time</h3>
-<p>Dynamic DiD models use <strong>relative time</strong>—the number of periods since treatment occurred—rather than calendar time. If treatment occurs in 2015:</p>
+<section id="relative-time" class="level3" data-number="13.3.2">
+<h3 data-number="13.3.2" class="anchored" data-anchor-id="relative-time"><span class="header-section-number">13.3.2</span> Relative Time</h3>
+<p>Dynamic DiD models are built around <strong>relative time</strong>—the number of periods that have elapsed since the event occurred—rather than calendar time. If the policy was enacted in 2015, then:</p>
 <table class="caption-top table">
 <thead>
 <tr class="header">
 <th style="text-align: center;">Calendar Year</th>
-<th style="text-align: center;">Relative Time</th>
+<th style="text-align: center;">Relative Time (<span class="math inline">\(k\)</span>)</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td style="text-align: center;">2012</td>
-<td style="text-align: center;">-3</td>
+<td style="text-align: center;"><span class="math inline">\(-3\)</span></td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">2013</td>
-<td style="text-align: center;">-2</td>
+<td style="text-align: center;"><span class="math inline">\(-2\)</span></td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">2014</td>
-<td style="text-align: center;">-1</td>
+<td style="text-align: center;"><span class="math inline">\(-1\)</span></td>
 </tr>
 <tr class="even">
-<td style="text-align: center;">2015 (treatment)</td>
-<td style="text-align: center;">0</td>
+<td style="text-align: center;"><strong>2015</strong> (treatment)</td>
+<td style="text-align: center;"><strong>0</strong></td>
 </tr>
 <tr class="odd">
 <td style="text-align: center;">2016</td>
-<td style="text-align: center;">+1</td>
+<td style="text-align: center;"><span class="math inline">\(+1\)</span></td>
 </tr>
 <tr class="even">
 <td style="text-align: center;">2017</td>
-<td style="text-align: center;">+2</td>
+<td style="text-align: center;"><span class="math inline">\(+2\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">2018</td>
+<td style="text-align: center;"><span class="math inline">\(+3\)</span></td>
 </tr>
 </tbody>
 </table>
-<p>This framing lets us estimate effects at each distance from treatment and, crucially, test whether pre-treatment “effects” are zero (as they should be if parallel trends holds).</p>
+<p>Relative time <span class="math inline">\(k = 0\)</span> is the period in which treatment occurs. Negative values of <span class="math inline">\(k\)</span> represent the pre-treatment period; positive values represent the post-treatment period.</p>
+<p>Why frame things this way? Because it lets us estimate the treatment effect at each distance from the event. And it lets us <em>test</em> whether there were “effects” before the policy even started—which there shouldn’t be, if parallel trends holds.</p>
 </section>
-<section id="the-dynamic-did-model" class="level3" data-number="13.2.3">
-<h3 data-number="13.2.3" class="anchored" data-anchor-id="the-dynamic-did-model"><span class="header-section-number">13.2.3</span> The Dynamic DiD Model</h3>
-<p>The dynamic DiD model includes dummy variables for each relative time period:</p>
-<p><span class="math display">\[
+<section id="the-dynamic-did-model" class="level3" data-number="13.3.3">
+<h3 data-number="13.3.3" class="anchored" data-anchor-id="the-dynamic-did-model"><span class="header-section-number">13.3.3</span> The Dynamic DiD Model</h3>
+<p>The dynamic DiD model replaces the single <span class="math inline">\(D_{it}\)</span> indicator with a set of dummy variables, one for each value of relative time:</p>
+<p><span id="eq-dyn-did"><span class="math display">\[
 y_{it} = \sum_{k \neq -1} \beta_k D_{it}^k + \alpha_i + \tau_t + \mu_{it}
-\]</span></p>
-<p>where <span class="math inline">\(D_{it}^k = 1\)</span> if unit <span class="math inline">\(i\)</span> is treated and period <span class="math inline">\(t\)</span> is <span class="math inline">\(k\)</span> periods from treatment.</p>
-<p>We <strong>omit</strong> <span class="math inline">\(k = -1\)</span> (the period just before treatment) as the reference category. All coefficients are interpreted relative to this baseline.</p>
+\tag{13.1}\]</span></span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(D_{it}^k\)</span> is a dummy variable that equals 1 if unit <span class="math inline">\(i\)</span> is in the treatment group <strong>and</strong> period <span class="math inline">\(t\)</span> corresponds to relative time <span class="math inline">\(k\)</span> for that unit, and 0 otherwise.</li>
+<li><span class="math inline">\(\alpha_i\)</span> and <span class="math inline">\(\tau_t\)</span> are unit and time fixed effects, as before.</li>
+<li>We <strong>omit</strong> the dummy for <span class="math inline">\(k = -1\)</span> (the period just before treatment) as the <strong>reference category</strong>.</li>
+</ul>
+<p>Because <span class="math inline">\(k = -1\)</span> is omitted, all of the <span class="math inline">\(\hat{\beta}_k\)</span> coefficients are interpreted as the treatment effect at time <span class="math inline">\(k\)</span> <em>relative to the period just before treatment</em>.</p>
+<ul>
+<li>The <strong>pre-treatment coefficients</strong> (<span class="math inline">\(\hat{\beta}_{-2}, \hat{\beta}_{-3}, \ldots\)</span>) should all be close to zero if parallel trends holds. Why? Think about what these coefficients measure. The coefficient <span class="math inline">\(\hat{\beta}_{-3}\)</span>, for example, estimates the difference between treated and control groups at <span class="math inline">\(k = -3\)</span> relative to their difference at <span class="math inline">\(k = -1\)</span>. If both groups were on the same trajectory before the policy, then the gap between them should not have been changing in the pre-treatment period, and all of these coefficients should be near zero. If instead <span class="math inline">\(\hat{\beta}_{-3}\)</span> is large and statistically significant, it means the groups were already drifting apart three years before the policy started—an obvious warning sign that the control group was not on the same path as the treated group. In that case, we cannot credibly attribute any post-treatment divergence to the policy, because the groups were diverging anyway.</li>
+<li>The <strong>post-treatment coefficients</strong> (<span class="math inline">\(\hat{\beta}_0, \hat{\beta}_1, \hat{\beta}_2, \ldots\)</span>) trace out the causal effect of the policy over time, again relative to the baseline period.</li>
+</ul>
 </section>
-<section id="example-environmental-policy-and-manufacturing-employment" class="level3" data-number="13.2.4">
-<h3 data-number="13.2.4" class="anchored" data-anchor-id="example-environmental-policy-and-manufacturing-employment"><span class="header-section-number">13.2.4</span> Example: Environmental Policy and Manufacturing Employment</h3>
-<p>Suppose we want to estimate how an environmental regulation affects manufacturing employment in cities. We have data on 50 cities observed from 1995 to 2010, with 25 cities adopting the policy in 2005.</p>
-<p>Let’s visualize the raw trends first:</p>
+<section id="constructing-the-data-for-dynamic-did" class="level3" data-number="13.3.4">
+<h3 data-number="13.3.4" class="anchored" data-anchor-id="constructing-the-data-for-dynamic-did"><span class="header-section-number">13.3.4</span> Constructing the Data for Dynamic DiD</h3>
+<p>To estimate <a href="#eq-dyn-did" class="quarto-xref">Equation&nbsp;<span>13.1</span></a>, we need to create a set of dummy variables—one for each relative time period, interacted with treatment status. Let’s walk through the data construction with a small example.</p>
+<p>Suppose we have 4 units (2 treated, 2 control), observed from 2014 to 2018, with treatment occurring in 2016. The standard DiD dataset has a single <code>treat_post</code> column. For dynamic DiD, we replace it with a series of <code>rel_t_treat</code> dummies:</p>
+<div class="cell">
+<div id="tbl-dynamic-dummies" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-dynamic-dummies-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;13.3: Relative time treatment dummies for a simple 4-unit, 5-year panel. For treated units, exactly one dummy equals 1 in each period.
+</figcaption>
+<div aria-describedby="tbl-dynamic-dummies-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="cell caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 7%">
+<col style="width: 4%">
+<col style="width: 14%">
+<col style="width: 9%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">unit_id</th>
+<th style="text-align: right;">year</th>
+<th style="text-align: right;">treatment_group</th>
+<th style="text-align: right;">treat_post</th>
+<th style="text-align: right;">rel_t_treat_-1</th>
+<th style="text-align: right;">rel_t_treat_-2</th>
+<th style="text-align: right;">rel_t_treat_0</th>
+<th style="text-align: right;">rel_t_treat_1</th>
+<th style="text-align: right;">rel_t_treat_2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2014</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2016</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2017</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2018</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2014</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2016</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2017</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2018</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">2014</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">2016</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">2017</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">2018</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">2014</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">2015</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">2016</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">2017</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">2018</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>Notice the pattern: for treated units, exactly one of the <code>rel_t_treat</code> columns equals 1 in each period (corresponding to that period’s relative time). For control units, all the <code>rel_t_treat</code> columns are 0. When we regress the outcome on these dummies (omitting <code>rel_t_treat_-1</code>), each coefficient gives us the treatment effect at that specific distance from the policy.</p>
+</section>
+<section id="example-environmental-policy-and-manufacturing-employment" class="level3" data-number="13.3.5">
+<h3 data-number="13.3.5" class="anchored" data-anchor-id="example-environmental-policy-and-manufacturing-employment"><span class="header-section-number">13.3.5</span> Example: Environmental Policy and Manufacturing Employment</h3>
+<p>Suppose we want to estimate how an environmental regulation affects manufacturing employment in cities. We have data on 50 cities observed from 1995 to 2010. In 2005, 25 cities adopted the policy while 25 did not. The true effect in our simulation starts at <span class="math inline">\(-100\)</span> jobs in the adoption year, grows to <span class="math inline">\(-300\)</span> after one year, <span class="math inline">\(-450\)</span> after two years, and levels off at <span class="math inline">\(-500\)</span> from year three onward.</p>
+<p>Let’s start by visualizing the raw trends:</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-env-trends" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-env-trends-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;13.3: Treatment and control cities show parallel pre-trends, then diverge after the policy in 2005.
+Figure&nbsp;13.5: Before the policy in 2005, treated and control cities follow parallel paths. After 2005, treated cities experience a growing decline in manufacturing employment.
 </figcaption>
 <div aria-describedby="fig-env-trends-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="advanced_did_files/figure-html/fig-env-trends-1.png" class="img-fluid figure-img" width="672">
@@ -818,32 +1300,35 @@ Figure&nbsp;13.3: Treatment and control cities show parallel pre-trends, then di
 </div>
 </div>
 </div>
-<p>The trends are parallel before 2005, then the treated cities experience a growing decline in manufacturing employment.</p>
+<p>The trends are parallel before 2005—good news for our identifying assumption. After the policy, treated cities experience a growing decline in manufacturing employment relative to control cities.</p>
+<p>A standard (static) DiD would estimate a single average effect across all post-treatment years. But the figure suggests the effect is growing over time. Dynamic DiD lets us capture this.</p>
 </section>
-<section id="estimating-the-dynamic-model" class="level3" data-number="13.2.5">
-<h3 data-number="13.2.5" class="anchored" data-anchor-id="estimating-the-dynamic-model"><span class="header-section-number">13.2.5</span> Estimating the Dynamic Model</h3>
+<section id="estimating-the-dynamic-model" class="level3" data-number="13.3.6">
+<h3 data-number="13.3.6" class="anchored" data-anchor-id="estimating-the-dynamic-model"><span class="header-section-number">13.3.6</span> Estimating the Dynamic Model</h3>
+<p>We estimate the model by including all the relative-time dummies (except <span class="math inline">\(k = -1\)</span>) along with city and year fixed effects:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimate dynamic DiD (note: rel_t_treat_-1 is omitted as reference)</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimate dynamic DiD (rel_t_treat_-1 omitted as reference)</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>dyn_did <span class="ot">&lt;-</span> <span class="fu">feols</span>(</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    manufacturing_emp <span class="sc">~</span> <span class="st">`</span><span class="at">rel_t_treat_-10</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_-9</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_-8</span><span class="st">`</span> <span class="sc">+</span> </span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">rel_t_treat_-7</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_-6</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_-5</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_-4</span><span class="st">`</span> <span class="sc">+</span> </span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">rel_t_treat_-3</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_-2</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_0</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_1</span><span class="st">`</span> <span class="sc">+</span> </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    manufacturing_emp <span class="sc">~</span> <span class="st">`</span><span class="at">rel_t_treat_-10</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_-9</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_-8</span><span class="st">`</span> <span class="sc">+</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">rel_t_treat_-7</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_-6</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_-5</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_-4</span><span class="st">`</span> <span class="sc">+</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">rel_t_treat_-3</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_-2</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_0</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_1</span><span class="st">`</span> <span class="sc">+</span></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">rel_t_treat_2</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_3</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_4</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_5</span><span class="st">`</span> <span class="sc">|</span></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        city_id <span class="sc">+</span> year,</span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">vcov =</span> <span class="st">"HC1"</span>,</span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> env_data</span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<p>Each coefficient tells us the estimated treatment effect at that relative time, compared to the omitted period <span class="math inline">\(k = -1\)</span>.</p>
 </section>
-<section id="the-event-study-plot" class="level3" data-number="13.2.6">
-<h3 data-number="13.2.6" class="anchored" data-anchor-id="the-event-study-plot"><span class="header-section-number">13.2.6</span> The Event Study Plot</h3>
-<p>The best way to present dynamic DiD results is an <strong>event study plot</strong>. We plot each coefficient with its 95% confidence interval, with the x-axis showing relative time and a vertical line at the treatment date.</p>
+<section id="the-event-study-plot" class="level3" data-number="13.3.7">
+<h3 data-number="13.3.7" class="anchored" data-anchor-id="the-event-study-plot"><span class="header-section-number">13.3.7</span> The Event Study Plot</h3>
+<p>The standard way to present dynamic DiD results is an <strong>event study plot</strong>. We plot each estimated <span class="math inline">\(\hat{\beta}_k\)</span> coefficient along with its 95% confidence interval on the y-axis, and relative time on the x-axis. A horizontal line at zero and a vertical dashed line at the treatment date provide reference points.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-event-study" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-event-study-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;13.4: Event study plot showing treatment effects over time. Pre-treatment coefficients near zero support parallel trends; post-treatment coefficients show the growing negative effect.
+Figure&nbsp;13.6: Event study plot. Pre-treatment coefficients cluster around zero, supporting parallel trends. Post-treatment coefficients show the growing negative effect of the environmental policy, starting at about -100 in the adoption year and leveling off near -500.
 </figcaption>
 <div aria-describedby="fig-event-study-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="advanced_did_files/figure-html/fig-event-study-1.png" class="img-fluid figure-img" width="672">
@@ -853,50 +1338,115 @@ Figure&nbsp;13.4: Event study plot showing treatment effects over time. Pre-trea
 </div>
 </div>
 </section>
-<section id="interpreting-the-event-study" class="level3" data-number="13.2.7">
-<h3 data-number="13.2.7" class="anchored" data-anchor-id="interpreting-the-event-study"><span class="header-section-number">13.2.7</span> Interpreting the Event Study</h3>
-<p>The event study plot reveals several important patterns:</p>
-<ol type="1">
-<li><p><strong>Pre-treatment coefficients (k &lt; -1):</strong> These cluster around zero with confidence intervals that include zero. This is strong evidence for parallel trends—before the policy, treated and control cities were on similar trajectories.</p></li>
-<li><p><strong>Reference period (k = -1):</strong> This is normalized to zero by construction.</p></li>
-<li><p><strong>Post-treatment coefficients (k ≥ 0):</strong> These show the causal effect of the policy. The effect starts at about -100 in the adoption year and grows to about -500 by year 3, where it levels off.</p></li>
-</ol>
+<section id="interpreting-the-event-study" class="level3" data-number="13.3.8">
+<h3 data-number="13.3.8" class="anchored" data-anchor-id="interpreting-the-event-study"><span class="header-section-number">13.3.8</span> Interpreting the Event Study</h3>
+<p>Look at the event study plot. There are three regions worth discussing:</p>
+<p><strong>Pre-treatment coefficients (<span class="math inline">\(k &lt; -1\)</span>).</strong> These are all close to zero, and their 95% confidence intervals include zero. This is the key test for parallel trends. Each pre-treatment coefficient estimates how the treated-control gap at time <span class="math inline">\(k\)</span> differs from the gap at <span class="math inline">\(k = -1\)</span>. If the two groups were trending in the same direction before the policy, these differences should all be small and statistically indistinguishable from zero.</p>
+<p>Why does this work as a test? Consider what it would mean if <span class="math inline">\(\hat{\beta}_{-5}\)</span> were large and negative. That would say: “Five years before this policy was enacted, the treated cities already had lower employment relative to control cities than they did one year before the policy.” That is a <em>trend difference</em> that existed well before anyone passed a regulation. If such pre-treatment gaps exist, we have no way to know whether the post-treatment gaps are caused by the policy or are just a continuation of whatever was already happening. The pre-treatment coefficients are, in effect, a <strong>placebo test</strong>: we are estimating the “effect” of a policy in years when the policy did not yet exist. If we find statistically significant effects in those placebo years, something is wrong with our control group.</p>
+<p>In our example, the pre-treatment coefficients are all small and bounce around zero with no discernible pattern. This is reassuring—it suggests that before the regulation, treated and control cities were on parallel paths.</p>
+<p><strong>The reference period (<span class="math inline">\(k = -1\)</span>).</strong> This is zero by construction, since it is the omitted category. All other coefficients are measured relative to this period.</p>
+<p><strong>Post-treatment coefficients (<span class="math inline">\(k \geq 0\)</span>).</strong> These trace out the causal effect of the policy over time. The effect starts at about <span class="math inline">\(-100\)</span> in the adoption year (<span class="math inline">\(k = 0\)</span>), grows to roughly <span class="math inline">\(-300\)</span> at <span class="math inline">\(k = 1\)</span>, reaches about <span class="math inline">\(-450\)</span> at <span class="math inline">\(k = 2\)</span>, and levels off near <span class="math inline">\(-500\)</span> from <span class="math inline">\(k = 3\)</span> onward. This matches the true effects we built into the simulation: the regulation reduced manufacturing employment, and the effect grew over several years before stabilizing.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Why Pre-Trends Matter
+<span class="screen-reader-only">Note</span>Pre-Trends as a Diagnostic
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The pre-treatment coefficients serve as a <strong>placebo test</strong>. If we found large, significant “effects” before the policy was implemented, that would suggest our control group is invalid—the groups were already diverging for reasons unrelated to the treatment.</p>
+<p>The pre-treatment coefficients are the most important part of an event study for judging whether a DiD design is credible. If you see large, statistically significant estimates before the policy was implemented, it means the treated and control groups were already diverging for reasons unrelated to the treatment. Any post-treatment divergence could just be a continuation of those pre-existing trends, and the DiD estimate cannot be trusted.</p>
+<p>Note that <em>failing</em> to find significant pre-trends does not <em>prove</em> parallel trends holds—we might just lack the statistical power to detect a violation, or the violation could start right at the treatment date. But finding flat pre-treatment coefficients is a necessary (if not sufficient) condition for a credible DiD design.</p>
+</div>
+</div>
+</section>
+<section id="a-note-on-staggered-adoption" class="level3" data-number="13.3.9">
+<h3 data-number="13.3.9" class="anchored" data-anchor-id="a-note-on-staggered-adoption"><span class="header-section-number">13.3.9</span> A Note on Staggered Adoption</h3>
+<p>Our environmental policy example is a “simple” case: all 25 treated cities adopted the policy in the same year (2005). This is called <strong>simultaneous adoption</strong>. But many real-world policies are adopted at different times by different units—some states raise their minimum wage in 2015, others in 2017, and still others in 2020. This is called <strong>staggered adoption</strong>.</p>
+<p>The standard TWFE dynamic DiD model can produce seriously biased estimates under staggered adoption. The problem, documented in a series of influential papers by Goodman-Bacon (2021), Callaway and Sant’Anna (2021), Sun and Abraham (2021), and others, arises because the TWFE estimator implicitly uses already-treated units as controls for later-treated units, which can create “negative weights” on some treatment effects.</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Staggered Adoption Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If units in your study are treated at different times, the simple TWFE estimator described here can be severely biased. You should use one of the newer estimators designed for staggered adoption (e.g., the Callaway-Sant’Anna estimator, implemented in the <code>did</code> R package, or the Sun-Abraham estimator). The details of these methods are beyond the scope of this chapter, but you should be aware that this is an active and important area of research.</p>
 </div>
 </div>
 </section>
 </section>
-<section id="cluster-robust-standard-errors" class="level2" data-number="13.3">
-<h2 data-number="13.3" class="anchored" data-anchor-id="cluster-robust-standard-errors"><span class="header-section-number">13.3</span> Cluster-Robust Standard Errors</h2>
-<section id="the-problem-non-independent-observations" class="level3" data-number="13.3.1">
-<h3 data-number="13.3.1" class="anchored" data-anchor-id="the-problem-non-independent-observations"><span class="header-section-number">13.3.1</span> The Problem: Non-Independent Observations</h3>
-<p>Standard OLS assumes observations are independent. But in panel data, observations from the same unit across time are often correlated. Students in the same classroom share a teacher; workers in the same firm share management; residents of the same state share policies.</p>
-<p>When errors are <strong>correlated within clusters</strong>, standard errors from regular OLS are too small. This leads to:</p>
+<section id="cluster-robust-standard-errors" class="level2" data-number="13.4">
+<h2 data-number="13.4" class="anchored" data-anchor-id="cluster-robust-standard-errors"><span class="header-section-number">13.4</span> Cluster-Robust Standard Errors</h2>
+<section id="the-problem-non-independent-observations" class="level3" data-number="13.4.1">
+<h3 data-number="13.4.1" class="anchored" data-anchor-id="the-problem-non-independent-observations"><span class="header-section-number">13.4.1</span> The Problem: Non-Independent Observations</h3>
+<p>Everything we have discussed so far concerns getting the <em>point estimate</em> right—ensuring that <span class="math inline">\(\hat{\beta}\)</span> is close to the true <span class="math inline">\(\beta\)</span>. But a point estimate without a measure of uncertainty is not very useful. We also need our standard errors, p-values, and confidence intervals to be correct.</p>
+<p>Standard OLS assumes that observations are <em>independent</em>. But in panel data, this assumption is almost always violated. Observations from the same unit across time are correlated: if a state has a high uninsured rate in 2012, it probably has a high uninsured rate in 2013 too. Students in the same classroom share a teacher, a curriculum, and a socioeconomic neighborhood. Workers at the same firm share management quality and corporate culture.</p>
+<p>When errors are <strong>correlated within groups</strong> (or “clusters”), standard OLS standard errors are wrong. They are typically <em>too small</em>, which means:</p>
 <ul>
-<li>T-statistics that are too large</li>
-<li>P-values that are too small</li>
-<li>Confidence intervals that are too narrow</li>
-<li><strong>Too many false positives</strong> (Type I errors)</li>
+<li>T-statistics are too large.</li>
+<li>P-values are too small.</li>
+<li>Confidence intervals are too narrow.</li>
+<li>You commit <strong>Type I errors</strong> (false positives) far more often than you think.</li>
 </ul>
+<p>Recall that a <strong>Type I error</strong> is when you reject the null hypothesis even though it is actually true—you conclude that a policy had an effect when it really did not. We usually set our significance level at <span class="math inline">\(\alpha = 0.05\)</span>, meaning we accept a 5% false positive rate. But when you ignore clustering, your <em>actual</em> false positive rate can be 20%, 30%, or even higher, all while R happily reports a p-value below 0.05.</p>
 </section>
-<section id="visualizing-the-problem" class="level3" data-number="13.3.2">
-<h3 data-number="13.3.2" class="anchored" data-anchor-id="visualizing-the-problem"><span class="header-section-number">13.3.2</span> Visualizing the Problem</h3>
+<section id="an-intuitive-example" class="level3" data-number="13.4.2">
+<h3 data-number="13.4.2" class="anchored" data-anchor-id="an-intuitive-example"><span class="header-section-number">13.4.2</span> An Intuitive Example</h3>
+<p>Here is a simple way to think about the problem. Imagine you want to estimate the average height of 5th graders in a city. You have two sampling plans:</p>
+<p><strong>Plan A (Simple Random Sample):</strong> Randomly select 1,000 students from across the entire city.</p>
+<p><strong>Plan B (Cluster Sample):</strong> Randomly select 40 classrooms, and measure all 25 students in each classroom.</p>
+<p>Both plans give you <span class="math inline">\(N = 1{,}000\)</span> observations. But they are not equally informative. In Plan B, students within the same classroom tend to be similar—they share a teacher, a neighborhood, and often a socioeconomic background. Measuring 25 students from the same classroom gives you much less new information than measuring 25 students drawn independently from across the city. The 25 students are not 25 independent data points; they are more like one and a half data points (exaggerating slightly to make the point).</p>
+<p>If you compute a standard error pretending that all 1,000 observations are independent, you will badly understate the true sampling uncertainty. Your confidence interval will be far too narrow.</p>
+</section>
+<section id="what-is-a-cluster" class="level3" data-number="13.4.3">
+<h3 data-number="13.4.3" class="anchored" data-anchor-id="what-is-a-cluster"><span class="header-section-number">13.4.3</span> What Is a “Cluster”?</h3>
+<p>A <strong>cluster</strong> is a group of observations where errors are likely correlated within the group but independent across groups. Some common examples:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Individual Unit</th>
+<th style="text-align: center;">Natural Cluster</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">Students</td>
+<td style="text-align: center;">Classroom</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Patients</td>
+<td style="text-align: center;">Hospital</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">Workers</td>
+<td style="text-align: center;">Firm</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Counties</td>
+<td style="text-align: center;">State</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">Person-year observations</td>
+<td style="text-align: center;">Person</td>
+</tr>
+</tbody>
+</table>
+<p>In DiD settings, the most natural cluster is usually the unit at which treatment is assigned. If the policy is set at the state level, then all observations within a state (across time) form a cluster.</p>
+</section>
+<section id="visualizing-clustered-data" class="level3" data-number="13.4.4">
+<h3 data-number="13.4.4" class="anchored" data-anchor-id="visualizing-clustered-data"><span class="header-section-number">13.4.4</span> Visualizing Clustered Data</h3>
+<p>The figure below illustrates what clustered data looks like. Each color represents a different cluster. Notice how observations within a cluster are bunched together—they are more similar to each other than to observations in other clusters. Standard OLS treats every dot as an independent piece of information, when in reality, dots of the same color are telling you largely the same thing.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-cluster-visual" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-cluster-visual-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;13.5: With clustered data, observations within groups are correlated. Regular standard errors don’t account for this, leading to overconfidence.
+Figure&nbsp;13.7: Each color represents a cluster. Observations within a cluster are correlated—they tend to cluster around the group mean (dashed lines). Standard errors that treat all observations as independent will be too small.
 </figcaption>
 <div aria-describedby="fig-cluster-visual-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="advanced_did_files/figure-html/fig-cluster-visual-1.png" class="img-fluid figure-img" width="672">
@@ -906,15 +1456,21 @@ Figure&nbsp;13.5: With clustered data, observations within groups are correlated
 </div>
 </div>
 </section>
-<section id="simulation-the-dangers-of-ignoring-clustering" class="level3" data-number="13.3.3">
-<h3 data-number="13.3.3" class="anchored" data-anchor-id="simulation-the-dangers-of-ignoring-clustering"><span class="header-section-number">13.3.3</span> Simulation: The Dangers of Ignoring Clustering</h3>
-<p>Let’s simulate what happens when we ignore clustering. We’ll generate data where the <strong>true treatment effect is zero</strong>, so any “significant” result is a false positive.</p>
+<section id="the-statistical-violation" class="level3" data-number="13.4.5">
+<h3 data-number="13.4.5" class="anchored" data-anchor-id="the-statistical-violation"><span class="header-section-number">13.4.5</span> The Statistical Violation</h3>
+<p>Formally, this is a violation of the Gauss-Markov assumptions of random sampling and homoskedasticity. In a standard OLS model, we assume that the error terms <span class="math inline">\(\mu_i\)</span> and <span class="math inline">\(\mu_j\)</span> are uncorrelated for any two observations <span class="math inline">\(i \neq j\)</span>. With clustered data, this fails: if observation <span class="math inline">\(i\)</span> has a high error, then other observations in the same cluster probably do too.</p>
+<p>On the bright side, clustering does <strong>not</strong> bias the coefficient estimate <span class="math inline">\(\hat{\beta}\)</span>. Your point estimate is still unbiased. The problem is that it invalidates the standard error calculation, which means your inference—your t-tests, p-values, and confidence intervals—is wrong.</p>
+<p>The degree of the problem depends on the <strong>intra-cluster correlation (ICC)</strong>: the fraction of total variance in the outcome that is attributable to between-cluster differences. When the ICC is high, within-cluster observations are very similar, and the effective sample size is much smaller than the nominal sample size. When the ICC is zero (no clustering), standard OLS inference is valid.</p>
+</section>
+<section id="simulation-type-i-error-rates-with-and-without-clustering" class="level3" data-number="13.4.6">
+<h3 data-number="13.4.6" class="anchored" data-anchor-id="simulation-type-i-error-rates-with-and-without-clustering"><span class="header-section-number">13.4.6</span> Simulation: Type I Error Rates With and Without Clustering</h3>
+<p>To see how bad the Type I error problem gets, let’s run a simulation. We will generate data where the <strong>true treatment effect is exactly zero</strong>, then run 500 regressions and count how often we incorrectly reject the null hypothesis—that is, how often we commit a Type I error. If our standard errors are correct, the Type I error rate should be about 5% (since we are testing at <span class="math inline">\(\alpha = 0.05\)</span>). If the standard errors are too small because we ignored clustering, the Type I error rate will be much higher.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-cluster-sim" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-cluster-sim-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;13.6: Distribution of p-values from 500 simulations where the true effect is zero. Naive standard errors (left) produce too many small p-values; cluster-robust standard errors (right) are properly calibrated.
+Figure&nbsp;13.8: Under the null hypothesis (true effect = 0), p-values should be uniformly distributed and we should reject at most 5% of the time. With naive standard errors (left panel), the p-values pile up near zero and we reject far too often. Cluster-robust standard errors (right panel) fix the problem.
 </figcaption>
 <div aria-describedby="fig-cluster-sim-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="advanced_did_files/figure-html/fig-cluster-sim-1.png" class="img-fluid figure-img" width="672">
@@ -923,52 +1479,95 @@ Figure&nbsp;13.6: Distribution of p-values from 500 simulations where the true e
 </div>
 </div>
 </div>
-<p>The simulation shows that:</p>
+<p>The results speak for themselves:</p>
 <ul>
-<li>With <strong>naive standard errors</strong>: We reject the null 61% of the time (should be 5%)</li>
-<li>With <strong>cluster-robust standard errors</strong>: We reject 6% of the time (close to 5%)</li>
+<li>With <strong>naive standard errors</strong>: The Type I error rate is 61%. Remember, the true effect is zero, so <em>every single rejection is a false positive</em>. We are supposed to be rejecting only 5% of the time, but instead we are committing Type I errors at a rate many times higher than that.</li>
+<li>With <strong>cluster-robust standard errors</strong>: The Type I error rate is about 6%, which is close to the nominal 5% we intended.</li>
 </ul>
-<p>Ignoring clustering leads to a <strong>massive inflation of false positives</strong>!</p>
+<p>This is not a minor technical footnote. If you ignore clustering in your panel data, you will “discover” treatment effects that do not exist. You will write up results that look statistically significant but are just noise. Published papers have been called into question for exactly this reason.</p>
 </section>
-<section id="implementing-cluster-robust-standard-errors" class="level3" data-number="13.3.4">
-<h3 data-number="13.3.4" class="anchored" data-anchor-id="implementing-cluster-robust-standard-errors"><span class="header-section-number">13.3.4</span> Implementing Cluster-Robust Standard Errors</h3>
-<p>In <code>fixest</code>, cluster-robust standard errors are easy to implement using the <code>cluster</code> argument:</p>
+<section id="how-cluster-robust-standard-errors-work" class="level3" data-number="13.4.7">
+<h3 data-number="13.4.7" class="anchored" data-anchor-id="how-cluster-robust-standard-errors-work"><span class="header-section-number">13.4.7</span> How Cluster-Robust Standard Errors Work</h3>
+<p>The formula for cluster-robust standard errors is too involved for this class, but the intuition is not:</p>
+<ol type="1">
+<li>Compute the regression residuals (<span class="math inline">\(\hat{y}_i - y_i\)</span>) as usual.</li>
+<li>Instead of treating each residual as independent, <strong>sum the residuals within each cluster</strong>.</li>
+<li>Compute the variance of these cluster-level sums.</li>
+<li>Use this to construct a standard error that reflects the true amount of independent variation in the data.</li>
+</ol>
+<p>What this means in practice is that your <strong>effective sample size</strong> is closer to the number of clusters (<span class="math inline">\(G\)</span>), not the total number of observations (<span class="math inline">\(N\)</span>). In our simulation, we had <span class="math inline">\(N = 1{,}500\)</span> observations but only <span class="math inline">\(G = 50\)</span> clusters. Naive standard errors acted as if we had 1,500 independent data points. Cluster-robust standard errors recognized that we really only had about 50 independent pieces of information.</p>
+</section>
+<section id="implementing-cluster-robust-standard-errors-in-r" class="level3" data-number="13.4.8">
+<h3 data-number="13.4.8" class="anchored" data-anchor-id="implementing-cluster-robust-standard-errors-in-r"><span class="header-section-number">13.4.8</span> Implementing Cluster-Robust Standard Errors in R</h3>
+<p>With the <code>fixest</code> package, cluster-robust standard errors are easy. Instead of using <code>vcov = "HC1"</code>, use the <code>cluster</code> argument and specify the clustering variable:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Standard (naive) standard errors</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Naive (incorrect) standard errors</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>model_naive <span class="ot">&lt;-</span> <span class="fu">feols</span>(y <span class="sc">~</span> treatment <span class="sc">|</span> state <span class="sc">+</span> year,</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">vcov =</span> <span class="st">"HC1"</span>,</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">data =</span> my_data)</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Cluster-robust standard errors (clustered at state level)</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Cluster-robust standard errors (correct for state-level clustering)</span></span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>model_cluster <span class="ot">&lt;-</span> <span class="fu">feols</span>(y <span class="sc">~</span> treatment <span class="sc">|</span> state <span class="sc">+</span> year,</span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">cluster =</span> <span class="st">"state"</span>,</span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>                       <span class="at">data =</span> my_data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<p>For the ACA expansion example, since the policy is set at the state level, we cluster at the state level:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Cluster-robust standard errors for the ACA DiD</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>did_crse <span class="ot">&lt;-</span> <span class="fu">feols</span>(uninsured_rate <span class="sc">~</span> treat_active <span class="sc">|</span> state_id <span class="sc">+</span> year,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">cluster =</span> <span class="st">"state_id"</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data =</span> panel_data)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(did_crse)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>OLS estimation, Dep. Var.: uninsured_rate
+Observations: 1,800
+Fixed-effects: state_id: 200,  year: 9
+Standard-errors: Clustered (state_id) 
+             Estimate Std. Error  t value  Pr(&gt;|t|)    
+treat_active -10.9088   0.564271 -19.3325 &lt; 2.2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 2.69942     Adj. R2: 0.814526
+                Within R2: 0.460845</code></pre>
+</div>
+</div>
+<p>Notice that the coefficient is unchanged (clustering does not affect the point estimate), but the standard error is larger than it would be with naive standard errors, leading to a wider confidence interval and a larger p-value.</p>
+</section>
+<section id="choosing-the-right-cluster-level" class="level3" data-number="13.4.9">
+<h3 data-number="13.4.9" class="anchored" data-anchor-id="choosing-the-right-cluster-level"><span class="header-section-number">13.4.9</span> Choosing the Right Cluster Level</h3>
+<p>A common question is: what should I cluster on? The answer is not always obvious, and reasonable people sometimes disagree. The general rule is:</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Rule of Thumb: Cluster at the Treatment Level
+<span class="screen-reader-only">Tip</span>Rule of Thumb: Cluster at the Level of Treatment Assignment
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Cluster your standard errors at the level where treatment is assigned. If policies are set at the state level, cluster by state. If a program is implemented at the school level, cluster by school.</p>
+<p>Cluster your standard errors at the level where treatment varies. If policies are set at the state level, cluster by state. If a program is implemented at the school level, cluster by school. If an intervention targets individual patients within hospitals, you might cluster at the hospital level.</p>
 </div>
 </div>
+<p>Some additional considerations:</p>
+<ul>
+<li>You generally need a reasonable number of clusters (at least 30-50) for the cluster-robust standard errors to work well. With very few clusters, they can be unreliable.</li>
+<li>When in doubt, cluster at a broader level rather than a narrower one. Clustering at the state level when you could cluster at the county level is conservative—it gives you larger standard errors, which is the safer error.</li>
+<li>In some settings, there may be good reasons to cluster at a different level than treatment assignment (e.g., if you believe there is spatial correlation across states). But treatment-level clustering is the default starting point.</li>
+</ul>
 </section>
 </section>
-<section id="summary" class="level2" data-number="13.4">
-<h2 data-number="13.4" class="anchored" data-anchor-id="summary"><span class="header-section-number">13.4</span> Summary</h2>
-<p>This chapter covered three important extensions to basic DiD:</p>
-<p><strong>Propensity Score Weighting (IPW-DiD)</strong> improves the counterfactual by up-weighting control units that are similar to treated units. When treated and control groups differ systematically, naive DiD violates parallel trends; IPW helps restore balance. The algorithm involves estimating propensity scores, computing inverse probability weights, and using those weights in the TWFE regression.</p>
-<p><strong>Dynamic DiD and Event Studies</strong> allow treatment effects to vary over time. By estimating separate effects for each period relative to treatment, we can see whether effects grow, shrink, or remain stable. Crucially, the pre-treatment coefficients serve as a placebo test: if they’re significantly different from zero, parallel trends is violated.</p>
-<p><strong>Cluster-Robust Standard Errors</strong> correct for correlated errors within groups. When observations within clusters (states, schools, firms) are correlated, standard OLS inference is overconfident, leading to inflated false positive rates. Clustering at the treatment level provides valid inference.</p>
-<p>These tools are essential for credible DiD analysis in practice.</p>
+<section id="summary" class="level2" data-number="13.5">
+<h2 data-number="13.5" class="anchored" data-anchor-id="summary"><span class="header-section-number">13.5</span> Summary</h2>
+<p>This chapter covered three extensions to the basic DiD framework that come up constantly in applied work.</p>
+<p><strong>Choosing good controls</strong> is the foundation of any DiD analysis. Researchers can draw on institutional knowledge (border discontinuity designs, natural comparison groups) or use data-driven methods like propensity score weighting to build a better counterfactual. The key is that your control group must be on a similar trajectory to your treated group before the policy—otherwise, your estimate will be biased.</p>
+<p><strong>IPW-DiD</strong> formalizes the data-driven approach by reweighting control units based on their predicted probability of treatment. Control units that resemble treated units on observables get high weights; dissimilar controls get low weights. The method is easy to implement (logistic regression <span class="math inline">\(\rightarrow\)</span> compute weights <span class="math inline">\(\rightarrow\)</span> weighted TWFE) but only corrects for the confounders you include in the propensity score model.</p>
+<p><strong>Dynamic DiD and event studies</strong> let treatment effects vary over time and provide a built-in diagnostic for the parallel trends assumption. Pre-treatment coefficients near zero support the design; significant pre-treatment “effects” are a red flag. Event study plots are the standard way to present these results.</p>
+<p><strong>Cluster-robust standard errors</strong> correct for correlated errors within groups. Without them, standard OLS inference in panel data produces standard errors that are too small, inflating the Type I error rate far beyond the intended 5%. The fix is simple in <code>fixest</code>: use the <code>cluster</code> argument and cluster at the level of treatment assignment.</p>
 </section>
-<section id="check-your-understanding" class="level2" data-number="13.5">
-<h2 data-number="13.5" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">13.5</span> Check Your Understanding</h2>
+<section id="check-your-understanding" class="level2" data-number="13.6">
+<h2 data-number="13.6" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">13.6</span> Check Your Understanding</h2>
 <p>For each question below, select the best answer from the dropdown menu.</p>
 <div class="question">
 <div class="answer-row">
@@ -983,7 +1582,7 @@ Figure&nbsp;13.6: Distribution of p-values from 500 simulations where the true e
 </div>
 
 <div class="answer-row">
-    <label>ii. Why do we typically omit k = -1 (the period just before treatment) in dynamic DiD? </label>
+    <label>ii. Why do we typically omit k = −1 in dynamic DiD? </label>
     <select onchange="checkAnswer(this, 'c')">
         <option value="">-- Select Answer --</option>
         <option value="a">Because there's no data for that period</option>
@@ -1027,19 +1626,19 @@ Figure&nbsp;13.6: Distribution of p-values from 500 simulations where the true e
 </div>
 
 <div class="answer-row">
-    <label>vi. <strong>(Challenge)</strong> If your event study shows significant negative "effects" at k = -3 and k = -2 (before treatment), what should you conclude? </label>
+    <label>vi. <strong>(Challenge)</strong> If your event study shows significant negative coefficients at k = -3 and k = -2, what should you conclude? </label>
     <select onchange="checkAnswer(this, 'c')">
         <option value="">-- Select Answer --</option>
         <option value="a">The treatment has anticipation effects</option>
         <option value="b">The treatment effect is very large</option>
-        <option value="c">The parallel trends assumption is likely violated; the control group may be invalid</option>
+        <option value="c">Parallel trends is likely violated; the control group may be invalid</option>
         <option value="d">You need more post-treatment periods</option>
     </select>
 </div>
 </div>
 
 <div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1048,15 +1647,15 @@ Figure&nbsp;13.6: Distribution of p-values from 500 simulations where the true e
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="i">
-<li><p>Control units with high propensity scores (high predicted probability of being treated) but who weren’t actually treated receive <strong>higher</strong> weights. The intuition is that these units are most similar to treated units on observables, making them better comparisons. The IPW formula gives them weight = P/(1-P), which increases with P.</p></li>
-<li><p>We need to omit one period to avoid perfect collinearity (similar to the dummy variable trap). We choose k = -1 because it’s the natural baseline: all treatment effect estimates are then interpreted as differences from the period immediately before treatment began.</p></li>
-<li><p>Pre-treatment coefficients should be zero if parallel trends holds—there should be no “effect” of a treatment that hasn’t happened yet. If these coefficients are significantly different from zero, it suggests treated and control groups were already diverging before the policy, violating the key identifying assumption.</p></li>
-<li><p>When observations within clusters are correlated, regular standard errors treat them as independent, underestimating the true uncertainty. This makes standard errors too small, t-statistics too large, p-values too small, and confidence intervals too narrow—leading to excessive false positives.</p></li>
-<li><p>The rule is to cluster at the level of treatment assignment. Since minimum wage policies are set at the state level, you should cluster by state. This accounts for correlation in outcomes among all workers within the same state who share the same policy environment.</p></li>
-<li><p>Significant pre-treatment effects are a red flag. They suggest the treated and control groups were on different trajectories <em>before</em> the policy—meaning any post-treatment difference could reflect these pre-existing trends rather than the causal effect of the policy. This casts serious doubt on the validity of the control group and the DiD estimate.</p></li>
+<li><p>Control units with high propensity scores (high predicted probability of being treated) but who weren’t actually treated receive <strong>higher</strong> weights. The IPW formula gives them weight <span class="math inline">\(= \hat{P}/(1-\hat{P})\)</span>, which increases as <span class="math inline">\(\hat{P}\)</span> gets larger. The intuition is that these units are most similar to treated units on observables, making them better comparisons.</p></li>
+<li><p>We need to omit one period to avoid perfect collinearity (similar to the dummy variable trap). We choose <span class="math inline">\(k = -1\)</span> because it is the natural baseline: all other coefficients are then interpreted as the treatment effect relative to the period immediately before treatment.</p></li>
+<li><p>Pre-treatment coefficients serve as a <strong>placebo test</strong>. If we find large, statistically significant “effects” before the policy was implemented, it means treated and control groups were already diverging—contradicting the parallel trends assumption and casting doubt on the entire analysis.</p></li>
+<li><p>When observations within clusters are correlated, naive standard errors treat them as independent and underestimate the true uncertainty. This produces standard errors that are too small, t-statistics that are too large, p-values that are too small, and confidence intervals that are too narrow—leading to excessive false positives.</p></li>
+<li><p>The rule is to cluster at the level of treatment assignment. Minimum wage policies are set at the state level, so you cluster by state. This accounts for the correlation in outcomes among all workers within the same state who share the same policy environment.</p></li>
+<li><p>Significant pre-treatment effects are a major red flag. They indicate that treated and control groups were on different trajectories <em>before</em> the policy, which means any post-treatment difference could reflect pre-existing trends rather than the policy’s causal effect. This calls the entire DiD design into question, and the researcher should consider finding better controls (e.g., through IPW) or using a different identification strategy.</p></li>
 </ol>
 </div>
 </div>
