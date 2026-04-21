@@ -1,0 +1,1439 @@
+# Regression Discontinuity {#sec-rdd}
+
+```{r}
+#| echo: false
+#| output: false
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(fixest)
+library(modelsummary)
+library(rdrobust)
+library(patchwork)
+
+options(scipen = 999)
+
+theme_set(theme_minimal(base_size = 12) +
+          theme(plot.title = element_text(face = "bold", size = 14),
+                plot.subtitle = element_text(size = 11, color = "gray40"),
+                panel.grid.minor = element_blank()))
+
+```
+
+```{=html}
+
+<style>
+.problem {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+.context {
+    background-color: #e8f4f8;
+    padding: 12px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border-left: 4px solid #2874a6;
+}
+.question {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #fff3cd;
+    border-radius: 5px;
+}
+.answer-row {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.answer-row label {
+    min-width: 320px;
+    font-weight: 500;
+}
+select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    min-width: 300px;
+    cursor: pointer;
+}
+select:focus {
+    border-color: #2874a6;
+    outline: none;
+}
+.correct {
+    border-color: #28a745 !important;
+    background-color: #d4edda !important;
+}
+.incorrect {
+    border-color: #dc3545 !important;
+    background-color: #f8d7da !important;
+}
+.explanation {
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #e7f3ff;
+    border-radius: 5px;
+    border-left: 4px solid #2874a6;
+}
+.note {
+    font-size: 0.85em;
+    color: #666;
+    font-style: italic;
+}
+</style>
+
+<script>
+function checkAnswer(selectElement, correctValue) {
+    if (selectElement.value === '') {
+        selectElement.classList.remove('correct', 'incorrect');
+    } else if (selectElement.value === correctValue) {
+        selectElement.classList.remove('incorrect');
+        selectElement.classList.add('correct');
+    } else {
+        selectElement.classList.remove('correct');
+        selectElement.classList.add('incorrect');
+    }
+}
+</script>
+
+```
+
+
+::: {.callout-tip collapse="true"}
+## **Key Questions**
+- What is a regression discontinuity (RD) design, and when can we use it?
+- How do cutoffs in the real world generate natural experiments?
+- What is a "running variable," and what role does it play?
+- What is the difference between **sharp** and **fuzzy** RD?
+- How do we choose between parametric and nonparametric RD, and what is a bandwidth?
+- How do we test whether an RD design is credible?
+:::
+
+::: {.callout-note collapse="true"}
+## **Suggested Readings**
+- Angrist & Pischke, *Mastering 'Metrics*, Chapter 4.
+- Carpenter & Dobkin (2009), "The Effect of Alcohol Consumption on Mortality: Regression Discontinuity Evidence from the Minimum Drinking Age," *American Economic Journal: Applied Economics*.
+- Abdulkadiroğlu, Angrist, & Pathak (2014), "The Elite Illusion: Achievement Effects at Boston and New York Exam Schools," *Econometrica*.
+:::
+
+
+Up to this point, we have built a toolkit of causal inference methods that rely on finding variation in treatment that is *as good as random*.
+Randomized trials give us random assignment directly.
+Multivariate regression controls for observables.
+Fixed effects absorb time-invariant unobservables.
+Difference-in-differences uses control units to net out common trends.
+
+Each of these methods takes the same basic approach:
+find a comparison group whose outcomes plausibly resemble what the treated group *would have done* without treatment.
+The tricky part is always making a credible case that this is true.
+
+This chapter introduces one more tool---arguably the cleanest and most transparent design in the applied economist's kit---**regression discontinuity (RD)**.
+RD takes advantage of a feature of modern life that may seem, at first, to be an obstacle to causal inference:
+the many rigid rules and cutoffs that determine who gets what.
+Speed limits, age thresholds, grade cutoffs, income ceilings for benefits, geographic borders, test-score minimums, and vote shares in close elections all share a common feature:
+a **sharp change in treatment at a known cutoff**.
+As we will see,
+rigid rules that at first glance seem to eliminate randomness actually generate valuable experiments.
+
+
+## From Control Units to Cutoffs
+
+### Where RD Fits in Our Toolkit
+
+Recall from @sec-did that the difference-in-differences design relies on *control units*---a comparison group that tells us what would have happened to the treated group in the absence of treatment.
+Its credibility rests on parallel trends:
+absent treatment, treated and control outcomes would have moved together.
+
+Regression discontinuity takes a very different approach.
+Instead of comparing units across groups over time,
+it compares units **just above and just below a cutoff** on some measured variable.
+The logic is simple:
+units right next to the cutoff are almost identical in every way that matters,
+*except* that one group receives treatment and the other does not.
+If the cutoff is truly a bright line that determines treatment---and if units cannot precisely manipulate their position on either side of it---then whether you fall to the left or right of the cutoff is essentially a coin flip.
+
+::: {.callout-note}
+## Regression Discontinuity Design
+A **regression discontinuity (RD) design** estimates the causal effect of a treatment by comparing units that fall on either side of a known cutoff value of a continuous "running variable."
+Because treatment assignment changes abruptly at the cutoff while other factors change smoothly,
+the jump in outcomes at the cutoff can be interpreted as the causal effect of treatment.
+:::
+
+### Why Rigid Rules Create Experiments
+
+Human behavior is constrained by rules.
+In the United States:
+
+- The **minimum legal drinking age (MLDA)** is 21.
+  Someone who turns 21 on Tuesday has legal access to alcohol; someone who turns 21 on Wednesday does not (until Wednesday).
+- **Public school funding** often changes based on class-size thresholds.
+  A school with 40 students in a grade gets one teacher per section; a school with 41 students hires a second teacher and splits the class in half.
+- **Selective schools** admit students whose test scores exceed a cutoff but reject those just below it.
+- **Means-tested programs** like Medicaid and SNAP provide benefits to families below an income threshold and not to families above it.
+- In **close elections**, the candidate with 50.01% of the vote takes office while the candidate with 49.99% does not.
+
+In each case, a small change in the relevant variable---a few days of age, a percent of the vote, a single test-score point---flips a binary treatment on or off.
+This is the signature of an RD design.
+
+### Why This Is a Natural Experiment
+
+Consider someone who turns 21 tomorrow versus someone who turned 21 yesterday.
+Over a two-day interval, they are nearly indistinguishable in terms of physical maturity, social environment, and life experience.
+The *only* meaningful difference between them is that one is legally allowed to walk into a bar and the other is not.
+
+If we were designing the ideal experiment to measure the effect of legal alcohol access,
+we could not do much better than this.
+A true RCT on drinking would be unethical and impossible to implement.
+But the MLDA has, in effect, run exactly such an experiment---for decades, on a massive scale, across the entire country.
+The only challenge is that the "treatment group" (age $\geq$ 21) and "control group" (age < 21) differ in one obvious way:
+*age itself*.
+As we will see, managing this complication is the central methodological challenge of RD.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-rd-intuition
+#| fig-cap: "The core intuition of RD: units just above and just below a cutoff are nearly identical in every way except treatment status. The jump in outcomes at the cutoff reveals the causal effect."
+
+set.seed(1)
+n <- 300
+x <- runif(n, 0, 100)
+d <- as.numeric(x >= 50)
+y <- 30 + 0.5 * x + 8 * d + rnorm(n, 0, 4)
+
+rd_intuition <- tibble(x = x, y = y, d = factor(d, labels = c("Untreated", "Treated")))
+
+ggplot(rd_intuition, aes(x = x, y = y, color = d)) +
+  geom_point(alpha = 0.5, size = 1.8) +
+  geom_smooth(aes(group = d), method = "lm", se = FALSE, linewidth = 1.2) +
+  geom_vline(xintercept = 50, linetype = "dashed", color = "black") +
+  annotate("segment", x = 50, xend = 50, y = 55, yend = 63,
+           arrow = arrow(type = "closed", length = unit(0.2, "cm"), ends = "both"),
+           color = "#e7298a", linewidth = 1) +
+  annotate("text", x = 52, y = 59, label = "Causal\neffect", hjust = 0,
+           color = "#e7298a", size = 4.5) +
+  annotate("text", x = 50, y = 95, label = "Cutoff", hjust = -0.1, size = 4) +
+  scale_color_manual(values = c("Untreated" = "grey50", "Treated" = "#0072B2")) +
+  labs(x = "Running Variable (X)", y = "Outcome (Y)", color = "") +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom")
+```
+
+@fig-rd-intuition shows the core idea.
+The running variable $X$ could be an age, a test score, a vote share, or an income threshold.
+Below the cutoff, we observe only untreated units (grey).
+Above the cutoff, we observe only treated units (blue).
+Both groups follow smooth trends in $X$,
+but at the cutoff there is a sudden jump in the outcome.
+This jump *is* the causal effect.
+
+
+## The Minimum Drinking Age
+
+### Birthdays and Funerals
+
+Our path into RD follows Carpenter and Dobkin's (2009) classic study of the minimum legal drinking age,
+which Angrist and Pischke use as the flagship example in their Chapter 4.
+
+The American MLDA is 21.
+Critics of this rule---including college presidents who have signed on to the Amethyst Initiative---argue that a lower drinking age would promote responsible, moderate alcohol consumption and reduce dangerous binge drinking.
+Proponents counter that the MLDA, blunt as it is, saves lives by restricting young people's access to alcohol.
+Who is right?
+
+This is a hard question to answer.
+We cannot randomly assign legal drinking access to some 21-year-olds and not others.
+We cannot persuade a state to randomize the MLDA at the individual level for research purposes.
+And simple before-and-after comparisons are contaminated by all sorts of developmental trends as young people mature.
+
+Fortunately, the MLDA itself generates a natural experiment.
+On the day a young person turns 21, her legal access to alcohol changes instantly.
+Her physical, emotional, and cognitive maturity has not changed appreciably---she is, biologically speaking, the same person she was yesterday.
+But the law sees her differently.
+
+Carpenter and Dobkin compared death rates for young people just below age 21 to those just above.
+Their findings echo Animal House:
+there is a striking and persistent increase in mortality at the 21st birthday,
+driven primarily by motor vehicle accidents, suicides, and other alcohol-related deaths.
+
+### A First Look at the Data
+
+To build intuition, let's simulate data that mirrors the patterns Carpenter and Dobkin documented.
+We will work with death rates by month of age (a 30-day interval) from age 19 to age 23,
+which is the window in AP Table 4.1.
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+set.seed(2025)
+
+# Create simulated data mirroring Carpenter & Dobkin (2009)
+mlda_data <- tibble(
+    # Month of age, centered at 21st birthday (0 = 21st birthday)
+    months = seq(-24, 23, by = 1)
+) |>
+    mutate(
+        age = 21 + months / 12,
+        # Legal drinking treatment dummy
+        over21 = as.numeric(months >= 0),
+        # True data-generating process:
+        # - slight downward trend in death rates with age
+        # - jump of 7.7 per 100,000 at the 21 cutoff (AP Table 4.1, Col 1)
+        # - small amount of noise
+        death_rate = 95 - 0.15 * months + 7.7 * over21 + rnorm(n(), 0, 2.0)
+    )
+
+head(mlda_data)
+```
+
+Here, `months` is the running variable---time in months relative to the 21st birthday.
+The variable `over21` is the **treatment indicator**,
+equal to 1 on or after the birthday and 0 before.
+The outcome `death_rate` is deaths per 100,000 per year.
+
+Let's plot it:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| label: fig-mlda-raw
+#| fig-cap: "Simulated death rates by month of age, in the style of Carpenter and Dobkin (2009). Each dot is one monthly interval. The vertical line at zero marks the 21st birthday."
+
+ggplot(mlda_data, aes(x = months, y = death_rate,
+                      color = factor(over21))) +
+    geom_point(size = 2.5, alpha = 0.8) +
+    geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+    scale_color_manual(values = c("0" = "grey50", "1" = "#0072B2"),
+                       labels = c("Under 21", "Over 21")) +
+    annotate("text", x = 0, y = 103, label = "MLDA cutoff",
+             hjust = -0.05, size = 3.5) +
+    labs(x = "Age in Months (0 = 21st birthday)",
+         y = "Death Rate per 100,000",
+         color = "") +
+    theme_minimal(base_size = 13) +
+    theme(legend.position = "bottom")
+```
+
+Eyeballing @fig-mlda-raw,
+there is a visible upward shift in death rates when the running variable crosses zero.
+Death rates below the cutoff cluster around 95;
+rates above the cutoff look noticeably higher.
+The goal of RD is to put a number on this visual pattern.
+
+
+## The Sharp RD Setup
+
+### Running Variables and Treatment Rules
+
+The MLDA gives us a clean example of a **sharp RD design**, where treatment status is a deterministic, discontinuous function of a running variable.
+
+Let $a$ denote age and $D_a$ denote the treatment indicator for legal drinking:
+
+$$
+D_a = \begin{cases} 1 & \text{if } a \geq 21 \\ 0 & \text{if } a < 21 \end{cases}
+$$ {#eq-sharp-rd-treatment}
+
+Two features of this setup matter:
+
+1. **Deterministic assignment.** Once we know a person's age, we know their treatment status with certainty. There is no randomness in the assignment rule.
+2. **Discontinuous assignment.** No matter how close age gets to 21, $D_a$ does not change until age actually crosses 21.
+
+::: {.callout-note}
+## Key RD Vocabulary
+- The **running variable** (also called the *forcing variable* or *score*) is the continuous variable whose value determines treatment. In the MLDA example, it is age.
+- The **cutoff** (also called the *threshold*) is the value of the running variable at which treatment status changes. In the MLDA example, the cutoff is 21.
+- **Sharp RD** describes designs where treatment status is a deterministic function of the running variable, jumping cleanly from 0 to 1 (or vice versa) at the cutoff.
+- **Fuzzy RD** describes designs where the *probability* or *intensity* of treatment jumps at the cutoff, but treatment itself is not a perfect function of the running variable. We will take this up later.
+:::
+
+### Why RD Is Different from Regression Control
+
+It is tempting to think of RD as "just regression with a dummy for being over the cutoff."
+Mechanically, that is what we will do.
+Conceptually, however, RD is quite different from the kind of regression adjustment we did in @sec-multivariate.
+
+In multivariate OLS,
+we compare treated and control units *at the same values of the controls*,
+hoping that after conditioning we are comparing apples to apples.
+In RD, there is **no** overlapping region.
+There is no age at which we observe both 20-year-olds with legal access to alcohol and 21-year-olds without it.
+Every unit below the cutoff is untreated, and every unit above it is treated.
+
+This means the validity of RD rests on a willingness to **extrapolate**---but only a tiny distance,
+across the cutoff.
+We need to believe that, had the MLDA not existed,
+the relationship between age and death rates would have continued smoothly through age 21.
+The jump at age 21 is the "extra" mortality caused by legal alcohol access,
+because the smooth age trend has been extrapolated from one side of the cutoff to the other.
+
+### Why RD Has No Classical Omitted Variable Bias
+
+Here is a remarkable property of sharp RD:
+*if we correctly model the relationship between the running variable and the outcome,* the design suffers no classical omitted variable bias.
+Why?
+Because treatment is a deterministic function of the running variable,
+any omitted variable that is correlated with treatment is also correlated with (a function of) the running variable.
+Controlling for the running variable adequately therefore automatically controls for every such omitted variable.
+
+This is the great strength of RD: you can explain in one or two sentences why the design is credible, and the argument is transparent enough that a skeptical reader can push back on specific steps.
+It is also the great weakness: "correctly modeling the running variable" is easier said than done, as we will see in a moment.
+
+
+## The Simple Sharp RD Regression
+
+### A Linear Model
+
+The simplest sharp RD regression uses a linear control for the running variable:
+
+$$
+Y_a = \alpha + \rho D_a + \gamma a + e_a
+$$ {#eq-rd-simple}
+
+where:
+
+- $Y_a$ is the outcome (e.g., the death rate in month of age $a$)
+- $D_a = 1$ if $a \geq a_0$ (the cutoff) and 0 otherwise
+- $a$ is the running variable (age in months)
+- $\rho$ is the **RD estimate**---the causal effect of treatment
+- $\gamma$ captures the smooth trend in outcomes as the running variable changes
+- $e_a$ is an error term
+
+The interpretation of $\rho$ is simple: it is the *vertical jump* in the fitted regression line at the cutoff.
+Holding the running variable fixed at $a_0$, the predicted outcome just below the cutoff is $\alpha + \gamma a_0$.
+Just above the cutoff, it is $\alpha + \gamma a_0 + \rho$.
+The difference is exactly $\rho$.
+
+### Estimating the Simple Model
+
+Let's estimate @eq-rd-simple on our simulated MLDA data.
+We will use `feols()` from `fixest`, with heteroskedasticity-robust standard errors:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# Simple linear RD with over-21 dummy and linear control for age
+simple_rd <- feols(death_rate ~ over21 + months,
+                   vcov = "HC1",
+                   data = mlda_data)
+
+summary(simple_rd)
+```
+
+The coefficient on `over21` is our estimate of $\rho$.
+It should be close to the true treatment effect of 7.7.
+This is very close to Carpenter and Dobkin's estimate from Table 4.1, column (1) of AP.
+
+The coefficient on `months` is the slope $\gamma$,
+capturing the smooth (mildly declining) trend in death rates as young people age.
+
+### Visualizing the RD Fit
+
+The right way to present a sharp RD result is to show the regression graphically.
+We compute fitted values from the model and overlay them on the scatter.
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| label: fig-simple-rd
+#| fig-cap: "Simple RD regression. The linear fit jumps at the cutoff; the size of the jump is our estimate of the MLDA effect on mortality."
+
+mlda_data <- mlda_data |>
+    mutate(yhat_linear = predict(simple_rd))
+
+ggplot(mlda_data, aes(x = months, y = death_rate, color = factor(over21))) +
+    geom_point(size = 2.2, alpha = 0.7) +
+    geom_line(aes(y = yhat_linear), linewidth = 1.1) +
+    geom_vline(xintercept = 0, linetype = "dashed") +
+    scale_color_manual(values = c("0" = "grey50", "1" = "#0072B2"),
+                       labels = c("Under 21", "Over 21")) +
+    annotate("segment",
+             x = 0.1, xend = 0.1,
+             y = 95, yend = 95 + coef(simple_rd)["over21"],
+             arrow = arrow(type = "closed", length = unit(0.2, "cm"),
+                           ends = "both"),
+             color = "#e7298a") +
+    annotate("text", x = 1.2,
+             y = 95 + coef(simple_rd)["over21"] / 2,
+             label = paste0("Jump \u2248 ", round(coef(simple_rd)["over21"], 1)),
+             color = "#e7298a", hjust = 0, size = 4.2) +
+    labs(x = "Age in Months (0 = 21st birthday)",
+         y = "Death Rate per 100,000",
+         color = "") +
+    theme_minimal(base_size = 13) +
+    theme(legend.position = "bottom")
+```
+
+The two line segments in @fig-simple-rd share the same slope---$\gamma$ in @eq-rd-simple---but are offset from each other by $\rho$ at the cutoff.
+That vertical gap is our RD estimate.
+
+
+## Running Variable Controls: Going Beyond Linear
+
+### Why Linear Might Not Be Enough
+
+The simple model assumes the relationship between the running variable and the outcome is *linear* on both sides of the cutoff.
+That might be good enough, but it might not.
+If the true relationship is curved, a linear fit will be forced to compromise---and may mistake nonlinearity in the underlying trend for a treatment effect.
+
+@fig-three-panels makes this point clearly, echoing Figure 4.3 in AP.
+Three different data-generating processes produce three different RD situations.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-three-panels
+#| fig-cap: "Three RD situations. Panel A: a linear relationship with a true discontinuity. Panel B: a nonlinear relationship with a true discontinuity. Panel C: a nonlinear relationship with no discontinuity---but a naive linear fit would find one."
+
+set.seed(101)
+
+make_panel <- function(type) {
+    x <- seq(0.01, 0.99, length.out = 80)
+    d <- as.numeric(x >= 0.5)
+    y <- switch(type,
+        "A" = 0.3 + 0.8 * x + 0.6 * d + rnorm(length(x), 0, 0.05),
+        "B" = 0.3 + 1.0 * sqrt(x) + 0.5 * d + rnorm(length(x), 0, 0.05),
+        "C" = 0.3 + 1.5 * (x - 0.5)^2 * sign(x - 0.5) + 0.8 * x +
+              rnorm(length(x), 0, 0.04)
+    )
+    tibble(x = x, y = y, d = d, panel = paste("Panel", type))
+}
+
+three_panels <- bind_rows(make_panel("A"), make_panel("B"), make_panel("C"))
+
+three_panels_labels <- tibble(
+    panel = c("Panel A", "Panel B", "Panel C"),
+    label = c("True jump,\nlinear trend",
+              "True jump,\nnonlinear trend",
+              "No jump,\nbut nonlinear trend")
+)
+
+ggplot(three_panels, aes(x = x, y = y)) +
+    geom_point(aes(color = factor(d)), size = 1.6, alpha = 0.7) +
+    geom_smooth(aes(group = d, color = factor(d)),
+                method = "lm", se = FALSE, linewidth = 1) +
+    geom_vline(xintercept = 0.5, linetype = "dashed") +
+    geom_text(data = three_panels_labels,
+              aes(x = 0.08, y = 1.6, label = label),
+              hjust = 0, size = 3.3, inherit.aes = FALSE) +
+    facet_wrap(~ panel) +
+    scale_color_manual(values = c("0" = "grey50", "1" = "#0072B2"),
+                       guide = "none") +
+    labs(x = "Running Variable (X)", y = "Outcome (Y)") +
+    theme_minimal(base_size = 13) +
+    theme(strip.text = element_text(face = "bold"))
+```
+
+Panel A shows the ideal case: the relationship is linear, and the jump at the cutoff is the true treatment effect.
+Panel B shows a slightly more complicated case where the underlying relationship has some curvature,
+but the discontinuity is still obvious.
+Panel C is the dangerous one.
+Here the true relationship is a smooth (if weirdly-shaped) curve with *no* treatment effect at all,
+but a naive linear fit on each side of the cutoff would produce two segments with a large gap at the cutoff.
+
+Panel C illustrates the central challenge of RD:
+how do we make sure a nonlinear trend in the running variable is not being misread as a jump?
+
+### Two Strategies for Handling Nonlinearity
+
+There are two broad approaches---neither perfect, both useful.
+
+1. **Model the nonlinearity.**
+   Include higher-order terms in the running variable (quadratic, cubic) and possibly allow the slope to differ on either side of the cutoff.
+   This is the **parametric** approach.
+2. **Zoom in on the cutoff.**
+   Restrict attention to observations within a narrow window of the cutoff.
+   Near the boundary, nonlinearities become much less of a worry, because any smooth curve looks roughly linear over a short interval.
+   This is the **nonparametric** (or *local*) approach.
+
+We will look at both in turn.
+
+
+## Parametric RD: Polynomials and Interactions
+
+### Adding a Quadratic Term
+
+The simplest extension to our linear model adds a quadratic term:
+
+$$
+Y_a = \alpha + \rho D_a + \gamma_1 a + \gamma_2 a^2 + e_a
+$$ {#eq-rd-quad}
+
+Here $\gamma_1 a + \gamma_2 a^2$ is a smooth quadratic function of the running variable.
+$\rho$ is still the jump at the cutoff.
+
+### Allowing Different Slopes on Each Side of the Cutoff
+
+A related modification allows the relationship between age and death rates to have *different slopes* on either side of the cutoff.
+Maybe the decline in death rates slows (or accelerates) once drinking becomes legal.
+We can allow this by interacting the running variable with the treatment dummy.
+
+To keep the interpretation of $\rho$ clean, it is standard to *center* the running variable at the cutoff---that is, replace $a$ with $(a - a_0)$.
+In our data the running variable `months` is already centered (it equals 0 at the 21st birthday), so we can use it directly.
+
+The interacted model is:
+
+$$
+Y_a = \alpha + \rho D_a + \gamma (a - a_0) + \delta (a - a_0) D_a + e_a
+$$ {#eq-rd-interact}
+
+With the running variable centered at the cutoff, $\rho$ is still the jump in average outcomes at the cutoff, and $\delta$ tells us how the slope *changes* after treatment.
+
+### A Richer Model
+
+We can combine both ideas to allow a different quadratic function on each side of the cutoff:
+
+$$
+\begin{aligned}
+Y_a = &\alpha + \rho D_a + \gamma_1 (a - a_0) + \gamma_2 (a - a_0)^2 \\
+      &+ \delta_1 (a - a_0) D_a + \delta_2 (a - a_0)^2 D_a + e_a
+\end{aligned}
+$$ {#eq-rd-fancy}
+
+This is AP's equation (4.4).
+In this model, both the slope and the curvature of the age-death relationship can shift at the cutoff, so the functional form is very flexible.
+$\rho$ remains the causal parameter of interest.
+
+### Estimating the Polynomial Models
+
+Let's run all three parametric RD regressions.
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# Model 1: linear
+rd_linear <- feols(death_rate ~ over21 + months,
+                   vcov = "HC1", data = mlda_data)
+
+# Model 2: linear, interacted (different slopes)
+rd_linear_int <- feols(death_rate ~ over21 + months + months:over21,
+                       vcov = "HC1", data = mlda_data)
+
+# Model 3: fancy quadratic, interacted (AP eq. 4.4)
+rd_fancy <- feols(death_rate ~ over21 + months + I(months^2) +
+                      months:over21 + I(months^2):over21,
+                  vcov = "HC1", data = mlda_data)
+```
+
+Let's compare the coefficients on `over21` across the three specifications:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| label: tbl-rd-parametric
+#| tbl-cap: "Parametric RD estimates of the MLDA effect on mortality, using linear, interacted-linear, and fancy-quadratic specifications. The coefficient on `over21` is our estimate of the jump at the cutoff."
+
+modelsummary(
+    list("Linear"              = rd_linear,
+         "Linear, interacted"  = rd_linear_int,
+         "Quadratic, interacted" = rd_fancy),
+    coef_map = c("over21" = "Over 21",
+                 "months" = "Age (months)",
+                 "I(months^2)" = "Age squared",
+                 "months:over21" = "Age \u00d7 Over 21",
+                 "I(months^2):over21" = "Age squared \u00d7 Over 21"),
+    stars = TRUE,
+    gof_omit = "AIC|BIC|Log|RMSE|Std"
+)
+```
+
+Three important things to notice:
+
+1. **The estimated MLDA effect is similar across specifications.** This is reassuring---the result is not an artifact of a specific functional form. This is exactly the kind of robustness check Angrist and Pischke emphasize: a credible RD produces stable estimates as you vary the model for the running variable.
+2. **Standard errors grow as we add parameters.** Each new term we estimate burns some degrees of freedom, which increases the standard error of $\hat{\rho}$. The quadratic-interacted model is the most flexible, but it is also the most imprecise.
+3. **Interpretation.** In the linear model, the slope of the age-death relationship is forced to be the same on both sides of the cutoff. In the interacted and quadratic models, the relationship can bend and curve differently on each side.
+
+### Visualizing the Three Fits
+
+Since all three models estimate similar effects but with different functional forms, it is especially useful to plot the fits.
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| label: fig-parametric-fits
+#| fig-cap: "Three parametric RD fits. Each line is the predicted death rate from one model. The jump at the cutoff is the MLDA effect under that specification."
+
+mlda_fits <- mlda_data |>
+    mutate(
+        fit_linear       = predict(rd_linear),
+        fit_linear_int   = predict(rd_linear_int),
+        fit_fancy        = predict(rd_fancy)
+    ) |>
+    select(months, over21, death_rate,
+           fit_linear, fit_linear_int, fit_fancy) |>
+    pivot_longer(cols = starts_with("fit_"),
+                 names_to  = "model",
+                 values_to = "yhat") |>
+    mutate(model = recode(model,
+        fit_linear     = "Linear",
+        fit_linear_int = "Linear, interacted",
+        fit_fancy      = "Quadratic, interacted"
+    ),
+    model = factor(model, levels = c("Linear", "Linear, interacted",
+                                      "Quadratic, interacted")))
+
+ggplot(mlda_fits, aes(x = months)) +
+    geom_point(aes(y = death_rate, color = factor(over21)),
+               size = 1.6, alpha = 0.5) +
+    geom_line(aes(y = yhat, group = interaction(model, over21),
+                  linetype = factor(over21)),
+              linewidth = 1.0, color = "#d95f02") +
+    geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+    facet_wrap(~model) +
+    scale_color_manual(values = c("0" = "grey50", "1" = "#0072B2"),
+                       guide = "none") +
+    scale_linetype_manual(values = c("0" = "solid", "1" = "solid"),
+                          guide = "none") +
+    labs(x = "Age in Months (0 = 21st birthday)",
+         y = "Death Rate per 100,000") +
+    theme_minimal(base_size = 13) +
+    theme(strip.text = element_text(face = "bold"))
+```
+
+The three fits tell the same basic story.
+The quadratic-interacted model catches a little extra curvature right after the cutoff---consistent with the idea that young people party hard on their 21st birthday and then taper off---but the estimated jump is essentially the same.
+
+::: {.callout-warning}
+## The Danger of Over-Fitting
+Adding higher-order polynomials---quartics, quintics, and beyond---sounds like a way to be safe by letting the data tell us the shape of the trend. In practice, it is the opposite. Higher-order polynomials chase noise near the boundaries, producing wild swings that can invent spurious jumps at the cutoff.
+@gelman_imbens_2019 argue strongly against global polynomial fits of order higher than 2, recommending local linear or local quadratic fits on a narrow bandwidth instead. Most applied RD papers today stop at quadratic.
+:::
+
+
+## Nonparametric RD: Zooming In on the Cutoff
+
+### The Idea of Local Estimation
+
+Instead of modeling the full age-death relationship with a global polynomial, the **nonparametric** approach focuses only on observations *near* the cutoff.
+Over a narrow enough window, any smooth function looks approximately linear---so a simple linear regression in that window should give a reasonable estimate of the jump.
+
+The econometric procedure that implements this trade-off is called **local linear regression**.
+We estimate the same linear RD as before:
+
+$$
+Y_a = \alpha + \rho D_a + \gamma a + e_a \quad \text{for } a_0 - b \leq a \leq a_0 + b
+$$ {#eq-rd-local}
+
+but only using observations whose running variable lies within a **bandwidth** $b$ of the cutoff.
+
+Choosing a bandwidth is a classic bias-variance trade-off:
+
+- A **narrow** bandwidth minimizes bias (less room for nonlinearity to confuse us) but uses less data, increasing the standard error.
+- A **wide** bandwidth gives us more observations (lower variance) but risks picking up smooth nonlinearities that are not really jumps.
+
+### A Hands-On Bandwidth Example
+
+Let's estimate the same RD on narrower and narrower windows around the cutoff.
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# Subset to age 19--23 (bandwidth = 24 months)
+rd_b24 <- feols(death_rate ~ over21 + months,
+                vcov = "HC1",
+                data = subset(mlda_data, abs(months) <= 24))
+
+# Subset to age 20--22 (bandwidth = 12 months)
+rd_b12 <- feols(death_rate ~ over21 + months,
+                vcov = "HC1",
+                data = subset(mlda_data, abs(months) <= 12))
+
+# Subset to age 20.5--21.5 (bandwidth = 6 months)
+rd_b06 <- feols(death_rate ~ over21 + months,
+                vcov = "HC1",
+                data = subset(mlda_data, abs(months) <= 6))
+```
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| label: tbl-bandwidths
+#| tbl-cap: "RD estimates of the MLDA effect at three different bandwidths. Narrower bandwidths mean fewer observations and larger standard errors, but also less risk of confusing a nonlinear trend for a jump."
+
+modelsummary(
+    list("Bandwidth = 24 months" = rd_b24,
+         "Bandwidth = 12 months" = rd_b12,
+         "Bandwidth = 6 months"  = rd_b06),
+    coef_map = c("over21" = "Over 21",
+                 "months" = "Age (months)"),
+    stars = TRUE,
+    gof_omit = "AIC|BIC|Log|RMSE|Std"
+)
+```
+
+The point estimates are broadly similar across bandwidths,
+though the standard errors grow noticeably as we shrink the window.
+This stability under bandwidth changes is another hallmark of a credible RD.
+
+### The `rdrobust` Package: Automating the Bandwidth Choice
+
+Choosing a bandwidth by hand is a judgment call,
+but econometricians have developed sophisticated methods for picking one that optimally balances bias and variance.
+The gold-standard implementation in R is the **`rdrobust`** package by Calonico, Cattaneo, and Titiunik, which automates essentially every step of a modern nonparametric RD:
+
+1. Select an optimal bandwidth (MSE-optimal or coverage-error-optimal).
+2. Fit a local linear (or local polynomial) regression on either side of the cutoff.
+3. Weight observations by a kernel that gives more weight to points near the cutoff.
+4. Compute bias-corrected point estimates and **robust** standard errors that correct for the bias introduced by kernel smoothing.
+
+The two main functions are `rdrobust()` for estimation and `rdplot()` for visualization.
+
+::: {.callout-note}
+## Why `rdrobust`?
+`rdrobust` has become the default in applied work for good reason. It implements state-of-the-art bandwidth selectors from @imbens_kalyanaraman_2012 and @calonico_2014, uses bias-correction techniques that let you report inferences that are valid even when the optimal bandwidth choice is imperfect, and produces well-formatted plots you can drop straight into a paper. Installing it is simple: `install.packages("rdrobust")`.
+:::
+
+### Estimation with `rdrobust()`
+
+`rdrobust()` needs three pieces of information: the outcome, the running variable, and (optionally) the cutoff `c`. Here is a complete estimation on our MLDA data:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# Default local linear RD with MSE-optimal bandwidth
+rd_rb <- rdrobust(y = mlda_data$death_rate,
+                  x = mlda_data$months,
+                  c = 0)
+
+summary(rd_rb)
+```
+
+The output reports three related estimates:
+
+- **Conventional:** the standard local-linear point estimate and its usual standard error.
+- **Bias-corrected:** the same point estimate adjusted for the bias inherent in local-linear smoothing.
+- **Robust:** the bias-corrected estimate with standard errors that are valid under that bias correction. This is the inference method Calonico, Cattaneo, and Titiunik recommend reporting.
+
+The MSE-optimal bandwidth---chosen by the package automatically---is printed near the bottom.
+Under the hood, `rdrobust` is doing a weighted local linear regression,
+but the interface is completely automatic.
+
+### Plotting the Result with `rdplot()`
+
+The companion function `rdplot()` makes a clean visualization: it bins the running variable, averages the outcome within each bin, and fits a (polynomial) trend on each side of the cutoff.
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| label: fig-rdplot
+#| fig-cap: "RD plot using the `rdrobust::rdplot()` function. Dots are bin-averages of the outcome, and the lines are fitted polynomials. The jump at the cutoff is the RD estimate."
+
+rdplot(y = mlda_data$death_rate,
+       x = mlda_data$months,
+       c = 0,
+       p = 2,
+       title    = "",
+       x.label  = "Months from 21st birthday",
+       y.label  = "Death rate per 100,000")
+```
+
+Notice the automatic binning: `rdplot()` chose a bin width using a mean-squared-error criterion,
+so the resulting scatter shows the general shape of the data without drowning you in noise.
+The curves on each side of the cutoff are quadratic fits, and the vertical gap at zero is the estimated MLDA effect.
+
+### Hand-Coded vs. Package Estimation
+
+One of the themes of this book is that the packages make our lives easier, but the underlying regression is something you could write yourself.
+The `rdrobust` estimate with bandwidth $b$ (setting aside the kernel weighting and bias correction for a moment) is essentially the same as our hand-coded `feols` regression on `abs(months) <= b`.
+Using the same bandwidth, the two should deliver very similar point estimates:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# Extract the MSE-optimal bandwidth chosen by rdrobust
+opt_bw <- rd_rb$bws[1, 1]
+opt_bw
+
+# Hand-rolled local linear RD at that bandwidth
+rd_hand <- feols(death_rate ~ over21 + months + months:over21,
+                 vcov = "HC1",
+                 data = subset(mlda_data, abs(months) <= opt_bw))
+
+# Compare the point estimates
+coef(rd_hand)["over21"]            # hand-rolled
+rd_rb$coef[1]                      # rdrobust conventional estimate
+```
+
+The two estimates are very close---not exactly equal, because `rdrobust` uses a triangular kernel that down-weights points further from the cutoff,
+while our hand-coded version gives every observation in the window equal weight.
+But the intuition is the same: run a linear RD in a narrow window, and you have a local-linear nonparametric RD.
+
+
+## Cause-Specific Effects: A Falsification Test
+
+### The Idea
+
+If our RD estimate really reflects the causal effect of legal drinking,
+we should see it for outcomes that alcohol plausibly affects---motor vehicle accidents, alcohol-related disease---but not for outcomes it has no good reason to affect---cancer, heart disease, or other internal causes.
+
+This is exactly what Carpenter and Dobkin found.
+In AP Table 4.1, the MLDA effect on all deaths is about 7.7 per 100,000, driven by roughly:
+
+- **Motor vehicle accidents:** 4.5 per 100,000
+- **Suicide:** 1.8
+- **Other external causes:** 0.8
+- **All internal causes:** 0.4 (statistically indistinguishable from zero)
+
+The near-zero effect on internal causes is our evidence that what we are picking up is not some mysterious coincidence of poor health at age 21, but rather the real effect of drinking behavior.
+It is a **falsification test**: an outcome that *should* show no effect is used to stress-test the design.
+
+### A Simulated Illustration
+
+Let's simulate two separate causes of death---a large MLDA effect on motor vehicle fatalities and a near-zero effect on internal causes---and plot them:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| label: fig-cause-specific
+#| fig-cap: "A visual falsification test: motor vehicle fatalities (blue) jump sharply at the MLDA cutoff, while deaths from internal causes (gray) show essentially no jump. This pattern supports a causal interpretation of the MLDA effect."
+
+set.seed(99)
+cause_months <- seq(-24, 23, by = 1)
+cause_data <- tibble(
+    months = cause_months,
+    over21 = as.numeric(months >= 0),
+    mva    = 25 + 0.05 * months + 4.5 * over21 +
+             rnorm(length(cause_months), 0, 1.2),
+    intern = 15 + 0.10 * months + 0.4 * over21 +
+             rnorm(length(cause_months), 0, 1.0)
+) |>
+    pivot_longer(c(mva, intern), names_to = "cause", values_to = "rate") |>
+    mutate(cause = recode(cause,
+                          mva    = "Motor vehicle fatalities",
+                          intern = "Deaths from internal causes"))
+
+ggplot(cause_data, aes(x = months, y = rate, color = cause)) +
+    geom_point(size = 1.8, alpha = 0.7) +
+    geom_smooth(aes(group = interaction(cause, over21)),
+                method = "lm", formula = y ~ poly(x, 2),
+                se = FALSE, linewidth = 1) +
+    geom_vline(xintercept = 0, linetype = "dashed") +
+    scale_color_manual(values = c("Motor vehicle fatalities" = "#0072B2",
+                                  "Deaths from internal causes" = "grey50")) +
+    labs(x = "Age in Months (0 = 21st birthday)",
+         y = "Death Rate per 100,000",
+         color = "Cause of death") +
+    theme_minimal(base_size = 13) +
+    theme(legend.position = "bottom")
+```
+
+The picture says it all.
+Motor vehicle fatalities jump sharply at the cutoff;
+deaths from internal causes barely budge.
+Alcohol is plausibly responsible for the first pattern and demonstrably not responsible for the second.
+This is the kind of evidence that makes an RD design convincing to a skeptical reader.
+
+
+## Fuzzy RD: When the Cutoff Shifts Treatment Probability
+
+So far we have focused on sharp RD, where treatment *is* a function of the running variable.
+In many applications, however, the cutoff changes the **probability** of treatment---not treatment itself---or the **intensity** of treatment, as measured by some continuous exposure variable.
+This is called **fuzzy RD**.
+
+### The Elite Illusion
+
+AP's flagship fuzzy RD example comes from Abdulkadiroğlu, Angrist, and Pathak's (2014) study of Boston's elite exam schools.
+
+Every year, thousands of Boston middle schoolers take the Independent Schools Entrance Exam (ISEE) in hopes of winning a seat at Boston Latin School (BLS), the most selective public exam school in the city.
+Admission is determined by a sharp test-score cutoff.
+If your score is above the cutoff, you get an offer.
+If it is below, you do not.
+
+But notice that *attending BLS* is not a sharp function of the cutoff.
+Some students who qualify decline the offer and enroll elsewhere.
+Some students who miss the cutoff go on to attend another exam school (often Boston Latin Academy, one step down the hierarchy).
+So actual BLS attendance changes smoothly---but not cleanly---at the cutoff.
+
+The *probability* of enrolling at BLS does jump at the cutoff, but not from 0 to 1.
+Similarly, the *peer quality* a student experiences---average classmate test scores---jumps sharply at the cutoff as treated students are placed in much more selective classrooms.
+The cutoff is like a shove: it nudges students into (or out of) a more selective environment,
+even if it does not mechanically determine any one student's school.
+
+### From Reduced Form to 2SLS
+
+To formalize this, we distinguish three objects:
+
+1. **The reduced form** is a sharp-style RD regression of the outcome on a dummy for clearing the cutoff.
+   $$
+   Y_i = \alpha_0 + \rho D_i + \beta_0 R_i + e_{0i}
+   $$
+   Here $D_i = 1$ if applicant $i$ cleared the BLS cutoff, and $R_i$ is their running-variable score.
+2. **The first stage** is a sharp-style RD regression of the endogenous treatment (e.g., average peer quality $\bar{X}_{(i)}$) on the same cutoff dummy.
+   $$
+   \bar{X}_{(i)} = \alpha_1 + \phi D_i + \beta_1 R_i + e_{1i}
+   $$
+   Here $\phi$ captures the jump in peer quality induced by crossing the cutoff.
+3. **The second stage** is the causal relationship of interest: the effect of peer quality on the outcome.
+   $$
+   Y_i = \alpha_2 + \lambda \hat{\bar{X}}_{(i)} + \beta_2 R_i + e_{2i}
+   $$
+   where $\hat{\bar{X}}_{(i)}$ is the fitted value from the first stage.
+
+This is exactly the instrumental variables setup from @sec-iv: **clearing the cutoff** is an instrument for **peer quality**.
+The two-stage-least-squares (2SLS) estimator is:
+
+$$
+\hat{\lambda}_{\text{2SLS}} = \frac{\hat{\rho}}{\hat{\phi}} = \frac{\text{jump in outcome}}{\text{jump in peer quality}}
+$$ {#eq-fuzzy-rd}
+
+This is why fuzzy RD is often summarized as *"fuzzy RD is IV."*
+The running-variable cutoff is your instrument.
+The reduced form is the RD on the outcome.
+The first stage is the RD on the treatment.
+And 2SLS just divides one by the other.
+
+::: {.callout-important}
+## Fuzzy RD Is IV
+In a fuzzy design, the indicator for clearing the cutoff is an **instrument** for the underlying treatment (enrollment, exposure, intensity). The causal effect is the ratio of the outcome RD to the treatment RD. All the same IV assumptions apply: the instrument must be relevant (it must actually shift treatment), and it must satisfy the exclusion restriction (it can only affect outcomes through treatment).
+:::
+
+### A Simulated Fuzzy RD Example
+
+Let's simulate a simplified version of the BLS setup.
+Applicants have a running-variable score centered at the cutoff.
+Clearing the cutoff raises the probability of enrolling at BLS (and thus the peer quality of your classmates),
+but does not move all students cleanly from 0 to 1.
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+set.seed(7)
+n <- 2000
+exam_data <- tibble(
+    score = runif(n, -20, 20),          # running variable, centered at cutoff
+    offer = as.numeric(score >= 0)       # clearing the cutoff
+) |>
+    mutate(
+        # Peer quality jumps by ~0.8 sigma at the cutoff (mirroring Fig 4.8)
+        peer_quality = 0.02 * score + 0.8 * offer + rnorm(n, 0, 0.3),
+        # Outcome: seventh-grade math score.
+        # The TRUE effect of peer quality on math is zero (mirroring AP).
+        # But the underlying score--outcome relationship is smooth.
+        math = 0.04 * score + 0 * peer_quality + rnorm(n, 0, 0.5)
+    )
+
+head(exam_data)
+```
+
+Now we can estimate the reduced form, first stage, and 2SLS estimate by hand:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# Reduced form: effect of clearing the cutoff on math
+rf <- feols(math ~ offer + score, vcov = "HC1", data = exam_data)
+
+# First stage: effect of clearing the cutoff on peer quality
+fs <- feols(peer_quality ~ offer + score, vcov = "HC1", data = exam_data)
+
+# 2SLS: use "offer" as an instrument for "peer_quality",
+# controlling smoothly for the running variable (score).
+iv_fit <- feols(math ~ score | peer_quality ~ offer,
+                vcov = "HC1", data = exam_data)
+```
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| label: tbl-fuzzy
+#| tbl-cap: "Fuzzy RD estimation. The first stage shows a large jump in peer quality at the cutoff, the reduced form shows an approximately zero jump in math scores, and the 2SLS estimate of the peer-quality effect is approximately zero."
+
+modelsummary(
+    list("First stage: peer quality" = fs,
+         "Reduced form: math" = rf,
+         "2SLS: peer effect" = iv_fit),
+    stars = TRUE,
+    gof_omit = "AIC|BIC|Log|RMSE|Std|Within"
+)
+```
+
+The story is exactly the Abdulkadiroğlu-Angrist-Pathak story:
+
+- The **first stage** confirms that clearing the cutoff leads to a large jump in peer quality (around 0.8 standard deviations).
+- The **reduced form** shows essentially no jump in students' own math scores.
+- The **2SLS** estimate of the causal effect of peer quality on math achievement is a small, statistically-insignificant number---not the 0.25 that a naive OLS regression would give.
+
+The punchline is striking: despite the common intuition that "peers matter," the fuzzy RD design suggests that the huge boost in peer quality that comes with an elite exam school seat produces essentially *no* gain in own-student math achievement.
+This is the *elite illusion*: exam schools look great because they admit great students, not because they *make* their students great.
+
+### Visualizing the Fuzzy RD
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+#| label: fig-fuzzy
+#| fig-cap: "Three pictures of the fuzzy RD. Top: the first stage (jump in peer quality). Middle: the reduced form (no jump in math scores). Bottom: putting them together, the 2SLS estimate of peer effects is approximately zero."
+
+bin_means <- function(data, x, y, width = 1) {
+    data |>
+        mutate(bin = floor(.data[[x]] / width) * width + width / 2) |>
+        group_by(bin) |>
+        summarise(y_mean = mean(.data[[y]]), .groups = "drop")
+}
+
+first_stage_bins <- bin_means(exam_data, "score", "peer_quality")
+reduced_form_bins <- bin_means(exam_data, "score", "math")
+
+p1 <- ggplot() +
+    geom_point(data = first_stage_bins,
+               aes(x = bin, y = y_mean),
+               color = "grey40", size = 2, alpha = 0.8) +
+    geom_smooth(data = exam_data,
+                aes(x = score, y = peer_quality,
+                    group = offer, color = factor(offer)),
+                method = "lm", se = FALSE, linewidth = 1) +
+    geom_vline(xintercept = 0, linetype = "dashed") +
+    scale_color_manual(values = c("0" = "grey50", "1" = "#0072B2"),
+                       guide = "none") +
+    labs(x = NULL, y = "Peer quality", title = "First stage") +
+    theme_minimal(base_size = 12)
+
+p2 <- ggplot() +
+    geom_point(data = reduced_form_bins,
+               aes(x = bin, y = y_mean),
+               color = "grey40", size = 2, alpha = 0.8) +
+    geom_smooth(data = exam_data,
+                aes(x = score, y = math,
+                    group = offer, color = factor(offer)),
+                method = "lm", se = FALSE, linewidth = 1) +
+    geom_vline(xintercept = 0, linetype = "dashed") +
+    scale_color_manual(values = c("0" = "grey50", "1" = "#0072B2"),
+                       guide = "none") +
+    labs(x = "Score (centered at cutoff)",
+         y = "Math score", title = "Reduced form") +
+    theme_minimal(base_size = 12)
+
+p1 / p2
+```
+
+The first stage is a dramatic jump in peer quality at the cutoff.
+The reduced form is essentially flat.
+By @eq-fuzzy-rd, if the numerator (reduced form) is zero but the denominator (first stage) is large and positive, the ratio---the 2SLS estimate of the peer effect on math---is also zero.
+
+
+## Assessing the Validity of an RD Design
+
+### What Could Go Wrong
+
+RD rests on one fundamental assumption: **in the absence of treatment, the outcome would be a smooth function of the running variable through the cutoff**.
+If that assumption holds, any jump in the outcome at the cutoff must be caused by treatment.
+If it fails, our estimate of $\rho$ could reflect all sorts of non-treatment factors.
+
+Two things in particular can break this assumption:
+
+1. **Manipulation of the running variable.** If units can precisely control where they fall relative to the cutoff, they can "choose" their own treatment status. This breaks the as-good-as-random comparison right at the cutoff. Canonical worry: a test-based scholarship where test administrators give some students an extra point to push them over the threshold; or a minimum income threshold for benefits where families can plausibly report income just below the cutoff.
+2. **Other things changing at the cutoff.** If some other policy or treatment shifts at exactly the same cutoff, we may be picking up a mixture of effects. Example: if legal drinking at 21 coincides with eligibility for some other 21+ privilege (like a different insurance rate), the MLDA effect we estimate includes both.
+
+### Covariate Balance Tests
+
+A good RD paper tests whether *pre-determined covariates*---variables measured before treatment is assigned, or that treatment could not plausibly affect---are balanced across the cutoff.
+If applicants who barely cleared the cutoff differ from those who barely missed it on variables like parental income, prior test scores, or gender,
+that is evidence that something other than pure randomization is happening at the boundary.
+Conversely, if these variables are smooth through the cutoff, the design looks more credible.
+
+In practice, we run RD regressions of *each covariate* on the cutoff dummy (with controls for the running variable) and check that $\hat{\rho}$ is close to zero.
+This is exactly what Abdulkadiroğlu, Angrist, and Pathak did for their exam school study: they showed that applicants' own prior test scores, family background, and demographics do **not** jump at the cutoff, which is necessary for the RD interpretation to hold.
+
+### Density Tests for Manipulation
+
+If units manipulate the running variable to end up on their preferred side of the cutoff, we would expect to see a "pile-up" just above or just below.
+A plot of the density of the running variable should be smooth through the cutoff;
+a sharp spike or dip is a red flag.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-mccrary
+#| fig-cap: "Two density plots. Left: smooth density through the cutoff---no evidence of manipulation. Right: a clear pile-up just above the cutoff, suggesting units may be manipulating their running-variable values to qualify for treatment."
+
+set.seed(3)
+smooth_x <- tibble(x = rnorm(4000), scenario = "Smooth density\n(no manipulation)")
+manip_x <- tibble(x = c(rnorm(3000),
+                        rnorm(1000, 0.6, 0.3)),
+                  scenario = "Pile-up above cutoff\n(manipulation)")
+
+bind_rows(smooth_x, manip_x) |>
+    ggplot(aes(x = x)) +
+    geom_histogram(bins = 40, fill = "#0072B2", color = "white",
+                   alpha = 0.85) +
+    geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+    facet_wrap(~scenario) +
+    labs(x = "Running variable (centered at cutoff)",
+         y = "Number of observations") +
+    theme_minimal(base_size = 13) +
+    theme(strip.text = element_text(face = "bold"))
+```
+
+The formal test for this is the **McCrary density test** (@mccrary_2008), which estimates the densities on either side of the cutoff and checks for a discontinuity.
+The `rddensity` package in R (from the same authors as `rdrobust`) implements a modern version due to @cattaneo_2020.
+
+### Placebo Cutoffs
+
+Another useful check is to estimate "effects" at fake cutoffs---values of the running variable where, in fact, nothing changes.
+If we find an "effect" of comparable size at, say, age 20 or age 22, our original finding at age 21 looks less credible:
+it suggests that the fitted model is just picking up some kind of noise or curvature that happens to jump at whatever value we plug in.
+If the fake cutoffs produce precisely-zero estimates, the real cutoff looks more convincing.
+
+
+## A Summary Picture: Sharp RD in One Figure
+
+To bring everything together, @fig-rd-summary shows a complete stylized sharp RD in one picture.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-rd-summary
+#| fig-cap: "Anatomy of a sharp RD. The smooth curve in each region is the expected outcome given the running variable. The jump at the cutoff is the causal effect. Extrapolating the left-hand curve across the cutoff (dashed line) gives the counterfactual outcome for the treated group."
+
+set.seed(42)
+n <- 400
+x <- runif(n, 0, 100)
+d <- as.numeric(x >= 50)
+e <- rnorm(n, 0, 2.5)
+y <- 40 + 0.15 * x + 0.005 * (x - 50)^2 + 8 * d + e
+
+rd_plot_data <- tibble(x = x, y = y, d = d)
+
+# counterfactual line: extrapolate the left-side model
+fit_left <- lm(y ~ x + I(x^2), data = subset(rd_plot_data, d == 0))
+cf_data  <- tibble(x = seq(50, 100, length.out = 120)) |>
+    mutate(yhat_cf = predict(fit_left, newdata = tibble(x = x)))
+
+ggplot(rd_plot_data, aes(x = x, y = y)) +
+    geom_point(aes(color = factor(d)), alpha = 0.4, size = 1.6) +
+    geom_smooth(aes(group = d, color = factor(d)),
+                method = "lm", formula = y ~ poly(x, 2),
+                se = FALSE, linewidth = 1.1) +
+    geom_line(data = cf_data, aes(x = x, y = yhat_cf),
+              color = "#0072B2", linetype = "dashed", linewidth = 1.0) +
+    geom_vline(xintercept = 50, linetype = "dashed", color = "black") +
+    annotate("segment",
+             x = 50.3, xend = 50.3,
+             y = predict(fit_left, newdata = tibble(x = 50)),
+             yend = predict(fit_left, newdata = tibble(x = 50)) + 8,
+             arrow = arrow(type = "closed", length = unit(0.2, "cm"),
+                           ends = "both"),
+             color = "#e7298a", linewidth = 1) +
+    annotate("text", x = 52, y = predict(fit_left, newdata = tibble(x = 50)) + 4,
+             label = "\u03c1", color = "#e7298a", size = 6, fontface = "bold",
+             hjust = 0) +
+    annotate("text", x = 75, y = 52,
+             label = "Counterfactual\n(if no treatment)",
+             hjust = 0, size = 3.5, color = "#0072B2", fontface = "italic") +
+    scale_color_manual(values = c("0" = "grey50", "1" = "#0072B2"),
+                       labels = c("Untreated", "Treated")) +
+    labs(x = "Running Variable (X)", y = "Outcome (Y)", color = "") +
+    theme_minimal(base_size = 13) +
+    theme(legend.position = "bottom")
+```
+
+The pink bracket shows the causal effect $\rho$:
+the vertical distance between what we actually observe just above the cutoff and what we *would have observed* had the trend below the cutoff continued smoothly.
+
+
+## Summary
+
+Regression discontinuity is one of the most transparent and credible causal-inference designs available.
+It turns rigid rules and cutoffs into natural experiments by exploiting the fact that units just above and just below a threshold are almost identical except for treatment.
+
+The core ideas:
+
+1. **Running variables and cutoffs.** RD requires a continuous measured variable and a known cutoff at which treatment changes. The MLDA, admissions cutoffs, income eligibility thresholds, and close elections all fit the bill.
+2. **Sharp vs. fuzzy.** In a sharp design, treatment flips cleanly at the cutoff. In a fuzzy design, the probability or intensity of treatment jumps, but treatment is not a perfect function of the running variable. Fuzzy RD is estimated by 2SLS, using the cutoff dummy as an instrument.
+3. **Modeling the running variable.** The RD estimate is the jump in the outcome at the cutoff after controlling for smooth trends in the running variable. Linear, interacted, and quadratic specifications are standard; higher-order polynomials are generally a bad idea.
+4. **Parametric vs. nonparametric.** Parametric RD fits a global polynomial to all the data. Nonparametric RD focuses on observations in a narrow bandwidth around the cutoff. Bandwidth choice is a bias-variance trade-off, and modern methods (implemented in `rdrobust`) automate the optimal choice.
+5. **The `rdrobust` package in R.** `rdrobust()` estimates local-polynomial RDs with MSE-optimal bandwidths and robust bias-corrected inference. `rdplot()` produces clean diagnostic plots. They are the tools of choice for modern applied RD.
+6. **Validity checks.** A credible RD paper shows (a) that pre-determined covariates are balanced across the cutoff, (b) that the density of the running variable is smooth through the cutoff (no manipulation), (c) that results are stable across bandwidth and polynomial choices, and (d) that "effects" vanish at placebo cutoffs and on falsification outcomes.
+
+A credible RD tells a clear story: here is the rule, here is the cutoff, here is the jump, and here is why nothing else can explain it.
+When those pieces fall into place, RD can deliver causal estimates that are hard to argue with.
+
+
+## Check Your Understanding
+
+:::: {.content-visible when-format="html"}
+
+For each question below,
+select the best answer from the dropdown menu.
+
+```{=html}
+<div class="question">
+<div class="answer-row">
+    <label>i. What is a "running variable" in an RD design? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">A variable that changes randomly over time</option>
+        <option value="b">The dependent variable in the RD regression</option>
+        <option value="c">The continuous variable whose value determines treatment assignment at a cutoff</option>
+        <option value="d">A variable that must be included as a control in the regression</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>ii. In a <b>sharp</b> RD design, the treatment variable is... </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Randomly assigned by a coin flip</option>
+        <option value="b">A deterministic function of the running variable, switching from 0 to 1 (or vice versa) at the cutoff</option>
+        <option value="c">A noisy function of a latent variable</option>
+        <option value="d">Determined by the researcher's choice of bandwidth</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iii. Why do we add polynomial terms of the running variable in parametric RD? </label>
+    <select onchange="checkAnswer(this, 'a')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">To ensure we do not mistake nonlinear trends in the running variable for a jump at the cutoff</option>
+        <option value="b">To increase the statistical power of the estimate</option>
+        <option value="c">Because the outcome is always nonlinear</option>
+        <option value="d">To satisfy the exclusion restriction</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iv. What trade-off does bandwidth selection involve in nonparametric RD? </label>
+    <select onchange="checkAnswer(this, 'd')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Between linearity and nonlinearity of the running variable</option>
+        <option value="b">Between treatment and control units</option>
+        <option value="c">Between point estimates and standard errors, unrelated to bias</option>
+        <option value="d">Between bias (wider bandwidths risk more) and variance (narrower bandwidths have less data)</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>v. In a <b>fuzzy</b> RD design, the jump at the cutoff is... </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The causal effect of crossing the cutoff, with no further interpretation needed</option>
+        <option value="b">The probability that treatment fails</option>
+        <option value="c">In the <i>probability</i> or <i>intensity</i> of treatment, which we use as an instrument for the underlying treatment via 2SLS</option>
+        <option value="d">Only valid if a McCrary test passes</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>vi. If the density of the running variable shows a sharp pile-up just above the cutoff, this suggests... </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The cutoff is not sharp enough</option>
+        <option value="b">Units may be manipulating the running variable, threatening the validity of the RD design</option>
+        <option value="c">The model should use a quadratic term</option>
+        <option value="d">The bandwidth is too wide</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>vii. In the Carpenter & Dobkin (2009) MLDA study, why was finding a large jump in motor vehicle fatalities but <i>not</i> in internal-cause deaths important? </label>
+    <select onchange="checkAnswer(this, 'a')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">It is a falsification test: the absence of effects on outcomes that alcohol should not affect increases confidence that the effects on outcomes it <i>should</i> affect are causal</option>
+        <option value="b">It proved that the MLDA is the correct policy</option>
+        <option value="c">It demonstrates that internal causes of death are under-reported</option>
+        <option value="d">It shows that the bandwidth was correctly chosen</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>viii. In the Abdulkadiroğlu, Angrist, & Pathak (2014) exam school study, the 2SLS estimate of the peer-quality effect on math achievement is close to zero. What does this suggest? </label>
+    <select onchange="checkAnswer(this, 'd')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Exam schools do not admit talented students</option>
+        <option value="b">The running variable was mis-measured</option>
+        <option value="c">Peer quality does not exist as a construct</option>
+        <option value="d">Much of the apparent advantage of elite exam schools reflects selection of high-achieving students, not a causal effect of better peers</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>ix. <b>(Challenge)</b> Suppose an RD estimate is large and statistically significant when a researcher uses a 5th-order polynomial for the running variable, but small and insignificant when using a linear or quadratic control. What should we conclude? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The effect is real and the higher-order polynomial is most accurate</option>
+        <option value="b">The linear model has too few parameters and should be rejected</option>
+        <option value="c">High-order polynomials are known to produce unreliable estimates in RD; the stability of simpler specifications should be treated as more credible evidence</option>
+        <option value="d">More data are needed before any conclusion can be reached</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>x. <b>(Challenge)</b> In a sharp RD design, the treatment dummy $D_a$ is determined entirely by the running variable $a$. Why does this mean there is <i>no classical omitted variable bias</i>, assuming the running variable is correctly modeled? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Because treatment is random</option>
+        <option value="b">Because any omitted variable correlated with treatment must also be correlated with (a function of) the running variable, so adequately controlling for the running variable also controls for every such omitted variable</option>
+        <option value="c">Because RD uses many covariates</option>
+        <option value="d">Because the sample size near the cutoff is small</option>
+    </select>
+</div>
+
+</div>
+```
+
+::: {.callout-tip collapse="true"}
+## Show Explanation
+
+i. The **running variable** is the continuous measure whose value determines whether a unit is treated (above the cutoff) or not (below). In the MLDA example, it is age. In exam schools, it is the admissions test score. The running variable is the backbone of the RD design: it is both the source of treatment assignment and the variable we must control for smoothly.
+
+ii. In a **sharp** RD, $D_a$ is a deterministic, discontinuous function of the running variable: if your age is at least 21, you are treated, period. This is different from fuzzy RD, where the cutoff changes the *probability* of treatment.
+
+iii. Panel C of @fig-three-panels shows why we add polynomials. A naive linear fit will be forced to approximate a curved relationship with two straight lines, and if the curvature changes sign near the cutoff, it will *look* like a jump even when none exists. Adding a quadratic (or an interacted linear) term lets the regression model the curvature instead of mistaking it for treatment.
+
+iv. Bandwidth selection is a classic **bias-variance trade-off**. A narrower bandwidth means fewer observations (higher variance) but a smaller window in which nonlinearity can confuse us (lower bias). A wider bandwidth uses more data (lower variance) but may pick up nonlinear trends that are not really jumps (higher bias). Modern tools like `rdrobust` pick a bandwidth that minimizes the mean squared error.
+
+v. In a **fuzzy** design, treatment is not a deterministic function of the running variable---some units above the cutoff are untreated, or some units below are treated anyway. The *probability* or *intensity* of treatment jumps at the cutoff. Because the reduced-form RD estimates the effect of *crossing the cutoff* and the first-stage RD estimates the jump in treatment, the causal effect of treatment on the outcome is the ratio: $\hat{\lambda} = \hat{\rho} / \hat{\phi}$. This is 2SLS with the cutoff dummy as an instrument.
+
+vi. A pile-up just above the cutoff is the signature of **manipulation**: units engineering their running-variable values to end up on the treated side. When this happens, units just above and just below the cutoff are no longer comparable, since the treated group disproportionately contains motivated manipulators. The McCrary density test (or its modern successor in `rddensity`) formalizes this diagnostic.
+
+vii. Finding *no* jump in internal-cause deaths at the MLDA cutoff is a **falsification test** (or "balance test"): an outcome that drinking should not affect shows the expected null result, while outcomes that drinking *should* affect (motor vehicle deaths, suicides, alcohol-related illness) do show big jumps. The null results rule out alternative explanations---like some other policy changing at age 21, or some coincidental jump in mortality---because such explanations would have produced effects on both kinds of deaths.
+
+viii. If peer quality truly had a large causal effect on a student's own achievement, we should see a jump in math scores that is roughly proportional to the jump in peer quality. We do not. Combined with the fact that exam schools admit students with large pre-existing advantages, this suggests that the raw achievement gap between exam school students and other public school students is largely a reflection of *selection*---who gets in---not a causal effect of the elite environment. This is the *elite illusion*.
+
+ix. @gelman_imbens_2019 make a strong case against high-order polynomials in RD: they give too much weight to extreme observations and can produce large, oscillating fits near the cutoff, generating spurious jumps. Modern best practice is to fit local linear (or at most local quadratic) regressions on a narrow bandwidth, and to show that results are stable across reasonable bandwidths and specifications. An estimate that appears only at polynomial order 5 is a warning sign, not evidence of a subtle true effect.
+
+x. OVB in a regression $Y = \beta_0 + \beta_1 D + e$ occurs when some omitted variable $Z$ is correlated with both $D$ and $Y$. But in sharp RD, $D$ is a *deterministic function* of the running variable $R$: $D = \mathbf{1}\{R \geq c\}$. So any $Z$ correlated with $D$ must also be correlated with $R$ (or some function of it). Once we correctly control for $R$ (via a sufficiently flexible polynomial or a sufficiently narrow bandwidth), there is no variation left in $D$ that is also correlated with any such $Z$. This is why RD has a much weaker reliance on observables than straight OLS---its credibility rests on modeling one variable (the running variable) correctly, rather than on controlling for everything that might confound treatment.
+
+:::
+
+::::
+
+:::: {.content-hidden when-format="html"}
+
+*Note: This section contains interactive content only available in the HTML version.*
+
+::::

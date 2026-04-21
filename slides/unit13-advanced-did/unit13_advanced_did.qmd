@@ -63,7 +63,7 @@ theme_set(theme_minimal(base_size = 16) +
 - **Bad Controls** $\rightarrow$ **Bad Counterfactual** $\rightarrow$ **Bad DiD Estimate**
 
 
-## One Method: Intuitive Selection of Controls
+## One Method: Intuitive Selection of Controls {.smaller}
 
 - Choosing controls based on institutional, geographic, or other pre-existing knowledge
 - Example:
@@ -76,28 +76,16 @@ theme_set(theme_minimal(base_size = 16) +
 
 - Dube, Lester, and Reich (2010) extend this idea to *all* counties on state borders which have different minimum wages
 
+. . .
+
 ![Contiguous border county pairs where one county experiences a minimum wage change and the other does not](all_mw_borders.png){fig-align="center"}
 
 
-## Dube, Lester, and Reich (2010)
-
-- By using all such border pairs, they have much more statistical power than just a single comparison
-
-. . .
-
-::: {.callout-note}
-## Key Idea
-The border discontinuity design relies on institutional knowledge: counties right next to each other share local economic conditions, so the one that doesn't get the policy change is a natural control for the one that does.
-:::
-
-
-## Second Method: Data-Driven Selection of Controls
+## Second Method: Data-Driven Selection of Controls {.smaller}
 
 - An alternative: choose controls based on "data-driven" methods
 - Use an algorithm to find "good" controls based on observable variables
-- The idea: if units share observable variables, they probably also share unobservable variables
-
-. . .
+- **The idea:** if units share observable variables, they probably also share unobservable variables
 
 - There are *lots* of methods: synthetic controls, nearest-neighbors, propensity scores, etc.
 - All share the same goal; they differ in the algorithm used
@@ -194,10 +182,12 @@ aca_exp_data <- panel_data |>
 ```
 
 
-## ACA Expansion: Non-Parallel Pre-Trends {.smaller}
+## ACA Expansion Map
 
-- We can see that states which expanded the ACA follow very different trends compared to all untreated states
-- Pre-trends are clearly not parallel --- bad news for our DiD estimate!
+![Map of ACA Expansion States](aca_expansion.png){fig-align="center"}
+
+
+## ACA Expansion: Non-Parallel Pre-Trends {.smaller}
 
 ```{r}
 #| label: naive-trends
@@ -214,22 +204,22 @@ ggplot(plot_data_naive, aes(x = year, y = mean_y, color = Group, linetype = Grou
   scale_color_manual(values = c("Control" = "#E69F00", "Treated" = "#0072B2")) +
   labs(x = "Year", y = "Mean Uninsured Rate (%)",
     title = "Expansion States vs. All Non-Expansion States",
-    subtitle = "Pre-trends are not parallel: control states are declining more slowly")
+    subtitle = "Generated using simulated data")
 ```
 
-::: aside
-Note: figure generated using simulated data.
-:::
+. . .
 
+- We can see that states which expanded the ACA follow very different trends compared to all untreated states
+- Pre-trends are clearly not parallel --- bad news for our DiD estimate!
 
-## Choosing Better Control States
+## Choosing Better Control States {.smaller}
 
 - We know that using *all* non-expansion states as controls is unwise
     - Violation of parallel trends $\rightarrow$ bad estimate
 - So what can we do?
 - Idea: use states which **should have** expanded the ACA **but didn't** as controls
 - Why?
-  - States which were highly likely to expand but didn't are much more *similar* to states which did expand
+  - States which were highly likely to expand but didn't (due to some last-minute change, a fluke in the political process, etc.) are much more *similar* to states which did expand
   - Therefore, they are more likely to form a "good" counterfactual
 
 
@@ -251,11 +241,11 @@ where:
 - $D_{i} = 1$ is an indicator if a unit is in the treatment group (i.e., treated at any time)
 - $P(D_{i} = 1 | x_1, ..., x_k)$ is the *probability of being in the treatment group conditional on $x$ variables*
 - $G()$ is a non-linear function (usually estimated with **logit regression**)
+- After estimating this regression, compute the *predicted probability of treatment,* $\hat{P_i}$, also called the **propensity score**
 
 
 ## From Predicted Probabilities to Weights {.smaller}
 
-- The *predicted probability of being in the treatment group*, $\hat{P_i}$, is the **propensity score**
 - We then compute the **inverse propensity weight** with:
 
 . . .
@@ -269,7 +259,7 @@ $$
 - Then, we use $IPW_i$ as *weights* in the standard TWFE DiD regression
 
 
-## What Does This Formula Do?
+## What Does This Formula Do? {.smaller}
 
 - If a unit is **treated** ($D_i=1$): $IPW_i = 1$
 - If a unit is **untreated** ($D_i=0$): $IPW_i = \frac{\hat{P_i}}{1 - \hat{P_i}}$
@@ -279,8 +269,8 @@ $$
 . . .
 
 - In other words:
-  - Untreated units that *look like* they should have been treated get **a lot of weight**
-  - Untreated units that look *nothing like* treated units get **very little weight**
+  - Untreated units that *look like* they should have been treated (but didnt't) get **a lot of weight** as a control
+  - Untreated units that look *nothing like* treated units get **very little weight** as a control
   - All treated units get weight of $1$
 
 
@@ -288,6 +278,7 @@ $$
 
 - Whether or not a state extends the ACA is probably a function of (at least):
   - Democratic vote share, region, and poverty rates
+    - Democrats more likely to support expansion; states with higher poverty rates also more likely to support it; if nearby states pass it so will others
 
 - So we can write:
 
@@ -300,6 +291,8 @@ $$
 . . .
 
 - Estimated propensity scores ($\hat{P_i}$) and IPW weights ($IPW_i$) look like:
+
+. . .
 
 | State | Status | $\hat{P_i}$ | $IPW_i$ |
 |:-----:|:------:|:-----------:|:-------:|
@@ -315,12 +308,16 @@ $$
 
 - Without IPW, all control states get equal weight --- regardless of how similar they are to treated states
 
+. . .
+
 ![All four control states shown at equal size](state_wts_constant.png){fig-align="center"}
 
 
 ## Control Set with IPW Weights
 
 - With IPW, control states that *look like* treated states (WI, PA) get much larger weight
+
+. . .
 
 ![WI and PA are large (high weight); TX and LA are small (low weight)](state_wts_ipw.png){fig-align="center"}
 
@@ -343,6 +340,8 @@ IPW upweights control units which *almost* got treated and downweights control u
 
 ## Let's Implement This Step-by-Step {.smaller}
 
+- In the simulated data, the **true effect** of expansion is a $-5$ point drop in the uninsured rate
+
 **Step 1:** Estimate the naive TWFE DiD (all controls, equal weight)
 
 ```{r}
@@ -358,12 +357,14 @@ summary(did_naive)
 . . .
 
 - The coefficient suggests a $\approx 11$ ppt reduction in the uninsured rate
-- But the **true effect** is $-5$! The estimate is roughly *twice as large* as it should be.
+- The estimate is roughly *twice as large* as it should be.
 
 
 ## Step 2: Aggregate Data & Estimate Propensity Scores {.smaller}
 
 - It's usually a good idea to estimate propensity scores on *just pre-treatment periods*
+
+. . .
 
 ```{r}
 #| echo: true
@@ -382,6 +383,14 @@ logit_treatment <- glm(
   data = agg_state_data, family = binomial("logit"))
 ```
 
+## Step 2.5: Examine Predictive Model {.smaller}
+
+```{r}
+#| echo: true
+
+summary(logit_treatment)
+
+```
 
 ## Step 3: Get Predicted Probabilities & Compute IPW {.smaller}
 
@@ -409,7 +418,10 @@ aca_exp_data <- aca_exp_data |>
 
 ## Check Propensity Score Overlap {.smaller}
 
-- We need treated and control propensity scores to **overlap** --- otherwise there's no good comparison
+- We need treated and control propensity scores to **overlap**
+  - Need untreated units with high predicted probability; treated units some variation in predicted probability
+
+. . .
 
 ```{r}
 ggplot(agg_state_data, aes(x = pred_prob, fill = factor(is_expanded))) +
@@ -424,6 +436,10 @@ ggplot(agg_state_data, aes(x = pred_prob, fill = factor(is_expanded))) +
 
 
 ## Step 4: Estimate IPW-Weighted TWFE DiD {.smaller}
+
+- Use the `weights` argument from `feols()` to weight the control units in the regression
+
+. . .
 
 ```{r}
 #| echo: true
@@ -543,8 +559,8 @@ where:
 - $y_{it}$, $\alpha_i$, $\tau_t$, and $\mu_{it}$ are the same as in our TWFE model
 - $D_{kit}$ are dummy variables which equal $1$ if the unit is treated AND the relative time is $k$, and $0$ otherwise
 - **Important:** We **omit** the dummy for $k=−1$ (the period just before treatment) as the reference category
-- The $\hat{\beta_k}$ coefficients trace out the effect of the policy over time *relative* to $k=−1$
-
+- The $\hat{\beta_k}$ coefficients trace out the effect of the policy over the post-treatment period *relative* to $k=−1$
+- The $\hat{\beta_j}$ coefficients trace out the "effect" of the policy over the pre-treatment period *relative* to $k=−1$
 
 ## Why Omit $k=-1$? {.smaller}
 
@@ -697,6 +713,7 @@ dyn_did <- feols(manufacturing_emp ~ `rel_t_treat_-10` + `rel_t_treat_-9` +
 
 - Note: `rel_t_treat_-1` (the period right before treatment) is **omitted** as the reference category
 - Each coefficient = treatment effect at that relative time, compared to $k = -1$
+- Alternatively, can make the `rel_t_treat` variable a factor and set the reference level to `-1`
 
 
 ## Interpreting the Results {.smaller}
@@ -708,12 +725,25 @@ summary(dyn_did)
 ```
 
 
-## Interpreting the Results
+## Interpreting the Coefficients {.smaller}
 
-- Post-treatment coefficients (`rel_t_treat_0` through `rel_t_treat_5`) show the effect **grows** over time:
-  - From $\approx -100$ in the year of treatment to $\approx -500$ five years after
-- Pre-treatment coefficients (`rel_t_treat_-10` through `rel_t_treat_-2`) are mostly **small and statistically insignificant**
-  - This is important --- why?
+Each $\hat{\beta}_k$ is the estimated treatment effect at relative time $k$, **relative to $k = -1$**
+
+- $\hat{\beta}_{-3} \approx -30$: Three years before adoption, treated cities had 30 less manufacturing jobs than control cities *compared to one year before adoption*. Not statistically different from zero $\rightarrow$ no pre-trend.
+
+- $\hat{\beta}_0 \approx -118$: In the adoption year, treated cities lost about 180 manufacturing jobs relative to control cities *compared to one year before adoption*. Statistically significant!
+
+- $\hat{\beta}_3 \approx -500$: Three years after adoption, the gap had grown to about 500 fewer jobs. Statistically significant!
+
+. . .
+
+**Key points:**
+
+- The coefficients are *not* the level of employment --- they are *differences* between treated and control, benchmarked to the period just before the policy
+
+- If $\hat{\beta}_{-5} = 0$ and $\hat{\beta}_{-2} = 0$ but $\hat{\beta}_0 = -100$, that's the pattern we want: nothing happening pre-treatment, then a break at the policy date
+
+- The confidence intervals tell you whether each coefficient is statistically distinguishable from zero
 
 
 ## Pre-Treatment Results and Parallel Trends {.smaller}
@@ -737,6 +767,8 @@ summary(dyn_did)
 
 - Often, it is hard to read that many coefficients, so we plot them as an **event-study plot**
 - We plot each coefficient (setting $k=-1$ to $0$) with its 95% confidence interval
+
+. . .
 
 ```{r}
 #| echo: true
@@ -777,13 +809,19 @@ ggplot(data = est_tab) +
 
 - **Left of the dashed line** (pre-treatment, $k < -1$):
   - Coefficients are near zero, confidence intervals include zero
+  - i.e., no statistically significant difference between treatment and control groups prior to treatment
   - $\rightarrow$ No evidence of pre-trends; parallel trends looks plausible
 
 - **Right of the dashed line** (post-treatment, $k \geq 0$):
   - Coefficients become large and negative, growing over time
   - $\rightarrow$ The causal effect of the policy, unfolding over time
 
-- If you saw significant pre-treatment coefficients: **red flag!** Your control group is probably not valid
+. . .
+
+::: {.callout-warning}
+If you saw significant pre-treatment coefficients: **red flag!** Your control group is probably not valid
+:::
+
 
 
 ## A Warning: Staggered Adoption {.smaller}
@@ -837,9 +875,9 @@ The simple TWFE dynamic DiD model can be very biased under staggered adoption. T
 
 - A **cluster** is a group of observations that are more similar to each other than to observations in other groups
 
-- Errors are *correlated within the cluster*
+- Errors from our regression are *correlated within the cluster*
 
-- Errors are *independent between clusters*
+- But Errors from our regression are still *independent between clusters*
 
 . . .
 
@@ -865,7 +903,7 @@ The simple TWFE dynamic DiD model can be very biased under staggered adoption. T
 - However, it will lead to an (often very large) **underestimation** of our "true" standard errors
 
 
-## What Happens When Standard Errors Are Too Small?
+## What Happens When Standard Errors Are Too Small? {.smaller}
 
 - If our standard errors are too small:
   - Our t-statistics are too big
@@ -908,6 +946,8 @@ The simple TWFE dynamic DiD model can be very biased under staggered adoption. T
 
 - Here is one draw from our simulation (showing 8 clusters for clarity)
 - Each color = a different cluster; observations within a cluster share a common error component
+
+. . .
 
 ```{r}
 #| label: cluster-scatter
@@ -1143,7 +1183,9 @@ ggplot(results_long_all, aes(x = pvalue, fill = method)) +
 
 ## CRSEs in the ACA Example {.smaller}
 
-- In the ACA expansion, the policy is set by the state, so we cluster at the state level:
+- Can easily tell `feols()` to use clustered standard errors (and at what level) using the `cluster = cluster_level` argument
+
+. . .
 
 ```{r}
 #| echo: true
@@ -1159,16 +1201,17 @@ summary(did_crse)
 - But the standard error is *larger*, giving wider confidence intervals and larger p-values
 
 
-## Choosing the Right Cluster Level
+## Choosing the Right Cluster Level {.smaller}
 
-- It is up to the researcher to define the clusters
+- So, *like* heteroskedastic robust SEs, easy to correct for
+- But *unlike* heteroskedastic robust SEs, we have to choose how we think the clusters are defined
   - This is trickier than it seems:
     - City data: cluster at the city-level? State-level? County?
     - Individual data: hospital-level? County-level?
   - **General rule: cluster at the level of treatment**
     - Studying state-level policies? Cluster by state
-- You generally need at least 30--50 clusters for CRSEs to work well
-- When in doubt, cluster at a broader level (e.g., state rather than county) --- this is conservative
+- You generally need at least 20 clusters for CRSEs to work well
+- When in doubt, cluster at a broader level (e.g., state rather than county) --- this will usually result in more conservative SEs
 
 
 ## CRSEs: Key Takeaways
@@ -1183,19 +1226,3 @@ summary(did_crse)
 
 - You generally need at least 30--50 clusters for CRSEs to work well
 
-
-## Summary: What We Learned Today {.smaller}
-
-1. **Choosing good controls** is the foundation of any DiD analysis
-    - Use institutional knowledge (border designs) or data-driven methods (IPW)
-
-2. **IPW-DiD** reweights controls so that the control group resembles the treated group on observables
-    - Propensity scores $\rightarrow$ IPW weights $\rightarrow$ weighted TWFE
-
-3. **Dynamic DiD** estimates treatment effects that change over time
-    - Pre-treatment coefficients = test for parallel trends
-    - Post-treatment coefficients = causal effects unfolding over time
-    - Present with event study plots
-
-4. **Cluster-robust SEs** fix inflated Type I error rates from correlated errors in panel data
-    - Rule: cluster at the level of treatment assignment
