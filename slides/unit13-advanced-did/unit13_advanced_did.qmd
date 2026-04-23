@@ -606,6 +606,29 @@ as.data.frame(
 ```
 
 
+## Example Data Structure {.smaller}
+
+- Alternatively, we can create a **factor** variable which equals the *relative time* for treated units and 0 for control units
+
+. . .
+
+```{r}
+#| echo: true
+#| output-location: column-fragment
+
+did_ex_tab <- did_ex_tab |>
+  mutate(rel_treat_t = case_when(treatment_group == 1 ~ rel_t,
+    TRUE ~ 0),
+    rel_treat_t.f = as.factor(rel_treat_t),
+    rel_t_treat.f = relevel(rel_treat_t.f, ref = "-1")
+    )
+
+as.data.frame(
+  did_ex_tab |> select(unit_id, year, treatment_group, rel_t_treat.f)
+)
+
+```
+
 ## Dynamic DiD Example {.smaller}
 
 - Suppose we want to estimate the effect of an *environmental policy* on manufacturing employment
@@ -646,10 +669,12 @@ get_true_effect <- function(relative_year) {
 city_fes <- rnorm(n_cities, 1000, 150)
 year_fes <- rnorm(length(years_e), 50, 20)
 
+group_level_gap <- 400
+
 final_simulated_data <- panel_env |>
   left_join(city_lookup, by = "city_id") |>
   mutate(
-    city_fe = city_fes[city_id],
+    city_fe = city_fes[city_id] + treated_group * group_level_gap,
     year_fe = year_fes[year - min(years_e) + 1],
     relative_year = year - adoption_year,
     true_effect = get_true_effect(relative_year),
@@ -664,10 +689,16 @@ final_simulated_data <- final_simulated_data |>
     rel_t_treat = case_when(treated_group == 1 ~ rel_t, TRUE ~ 0))
 
 final_simulated_data <- dummy_cols(final_simulated_data,
-  select_columns = "rel_t_treat", remove_selected_columns = TRUE)
+  select_columns = "rel_t_treat", remove_selected_columns = FALSE)
 
 final_simulated_data <- final_simulated_data |>
   mutate(rel_t_treat_0 = rel_t_treat_0 * treated_group)
+
+
+final_simulated_data <- final_simulated_data |>
+  mutate(rel_t_treat.f = as.factor(rel_t_treat),
+    rel_t_treat.f = relevel(rel_t_treat.f, ref = "-1"))
+
 ```
 
 
@@ -713,8 +744,24 @@ dyn_did <- feols(manufacturing_emp ~ `rel_t_treat_-10` + `rel_t_treat_-9` +
 
 - Note: `rel_t_treat_-1` (the period right before treatment) is **omitted** as the reference category
 - Each coefficient = treatment effect at that relative time, compared to $k = -1$
-- Alternatively, can make the `rel_t_treat` variable a factor and set the reference level to `-1`
 
+## Estimating the Dynamic Model {.smaller}
+
+- Instead estimating using the factor variable:
+
+. . .
+
+```{r}
+#| echo: true
+
+dyn_did_2 <- feols(manufacturing_emp ~ rel_t_treat.f |
+    city_id + year,
+    vcov = "HC1",
+    data = final_simulated_data)
+
+summary(dyn_did_2)
+
+```
 
 ## Interpreting the Results {.smaller}
 

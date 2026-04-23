@@ -442,7 +442,7 @@
   <meta name="generator" content="quarto-1.9.37">
 
   <meta name="author" content="Prof. Caraher">
-  <meta name="dcterms.date" content="2026-04-20">
+  <meta name="dcterms.date" content="2026-04-23">
   <title>Advanced Difference-in-Differences</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1068,7 +1068,7 @@ Prof. Caraher
     </div>
 </div>
 
-  <p class="date">2026-04-20</p>
+  <p class="date">2026-04-23</p>
 </section>
 <section id="econometrics-so-far" class="slide level2">
 <h2>Econometrics So Far</h2>
@@ -1746,6 +1746,51 @@ y_{it} = \sum_{j=-J}^{-2}\beta_jD_{it} + \sum_{k=0}^{K}\beta_kD_{it}  + \alpha_i
 </div>
 </div>
 </section>
+<section id="example-data-structure-1" class="slide level2 smaller">
+<h2>Example Data Structure</h2>
+<ul>
+<li class="fragment">Alternatively, we can create a <strong>factor</strong> variable which equals the <em>relative time</em> for treated units and 0 for control units</li>
+</ul>
+<div class="fragment">
+<div class="cell columns column-output-location">
+<div class="column">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href></a>did_ex_tab <span class="ot">&lt;-</span> did_ex_tab <span class="sc">|&gt;</span></span>
+<span id="cb10-2"><a href></a>  <span class="fu">mutate</span>(<span class="at">rel_treat_t =</span> <span class="fu">case_when</span>(treatment_group <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> rel_t,</span>
+<span id="cb10-3"><a href></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">0</span>),</span>
+<span id="cb10-4"><a href></a>    <span class="at">rel_treat_t.f =</span> <span class="fu">as.factor</span>(rel_treat_t),</span>
+<span id="cb10-5"><a href></a>    <span class="at">rel_t_treat.f =</span> <span class="fu">relevel</span>(rel_treat_t.f, <span class="at">ref =</span> <span class="st">&quot;-1&quot;</span>)</span>
+<span id="cb10-6"><a href></a>    )</span>
+<span id="cb10-7"><a href></a></span>
+<span id="cb10-8"><a href></a><span class="fu">as.data.frame</span>(</span>
+<span id="cb10-9"><a href></a>  did_ex_tab <span class="sc">|&gt;</span> <span class="fu">select</span>(unit_id, year, treatment_group, rel_t_treat.f)</span>
+<span id="cb10-10"><a href></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div><div class="column fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>   unit_id year treatment_group rel_t_treat.f
+1        1 2014               1            -2
+2        1 2015               1            -1
+3        1 2016               1             0
+4        1 2017               1             1
+5        1 2018               1             2
+6        2 2014               1            -2
+7        2 2015               1            -1
+8        2 2016               1             0
+9        2 2017               1             1
+10       2 2018               1             2
+11       3 2014               0             0
+12       3 2015               0             0
+13       3 2016               0             0
+14       3 2017               0             0
+15       3 2018               0             0
+16       4 2014               0             0
+17       4 2015               0             0
+18       4 2016               0             0
+19       4 2017               0             0
+20       4 2018               0             0</code></pre>
+</div>
+</div></div>
+</div>
+</section>
 <section id="dynamic-did-example" class="slide level2 smaller">
 <h2>Dynamic DiD Example</h2>
 <ul>
@@ -1777,26 +1822,67 @@ y_{it} = \sum_{j=-J}^{-2}\beta_jD_{it} + \sum_{k=0}^{K}\beta_kD_{it}  + \alpha_i
 <section id="estimating-the-dynamic-model" class="slide level2 smaller">
 <h2>Estimating the Dynamic Model</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href></a>dyn_did <span class="ot">&lt;-</span> <span class="fu">feols</span>(manufacturing_emp <span class="sc">~</span> <span class="st">`</span><span class="at">rel_t_treat_-10</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_-9</span><span class="st">`</span> <span class="sc">+</span></span>
-<span id="cb10-2"><a href></a>    <span class="st">`</span><span class="at">rel_t_treat_-8</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_-7</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_-6</span><span class="st">`</span> <span class="sc">+</span></span>
-<span id="cb10-3"><a href></a>    <span class="st">`</span><span class="at">rel_t_treat_-5</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_-4</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_-3</span><span class="st">`</span> <span class="sc">+</span></span>
-<span id="cb10-4"><a href></a>    <span class="st">`</span><span class="at">rel_t_treat_-2</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_0</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_1</span><span class="st">`</span> <span class="sc">+</span></span>
-<span id="cb10-5"><a href></a>    <span class="st">`</span><span class="at">rel_t_treat_2</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_3</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_4</span><span class="st">`</span> <span class="sc">+</span></span>
-<span id="cb10-6"><a href></a>    <span class="st">`</span><span class="at">rel_t_treat_5</span><span class="st">`</span> <span class="sc">|</span></span>
-<span id="cb10-7"><a href></a>    city_id <span class="sc">+</span> year,</span>
-<span id="cb10-8"><a href></a>    <span class="at">vcov =</span> <span class="st">&quot;HC1&quot;</span>,</span>
-<span id="cb10-9"><a href></a>    <span class="at">data =</span> final_simulated_data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href></a>dyn_did <span class="ot">&lt;-</span> <span class="fu">feols</span>(manufacturing_emp <span class="sc">~</span> <span class="st">`</span><span class="at">rel_t_treat_-10</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_-9</span><span class="st">`</span> <span class="sc">+</span></span>
+<span id="cb12-2"><a href></a>    <span class="st">`</span><span class="at">rel_t_treat_-8</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_-7</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_-6</span><span class="st">`</span> <span class="sc">+</span></span>
+<span id="cb12-3"><a href></a>    <span class="st">`</span><span class="at">rel_t_treat_-5</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_-4</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_-3</span><span class="st">`</span> <span class="sc">+</span></span>
+<span id="cb12-4"><a href></a>    <span class="st">`</span><span class="at">rel_t_treat_-2</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_0</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_1</span><span class="st">`</span> <span class="sc">+</span></span>
+<span id="cb12-5"><a href></a>    <span class="st">`</span><span class="at">rel_t_treat_2</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_3</span><span class="st">`</span> <span class="sc">+</span> <span class="st">`</span><span class="at">rel_t_treat_4</span><span class="st">`</span> <span class="sc">+</span></span>
+<span id="cb12-6"><a href></a>    <span class="st">`</span><span class="at">rel_t_treat_5</span><span class="st">`</span> <span class="sc">|</span></span>
+<span id="cb12-7"><a href></a>    city_id <span class="sc">+</span> year,</span>
+<span id="cb12-8"><a href></a>    <span class="at">vcov =</span> <span class="st">&quot;HC1&quot;</span>,</span>
+<span id="cb12-9"><a href></a>    <span class="at">data =</span> final_simulated_data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <ul>
 <li class="fragment">Note: <code>rel_t_treat_-1</code> (the period right before treatment) is <strong>omitted</strong> as the reference category</li>
 <li class="fragment">Each coefficient = treatment effect at that relative time, compared to <span class="math inline">\(k = -1\)</span></li>
-<li class="fragment">Alternatively, can make the <code>rel_t_treat</code> variable a factor and set the reference level to <code>-1</code></li>
 </ul>
+</section>
+<section id="estimating-the-dynamic-model-1" class="slide level2 smaller">
+<h2>Estimating the Dynamic Model</h2>
+<ul>
+<li class="fragment">Instead estimating using the factor variable:</li>
+</ul>
+<div class="fragment">
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href></a>dyn_did_2 <span class="ot">&lt;-</span> <span class="fu">feols</span>(manufacturing_emp <span class="sc">~</span> rel_t_treat.f <span class="sc">|</span></span>
+<span id="cb13-2"><a href></a>    city_id <span class="sc">+</span> year,</span>
+<span id="cb13-3"><a href></a>    <span class="at">vcov =</span> <span class="st">&quot;HC1&quot;</span>,</span>
+<span id="cb13-4"><a href></a>    <span class="at">data =</span> final_simulated_data)</span>
+<span id="cb13-5"><a href></a></span>
+<span id="cb13-6"><a href></a><span class="fu">summary</span>(dyn_did_2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>OLS estimation, Dep. Var.: manufacturing_emp
+Observations: 800
+Fixed-effects: city_id: 50,  year: 16
+Standard-errors: Heteroskedasticity-robust 
+                    Estimate Std. Error    t value   Pr(&gt;|t|)    
+rel_t_treat.f-10  -45.891986    20.8395  -2.202162 2.7970e-02 *  
+rel_t_treat.f-9     0.032430    21.8538   0.001484 9.9882e-01    
+rel_t_treat.f-8     4.200795    21.3792   0.196490 8.4428e-01    
+rel_t_treat.f-7     0.004546    23.3134   0.000195 9.9984e-01    
+rel_t_treat.f-6   -25.407032    20.7310  -1.225557 2.2077e-01    
+rel_t_treat.f-5   -18.816323    21.7368  -0.865646 3.8697e-01    
+rel_t_treat.f-4     0.190090    20.0074   0.009501 9.9242e-01    
+rel_t_treat.f-3   -30.032327    20.7426  -1.447857 1.4809e-01    
+rel_t_treat.f-2     5.899519    20.8296   0.283228 7.7708e-01    
+rel_t_treat.f0   -118.727649    19.1594  -6.196822 9.6929e-10 ***
+rel_t_treat.f1   -305.130219    21.6454 -14.096784  &lt; 2.2e-16 ***
+rel_t_treat.f2   -455.941394    20.6898 -22.037036  &lt; 2.2e-16 ***
+rel_t_treat.f3   -499.662713    21.8847 -22.831593  &lt; 2.2e-16 ***
+rel_t_treat.f4   -517.799223    21.9008 -23.642990  &lt; 2.2e-16 ***
+rel_t_treat.f5   -494.140275    21.8736 -22.590724  &lt; 2.2e-16 ***
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+RMSE: 47.7     Adj. R2: 0.962362
+             Within R2: 0.825985</code></pre>
+</div>
+</div>
+</div>
 </section>
 <section id="interpreting-the-results" class="slide level2 smaller">
 <h2>Interpreting the Results</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href></a><span class="fu">summary</span>(dyn_did)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href></a><span class="fu">summary</span>(dyn_did)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>OLS estimation, Dep. Var.: manufacturing_emp
 Observations: 800
@@ -1872,34 +1958,34 @@ RMSE: 47.7     Adj. R2: 0.948446
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href></a>est_tab <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(dyn_did<span class="sc">$</span>coeftable) <span class="sc">|&gt;</span></span>
-<span id="cb13-2"><a href></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">&quot;coefname&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb13-3"><a href></a>  <span class="fu">mutate</span>(</span>
-<span id="cb13-4"><a href></a>    <span class="at">est =</span> Estimate,</span>
-<span id="cb13-5"><a href></a>    <span class="at">ci95_l =</span> <span class="fu">confint</span>(dyn_did)[,<span class="dv">1</span>],</span>
-<span id="cb13-6"><a href></a>    <span class="at">ci95_u =</span> <span class="fu">confint</span>(dyn_did)[,<span class="dv">2</span>],</span>
-<span id="cb13-7"><a href></a>    <span class="at">rel_t =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">10</span><span class="sc">:-</span><span class="dv">2</span>, <span class="dv">0</span><span class="sc">:</span><span class="dv">5</span>))</span>
-<span id="cb13-8"><a href></a></span>
-<span id="cb13-9"><a href></a>omitted_lvl <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">coefname =</span> <span class="st">&quot;ref&quot;</span>, <span class="at">rel_t =</span> <span class="sc">-</span><span class="dv">1</span>, <span class="at">est =</span> <span class="dv">0</span>,</span>
-<span id="cb13-10"><a href></a>  <span class="at">ci95_l =</span> <span class="dv">0</span>, <span class="at">ci95_u =</span> <span class="dv">0</span>, <span class="at">Estimate =</span> <span class="dv">0</span>)</span>
-<span id="cb13-11"><a href></a></span>
-<span id="cb13-12"><a href></a>est_tab <span class="ot">&lt;-</span> est_tab <span class="sc">|&gt;</span></span>
-<span id="cb13-13"><a href></a>  <span class="fu">bind_rows</span>(omitted_lvl) <span class="sc">|&gt;</span></span>
-<span id="cb13-14"><a href></a>  <span class="fu">arrange</span>(rel_t)</span>
-<span id="cb13-15"><a href></a></span>
-<span id="cb13-16"><a href></a><span class="fu">ggplot</span>(<span class="at">data =</span> est_tab) <span class="sc">+</span></span>
-<span id="cb13-17"><a href></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">&quot;solid&quot;</span>, <span class="at">color =</span> <span class="st">&quot;gray60&quot;</span>) <span class="sc">+</span></span>
-<span id="cb13-18"><a href></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">linetype =</span> <span class="st">&quot;dashed&quot;</span>, <span class="at">color =</span> <span class="st">&quot;gray40&quot;</span>) <span class="sc">+</span></span>
-<span id="cb13-19"><a href></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">x =</span> rel_t, <span class="at">ymin =</span> ci95_l, <span class="at">ymax =</span> ci95_u),</span>
-<span id="cb13-20"><a href></a>    <span class="at">width =</span> <span class="fl">0.2</span>, <span class="at">color =</span> <span class="st">&quot;#0072B2&quot;</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb13-21"><a href></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> rel_t, <span class="at">y =</span> est), <span class="at">size =</span> <span class="dv">3</span>, <span class="at">color =</span> <span class="st">&quot;#0072B2&quot;</span>) <span class="sc">+</span></span>
-<span id="cb13-22"><a href></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> rel_t, <span class="at">y =</span> est), <span class="at">color =</span> <span class="st">&quot;#0072B2&quot;</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb13-23"><a href></a>  <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">700</span>, <span class="dv">300</span>)) <span class="sc">+</span></span>
-<span id="cb13-24"><a href></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">10</span>, <span class="dv">5</span>, <span class="dv">1</span>)) <span class="sc">+</span></span>
-<span id="cb13-25"><a href></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Years Relative to Policy Adoption&quot;</span>,</span>
-<span id="cb13-26"><a href></a>    <span class="at">y =</span> <span class="st">&quot;Estimated Effect on Employment&quot;</span>,</span>
-<span id="cb13-27"><a href></a>    <span class="at">title =</span> <span class="st">&quot;Event Study: Environmental Policy &amp; Manufacturing Employment&quot;</span>,</span>
-<span id="cb13-28"><a href></a>    <span class="at">subtitle =</span> <span class="st">&quot;Reference period: k = -1 (one year before adoption)&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href></a>est_tab <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(dyn_did<span class="sc">$</span>coeftable) <span class="sc">|&gt;</span></span>
+<span id="cb17-2"><a href></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">&quot;coefname&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb17-3"><a href></a>  <span class="fu">mutate</span>(</span>
+<span id="cb17-4"><a href></a>    <span class="at">est =</span> Estimate,</span>
+<span id="cb17-5"><a href></a>    <span class="at">ci95_l =</span> <span class="fu">confint</span>(dyn_did)[,<span class="dv">1</span>],</span>
+<span id="cb17-6"><a href></a>    <span class="at">ci95_u =</span> <span class="fu">confint</span>(dyn_did)[,<span class="dv">2</span>],</span>
+<span id="cb17-7"><a href></a>    <span class="at">rel_t =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">10</span><span class="sc">:-</span><span class="dv">2</span>, <span class="dv">0</span><span class="sc">:</span><span class="dv">5</span>))</span>
+<span id="cb17-8"><a href></a></span>
+<span id="cb17-9"><a href></a>omitted_lvl <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">coefname =</span> <span class="st">&quot;ref&quot;</span>, <span class="at">rel_t =</span> <span class="sc">-</span><span class="dv">1</span>, <span class="at">est =</span> <span class="dv">0</span>,</span>
+<span id="cb17-10"><a href></a>  <span class="at">ci95_l =</span> <span class="dv">0</span>, <span class="at">ci95_u =</span> <span class="dv">0</span>, <span class="at">Estimate =</span> <span class="dv">0</span>)</span>
+<span id="cb17-11"><a href></a></span>
+<span id="cb17-12"><a href></a>est_tab <span class="ot">&lt;-</span> est_tab <span class="sc">|&gt;</span></span>
+<span id="cb17-13"><a href></a>  <span class="fu">bind_rows</span>(omitted_lvl) <span class="sc">|&gt;</span></span>
+<span id="cb17-14"><a href></a>  <span class="fu">arrange</span>(rel_t)</span>
+<span id="cb17-15"><a href></a></span>
+<span id="cb17-16"><a href></a><span class="fu">ggplot</span>(<span class="at">data =</span> est_tab) <span class="sc">+</span></span>
+<span id="cb17-17"><a href></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">&quot;solid&quot;</span>, <span class="at">color =</span> <span class="st">&quot;gray60&quot;</span>) <span class="sc">+</span></span>
+<span id="cb17-18"><a href></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">linetype =</span> <span class="st">&quot;dashed&quot;</span>, <span class="at">color =</span> <span class="st">&quot;gray40&quot;</span>) <span class="sc">+</span></span>
+<span id="cb17-19"><a href></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">x =</span> rel_t, <span class="at">ymin =</span> ci95_l, <span class="at">ymax =</span> ci95_u),</span>
+<span id="cb17-20"><a href></a>    <span class="at">width =</span> <span class="fl">0.2</span>, <span class="at">color =</span> <span class="st">&quot;#0072B2&quot;</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb17-21"><a href></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> rel_t, <span class="at">y =</span> est), <span class="at">size =</span> <span class="dv">3</span>, <span class="at">color =</span> <span class="st">&quot;#0072B2&quot;</span>) <span class="sc">+</span></span>
+<span id="cb17-22"><a href></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> rel_t, <span class="at">y =</span> est), <span class="at">color =</span> <span class="st">&quot;#0072B2&quot;</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb17-23"><a href></a>  <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">700</span>, <span class="dv">300</span>)) <span class="sc">+</span></span>
+<span id="cb17-24"><a href></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">10</span>, <span class="dv">5</span>, <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb17-25"><a href></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Years Relative to Policy Adoption&quot;</span>,</span>
+<span id="cb17-26"><a href></a>    <span class="at">y =</span> <span class="st">&quot;Estimated Effect on Employment&quot;</span>,</span>
+<span id="cb17-27"><a href></a>    <span class="at">title =</span> <span class="st">&quot;Event Study: Environmental Policy &amp; Manufacturing Employment&quot;</span>,</span>
+<span id="cb17-28"><a href></a>    <span class="at">subtitle =</span> <span class="st">&quot;Reference period: k = -1 (one year before adoption)&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 </div>
@@ -2218,14 +2304,14 @@ RMSE: 47.7     Adj. R2: 0.948446
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href></a><span class="co"># Naive standard errors (WRONG with clustered data)</span></span>
-<span id="cb17-2"><a href></a>model <span class="ot">&lt;-</span> <span class="fu">feols</span>(y <span class="sc">~</span> treatment, <span class="at">data =</span> my_data, <span class="at">vcov =</span> <span class="st">&quot;iid&quot;</span>)</span>
-<span id="cb17-3"><a href></a></span>
-<span id="cb17-4"><a href></a><span class="co"># Heteroskedasticity-robust (ALSO WRONG with clustered data)</span></span>
-<span id="cb17-5"><a href></a>model <span class="ot">&lt;-</span> <span class="fu">feols</span>(y <span class="sc">~</span> treatment, <span class="at">data =</span> my_data, <span class="at">vcov =</span> <span class="st">&quot;HC1&quot;</span>)</span>
-<span id="cb17-6"><a href></a></span>
-<span id="cb17-7"><a href></a><span class="co"># Cluster-robust standard errors (CORRECT)</span></span>
-<span id="cb17-8"><a href></a>model <span class="ot">&lt;-</span> <span class="fu">feols</span>(y <span class="sc">~</span> treatment, <span class="at">data =</span> my_data, <span class="at">cluster =</span> <span class="st">&quot;cluster_id&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href></a><span class="co"># Naive standard errors (WRONG with clustered data)</span></span>
+<span id="cb21-2"><a href></a>model <span class="ot">&lt;-</span> <span class="fu">feols</span>(y <span class="sc">~</span> treatment, <span class="at">data =</span> my_data, <span class="at">vcov =</span> <span class="st">&quot;iid&quot;</span>)</span>
+<span id="cb21-3"><a href></a></span>
+<span id="cb21-4"><a href></a><span class="co"># Heteroskedasticity-robust (ALSO WRONG with clustered data)</span></span>
+<span id="cb21-5"><a href></a>model <span class="ot">&lt;-</span> <span class="fu">feols</span>(y <span class="sc">~</span> treatment, <span class="at">data =</span> my_data, <span class="at">vcov =</span> <span class="st">&quot;HC1&quot;</span>)</span>
+<span id="cb21-6"><a href></a></span>
+<span id="cb21-7"><a href></a><span class="co"># Cluster-robust standard errors (CORRECT)</span></span>
+<span id="cb21-8"><a href></a>model <span class="ot">&lt;-</span> <span class="fu">feols</span>(y <span class="sc">~</span> treatment, <span class="at">data =</span> my_data, <span class="at">cluster =</span> <span class="st">&quot;cluster_id&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 <div class="fragment">
@@ -2277,11 +2363,11 @@ RMSE: 47.7     Adj. R2: 0.948446
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href></a>did_crse <span class="ot">&lt;-</span> <span class="fu">feols</span>(uninsured_rate <span class="sc">~</span> treat_post <span class="sc">|</span> state_id <span class="sc">+</span> year,</span>
-<span id="cb22-2"><a href></a>                   <span class="at">cluster =</span> <span class="st">&quot;state_id&quot;</span>,</span>
-<span id="cb22-3"><a href></a>                   <span class="at">data =</span> aca_exp_data)</span>
-<span id="cb22-4"><a href></a></span>
-<span id="cb22-5"><a href></a><span class="fu">summary</span>(did_crse)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href></a>did_crse <span class="ot">&lt;-</span> <span class="fu">feols</span>(uninsured_rate <span class="sc">~</span> treat_post <span class="sc">|</span> state_id <span class="sc">+</span> year,</span>
+<span id="cb26-2"><a href></a>                   <span class="at">cluster =</span> <span class="st">&quot;state_id&quot;</span>,</span>
+<span id="cb26-3"><a href></a>                   <span class="at">data =</span> aca_exp_data)</span>
+<span id="cb26-4"><a href></a></span>
+<span id="cb26-5"><a href></a><span class="fu">summary</span>(did_crse)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>OLS estimation, Dep. Var.: uninsured_rate
 Observations: 1,800
