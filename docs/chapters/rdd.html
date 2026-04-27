@@ -87,7 +87,7 @@ div.csl-indent {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../chapters/references.html" rel="next">
+<link href="../chapters/putting_it_all_together.html" rel="next">
 <link href="../chapters/instrumental_variables.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
@@ -310,6 +310,12 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../chapters/putting_it_all_together.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Putting It All Together</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../chapters/references.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">References</span></a>
   </div>
@@ -399,23 +405,13 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#the-idea-of-local-estimation" id="toc-the-idea-of-local-estimation" class="nav-link" data-scroll-target="#the-idea-of-local-estimation"><span class="header-section-number">15.7.1</span> The Idea of Local Estimation</a></li>
   <li><a href="#a-hands-on-bandwidth-example" id="toc-a-hands-on-bandwidth-example" class="nav-link" data-scroll-target="#a-hands-on-bandwidth-example"><span class="header-section-number">15.7.2</span> A Hands-On Bandwidth Example</a></li>
-  <li><a href="#the-rdrobust-package-automating-the-bandwidth-choice" id="toc-the-rdrobust-package-automating-the-bandwidth-choice" class="nav-link" data-scroll-target="#the-rdrobust-package-automating-the-bandwidth-choice"><span class="header-section-number">15.7.3</span> The <code>rdrobust</code> Package: Automating the Bandwidth Choice</a></li>
-  <li><a href="#estimation-with-rdrobust" id="toc-estimation-with-rdrobust" class="nav-link" data-scroll-target="#estimation-with-rdrobust"><span class="header-section-number">15.7.4</span> Estimation with <code>rdrobust()</code></a></li>
-  <li><a href="#plotting-the-result-with-rdplot" id="toc-plotting-the-result-with-rdplot" class="nav-link" data-scroll-target="#plotting-the-result-with-rdplot"><span class="header-section-number">15.7.5</span> Plotting the Result with <code>rdplot()</code></a></li>
-  <li><a href="#hand-coded-vs.-package-estimation" id="toc-hand-coded-vs.-package-estimation" class="nav-link" data-scroll-target="#hand-coded-vs.-package-estimation"><span class="header-section-number">15.7.6</span> Hand-Coded vs.&nbsp;Package Estimation</a></li>
   </ul></li>
   <li><a href="#cause-specific-effects-a-falsification-test" id="toc-cause-specific-effects-a-falsification-test" class="nav-link" data-scroll-target="#cause-specific-effects-a-falsification-test"><span class="header-section-number">15.8</span> Cause-Specific Effects: A Falsification Test</a>
   <ul class="collapse">
   <li><a href="#the-idea" id="toc-the-idea" class="nav-link" data-scroll-target="#the-idea"><span class="header-section-number">15.8.1</span> The Idea</a></li>
   <li><a href="#a-simulated-illustration" id="toc-a-simulated-illustration" class="nav-link" data-scroll-target="#a-simulated-illustration"><span class="header-section-number">15.8.2</span> A Simulated Illustration</a></li>
   </ul></li>
-  <li><a href="#fuzzy-rd-when-the-cutoff-shifts-treatment-probability" id="toc-fuzzy-rd-when-the-cutoff-shifts-treatment-probability" class="nav-link" data-scroll-target="#fuzzy-rd-when-the-cutoff-shifts-treatment-probability"><span class="header-section-number">15.9</span> Fuzzy RD: When the Cutoff Shifts Treatment Probability</a>
-  <ul class="collapse">
-  <li><a href="#the-elite-illusion" id="toc-the-elite-illusion" class="nav-link" data-scroll-target="#the-elite-illusion"><span class="header-section-number">15.9.1</span> The Elite Illusion</a></li>
-  <li><a href="#from-reduced-form-to-2sls" id="toc-from-reduced-form-to-2sls" class="nav-link" data-scroll-target="#from-reduced-form-to-2sls"><span class="header-section-number">15.9.2</span> From Reduced Form to 2SLS</a></li>
-  <li><a href="#a-simulated-fuzzy-rd-example" id="toc-a-simulated-fuzzy-rd-example" class="nav-link" data-scroll-target="#a-simulated-fuzzy-rd-example"><span class="header-section-number">15.9.3</span> A Simulated Fuzzy RD Example</a></li>
-  <li><a href="#visualizing-the-fuzzy-rd" id="toc-visualizing-the-fuzzy-rd" class="nav-link" data-scroll-target="#visualizing-the-fuzzy-rd"><span class="header-section-number">15.9.4</span> Visualizing the Fuzzy RD</a></li>
-  </ul></li>
+  <li><a href="#a-brief-note-on-fuzzy-rd" id="toc-a-brief-note-on-fuzzy-rd" class="nav-link" data-scroll-target="#a-brief-note-on-fuzzy-rd"><span class="header-section-number">15.9</span> A Brief Note on Fuzzy RD</a></li>
   <li><a href="#assessing-the-validity-of-an-rd-design" id="toc-assessing-the-validity-of-an-rd-design" class="nav-link" data-scroll-target="#assessing-the-validity-of-an-rd-design"><span class="header-section-number">15.10</span> Assessing the Validity of an RD Design</a>
   <ul class="collapse">
   <li><a href="#what-could-go-wrong" id="toc-what-could-go-wrong" class="nav-link" data-scroll-target="#what-could-go-wrong"><span class="header-section-number">15.10.1</span> What Could Go Wrong</a></li>
@@ -548,7 +544,6 @@ function checkAnswer(selectElement, correctValue) {
 <li>What is a regression discontinuity (RD) design, and when can we use it?</li>
 <li>How do cutoffs in the real world generate natural experiments?</li>
 <li>What is a “running variable,” and what role does it play?</li>
-<li>What is the difference between <strong>sharp</strong> and <strong>fuzzy</strong> RD?</li>
 <li>How do we choose between parametric and nonparametric RD, and what is a bandwidth?</li>
 <li>How do we test whether an RD design is credible?</li>
 </ul>
@@ -570,7 +565,6 @@ function checkAnswer(selectElement, correctValue) {
 <ul>
 <li>Angrist &amp; Pischke, <em>Mastering ’Metrics</em>, Chapter 4.</li>
 <li>Carpenter &amp; Dobkin (2009), “The Effect of Alcohol Consumption on Mortality: Regression Discontinuity Evidence from the Minimum Drinking Age,” <em>American Economic Journal: Applied Economics</em>.</li>
-<li>Abdulkadiroğlu, Angrist, &amp; Pathak (2014), “The Elite Illusion: Achievement Effects at Boston and New York Exam Schools,” <em>Econometrica</em>.</li>
 </ul>
 </div>
 </div>
@@ -735,8 +729,7 @@ D_a = \begin{cases} 1 &amp; \text{if } a \geq 21 \\ 0 &amp; \text{if } a &lt; 21
 <ul>
 <li>The <strong>running variable</strong> (also called the <em>forcing variable</em> or <em>score</em>) is the continuous variable whose value determines treatment. In the MLDA example, it is age.</li>
 <li>The <strong>cutoff</strong> (also called the <em>threshold</em>) is the value of the running variable at which treatment status changes. In the MLDA example, the cutoff is 21.</li>
-<li><strong>Sharp RD</strong> describes designs where treatment status is a deterministic function of the running variable, jumping cleanly from 0 to 1 (or vice versa) at the cutoff.</li>
-<li><strong>Fuzzy RD</strong> describes designs where the <em>probability</em> or <em>intensity</em> of treatment jumps at the cutoff, but treatment itself is not a perfect function of the running variable. We will take this up later.</li>
+<li><strong>Sharp RD</strong> describes designs where treatment status is a deterministic function of the running variable, jumping cleanly from 0 to 1 (or vice versa) at the cutoff. This chapter focuses on sharp RD. A <em>fuzzy</em> RD variant, where the cutoff shifts only the <em>probability</em> of treatment, is briefly noted at the end of the chapter.</li>
 </ul>
 </div>
 </div>
@@ -1284,127 +1277,20 @@ Table&nbsp;15.2: RD estimates of the MLDA effect at three different bandwidths. 
 </div>
 </div>
 <p>The point estimates are broadly similar across bandwidths, though the standard errors grow noticeably as we shrink the window. This stability under bandwidth changes is another hallmark of a credible RD.</p>
-</section>
-<section id="the-rdrobust-package-automating-the-bandwidth-choice" class="level3" data-number="15.7.3">
-<h3 data-number="15.7.3" class="anchored" data-anchor-id="the-rdrobust-package-automating-the-bandwidth-choice"><span class="header-section-number">15.7.3</span> The <code>rdrobust</code> Package: Automating the Bandwidth Choice</h3>
-<p>Choosing a bandwidth by hand is a judgment call, but econometricians have developed sophisticated methods for picking one that optimally balances bias and variance. The gold-standard implementation in R is the <strong><code>rdrobust</code></strong> package by Calonico, Cattaneo, and Titiunik, which automates essentially every step of a modern nonparametric RD:</p>
-<ol type="1">
-<li>Select an optimal bandwidth (MSE-optimal or coverage-error-optimal).</li>
-<li>Fit a local linear (or local polynomial) regression on either side of the cutoff.</li>
-<li>Weight observations by a kernel that gives more weight to points near the cutoff.</li>
-<li>Compute bias-corrected point estimates and <strong>robust</strong> standard errors that correct for the bias introduced by kernel smoothing.</li>
-</ol>
-<p>The two main functions are <code>rdrobust()</code> for estimation and <code>rdplot()</code> for visualization.</p>
-<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Why <code>rdrobust</code>?
+<span class="screen-reader-only">Tip</span>The <code>rdrobust</code> Package: Worth Exploring if You Use RD
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><code>rdrobust</code> has become the default in applied work for good reason. It implements state-of-the-art bandwidth selectors from <span class="citation" data-cites="imbens_kalyanaraman_2012">Imbens and Kalyanaraman (<a href="references.html#ref-imbens_kalyanaraman_2012" role="doc-biblioref">2012</a>)</span> and <span class="citation" data-cites="calonico_2014">Calonico et al. (<a href="references.html#ref-calonico_2014" role="doc-biblioref">2014</a>)</span>, uses bias-correction techniques that let you report inferences that are valid even when the optimal bandwidth choice is imperfect, and produces well-formatted plots you can drop straight into a paper. Installing it is simple: <code>install.packages("rdrobust")</code>.</p>
+<p>Choosing a bandwidth by hand is a judgment call. For published work, most applied economists instead use the <strong><code>rdrobust</code></strong> package in R, developed by Calonico, Cattaneo, and Titiunik. It automates the whole modern pipeline: it picks an MSE-optimal bandwidth, fits a kernel-weighted local linear (or polynomial) regression on each side of the cutoff, and reports <strong>bias-corrected</strong> point estimates together with <strong>robust standard errors</strong> that remain valid even when the optimal bandwidth is imperfect. The companion function <code>rdplot()</code> produces the publication-ready “jump at the cutoff” graph that you see in RD papers.</p>
+<p>We are not going to work through <code>rdrobust</code> in this course. The hand-coded <code>feols</code> RD above captures the essential idea: run a linear regression in a narrow window, and you have a local-linear nonparametric RD. But if you ever write a paper or thesis using an RD design, <code>rdrobust</code> is the tool to reach for. Useful references to start from are <span class="citation" data-cites="imbens_kalyanaraman_2012">Imbens and Kalyanaraman (<a href="references.html#ref-imbens_kalyanaraman_2012" role="doc-biblioref">2012</a>)</span> and <span class="citation" data-cites="calonico_2014">Calonico et al. (<a href="references.html#ref-calonico_2014" role="doc-biblioref">2014</a>)</span>. Installing the package is simple: <code>install.packages("rdrobust")</code>.</p>
 </div>
 </div>
-</section>
-<section id="estimation-with-rdrobust" class="level3" data-number="15.7.4">
-<h3 data-number="15.7.4" class="anchored" data-anchor-id="estimation-with-rdrobust"><span class="header-section-number">15.7.4</span> Estimation with <code>rdrobust()</code></h3>
-<p><code>rdrobust()</code> needs three pieces of information: the outcome, the running variable, and (optionally) the cutoff <code>c</code>. Here is a complete estimation on our MLDA data:</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Default local linear RD with MSE-optimal bandwidth</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>rd_rb <span class="ot">&lt;-</span> <span class="fu">rdrobust</span>(<span class="at">y =</span> mlda_data<span class="sc">$</span>death_rate,</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">x =</span> mlda_data<span class="sc">$</span>months,</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">c =</span> <span class="dv">0</span>)</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(rd_rb)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Sharp RD estimates using local polynomial regression.
-
-Number of Obs.                   48
-BW type                       mserd
-Kernel                   Triangular
-VCE method                       NN
-
-Number of Obs.                   24           24
-Eff. Number of Obs.               7            8
-Order est. (p)                    1            1
-Order bias  (q)                   2            2
-BW est. (h)                   7.423        7.423
-BW bias (b)                  11.800       11.800
-rho (h/b)                     0.629        0.629
-Unique Obs.                      24           24
-
-=====================================================================
-                   Point    Robust Inference
-                Estimate         z     P&gt;|z|      [ 95% C.I. ]       
----------------------------------------------------------------------
-     RD Effect     2.843     0.835     0.404    [-3.263 , 8.108]     
-=====================================================================</code></pre>
-</div>
-</div>
-<p>The output reports three related estimates:</p>
-<ul>
-<li><strong>Conventional:</strong> the standard local-linear point estimate and its usual standard error.</li>
-<li><strong>Bias-corrected:</strong> the same point estimate adjusted for the bias inherent in local-linear smoothing.</li>
-<li><strong>Robust:</strong> the bias-corrected estimate with standard errors that are valid under that bias correction. This is the inference method Calonico, Cattaneo, and Titiunik recommend reporting.</li>
-</ul>
-<p>The MSE-optimal bandwidth—chosen by the package automatically—is printed near the bottom. Under the hood, <code>rdrobust</code> is doing a weighted local linear regression, but the interface is completely automatic.</p>
-</section>
-<section id="plotting-the-result-with-rdplot" class="level3" data-number="15.7.5">
-<h3 data-number="15.7.5" class="anchored" data-anchor-id="plotting-the-result-with-rdplot"><span class="header-section-number">15.7.5</span> Plotting the Result with <code>rdplot()</code></h3>
-<p>The companion function <code>rdplot()</code> makes a clean visualization: it bins the running variable, averages the outcome within each bin, and fits a (polynomial) trend on each side of the cutoff.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rdplot</span>(<span class="at">y =</span> mlda_data<span class="sc">$</span>death_rate,</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> mlda_data<span class="sc">$</span>months,</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>       <span class="at">c =</span> <span class="dv">0</span>,</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">p =</span> <span class="dv">2</span>,</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">title    =</span> <span class="st">""</span>,</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">x.label  =</span> <span class="st">"Months from 21st birthday"</span>,</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">y.label  =</span> <span class="st">"Death rate per 100,000"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output-display">
-<div id="fig-rdplot" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-rdplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;15.6: RD plot using the <code>rdrobust::rdplot()</code> function. Dots are bin-averages of the outcome, and the lines are fitted polynomials. The jump at the cutoff is the RD estimate.
-</figcaption>
-<div aria-describedby="fig-rdplot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="rdd_files/figure-html/fig-rdplot-1.png" class="img-fluid figure-img" width="672">
-</div>
-</figure>
-</div>
-</div>
-</div>
-<p>Notice the automatic binning: <code>rdplot()</code> chose a bin width using a mean-squared-error criterion, so the resulting scatter shows the general shape of the data without drowning you in noise. The curves on each side of the cutoff are quadratic fits, and the vertical gap at zero is the estimated MLDA effect.</p>
-</section>
-<section id="hand-coded-vs.-package-estimation" class="level3" data-number="15.7.6">
-<h3 data-number="15.7.6" class="anchored" data-anchor-id="hand-coded-vs.-package-estimation"><span class="header-section-number">15.7.6</span> Hand-Coded vs.&nbsp;Package Estimation</h3>
-<p>One of the themes of this book is that the packages make our lives easier, but the underlying regression is something you could write yourself. The <code>rdrobust</code> estimate with bandwidth <span class="math inline">\(b\)</span> (setting aside the kernel weighting and bias correction for a moment) is essentially the same as our hand-coded <code>feols</code> regression on <code>abs(months) &lt;= b</code>. Using the same bandwidth, the two should deliver very similar point estimates:</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract the MSE-optimal bandwidth chosen by rdrobust</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>opt_bw <span class="ot">&lt;-</span> rd_rb<span class="sc">$</span>bws[<span class="dv">1</span>, <span class="dv">1</span>]</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>opt_bw</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 7.423076</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Hand-rolled local linear RD at that bandwidth</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>rd_hand <span class="ot">&lt;-</span> <span class="fu">feols</span>(death_rate <span class="sc">~</span> over21 <span class="sc">+</span> months <span class="sc">+</span> months<span class="sc">:</span>over21,</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">vcov =</span> <span class="st">"HC1"</span>,</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">data =</span> <span class="fu">subset</span>(mlda_data, <span class="fu">abs</span>(months) <span class="sc">&lt;=</span> opt_bw))</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare the point estimates</span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(rd_hand)[<span class="st">"over21"</span>]            <span class="co"># hand-rolled</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>  over21 
-2.096363 </code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>rd_rb<span class="sc">$</span>coef[<span class="dv">1</span>]                      <span class="co"># rdrobust conventional estimate</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 2.842513</code></pre>
-</div>
-</div>
-<p>The two estimates are very close—not exactly equal, because <code>rdrobust</code> uses a triangular kernel that down-weights points further from the cutoff, while our hand-coded version gives every observation in the window equal weight. But the intuition is the same: run a linear RD in a narrow window, and you have a local-linear nonparametric RD.</p>
 </section>
 </section>
 <section id="cause-specific-effects-a-falsification-test" class="level2" data-number="15.8">
@@ -1425,39 +1311,39 @@ Figure&nbsp;15.6: RD plot using the <code>rdrobust::rdplot()</code> function. Do
 <h3 data-number="15.8.2" class="anchored" data-anchor-id="a-simulated-illustration"><span class="header-section-number">15.8.2</span> A Simulated Illustration</h3>
 <p>Let’s simulate two separate causes of death—a large MLDA effect on motor vehicle fatalities and a near-zero effect on internal causes—and plot them:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">99</span>)</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>cause_months <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">24</span>, <span class="dv">23</span>, <span class="at">by =</span> <span class="dv">1</span>)</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>cause_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">months =</span> cause_months,</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">over21 =</span> <span class="fu">as.numeric</span>(months <span class="sc">&gt;=</span> <span class="dv">0</span>),</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">mva    =</span> <span class="dv">25</span> <span class="sc">+</span> <span class="fl">0.05</span> <span class="sc">*</span> months <span class="sc">+</span> <span class="fl">4.5</span> <span class="sc">*</span> over21 <span class="sc">+</span></span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>             <span class="fu">rnorm</span>(<span class="fu">length</span>(cause_months), <span class="dv">0</span>, <span class="fl">1.2</span>),</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">intern =</span> <span class="dv">15</span> <span class="sc">+</span> <span class="fl">0.10</span> <span class="sc">*</span> months <span class="sc">+</span> <span class="fl">0.4</span> <span class="sc">*</span> over21 <span class="sc">+</span></span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>             <span class="fu">rnorm</span>(<span class="fu">length</span>(cause_months), <span class="dv">0</span>, <span class="fl">1.0</span>)</span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_longer</span>(<span class="fu">c</span>(mva, intern), <span class="at">names_to =</span> <span class="st">"cause"</span>, <span class="at">values_to =</span> <span class="st">"rate"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">cause =</span> <span class="fu">recode</span>(cause,</span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>                          <span class="at">mva    =</span> <span class="st">"Motor vehicle fatalities"</span>,</span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>                          <span class="at">intern =</span> <span class="st">"Deaths from internal causes"</span>))</span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(cause_data, <span class="fu">aes</span>(<span class="at">x =</span> months, <span class="at">y =</span> rate, <span class="at">color =</span> cause)) <span class="sc">+</span></span>
-<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">1.8</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
-<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="fu">aes</span>(<span class="at">group =</span> <span class="fu">interaction</span>(cause, over21)),</span>
-<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>                <span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">formula =</span> y <span class="sc">~</span> <span class="fu">poly</span>(x, <span class="dv">2</span>),</span>
-<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>                <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
-<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Motor vehicle fatalities"</span> <span class="ot">=</span> <span class="st">"#0072B2"</span>,</span>
-<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>                                  <span class="st">"Deaths from internal causes"</span> <span class="ot">=</span> <span class="st">"grey50"</span>)) <span class="sc">+</span></span>
-<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Age in Months (0 = 21st birthday)"</span>,</span>
-<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>         <span class="at">y =</span> <span class="st">"Death Rate per 100,000"</span>,</span>
-<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>         <span class="at">color =</span> <span class="st">"Cause of death"</span>) <span class="sc">+</span></span>
-<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
-<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">99</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>cause_months <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">24</span>, <span class="dv">23</span>, <span class="at">by =</span> <span class="dv">1</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>cause_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">months =</span> cause_months,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">over21 =</span> <span class="fu">as.numeric</span>(months <span class="sc">&gt;=</span> <span class="dv">0</span>),</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">mva    =</span> <span class="dv">25</span> <span class="sc">+</span> <span class="fl">0.05</span> <span class="sc">*</span> months <span class="sc">+</span> <span class="fl">4.5</span> <span class="sc">*</span> over21 <span class="sc">+</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>             <span class="fu">rnorm</span>(<span class="fu">length</span>(cause_months), <span class="dv">0</span>, <span class="fl">1.2</span>),</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">intern =</span> <span class="dv">15</span> <span class="sc">+</span> <span class="fl">0.10</span> <span class="sc">*</span> months <span class="sc">+</span> <span class="fl">0.4</span> <span class="sc">*</span> over21 <span class="sc">+</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>             <span class="fu">rnorm</span>(<span class="fu">length</span>(cause_months), <span class="dv">0</span>, <span class="fl">1.0</span>)</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_longer</span>(<span class="fu">c</span>(mva, intern), <span class="at">names_to =</span> <span class="st">"cause"</span>, <span class="at">values_to =</span> <span class="st">"rate"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">cause =</span> <span class="fu">recode</span>(cause,</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>                          <span class="at">mva    =</span> <span class="st">"Motor vehicle fatalities"</span>,</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>                          <span class="at">intern =</span> <span class="st">"Deaths from internal causes"</span>))</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(cause_data, <span class="fu">aes</span>(<span class="at">x =</span> months, <span class="at">y =</span> rate, <span class="at">color =</span> cause)) <span class="sc">+</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">1.8</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="fu">aes</span>(<span class="at">group =</span> <span class="fu">interaction</span>(cause, over21)),</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>                <span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">formula =</span> y <span class="sc">~</span> <span class="fu">poly</span>(x, <span class="dv">2</span>),</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>                <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Motor vehicle fatalities"</span> <span class="ot">=</span> <span class="st">"#0072B2"</span>,</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>                                  <span class="st">"Deaths from internal causes"</span> <span class="ot">=</span> <span class="st">"grey50"</span>)) <span class="sc">+</span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Age in Months (0 = 21st birthday)"</span>,</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>         <span class="at">y =</span> <span class="st">"Death Rate per 100,000"</span>,</span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>         <span class="at">color =</span> <span class="st">"Cause of death"</span>) <span class="sc">+</span></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div id="fig-cause-specific" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-cause-specific-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;15.7: A visual falsification test: motor vehicle fatalities (blue) jump sharply at the MLDA cutoff, while deaths from internal causes (gray) show essentially no jump. This pattern supports a causal interpretation of the MLDA effect.
+Figure&nbsp;15.6: A visual falsification test: motor vehicle fatalities (blue) jump sharply at the MLDA cutoff, while deaths from internal causes (gray) show essentially no jump. This pattern supports a causal interpretation of the MLDA effect.
 </figcaption>
 <div aria-describedby="fig-cause-specific-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="rdd_files/figure-html/fig-cause-specific-1.png" class="img-fluid figure-img" width="672">
@@ -1469,305 +1355,11 @@ Figure&nbsp;15.7: A visual falsification test: motor vehicle fatalities (blue) j
 <p>The picture says it all. Motor vehicle fatalities jump sharply at the cutoff; deaths from internal causes barely budge. Alcohol is plausibly responsible for the first pattern and demonstrably not responsible for the second. This is the kind of evidence that makes an RD design convincing to a skeptical reader.</p>
 </section>
 </section>
-<section id="fuzzy-rd-when-the-cutoff-shifts-treatment-probability" class="level2" data-number="15.9">
-<h2 data-number="15.9" class="anchored" data-anchor-id="fuzzy-rd-when-the-cutoff-shifts-treatment-probability"><span class="header-section-number">15.9</span> Fuzzy RD: When the Cutoff Shifts Treatment Probability</h2>
-<p>So far we have focused on sharp RD, where treatment <em>is</em> a function of the running variable. In many applications, however, the cutoff changes the <strong>probability</strong> of treatment—not treatment itself—or the <strong>intensity</strong> of treatment, as measured by some continuous exposure variable. This is called <strong>fuzzy RD</strong>.</p>
-<section id="the-elite-illusion" class="level3" data-number="15.9.1">
-<h3 data-number="15.9.1" class="anchored" data-anchor-id="the-elite-illusion"><span class="header-section-number">15.9.1</span> The Elite Illusion</h3>
-<p>AP’s flagship fuzzy RD example comes from Abdulkadiroğlu, Angrist, and Pathak’s (2014) study of Boston’s elite exam schools.</p>
-<p>Every year, thousands of Boston middle schoolers take the Independent Schools Entrance Exam (ISEE) in hopes of winning a seat at Boston Latin School (BLS), the most selective public exam school in the city. Admission is determined by a sharp test-score cutoff. If your score is above the cutoff, you get an offer. If it is below, you do not.</p>
-<p>But notice that <em>attending BLS</em> is not a sharp function of the cutoff. Some students who qualify decline the offer and enroll elsewhere. Some students who miss the cutoff go on to attend another exam school (often Boston Latin Academy, one step down the hierarchy). So actual BLS attendance changes smoothly—but not cleanly—at the cutoff.</p>
-<p>The <em>probability</em> of enrolling at BLS does jump at the cutoff, but not from 0 to 1. Similarly, the <em>peer quality</em> a student experiences—average classmate test scores—jumps sharply at the cutoff as treated students are placed in much more selective classrooms. The cutoff is like a shove: it nudges students into (or out of) a more selective environment, even if it does not mechanically determine any one student’s school.</p>
-</section>
-<section id="from-reduced-form-to-2sls" class="level3" data-number="15.9.2">
-<h3 data-number="15.9.2" class="anchored" data-anchor-id="from-reduced-form-to-2sls"><span class="header-section-number">15.9.2</span> From Reduced Form to 2SLS</h3>
-<p>To formalize this, we distinguish three objects:</p>
-<ol type="1">
-<li><strong>The reduced form</strong> is a sharp-style RD regression of the outcome on a dummy for clearing the cutoff. <span class="math display">\[
-Y_i = \alpha_0 + \rho D_i + \beta_0 R_i + e_{0i}
-\]</span> Here <span class="math inline">\(D_i = 1\)</span> if applicant <span class="math inline">\(i\)</span> cleared the BLS cutoff, and <span class="math inline">\(R_i\)</span> is their running-variable score.</li>
-<li><strong>The first stage</strong> is a sharp-style RD regression of the endogenous treatment (e.g., average peer quality <span class="math inline">\(\bar{X}_{(i)}\)</span>) on the same cutoff dummy. <span class="math display">\[
-\bar{X}_{(i)} = \alpha_1 + \phi D_i + \beta_1 R_i + e_{1i}
-\]</span> Here <span class="math inline">\(\phi\)</span> captures the jump in peer quality induced by crossing the cutoff.</li>
-<li><strong>The second stage</strong> is the causal relationship of interest: the effect of peer quality on the outcome. <span class="math display">\[
-Y_i = \alpha_2 + \lambda \hat{\bar{X}}_{(i)} + \beta_2 R_i + e_{2i}
-\]</span> where <span class="math inline">\(\hat{\bar{X}}_{(i)}\)</span> is the fitted value from the first stage.</li>
-</ol>
-<p>This is exactly the instrumental variables setup from <a href="instrumental_variables.html" class="quarto-xref"><span>Chapter 14</span></a>: <strong>clearing the cutoff</strong> is an instrument for <strong>peer quality</strong>. The two-stage-least-squares (2SLS) estimator is:</p>
-<p><span id="eq-fuzzy-rd"><span class="math display">\[
-\hat{\lambda}_{\text{2SLS}} = \frac{\hat{\rho}}{\hat{\phi}} = \frac{\text{jump in outcome}}{\text{jump in peer quality}}
-\tag{15.7}\]</span></span></p>
-<p>This is why fuzzy RD is often summarized as <em>“fuzzy RD is IV.”</em> The running-variable cutoff is your instrument. The reduced form is the RD on the outcome. The first stage is the RD on the treatment. And 2SLS just divides one by the other.</p>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Important</span>Fuzzy RD Is IV
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>In a fuzzy design, the indicator for clearing the cutoff is an <strong>instrument</strong> for the underlying treatment (enrollment, exposure, intensity). The causal effect is the ratio of the outcome RD to the treatment RD. All the same IV assumptions apply: the instrument must be relevant (it must actually shift treatment), and it must satisfy the exclusion restriction (it can only affect outcomes through treatment).</p>
-</div>
-</div>
-</section>
-<section id="a-simulated-fuzzy-rd-example" class="level3" data-number="15.9.3">
-<h3 data-number="15.9.3" class="anchored" data-anchor-id="a-simulated-fuzzy-rd-example"><span class="header-section-number">15.9.3</span> A Simulated Fuzzy RD Example</h3>
-<p>Let’s simulate a simplified version of the BLS setup. Applicants have a running-variable score centered at the cutoff. Clearing the cutoff raises the probability of enrolling at BLS (and thus the peer quality of your classmates), but does not move all students cleanly from 0 to 1.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">7</span>)</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">2000</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>exam_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">score =</span> <span class="fu">runif</span>(n, <span class="sc">-</span><span class="dv">20</span>, <span class="dv">20</span>),          <span class="co"># running variable, centered at cutoff</span></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">offer =</span> <span class="fu">as.numeric</span>(score <span class="sc">&gt;=</span> <span class="dv">0</span>)       <span class="co"># clearing the cutoff</span></span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Peer quality jumps by ~0.8 sigma at the cutoff (mirroring Fig 4.8)</span></span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">peer_quality =</span> <span class="fl">0.02</span> <span class="sc">*</span> score <span class="sc">+</span> <span class="fl">0.8</span> <span class="sc">*</span> offer <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="fl">0.3</span>),</span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Outcome: seventh-grade math score.</span></span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>        <span class="co"># The TRUE effect of peer quality on math is zero (mirroring AP).</span></span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>        <span class="co"># But the underlying score--outcome relationship is smooth.</span></span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">math =</span> <span class="fl">0.04</span> <span class="sc">*</span> score <span class="sc">+</span> <span class="dv">0</span> <span class="sc">*</span> peer_quality <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="fl">0.5</span>)</span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(exam_data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 6 × 4
-   score offer peer_quality   math
-   &lt;dbl&gt; &lt;dbl&gt;        &lt;dbl&gt;  &lt;dbl&gt;
-1  19.6      1        1.57   1.38 
-2  -4.09     0       -0.311 -0.695
-3 -15.4      0       -0.243 -0.959
-4 -17.2      0       -0.454 -1.62 
-5 -10.3      0       -0.451  0.684
-6  11.7      1        1.21   0.601</code></pre>
-</div>
-</div>
-<p>Now we can estimate the reduced form, first stage, and 2SLS estimate by hand:</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Reduced form: effect of clearing the cutoff on math</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>rf <span class="ot">&lt;-</span> <span class="fu">feols</span>(math <span class="sc">~</span> offer <span class="sc">+</span> score, <span class="at">vcov =</span> <span class="st">"HC1"</span>, <span class="at">data =</span> exam_data)</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co"># First stage: effect of clearing the cutoff on peer quality</span></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>fs <span class="ot">&lt;-</span> <span class="fu">feols</span>(peer_quality <span class="sc">~</span> offer <span class="sc">+</span> score, <span class="at">vcov =</span> <span class="st">"HC1"</span>, <span class="at">data =</span> exam_data)</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 2SLS: use "offer" as an instrument for "peer_quality",</span></span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="co"># controlling smoothly for the running variable (score).</span></span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>iv_fit <span class="ot">&lt;-</span> <span class="fu">feols</span>(math <span class="sc">~</span> score <span class="sc">|</span> peer_quality <span class="sc">~</span> offer,</span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>                <span class="at">vcov =</span> <span class="st">"HC1"</span>, <span class="at">data =</span> exam_data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">modelsummary</span>(</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="st">"First stage: peer quality"</span> <span class="ot">=</span> fs,</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>         <span class="st">"Reduced form: math"</span> <span class="ot">=</span> rf,</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>         <span class="st">"2SLS: peer effect"</span> <span class="ot">=</span> iv_fit),</span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">stars =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">gof_omit =</span> <span class="st">"AIC|BIC|Log|RMSE|Std|Within"</span></span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div id="tbl-fuzzy" class="cell quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-tbl figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-fuzzy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;15.3: Fuzzy RD estimation. The first stage shows a large jump in peer quality at the cutoff, the reduced form shows an approximately zero jump in math scores, and the 2SLS estimate of the peer-quality effect is approximately zero.
-</figcaption>
-<div aria-describedby="tbl-fuzzy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div class="cell-output-display">
-<!-- preamble start -->
-
-    <script src="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.js"></script>
-
-    <script>
-      // Create table-specific functions using external factory
-      const tableFns_0fcgufj11dui23xuy6ln = TinyTable.createTableFunctions("tinytable_0fcgufj11dui23xuy6ln");
-      // tinytable span after
-      window.addEventListener('load', function () {
-          var cellsToStyle = [
-            // tinytable style arrays after
-          { positions: [ { i: '11', j: 2 }, { i: '11', j: 3 }, { i: '11', j: 4 } ], css_id: 'tinytable_css_u5kcx3isk6vdhht058b2',}, 
-          { positions: [ { i: '8', j: 2 }, { i: '8', j: 3 }, { i: '8', j: 4 } ], css_id: 'tinytable_css_0deb8vntif782nryrqpq',}, 
-          { positions: [ { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '4', j: 2 }, { i: '5', j: 2 }, { i: '6', j: 2 }, { i: '7', j: 2 }, { i: '9', j: 2 }, { i: '10', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '3', j: 3 }, { i: '4', j: 3 }, { i: '5', j: 3 }, { i: '6', j: 3 }, { i: '7', j: 3 }, { i: '9', j: 3 }, { i: '10', j: 3 }, { i: '1', j: 4 }, { i: '2', j: 4 }, { i: '3', j: 4 }, { i: '4', j: 4 }, { i: '5', j: 4 }, { i: '6', j: 4 }, { i: '7', j: 4 }, { i: '9', j: 4 }, { i: '10', j: 4 } ], css_id: 'tinytable_css_tvfs7h1y12vf5jrmg2iw',}, 
-          { positions: [ { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 } ], css_id: 'tinytable_css_0jlkux1bjgu3ahi1fbjg',}, 
-          { positions: [ { i: '11', j: 1 } ], css_id: 'tinytable_css_0croxshaykd6kjgdptay',}, 
-          { positions: [ { i: '8', j: 1 } ], css_id: 'tinytable_css_hn6jkt994swf7zd740vd',}, 
-          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '4', j: 1 }, { i: '5', j: 1 }, { i: '6', j: 1 }, { i: '7', j: 1 }, { i: '9', j: 1 }, { i: '10', j: 1 } ], css_id: 'tinytable_css_uvr515efkkeamg1oah5c',}, 
-          { positions: [ { i: '0', j: 1 } ], css_id: 'tinytable_css_ojh0iglx468g3ivxe16q',}, 
-          ];
-
-          // Loop over the arrays to style the cells
-          cellsToStyle.forEach(function (group) {
-              group.positions.forEach(function (cell) {
-                  tableFns_0fcgufj11dui23xuy6ln.styleCell(cell.i, cell.j, group.css_id);
-              });
-          });
-      });
-    </script>
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
-    <style>
-    /* tinytable css entries after */
-    #tinytable_0fcgufj11dui23xuy6ln td.tinytable_css_u5kcx3isk6vdhht058b2, #tinytable_0fcgufj11dui23xuy6ln th.tinytable_css_u5kcx3isk6vdhht058b2 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
-    #tinytable_0fcgufj11dui23xuy6ln td.tinytable_css_0deb8vntif782nryrqpq, #tinytable_0fcgufj11dui23xuy6ln th.tinytable_css_0deb8vntif782nryrqpq {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
-    #tinytable_0fcgufj11dui23xuy6ln td.tinytable_css_tvfs7h1y12vf5jrmg2iw, #tinytable_0fcgufj11dui23xuy6ln th.tinytable_css_tvfs7h1y12vf5jrmg2iw { text-align: center }
-    #tinytable_0fcgufj11dui23xuy6ln td.tinytable_css_0jlkux1bjgu3ahi1fbjg, #tinytable_0fcgufj11dui23xuy6ln th.tinytable_css_0jlkux1bjgu3ahi1fbjg {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
-    #tinytable_0fcgufj11dui23xuy6ln td.tinytable_css_0croxshaykd6kjgdptay, #tinytable_0fcgufj11dui23xuy6ln th.tinytable_css_0croxshaykd6kjgdptay {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
-    #tinytable_0fcgufj11dui23xuy6ln td.tinytable_css_hn6jkt994swf7zd740vd, #tinytable_0fcgufj11dui23xuy6ln th.tinytable_css_hn6jkt994swf7zd740vd {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
-    #tinytable_0fcgufj11dui23xuy6ln td.tinytable_css_uvr515efkkeamg1oah5c, #tinytable_0fcgufj11dui23xuy6ln th.tinytable_css_uvr515efkkeamg1oah5c { text-align: left }
-    #tinytable_0fcgufj11dui23xuy6ln td.tinytable_css_ojh0iglx468g3ivxe16q, #tinytable_0fcgufj11dui23xuy6ln th.tinytable_css_ojh0iglx468g3ivxe16q {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
-    </style>
-    <div class="container">
-      <table class="tinytable" id="tinytable_0fcgufj11dui23xuy6ln" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
-        
-        <thead>
-              <tr>
-                <th scope="col" data-row="0" data-col="1"> </th>
-                <th scope="col" data-row="0" data-col="2">First stage: peer quality</th>
-                <th scope="col" data-row="0" data-col="3">Reduced form: math</th>
-                <th scope="col" data-row="0" data-col="4">2SLS: peer effect</th>
-              </tr>
-        </thead>
-        <tfoot><tr><td colspan="4">+ p &lt; 0.1, * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001</td></tr></tfoot>
-        <tbody>
-                <tr>
-                  <td data-row="1" data-col="1">(Intercept)</td>
-                  <td data-row="1" data-col="2">0.028+</td>
-                  <td data-row="1" data-col="3">-0.005</td>
-                  <td data-row="1" data-col="4">-0.005</td>
-                </tr>
-                <tr>
-                  <td data-row="2" data-col="1"></td>
-                  <td data-row="2" data-col="2">(0.014)</td>
-                  <td data-row="2" data-col="3">(0.025)</td>
-                  <td data-row="2" data-col="4">(0.027)</td>
-                </tr>
-                <tr>
-                  <td data-row="3" data-col="1">offer</td>
-                  <td data-row="3" data-col="2">0.747***</td>
-                  <td data-row="3" data-col="3">0.009</td>
-                  <td data-row="3" data-col="4"></td>
-                </tr>
-                <tr>
-                  <td data-row="4" data-col="1"></td>
-                  <td data-row="4" data-col="2">(0.027)</td>
-                  <td data-row="4" data-col="3">(0.045)</td>
-                  <td data-row="4" data-col="4"></td>
-                </tr>
-                <tr>
-                  <td data-row="5" data-col="1">score</td>
-                  <td data-row="5" data-col="2">0.022***</td>
-                  <td data-row="5" data-col="3">0.038***</td>
-                  <td data-row="5" data-col="4">0.037***</td>
-                </tr>
-                <tr>
-                  <td data-row="6" data-col="1"></td>
-                  <td data-row="6" data-col="2">(0.001)</td>
-                  <td data-row="6" data-col="3">(0.002)</td>
-                  <td data-row="6" data-col="4">(0.003)</td>
-                </tr>
-                <tr>
-                  <td data-row="7" data-col="1">fit_peer_quality</td>
-                  <td data-row="7" data-col="2"></td>
-                  <td data-row="7" data-col="3"></td>
-                  <td data-row="7" data-col="4">0.012</td>
-                </tr>
-                <tr>
-                  <td data-row="8" data-col="1"></td>
-                  <td data-row="8" data-col="2"></td>
-                  <td data-row="8" data-col="3"></td>
-                  <td data-row="8" data-col="4">(0.060)</td>
-                </tr>
-                <tr>
-                  <td data-row="9" data-col="1">Num.Obs.</td>
-                  <td data-row="9" data-col="2">2000</td>
-                  <td data-row="9" data-col="3">2000</td>
-                  <td data-row="9" data-col="4">2000</td>
-                </tr>
-                <tr>
-                  <td data-row="10" data-col="1">R2</td>
-                  <td data-row="10" data-col="2">0.805</td>
-                  <td data-row="10" data-col="3">0.435</td>
-                  <td data-row="10" data-col="4">0.435</td>
-                </tr>
-                <tr>
-                  <td data-row="11" data-col="1">R2 Adj.</td>
-                  <td data-row="11" data-col="2">0.804</td>
-                  <td data-row="11" data-col="3">0.435</td>
-                  <td data-row="11" data-col="4">0.435</td>
-                </tr>
-        </tbody>
-      </table>
-    </div>
-<!-- hack to avoid NA insertion in last line -->
-</div>
-</div>
-</figure>
-</div>
-</div>
-<p>The story is exactly the Abdulkadiroğlu-Angrist-Pathak story:</p>
-<ul>
-<li>The <strong>first stage</strong> confirms that clearing the cutoff leads to a large jump in peer quality (around 0.8 standard deviations).</li>
-<li>The <strong>reduced form</strong> shows essentially no jump in students’ own math scores.</li>
-<li>The <strong>2SLS</strong> estimate of the causal effect of peer quality on math achievement is a small, statistically-insignificant number—not the 0.25 that a naive OLS regression would give.</li>
-</ul>
-<p>The punchline is striking: despite the common intuition that “peers matter,” the fuzzy RD design suggests that the huge boost in peer quality that comes with an elite exam school seat produces essentially <em>no</em> gain in own-student math achievement. This is the <em>elite illusion</em>: exam schools look great because they admit great students, not because they <em>make</em> their students great.</p>
-</section>
-<section id="visualizing-the-fuzzy-rd" class="level3" data-number="15.9.4">
-<h3 data-number="15.9.4" class="anchored" data-anchor-id="visualizing-the-fuzzy-rd"><span class="header-section-number">15.9.4</span> Visualizing the Fuzzy RD</h3>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>bin_means <span class="ot">&lt;-</span> <span class="cf">function</span>(data, x, y, <span class="at">width =</span> <span class="dv">1</span>) {</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    data <span class="sc">|&gt;</span></span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">mutate</span>(<span class="at">bin =</span> <span class="fu">floor</span>(.data[[x]] <span class="sc">/</span> width) <span class="sc">*</span> width <span class="sc">+</span> width <span class="sc">/</span> <span class="dv">2</span>) <span class="sc">|&gt;</span></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">group_by</span>(bin) <span class="sc">|&gt;</span></span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>        <span class="fu">summarise</span>(<span class="at">y_mean =</span> <span class="fu">mean</span>(.data[[y]]), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>first_stage_bins <span class="ot">&lt;-</span> <span class="fu">bin_means</span>(exam_data, <span class="st">"score"</span>, <span class="st">"peer_quality"</span>)</span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>reduced_form_bins <span class="ot">&lt;-</span> <span class="fu">bin_means</span>(exam_data, <span class="st">"score"</span>, <span class="st">"math"</span>)</span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">data =</span> first_stage_bins,</span>
-<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>               <span class="fu">aes</span>(<span class="at">x =</span> bin, <span class="at">y =</span> y_mean),</span>
-<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>               <span class="at">color =</span> <span class="st">"grey40"</span>, <span class="at">size =</span> <span class="dv">2</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="at">data =</span> exam_data,</span>
-<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>                <span class="fu">aes</span>(<span class="at">x =</span> score, <span class="at">y =</span> peer_quality,</span>
-<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>                    <span class="at">group =</span> offer, <span class="at">color =</span> <span class="fu">factor</span>(offer)),</span>
-<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>                <span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
-<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"0"</span> <span class="ot">=</span> <span class="st">"grey50"</span>, <span class="st">"1"</span> <span class="ot">=</span> <span class="st">"#0072B2"</span>),</span>
-<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>                       <span class="at">guide =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
-<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"Peer quality"</span>, <span class="at">title =</span> <span class="st">"First stage"</span>) <span class="sc">+</span></span>
-<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span>
-<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">data =</span> reduced_form_bins,</span>
-<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a>               <span class="fu">aes</span>(<span class="at">x =</span> bin, <span class="at">y =</span> y_mean),</span>
-<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a>               <span class="at">color =</span> <span class="st">"grey40"</span>, <span class="at">size =</span> <span class="dv">2</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="at">data =</span> exam_data,</span>
-<span id="cb26-30"><a href="#cb26-30" aria-hidden="true" tabindex="-1"></a>                <span class="fu">aes</span>(<span class="at">x =</span> score, <span class="at">y =</span> math,</span>
-<span id="cb26-31"><a href="#cb26-31" aria-hidden="true" tabindex="-1"></a>                    <span class="at">group =</span> offer, <span class="at">color =</span> <span class="fu">factor</span>(offer)),</span>
-<span id="cb26-32"><a href="#cb26-32" aria-hidden="true" tabindex="-1"></a>                <span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb26-33"><a href="#cb26-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
-<span id="cb26-34"><a href="#cb26-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"0"</span> <span class="ot">=</span> <span class="st">"grey50"</span>, <span class="st">"1"</span> <span class="ot">=</span> <span class="st">"#0072B2"</span>),</span>
-<span id="cb26-35"><a href="#cb26-35" aria-hidden="true" tabindex="-1"></a>                       <span class="at">guide =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
-<span id="cb26-36"><a href="#cb26-36" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Score (centered at cutoff)"</span>,</span>
-<span id="cb26-37"><a href="#cb26-37" aria-hidden="true" tabindex="-1"></a>         <span class="at">y =</span> <span class="st">"Math score"</span>, <span class="at">title =</span> <span class="st">"Reduced form"</span>) <span class="sc">+</span></span>
-<span id="cb26-38"><a href="#cb26-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span>
-<span id="cb26-39"><a href="#cb26-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-40"><a href="#cb26-40" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">/</span> p2</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output-display">
-<div id="fig-fuzzy" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-fuzzy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;15.8: Three pictures of the fuzzy RD. Top: the first stage (jump in peer quality). Middle: the reduced form (no jump in math scores). Bottom: putting them together, the 2SLS estimate of peer effects is approximately zero.
-</figcaption>
-<div aria-describedby="fig-fuzzy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="rdd_files/figure-html/fig-fuzzy-1.png" class="img-fluid figure-img" width="672">
-</div>
-</figure>
-</div>
-</div>
-</div>
-<p>The first stage is a dramatic jump in peer quality at the cutoff. The reduced form is essentially flat. By <a href="#eq-fuzzy-rd" class="quarto-xref">Equation&nbsp;<span>15.7</span></a>, if the numerator (reduced form) is zero but the denominator (first stage) is large and positive, the ratio—the 2SLS estimate of the peer effect on math—is also zero.</p>
-</section>
+<section id="a-brief-note-on-fuzzy-rd" class="level2" data-number="15.9">
+<h2 data-number="15.9" class="anchored" data-anchor-id="a-brief-note-on-fuzzy-rd"><span class="header-section-number">15.9</span> A Brief Note on Fuzzy RD</h2>
+<p>Everything above assumes <strong>sharp RD</strong>: the cutoff determines treatment status cleanly. In many real-world applications the cutoff does not assign treatment perfectly—it only shifts the <em>probability</em> or <em>intensity</em> of treatment. Think of a scholarship that most but not all qualifying students accept, or an elite school offer that many qualifying students decline and a few non-qualifying students circumvent. This setting is called <strong>fuzzy RD</strong>.</p>
+<p>The intuition is straightforward if you have already seen IV (<a href="instrumental_variables.html" class="quarto-xref"><span>Chapter 14</span></a>): the cutoff indicator is an <strong>instrument</strong> for the underlying treatment, and the causal effect is estimated by 2SLS. Specifically, you divide the jump in the outcome at the cutoff (the reduced form) by the jump in the treatment probability at the cutoff (the first stage). All the usual IV caveats apply—the first stage must be strong, and the exclusion restriction is the claim that clearing the cutoff affects the outcome only through treatment.</p>
+<p>We will not estimate a fuzzy RD in this course. Just know that it exists, that a famous example is Abdulkadiroğlu, Angrist, and Pathak’s (2014) study of Boston’s elite exam schools (the “elite illusion”), and that the technique sits at the intersection of RD and IV.</p>
 </section>
 <section id="assessing-the-validity-of-an-rd-design" class="level2" data-number="15.10">
 <h2 data-number="15.10" class="anchored" data-anchor-id="assessing-the-validity-of-an-rd-design"><span class="header-section-number">15.10</span> Assessing the Validity of an RD Design</h2>
@@ -1793,7 +1385,7 @@ Figure&nbsp;15.8: Three pictures of the fuzzy RD. Top: the first stage (jump in 
 <div id="fig-mccrary" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-mccrary-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;15.9: Two density plots. Left: smooth density through the cutoff—no evidence of manipulation. Right: a clear pile-up just above the cutoff, suggesting units may be manipulating their running-variable values to qualify for treatment.
+Figure&nbsp;15.7: Two density plots. Left: smooth density through the cutoff—no evidence of manipulation. Right: a clear pile-up just above the cutoff, suggesting units may be manipulating their running-variable values to qualify for treatment.
 </figcaption>
 <div aria-describedby="fig-mccrary-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="rdd_files/figure-html/fig-mccrary-1.png" class="img-fluid figure-img" width="672">
@@ -1811,13 +1403,13 @@ Figure&nbsp;15.9: Two density plots. Left: smooth density through the cutoff—n
 </section>
 <section id="a-summary-picture-sharp-rd-in-one-figure" class="level2" data-number="15.11">
 <h2 data-number="15.11" class="anchored" data-anchor-id="a-summary-picture-sharp-rd-in-one-figure"><span class="header-section-number">15.11</span> A Summary Picture: Sharp RD in One Figure</h2>
-<p>To bring everything together, <a href="#fig-rd-summary" class="quarto-xref">Figure&nbsp;<span>15.10</span></a> shows a complete stylized sharp RD in one picture.</p>
+<p>To bring everything together, <a href="#fig-rd-summary" class="quarto-xref">Figure&nbsp;<span>15.8</span></a> shows a complete stylized sharp RD in one picture.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-rd-summary" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-rd-summary-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;15.10: Anatomy of a sharp RD. The smooth curve in each region is the expected outcome given the running variable. The jump at the cutoff is the causal effect. Extrapolating the left-hand curve across the cutoff (dashed line) gives the counterfactual outcome for the treated group.
+Figure&nbsp;15.8: Anatomy of a sharp RD. The smooth curve in each region is the expected outcome given the running variable. The jump at the cutoff is the causal effect. Extrapolating the left-hand curve across the cutoff (dashed line) gives the counterfactual outcome for the treated group.
 </figcaption>
 <div aria-describedby="fig-rd-summary-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="rdd_files/figure-html/fig-rd-summary-1.png" class="img-fluid figure-img" width="672">
@@ -1834,10 +1426,9 @@ Figure&nbsp;15.10: Anatomy of a sharp RD. The smooth curve in each region is the
 <p>The core ideas:</p>
 <ol type="1">
 <li><strong>Running variables and cutoffs.</strong> RD requires a continuous measured variable and a known cutoff at which treatment changes. The MLDA, admissions cutoffs, income eligibility thresholds, and close elections all fit the bill.</li>
-<li><strong>Sharp vs.&nbsp;fuzzy.</strong> In a sharp design, treatment flips cleanly at the cutoff. In a fuzzy design, the probability or intensity of treatment jumps, but treatment is not a perfect function of the running variable. Fuzzy RD is estimated by 2SLS, using the cutoff dummy as an instrument.</li>
+<li><strong>Sharp RD.</strong> We focused on <em>sharp</em> RD, where treatment is a deterministic function of the running variable. A <em>fuzzy</em> RD variant—where the cutoff only shifts the probability of treatment—exists and is handled by combining RD with IV. We flagged it but did not estimate one.</li>
 <li><strong>Modeling the running variable.</strong> The RD estimate is the jump in the outcome at the cutoff after controlling for smooth trends in the running variable. Linear, interacted, and quadratic specifications are standard; higher-order polynomials are generally a bad idea.</li>
-<li><strong>Parametric vs.&nbsp;nonparametric.</strong> Parametric RD fits a global polynomial to all the data. Nonparametric RD focuses on observations in a narrow bandwidth around the cutoff. Bandwidth choice is a bias-variance trade-off, and modern methods (implemented in <code>rdrobust</code>) automate the optimal choice.</li>
-<li><strong>The <code>rdrobust</code> package in R.</strong> <code>rdrobust()</code> estimates local-polynomial RDs with MSE-optimal bandwidths and robust bias-corrected inference. <code>rdplot()</code> produces clean diagnostic plots. They are the tools of choice for modern applied RD.</li>
+<li><strong>Parametric vs.&nbsp;nonparametric.</strong> Parametric RD fits a global polynomial to all the data. Nonparametric RD focuses on observations in a narrow bandwidth around the cutoff. Bandwidth choice is a bias-variance trade-off, and modern implementations (notably the <code>rdrobust</code> package in R) automate the optimal choice and inference—worth exploring if you ever use an RD design in practice.</li>
 <li><strong>Validity checks.</strong> A credible RD paper shows (a) that pre-determined covariates are balanced across the cutoff, (b) that the density of the running variable is smooth through the cutoff (no manipulation), (c) that results are stable across bandwidth and polynomial choices, and (d) that “effects” vanish at placebo cutoffs and on falsification outcomes.</li>
 </ol>
 <p>A credible RD tells a clear story: here is the rule, here is the cutoff, here is the jump, and here is why nothing else can explain it. When those pieces fall into place, RD can deliver causal estimates that are hard to argue with.</p>
@@ -1891,18 +1482,7 @@ Figure&nbsp;15.10: Anatomy of a sharp RD. The smooth curve in each region is the
 </div>
 
 <div class="answer-row">
-    <label>v. In a <b>fuzzy</b> RD design, the jump at the cutoff is... </label>
-    <select onchange="checkAnswer(this, 'c')">
-        <option value="">-- Select Answer --</option>
-        <option value="a">The causal effect of crossing the cutoff, with no further interpretation needed</option>
-        <option value="b">The probability that treatment fails</option>
-        <option value="c">In the probability or intensity of treatment, which we use as an instrument for the underlying treatment via 2SLS</option>
-        <option value="d">Only valid if a McCrary test passes</option>
-    </select>
-</div>
-
-<div class="answer-row">
-    <label>vi. If the density of the running variable shows a sharp pile-up just above the cutoff, this suggests... </label>
+    <label>v. If the density of the running variable shows a sharp pile-up just above the cutoff, this suggests... </label>
     <select onchange="checkAnswer(this, 'b')">
         <option value="">-- Select Answer --</option>
         <option value="a">The cutoff is not sharp enough</option>
@@ -1913,7 +1493,7 @@ Figure&nbsp;15.10: Anatomy of a sharp RD. The smooth curve in each region is the
 </div>
 
 <div class="answer-row">
-    <label>vii. In the Carpenter &amp; Dobkin (2009) MLDA study, why was finding a large jump in motor vehicle fatalities but <i>not</i> in internal-cause deaths important? </label>
+    <label>vi. In the Carpenter &amp; Dobkin (2009) MLDA study, why was finding a large jump in motor vehicle fatalities but <i>not</i> in internal-cause deaths important? </label>
     <select onchange="checkAnswer(this, 'a')">
         <option value="">-- Select Answer --</option>
         <option value="a">It is a falsification test: the absence of effects on outcomes that alcohol should not affect increases confidence that the effects on outcomes it should affect are causal</option>
@@ -1924,18 +1504,7 @@ Figure&nbsp;15.10: Anatomy of a sharp RD. The smooth curve in each region is the
 </div>
 
 <div class="answer-row">
-    <label>viii. In the Abdulkadiroğlu, Angrist, &amp; Pathak (2014) exam school study, the 2SLS estimate of the peer-quality effect on math achievement is close to zero. What does this suggest? </label>
-    <select onchange="checkAnswer(this, 'd')">
-        <option value="">-- Select Answer --</option>
-        <option value="a">Exam schools do not admit talented students</option>
-        <option value="b">The running variable was mis-measured</option>
-        <option value="c">Peer quality does not exist as a construct</option>
-        <option value="d">Much of the apparent advantage of elite exam schools reflects selection of high-achieving students, not a causal effect of better peers</option>
-    </select>
-</div>
-
-<div class="answer-row">
-    <label>ix. <b>(Challenge)</b> Suppose an RD estimate is large and statistically significant when a researcher uses a 5th-order polynomial for the running variable, but small and insignificant when using a linear or quadratic control. What should we conclude? </label>
+    <label>vii. <b>(Challenge)</b> Suppose an RD estimate is large and statistically significant when a researcher uses a 5th-order polynomial for the running variable, but small and insignificant when using a linear or quadratic control. What should we conclude? </label>
     <select onchange="checkAnswer(this, 'c')">
         <option value="">-- Select Answer --</option>
         <option value="a">The effect is real and the higher-order polynomial is most accurate</option>
@@ -1946,7 +1515,7 @@ Figure&nbsp;15.10: Anatomy of a sharp RD. The smooth curve in each region is the
 </div>
 
 <div class="answer-row">
-    <label>x. <b>(Challenge)</b> In a sharp RD design, the treatment dummy $D_a$ is determined entirely by the running variable $a$. Why does this mean there is <i>no classical omitted variable bias</i>, assuming the running variable is correctly modeled? </label>
+    <label>viii. <b>(Challenge)</b> In a sharp RD design, the treatment dummy $D_a$ is determined entirely by the running variable $a$. Why does this mean there is <i>no classical omitted variable bias</i>, assuming the running variable is correctly modeled? </label>
     <select onchange="checkAnswer(this, 'b')">
         <option value="">-- Select Answer --</option>
         <option value="a">Because treatment is random</option>
@@ -1958,7 +1527,7 @@ Figure&nbsp;15.10: Anatomy of a sharp RD. The smooth curve in each region is the
 
 </div>
 <div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1967,17 +1536,15 @@ Figure&nbsp;15.10: Anatomy of a sharp RD. The smooth curve in each region is the
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="i">
 <li><p>The <strong>running variable</strong> is the continuous measure whose value determines whether a unit is treated (above the cutoff) or not (below). In the MLDA example, it is age. In exam schools, it is the admissions test score. The running variable is the backbone of the RD design: it is both the source of treatment assignment and the variable we must control for smoothly.</p></li>
-<li><p>In a <strong>sharp</strong> RD, <span class="math inline">\(D_a\)</span> is a deterministic, discontinuous function of the running variable: if your age is at least 21, you are treated, period. This is different from fuzzy RD, where the cutoff changes the <em>probability</em> of treatment.</p></li>
+<li><p>In a <strong>sharp</strong> RD, <span class="math inline">\(D_a\)</span> is a deterministic, discontinuous function of the running variable: if your age is at least 21, you are treated, period. (In the <em>fuzzy</em> variant, briefly noted at the end of the chapter, the cutoff only changes the <em>probability</em> of treatment.)</p></li>
 <li><p>Panel C of <a href="#fig-three-panels" class="quarto-xref">Figure&nbsp;<span>15.4</span></a> shows why we add polynomials. A naive linear fit will be forced to approximate a curved relationship with two straight lines, and if the curvature changes sign near the cutoff, it will <em>look</em> like a jump even when none exists. Adding a quadratic (or an interacted linear) term lets the regression model the curvature instead of mistaking it for treatment.</p></li>
 <li><p>Bandwidth selection is a classic <strong>bias-variance trade-off</strong>. A narrower bandwidth means fewer observations (higher variance) but a smaller window in which nonlinearity can confuse us (lower bias). A wider bandwidth uses more data (lower variance) but may pick up nonlinear trends that are not really jumps (higher bias). Modern tools like <code>rdrobust</code> pick a bandwidth that minimizes the mean squared error.</p></li>
-<li><p>In a <strong>fuzzy</strong> design, treatment is not a deterministic function of the running variable—some units above the cutoff are untreated, or some units below are treated anyway. The <em>probability</em> or <em>intensity</em> of treatment jumps at the cutoff. Because the reduced-form RD estimates the effect of <em>crossing the cutoff</em> and the first-stage RD estimates the jump in treatment, the causal effect of treatment on the outcome is the ratio: <span class="math inline">\(\hat{\lambda} = \hat{\rho} / \hat{\phi}\)</span>. This is 2SLS with the cutoff dummy as an instrument.</p></li>
 <li><p>A pile-up just above the cutoff is the signature of <strong>manipulation</strong>: units engineering their running-variable values to end up on the treated side. When this happens, units just above and just below the cutoff are no longer comparable, since the treated group disproportionately contains motivated manipulators. The McCrary density test (or its modern successor in <code>rddensity</code>) formalizes this diagnostic.</p></li>
 <li><p>Finding <em>no</em> jump in internal-cause deaths at the MLDA cutoff is a <strong>falsification test</strong> (or “balance test”): an outcome that drinking should not affect shows the expected null result, while outcomes that drinking <em>should</em> affect (motor vehicle deaths, suicides, alcohol-related illness) do show big jumps. The null results rule out alternative explanations—like some other policy changing at age 21, or some coincidental jump in mortality—because such explanations would have produced effects on both kinds of deaths.</p></li>
-<li><p>If peer quality truly had a large causal effect on a student’s own achievement, we should see a jump in math scores that is roughly proportional to the jump in peer quality. We do not. Combined with the fact that exam schools admit students with large pre-existing advantages, this suggests that the raw achievement gap between exam school students and other public school students is largely a reflection of <em>selection</em>—who gets in—not a causal effect of the elite environment. This is the <em>elite illusion</em>.</p></li>
 <li><p><span class="citation" data-cites="gelman_imbens_2019">Gelman and Imbens (<a href="references.html#ref-gelman_imbens_2019" role="doc-biblioref">2019</a>)</span> make a strong case against high-order polynomials in RD: they give too much weight to extreme observations and can produce large, oscillating fits near the cutoff, generating spurious jumps. Modern best practice is to fit local linear (or at most local quadratic) regressions on a narrow bandwidth, and to show that results are stable across reasonable bandwidths and specifications. An estimate that appears only at polynomial order 5 is a warning sign, not evidence of a subtle true effect.</p></li>
 <li><p>OVB in a regression <span class="math inline">\(Y = \beta_0 + \beta_1 D + e\)</span> occurs when some omitted variable <span class="math inline">\(Z\)</span> is correlated with both <span class="math inline">\(D\)</span> and <span class="math inline">\(Y\)</span>. But in sharp RD, <span class="math inline">\(D\)</span> is a <em>deterministic function</em> of the running variable <span class="math inline">\(R\)</span>: <span class="math inline">\(D = \mathbf{1}\{R \geq c\}\)</span>. So any <span class="math inline">\(Z\)</span> correlated with <span class="math inline">\(D\)</span> must also be correlated with <span class="math inline">\(R\)</span> (or some function of it). Once we correctly control for <span class="math inline">\(R\)</span> (via a sufficiently flexible polynomial or a sufficiently narrow bandwidth), there is no variation left in <span class="math inline">\(D\)</span> that is also correlated with any such <span class="math inline">\(Z\)</span>. This is why RD has a much weaker reliance on observables than straight OLS—its credibility rests on modeling one variable (the running variable) correctly, rather than on controlling for everything that might confound treatment.</p></li>
 </ol>
@@ -2413,8 +1980,8 @@ McCrary, Justin. 2008. <span>“Manipulation of the Running Variable in the Regr
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../chapters/references.html" class="pagination-link" aria-label="References">
-        <span class="nav-page-text">References</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../chapters/putting_it_all_together.html" class="pagination-link" aria-label="Putting It All Together">
+        <span class="nav-page-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Putting It All Together</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

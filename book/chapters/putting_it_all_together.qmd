@@ -1,0 +1,1389 @@
+---
+prefer-html: true
+---
+
+# Putting It All Together {#sec-putting-it-all-together}
+
+```{r}
+#| echo: false
+#| output: false
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(patchwork)
+# DiagrammeR produces an HTML widget; load it only when actually rendering HTML
+# (not for PDF or EPUB, which can't render htmlwidgets natively).
+.is_real_html <- function() {
+  isTRUE(knitr::is_html_output(excludes = c("epub", "epub2", "epub3")))
+}
+if (.is_real_html()) library(DiagrammeR)
+
+theme_set(theme_minimal(base_size = 12) +
+          theme(plot.title = element_text(face = "bold", size = 14),
+                plot.subtitle = element_text(size = 11, color = "gray40"),
+                panel.grid.minor = element_blank()))
+
+```
+
+```{=html}
+
+<style>
+.problem {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+.context {
+    background-color: #e8f4f8;
+    padding: 12px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border-left: 4px solid #2874a6;
+}
+.question {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #fff3cd;
+    border-radius: 5px;
+}
+.answer-row {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.answer-row label {
+    min-width: 320px;
+    font-weight: 500;
+}
+select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    min-width: 300px;
+    cursor: pointer;
+}
+select:focus {
+    border-color: #2874a6;
+    outline: none;
+}
+.correct {
+    border-color: #28a745 !important;
+    background-color: #d4edda !important;
+}
+.incorrect {
+    border-color: #dc3545 !important;
+    background-color: #f8d7da !important;
+}
+.explanation {
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #e7f3ff;
+    border-radius: 5px;
+    border-left: 4px solid #2874a6;
+}
+.note {
+    font-size: 0.85em;
+    color: #666;
+    font-style: italic;
+}
+
+/* Method Picker Widget */
+.picker-container {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e8f4f8 100%);
+    border: 2px solid #2874a6;
+    border-radius: 12px;
+    padding: 25px;
+    margin: 25px 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+.picker-container h3 {
+    margin-top: 0;
+    color: #1a5276;
+}
+.picker-step {
+    margin: 18px 0;
+    padding: 14px 16px;
+    background: white;
+    border-radius: 8px;
+    border-left: 5px solid #2874a6;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.picker-step label {
+    font-weight: 600;
+    color: #1a5276;
+    display: block;
+    margin-bottom: 8px;
+    min-width: unset;
+}
+.picker-step select {
+    width: 100%;
+    max-width: 520px;
+    min-width: 260px;
+}
+.picker-result {
+    margin-top: 20px;
+    padding: 22px;
+    background: #fff;
+    border: 2px dashed #2874a6;
+    border-radius: 10px;
+    font-size: 1.02em;
+    line-height: 1.55;
+}
+.picker-result.empty {
+    background: #f4f6f8;
+    color: #6c757d;
+    font-style: italic;
+    border-style: dotted;
+    text-align: center;
+}
+.picker-result .rec-method {
+    font-size: 1.35em;
+    font-weight: 700;
+    color: #1a5276;
+    margin-bottom: 8px;
+}
+.picker-result .rec-why {
+    color: #333;
+    margin-bottom: 10px;
+}
+.picker-result .rec-caveat {
+    background: #fff3cd;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 0.95em;
+    border-left: 3px solid #f0ad4e;
+    margin-top: 10px;
+}
+.picker-result .rec-link {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 0.92em;
+    color: #1a5276;
+    font-weight: 600;
+}
+.picker-reset {
+    margin-top: 12px;
+    padding: 8px 16px;
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+.picker-reset:hover { background: #495057; }
+
+/* Method Review Cards */
+.method-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 18px;
+    margin: 20px 0;
+}
+.method-card {
+    border: 1px solid #dee2e6;
+    border-top: 5px solid #2874a6;
+    border-radius: 10px;
+    padding: 16px 18px;
+    background: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+}
+.method-card h4 {
+    margin-top: 0;
+    color: #1a5276;
+    font-size: 1.1em;
+}
+.method-card .mc-label {
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.85em;
+    margin-top: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+.method-card .mc-body {
+    font-size: 0.95em;
+    margin-top: 3px;
+    color: #333;
+}
+.method-card.ols { border-top-color: #2874a6; }
+.method-card.fe  { border-top-color: #117a65; }
+.method-card.did { border-top-color: #6c3483; }
+.method-card.iv  { border-top-color: #b9770e; }
+.method-card.rdd { border-top-color: #922b21; }
+.method-card.rct { border-top-color: #1e8449; }
+.method-card.lpm { border-top-color: #2e4053; }
+
+</style>
+
+<script>
+function checkAnswer(selectElement, correctValue) {
+    if (selectElement.value === '') {
+        selectElement.classList.remove('correct', 'incorrect');
+    } else if (selectElement.value === correctValue) {
+        selectElement.classList.remove('incorrect');
+        selectElement.classList.add('correct');
+    } else {
+        selectElement.classList.remove('correct');
+        selectElement.classList.add('incorrect');
+    }
+}
+</script>
+
+```
+
+
+::: {.callout-tip collapse="true"}
+## **Key Questions**
+
+- What is the common thread that runs through every method in this book?
+- How do we decide which econometric method to use for a given research question?
+- How do the assumptions behind each method trade off credibility and generality?
+- What questions should we ask ourselves before committing to a research design?
+- What is the difference between a technique and a *research design*?
+:::
+
+::: {.callout-note collapse="true"}
+## **Suggested Readings**
+
+- @angrist_mastering_2014, Ch. 1 and the concluding sections of each subsequent chapter
+- @angrist_credibility_2010, for an engaging overview of how empirical economics has evolved
+- @bailey_real_2020, for practical advice on choosing and defending a research design
+:::
+
+
+You have made it to the end of the semester -- woohoo! 
+A single-variable comparison that we were skeptical about in @sec-introduction has, over fifteen chapters, grown into a full toolkit for doing honest causal work.
+
+The goal of this final chapter is not to teach you any *new* technique.
+Instead, it is to step back and see the forest for the trees.
+Every method we have covered---from the basic RCT in @sec-rcts to regression discontinuity in @sec-rdd---is trying to solve **exactly the same problem** in a slightly different way.
+Once you see that problem clearly,
+choosing the right method for a given question becomes less about memorizing decision rules
+and more about asking a small number of honest questions of your data and your research setting.
+
+This chapter does three things:
+
+1. **Synthesizes the core problem of causal inference** and shows how every method is an attempt to approximate the randomized control trial we can rarely run.
+2. **Reviews each method side by side**, emphasizing what each one assumes, what each one identifies, and what each one *cannot* do.
+3. **Gives you concrete tools**---a flowchart, a method picker, and a checklist---for choosing a research design in practice.
+
+
+## The Common Thread
+
+If you remember only one thing from this course, remember this:
+
+::: {.callout-important}
+## The Fundamental Problem of Causal Inference
+For any unit $i$, the individual causal effect of treatment is
+$$
+\kappa_i = Y_{1i} - Y_{0i},
+$$
+but we only ever observe one of $Y_{1i}$ or $Y_{0i}$, never both.
+Estimating a causal effect is therefore a problem of constructing a **credible counterfactual**---a convincing estimate of what would have happened to the treated group had they not been treated.
+:::
+
+This is the same framework we introduced in @sec-rcts using the potential outcomes notation $(Y_{1i}, Y_{0i})$.
+It tells us that we are always working with incomplete information.
+Every single method in this book---from bivariate OLS to regression discontinuity---can be understood as a *different strategy for reconstructing the counterfactual.*
+
+The reason the RCT is the gold standard is that random assignment eliminates selection bias by construction:
+the treated and control groups are, on average, identical in every way other than the treatment itself.
+When we can randomize, the counterfactual is delivered on a silver platter.
+
+Most of the time, we cannot randomize.
+So we look for strategies that approximate randomization:
+we control for observed differences,
+we exploit policy changes that are plausibly as-good-as-random,
+we find instruments that shift treatment without touching the outcome directly,
+or we zoom in on cutoffs where the two sides are essentially identical.
+These strategies define what @angrist_credibility_2010 call the **credibility revolution** in empirical economics.
+
+@fig-counterfactual-strategies shows the core idea pictorially.
+Each method we have covered is a different arrow trying to get us back to the same destination: a plausible estimate of $E[Y_{0i} \mid D_i = 1]$, the counterfactual average outcome for the treated group.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-counterfactual-strategies
+#| fig-cap: "Every method in this book is a strategy for recovering the same missing piece: the counterfactual for the treated."
+#| fig-width: 9
+#| fig-height: 5.5
+
+strategies <- tibble::tribble(
+  ~method,                  ~strategy,                                              ~y,   ~col,
+  "RCT",                    "Random assignment eliminates\nselection bias",          7,  "#1e8449",
+  "OLS with controls",      "Adjust for observed\ndifferences",                      6,  "#2874a6",
+  "Panel Fixed Effects",    "Remove time-invariant\nunit differences",               5,  "#117a65",
+  "Difference-in-Differences", "Subtract out parallel\ncontrol-group trends",        4,  "#6c3483",
+  "Instrumental Variables", "Use exogenous variation\nin treatment",                 3,  "#b9770e",
+  "Regression Discontinuity", "Compare units just\nabove vs. just below a cutoff",   2,  "#922b21"
+)
+
+strategy_colors <- setNames(strategies$col, strategies$method)
+
+ggplot(strategies, aes(x = 1, y = y)) +
+  geom_segment(aes(xend = 4, yend = y, color = method),
+               arrow = arrow(length = unit(0.22, "cm"), type = "closed"),
+               linewidth = 1.2, show.legend = FALSE) +
+  geom_label(aes(x = 0.05, label = method, fill = method),
+             color = "white", hjust = 0, size = 3.7, fontface = "bold",
+             label.padding = unit(0.28, "lines"), show.legend = FALSE) +
+  geom_text(aes(x = 2.4, label = strategy), size = 3.5, color = "gray20") +
+  geom_label(aes(x = 4.6, y = 4.5, label = "Credible\ncounterfactual\n for the treated"),
+             fill = "#fff3cd", color = "#1a5276", fontface = "bold", size = 4.2,
+             label.padding = unit(0.5, "lines")) +
+  scale_color_manual(values = strategy_colors) +
+  scale_fill_manual(values = strategy_colors) +
+  scale_y_continuous(limits = c(1.3, 7.8)) +
+  scale_x_continuous(limits = c(0, 5.3)) +
+  labs(title = "Different Arrows, Same Destination",
+       subtitle = "Every method tries to estimate what would have happened in the absence of treatment") +
+  theme_void() +
+  theme(plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+        plot.subtitle = element_text(size = 11, color = "gray40", hjust = 0.5))
+
+```
+
+Once you hold this picture in your head, the rest of the chapter is just filling in details about *which* arrow is credible under which conditions.
+
+
+## A Ladder of Identification
+
+A useful way to organize the methods we have studied is as a **ladder of identification**,
+ordered by how strong an assumption about unobservables you are willing to make.
+Strong assumptions buy you more flexibility about where your data come from,
+but they are also harder to defend.
+Weak assumptions are easier to defend but demand much more of your research design.
+
+@fig-identification-ladder shows the ladder.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-identification-ladder
+#| fig-cap: "The ladder of identification. Higher rungs require stronger assumptions about unobservables; lower rungs require a more structured research design."
+#| fig-width: 10
+#| fig-height: 6.5
+
+ladder <- tibble::tribble(
+  ~rung, ~method,                                  ~assumes,                                                  ~chapter,                 ~col,
+     6,  "Simple comparisons (no controls)",        "E[Y_0 | D=1] = E[Y_0 | D=0]\n(treated and control identical on average)", "Ch. 1",       "#7f8c8d",
+     5,  "OLS with control variables",              "Conditional independence:\nE[Y_0 | D, X] = E[Y_0 | X]",                  "Ch. 5",       "#2874a6",
+     4,  "Panel Fixed Effects",                     "All time-invariant confounders;\nno unit-specific trends",               "Ch. 11",      "#117a65",
+     3,  "Difference-in-Differences",               "Parallel trends in the\nabsence of treatment",                            "Ch. 12, 13",  "#6c3483",
+     2,  "Instrumental Variables",                  "Relevance (testable) + Exclusion (untestable):\nZ affects Y only through D", "Ch. 14",  "#b9770e",
+     1,  "Regression Discontinuity",                "Smooth potential outcomes\nat the cutoff",                                "Ch. 15",      "#922b21",
+     0,  "Randomized Control Trial",                "Random assignment\n(only sampling uncertainty)",                          "Ch. 3",       "#1e8449"
+)
+
+ladder_colors <- setNames(ladder$col, ladder$method)
+
+ggplot(ladder, aes(x = 1, y = rung)) +
+  geom_rect(aes(xmin = 0.5, xmax = 9.5, ymin = rung - 0.42, ymax = rung + 0.42, fill = method),
+            alpha = 0.15, show.legend = FALSE) +
+  geom_label(aes(x = 0.8, label = method, fill = method),
+             color = "white", hjust = 0, size = 3.8, fontface = "bold",
+             label.padding = unit(0.32, "lines"), show.legend = FALSE) +
+  geom_text(aes(x = 5, label = assumes), size = 3.25, color = "gray20", hjust = 0) +
+  geom_text(aes(x = 9.3, label = chapter), size = 2.9, color = "gray40",
+            hjust = 1, fontface = "italic") +
+  scale_fill_manual(values = ladder_colors) +
+  scale_x_continuous(limits = c(0.5, 9.5), expand = c(0, 0)) +
+  scale_y_continuous(limits = c(-0.5, 6.6),
+                     breaks = 0:6,
+                     labels = c("Gold\nstandard", "Very credible", "Credible w/\ninstrument",
+                                "Credible w/\ncontrol group", "Credible w/\npanel", "Credible w/\ncontrols", "Rarely\ncredible")) +
+  labs(title = "The Ladder of Identification",
+       subtitle = "Each rung trades a stronger research design for weaker assumptions about unobservables",
+       y = NULL, x = NULL) +
+  theme(axis.text.x = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text.y = element_text(size = 9, color = "gray30", lineheight = 0.9),
+        panel.grid = element_blank(),
+        plot.title = element_text(face = "bold", size = 14),
+        plot.subtitle = element_text(size = 11, color = "gray40"))
+
+```
+
+The ordering here is not strict---reasonable people might swap, say, panel FE and IV depending on the setting---but the intuition is reliable.
+When you read an empirical paper, ask yourself where on this ladder it sits.
+When you design your own research, ask what the *highest rung* you can credibly claim is.
+
+
+## The Anatomy of a Research Design
+
+Before we review methods one by one, it is worth making a distinction that professional economists rely on all the time:
+
+::: {.callout-note}
+## Technique vs. Research Design
+A **technique** is a statistical tool: OLS, logistic regression, 2SLS, local-linear regression.
+
+A **research design** is a *credible argument* that the comparison being made approximates the apples-to-apples ideal of a randomized experiment. A research design answers the question: *"Why should I believe the comparison units look like the counterfactual?"*
+:::
+
+The same technique---OLS---can support wildly different research designs.
+OLS on a cross-section of wages regressed on education is a *correlational* exercise.
+OLS on the *same* wage data with an instrument for education is an IV research design.
+OLS on panel wages with unit and time fixed effects is a panel FE research design.
+OLS on wages for workers near a schooling-reform cutoff is an RD research design.
+
+The technique is *OLS* in every case.
+The research design is what makes the estimate believable.
+This is why practicing econometricians spend enormous amounts of time worrying about identification strategy and relatively little time worrying about which package has the fanciest algorithm.
+
+
+## Method Review: The Whole Semester on One Page
+
+@fig-method-overview summarizes what each method *looks like* visually.
+The job of a research design is usually to demonstrate one of these pictures:
+a jump,
+a divergence,
+a parallel shift,
+a conditional gap.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: fig-method-overview
+#| fig-cap: "What the key methods 'look like' visually. Each panel is the picture a credible empirical paper shows the reader."
+#| fig-width: 11
+#| fig-height: 7
+
+set.seed(1042)
+
+# RCT: overlapping densities, treated higher mean
+df_rct <- bind_rows(
+  tibble(group = "Control", y = rnorm(800, 0, 1)),
+  tibble(group = "Treated", y = rnorm(800, 1, 1))
+)
+p_rct <- ggplot(df_rct, aes(x = y, fill = group)) +
+  geom_density(alpha = 0.55, color = NA) +
+  scale_fill_manual(values = c("Control" = "#2874a6", "Treated" = "#1e8449")) +
+  labs(title = "RCT", subtitle = "Random assignment: groups identical except for treatment",
+       x = "Outcome", y = NULL) +
+  theme(legend.position = "bottom", legend.title = element_blank())
+
+# OLS w/ controls: scatter with line
+df_ols <- tibble(x = runif(150, 0, 10),
+                 y = 2 + 0.6 * x + rnorm(150, 0, 1.4))
+p_ols <- ggplot(df_ols, aes(x, y)) +
+  geom_point(alpha = 0.55, color = "#2874a6") +
+  geom_smooth(method = "lm", se = FALSE, color = "#1a5276", linewidth = 1.1) +
+  labs(title = "OLS", subtitle = "Line of best fit: slope = conditional association",
+       x = "x", y = "y")
+
+# Panel FE: multiple units, each with own intercept; slopes within are similar
+df_fe <- expand_grid(unit = factor(1:5), t = 1:6) |>
+  mutate(unit_fx = as.numeric(unit) * 2,
+         x = unit_fx + rnorm(n(), 0, 0.6) + 0.3 * t,
+         y = unit_fx + 0.5 * x + rnorm(n(), 0, 0.4))
+p_fe <- ggplot(df_fe, aes(x, y, color = unit)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, linewidth = 0.8, linetype = "dashed") +
+  geom_smooth(aes(group = 1), method = "lm", se = FALSE, color = "black", linewidth = 1.2) +
+  scale_color_brewer(palette = "Dark2") +
+  labs(title = "Panel Fixed Effects",
+       subtitle = "Within-unit variation after removing unit-specific levels",
+       x = "x", y = "y") +
+  theme(legend.position = "none")
+
+# DiD: two lines, parallel before, jump for treated
+df_did <- tibble(
+  t = rep(1:6, 2),
+  group = rep(c("Treated", "Control"), each = 6),
+  y = c(1, 1.2, 1.4, 3.0, 3.3, 3.6,   # treated jumps at t=4
+        1.0, 1.1, 1.25, 1.4, 1.55, 1.7)
+)
+p_did <- ggplot(df_did, aes(t, y, color = group)) +
+  geom_line(linewidth = 1.2) +
+  geom_point(size = 2.4) +
+  geom_vline(xintercept = 3.5, linetype = "dashed", color = "gray50") +
+  annotate("text", x = 3.6, y = 3.65, label = "Policy", hjust = 0, size = 3, color = "gray40") +
+  scale_color_manual(values = c("Treated" = "#6c3483", "Control" = "#2874a6")) +
+  labs(title = "Difference-in-Differences",
+       subtitle = "Parallel trends broken by treatment",
+       x = "Time", y = "Outcome") +
+  theme(legend.position = "bottom", legend.title = element_blank())
+
+# IV: instrument Z shifts D, which shifts Y
+df_iv <- tibble(z = rep(c("Z = 0", "Z = 1"), each = 600),
+                d = ifelse(z == "Z = 1", rbinom(600, 1, 0.7), rbinom(600, 1, 0.25)),
+                y = 0.5 + 1.3 * d + rnorm(1200, 0, 0.6))
+p_iv <- df_iv |>
+  group_by(z) |>
+  summarize(D_share = mean(d), Y_mean = mean(y), .groups = "drop") |>
+  pivot_longer(-z) |>
+  mutate(name = factor(name, levels = c("D_share", "Y_mean"),
+                       labels = c("Treatment share", "Outcome"))) |>
+  ggplot(aes(z, value, fill = z)) +
+  geom_col(width = 0.55) +
+  facet_wrap(~ name, scales = "free_y") +
+  scale_fill_manual(values = c("Z = 0" = "#b9770e", "Z = 1" = "#d4a017")) +
+  labs(title = "Instrumental Variables",
+       subtitle = "Instrument Z shifts treatment, which shifts outcome",
+       x = NULL, y = NULL) +
+  theme(legend.position = "none")
+
+# RD: running variable with a jump at cutoff
+df_rd <- tibble(x = runif(400, -5, 5),
+                d = as.numeric(x >= 0),
+                y = 1 + 0.2 * x + 1.4 * d + rnorm(400, 0, 0.5))
+p_rd <- ggplot(df_rd, aes(x, y)) +
+  geom_point(alpha = 0.4, color = "#922b21", size = 1.3) +
+  geom_smooth(data = filter(df_rd, x < 0), method = "lm", se = FALSE, color = "#641e16", linewidth = 1.1) +
+  geom_smooth(data = filter(df_rd, x >= 0), method = "lm", se = FALSE, color = "#641e16", linewidth = 1.1) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "gray40") +
+  labs(title = "Regression Discontinuity",
+       subtitle = "Jump in outcome at the cutoff",
+       x = "Running variable", y = "Outcome")
+
+(p_rct | p_ols | p_fe) /
+  (p_did | p_iv | p_rd) +
+  plot_layout(heights = c(1, 1))
+
+```
+
+Now let's review each method in words, emphasizing assumptions, the estimand, and the characteristic research-design question you have to answer.
+
+::: {.content-visible when-format="html"}
+
+```{=html}
+<div class="method-grid">
+
+<div class="method-card rct">
+<h4>Randomized Control Trial</h4>
+<div class="mc-label">From</div>
+<div class="mc-body">Chapter <a href="#sec-rcts">3</a></div>
+<div class="mc-label">Key Idea</div>
+<div class="mc-body">Randomization creates groups identical in expectation; the simple difference in means <em>is</em> the causal effect.</div>
+<div class="mc-label">Identifying Assumption</div>
+<div class="mc-body">Successful random assignment; compliance; no spillovers.</div>
+<div class="mc-label">Estimand</div>
+<div class="mc-body">Average Treatment Effect (ATE) in the experimental sample.</div>
+<div class="mc-label">Key Risk</div>
+<div class="mc-body">Non-compliance; attrition; external validity.</div>
+</div>
+
+<div class="method-card ols">
+<h4>OLS (Bivariate and Multivariate)</h4>
+<div class="mc-label">From</div>
+<div class="mc-body">Chapters <a href="#sec-ols">4</a>, <a href="#sec-multivariate">5</a></div>
+<div class="mc-label">Key Idea</div>
+<div class="mc-body">Minimize sum of squared residuals; interpret slope as conditional change in y per unit change in x.</div>
+<div class="mc-label">Identifying Assumption</div>
+<div class="mc-body">Zero conditional mean: <em>E[μ | X] = 0</em>. Rarely credible without careful design.</div>
+<div class="mc-label">Estimand</div>
+<div class="mc-body">Conditional association (descriptive) or causal effect (if assumptions hold).</div>
+<div class="mc-label">Key Risk</div>
+<div class="mc-body">Omitted variable bias; see the OVB formula in <a href="#sec-multivariate">Chapter 5</a>.</div>
+</div>
+
+<div class="method-card ols">
+<h4>Dummies, Nonlinearities, Interactions</h4>
+<div class="mc-label">From</div>
+<div class="mc-body">Chapters <a href="#sec-dummy-nonlinear">7</a>, <a href="#sec-interaction-effects">8</a></div>
+<div class="mc-label">Key Idea</div>
+<div class="mc-body">Extend OLS to categorical and nonlinear relationships; different slopes for different groups.</div>
+<div class="mc-label">Identifying Assumption</div>
+<div class="mc-body">Same as OLS; functional form is correctly specified.</div>
+<div class="mc-label">Estimand</div>
+<div class="mc-body">Group-specific means or slopes; percentage changes via logs.</div>
+<div class="mc-label">Key Risk</div>
+<div class="mc-body">Dummy variable trap; misinterpreting interactions without main effects.</div>
+</div>
+
+<div class="method-card lpm">
+<h4>Binary Outcomes (LPM / Logit)</h4>
+<div class="mc-label">From</div>
+<div class="mc-body">Chapter <a href="#sec-binary-outcomes">10</a></div>
+<div class="mc-label">Key Idea</div>
+<div class="mc-body">When y ∈ {0,1}, model the probability <em>P(y=1|X)</em>. LPM uses OLS; logit uses a logistic link.</div>
+<div class="mc-label">Identifying Assumption</div>
+<div class="mc-body">Same identification issues as OLS; logit bounds predictions in [0,1].</div>
+<div class="mc-label">Estimand</div>
+<div class="mc-body">Change in probability (LPM) or log-odds/odds ratio (logit).</div>
+<div class="mc-label">Key Risk</div>
+<div class="mc-body">LPM predictions can escape [0,1]; logit coefficients are not marginal effects.</div>
+</div>
+
+<div class="method-card fe">
+<h4>Panel Fixed Effects</h4>
+<div class="mc-label">From</div>
+<div class="mc-body">Chapter <a href="#sec-panel-fe">11</a></div>
+<div class="mc-label">Key Idea</div>
+<div class="mc-body">Observing the same units over time lets us absorb all time-invariant characteristics of each unit.</div>
+<div class="mc-label">Identifying Assumption</div>
+<div class="mc-body">No time-varying unobserved confounders correlated with the regressor.</div>
+<div class="mc-label">Estimand</div>
+<div class="mc-body">Effect of within-unit changes in x on within-unit changes in y.</div>
+<div class="mc-label">Key Risk</div>
+<div class="mc-body">Absorbs cross-sectional variation; doesn't fix reverse causality or trends.</div>
+</div>
+
+<div class="method-card did">
+<h4>Difference-in-Differences</h4>
+<div class="mc-label">From</div>
+<div class="mc-body">Chapters <a href="#sec-did">12</a>, <a href="#sec-advanced-did">13</a></div>
+<div class="mc-label">Key Idea</div>
+<div class="mc-body">Use untreated units to subtract off the counterfactual trend from the treated units.</div>
+<div class="mc-label">Identifying Assumption</div>
+<div class="mc-body"><strong>Parallel trends</strong> in the absence of treatment (untestable; check pre-trends).</div>
+<div class="mc-label">Estimand</div>
+<div class="mc-body">Average Treatment Effect on the Treated (ATT).</div>
+<div class="mc-label">Key Risk</div>
+<div class="mc-body">Differential trends; staggered adoption; spillovers; poorly-matched controls.</div>
+</div>
+
+<div class="method-card iv">
+<h4>Instrumental Variables</h4>
+<div class="mc-label">From</div>
+<div class="mc-body">Chapter <a href="#sec-iv">14</a></div>
+<div class="mc-label">Key Idea</div>
+<div class="mc-body">Use a variable Z that shifts treatment but affects outcome <em>only</em> through treatment.</div>
+<div class="mc-label">Identifying Assumption</div>
+<div class="mc-body">Relevance: Cov(Z, D) ≠ 0 (testable, F > 10).<br>Exclusion: Cov(Z, μ) = 0 (untestable).</div>
+<div class="mc-label">Estimand</div>
+<div class="mc-body">Local Average Treatment Effect (LATE) for compliers.</div>
+<div class="mc-label">Key Risk</div>
+<div class="mc-body">Weak instruments; violated exclusion; LATE may differ from the effect of policy interest.</div>
+</div>
+
+<div class="method-card rdd">
+<h4>Regression Discontinuity</h4>
+<div class="mc-label">From</div>
+<div class="mc-body">Chapter <a href="#sec-rdd">15</a></div>
+<div class="mc-label">Key Idea</div>
+<div class="mc-body">At a sharp cutoff in a running variable, units just above and just below are nearly identical.</div>
+<div class="mc-label">Identifying Assumption</div>
+<div class="mc-body">Potential outcomes are smooth through the cutoff; no manipulation of the running variable.</div>
+<div class="mc-label">Estimand</div>
+<div class="mc-body">Treatment effect at the cutoff (local).</div>
+<div class="mc-label">Key Risk</div>
+<div class="mc-body">Manipulation (pile-up); over-fitting polynomials; narrow external validity.</div>
+</div>
+
+</div>
+```
+
+:::
+
+::: {.content-hidden when-format="html"}
+
+For readers of the PDF edition, the method cards summarized below are rendered as a grid in the HTML version. The content is the same across formats; each card names the method, the chapter, the key idea, the identifying assumption, the estimand, and the key risk. These are all covered in detail in the chapters referenced above.
+
+:::
+
+
+## What Goes Wrong Where: A Unified View of Threats
+
+A complementary way to organize what we have learned is by the *kinds of threats* each method is designed to neutralize.
+The table below lays these out side by side.
+
+::: {.content-visible when-format="html"}
+
+```{=html}
+<table style="width:100%; border-collapse: collapse; margin: 20px 0; font-size: 0.95em;">
+<thead>
+<tr style="background: #1a5276; color: white; text-align: left;">
+  <th style="padding: 10px;">Threat</th>
+  <th style="padding: 10px;">What it looks like</th>
+  <th style="padding: 10px;">Methods that address it</th>
+  <th style="padding: 10px;">Methods that don't</th>
+</tr>
+</thead>
+<tbody>
+<tr style="border-bottom: 1px solid #dee2e6;">
+  <td style="padding: 10px; font-weight: 600;">Observed confounders</td>
+  <td style="padding: 10px;">Pre-treatment characteristics differ across treated/control and affect the outcome</td>
+  <td style="padding: 10px;">Multivariate OLS; IPW-DiD</td>
+  <td style="padding: 10px;">Bivariate OLS</td>
+</tr>
+<tr style="background: #f8f9fa; border-bottom: 1px solid #dee2e6;">
+  <td style="padding: 10px; font-weight: 600;">Unobserved, time-invariant confounders</td>
+  <td style="padding: 10px;">Persistent differences across units (culture, geography, innate ability)</td>
+  <td style="padding: 10px;">Panel FE; DiD; TWFE</td>
+  <td style="padding: 10px;">Cross-sectional OLS</td>
+</tr>
+<tr style="border-bottom: 1px solid #dee2e6;">
+  <td style="padding: 10px; font-weight: 600;">Unobserved, time-varying shocks (common)</td>
+  <td style="padding: 10px;">Macroeconomic shocks, calendar seasonality, policy shifts that affect everyone</td>
+  <td style="padding: 10px;">Time FE; TWFE; DiD</td>
+  <td style="padding: 10px;">Unit FE alone</td>
+</tr>
+<tr style="background: #f8f9fa; border-bottom: 1px solid #dee2e6;">
+  <td style="padding: 10px; font-weight: 600;">Differential trends</td>
+  <td style="padding: 10px;">Treatment and control groups were trending differently before treatment</td>
+  <td style="padding: 10px;">Event-study DiD with careful pre-trend checks; RD (if a cutoff is available)</td>
+  <td style="padding: 10px;">Basic 2×2 DiD</td>
+</tr>
+<tr style="border-bottom: 1px solid #dee2e6;">
+  <td style="padding: 10px; font-weight: 600;">Reverse causality / simultaneity</td>
+  <td style="padding: 10px;">Y causes D as well as the other way around</td>
+  <td style="padding: 10px;">IV with genuinely exogenous Z; RD; RCT</td>
+  <td style="padding: 10px;">OLS; FE; DiD (without further structure)</td>
+</tr>
+<tr style="background: #f8f9fa; border-bottom: 1px solid #dee2e6;">
+  <td style="padding: 10px; font-weight: 600;">Selection into treatment</td>
+  <td style="padding: 10px;">Units with higher potential outcomes are more likely to be treated</td>
+  <td style="padding: 10px;">RCT; IV; RD; conditional-on-observables designs if all relevant X are measured</td>
+  <td style="padding: 10px;">Bivariate OLS; simple comparisons</td>
+</tr>
+<tr style="border-bottom: 1px solid #dee2e6;">
+  <td style="padding: 10px; font-weight: 600;">Heteroskedasticity</td>
+  <td style="padding: 10px;">Error variance differs across observations</td>
+  <td style="padding: 10px;">Heteroskedasticity-robust SEs (Chapter <a href="#sec-heteroskedasticity">9</a>)</td>
+  <td style="padding: 10px;">Classical SEs from <code>lm()</code> without correction</td>
+</tr>
+<tr style="background: #f8f9fa; border-bottom: 1px solid #dee2e6;">
+  <td style="padding: 10px; font-weight: 600;">Clustered errors (panel)</td>
+  <td style="padding: 10px;">Observations within a unit are correlated over time</td>
+  <td style="padding: 10px;">Cluster-robust SEs at the unit or policy level (Chapter <a href="#sec-advanced-did">13</a>)</td>
+  <td style="padding: 10px;">Observation-level robust SEs</td>
+</tr>
+</tbody>
+</table>
+```
+
+:::
+
+::: {.content-hidden when-format="html"}
+
+The matrix of threats and methods is rendered as a formatted HTML table in the web version. Very briefly:
+
+- Observed confounders are handled by multivariate OLS (@sec-multivariate) and by IPW-DiD (@sec-advanced-did).
+- Unobserved time-invariant confounders are handled by panel fixed effects (@sec-panel-fe) and DiD (@sec-did).
+- Unobserved time-varying shocks that hit everyone the same way are absorbed by time fixed effects, and DiD.
+- Differential trends are not handled by basic DiD but can be diagnosed with event studies (@sec-advanced-did) and sometimes replaced by RD (@sec-rdd) if an appropriate cutoff exists.
+- Reverse causality is handled by IV (@sec-iv), RD (@sec-rdd), and RCTs (@sec-rcts), but *not* by OLS, FE, or DiD.
+- Selection into treatment is handled by RCTs, IV, RD, and conditional-on-observables designs when all relevant X are measured.
+- Heteroskedasticity is handled by robust SEs (@sec-heteroskedasticity).
+- Clustered errors are handled by cluster-robust SEs (@sec-advanced-did).
+
+:::
+
+
+## Choosing a Method: The Flowchart
+
+Enough preamble.
+
+::: {.content-visible when-format="html"}
+
+@fig-method-flowchart is a flowchart that encodes the decisions applied economists actually make when they design a project.
+It is not the only possible flowchart, and applied economists sometimes do things differently.
+But if you follow these steps carefully, you will land on a research design that would not embarrass you at a seminar.
+
+:::
+
+::: {.content-hidden when-format="html"}
+
+The text below encodes the decisions applied economists actually make when they design a project.
+It is not the only possible flowchart, and applied economists sometimes do things differently.
+But if you follow these steps carefully, you will land on a research design that would not embarrass you at a seminar.
+
+:::
+
+::: {.content-visible when-format="html"}
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| eval: !expr isTRUE(knitr::is_html_output(excludes = c("epub", "epub2", "epub3")))
+#| label: fig-method-flowchart
+#| fig-cap: "A decision flowchart for choosing a method. Start at the top and follow the arrows based on your answer at each diamond."
+#| fig-width: 11
+#| fig-height: 9
+
+DiagrammeR::grViz("
+digraph method_flowchart {
+  graph [layout = dot, rankdir = TB, bgcolor = 'white',
+         fontname = 'Helvetica', pad = 0.3, nodesep = 0.35, ranksep = 0.45]
+
+  node [shape = box, style = 'rounded,filled', fontname = 'Helvetica',
+        fontsize = 11, color = '#2874a6', penwidth = 1.5]
+  edge [fontname = 'Helvetica', fontsize = 10, color = '#495057']
+
+  Q1 [label = 'What is your\\nresearch question?', shape = diamond,
+      fillcolor = '#fff3cd', color = '#b38600']
+
+  QD [label = 'Descriptive / predictive\\n(no causal claim)', fillcolor = '#e8f4f8']
+  QC [label = 'Causal\\n(I want the effect of D on Y)', shape = diamond,
+      fillcolor = '#fff3cd', color = '#b38600']
+
+  Q2 [label = 'Can you randomize\\ntreatment?', shape = diamond,
+      fillcolor = '#fff3cd', color = '#b38600']
+  M_RCT [label = 'Randomized Control Trial\\n(simple diff in means +\\nrobust SEs)',
+         fillcolor = '#d4efdf', color = '#1e8449']
+
+  Q3 [label = 'Is there a natural experiment:\\na rule, reform, or cutoff\\nthat creates as-good-as-random\\nvariation in treatment?', shape = diamond,
+      fillcolor = '#fff3cd', color = '#b38600']
+
+  Q4 [label = 'Does a cutoff in a\\ncontinuous running variable\\ndetermine treatment?', shape = diamond,
+      fillcolor = '#fff3cd', color = '#b38600']
+  M_RD [label = 'Regression Discontinuity\\n(sharp design;\\nrdrobust)',
+        fillcolor = '#f5b7b1', color = '#922b21']
+
+  Q5 [label = 'Do you observe treated &\\ncontrol units both before and\\nafter the treatment event?', shape = diamond,
+      fillcolor = '#fff3cd', color = '#b38600']
+  M_DID [label = 'Difference-in-Differences\\n(2×2 or TWFE + event study +\\ncluster SEs at treatment level)',
+         fillcolor = '#d7bde2', color = '#6c3483']
+
+  Q6 [label = 'Do you have a credible\\ninstrument Z that shifts D\\nbut only affects Y through D?', shape = diamond,
+      fillcolor = '#fff3cd', color = '#b38600']
+  M_IV [label = 'Instrumental Variables (2SLS)\\ncheck first-stage F > 10,\\ninterpret as LATE for compliers',
+        fillcolor = '#fad7a0', color = '#b9770e']
+
+  Q7 [label = 'Do you have panel data\\non the same units over time?', shape = diamond,
+      fillcolor = '#fff3cd', color = '#b38600']
+  M_FE [label = 'Panel Fixed Effects\\n(unit + time FE;\\ncluster SEs at unit)',
+        fillcolor = '#a3e4d7', color = '#117a65']
+
+  Q8 [label = 'Do you believe observed\\ncontrols X are sufficient\\nfor conditional independence?', shape = diamond,
+      fillcolor = '#fff3cd', color = '#b38600']
+  M_OLS [label = 'Multivariate OLS with controls\\n(+ robust SEs; be humble\\nabout causal claims)',
+         fillcolor = '#aed6f1', color = '#2874a6']
+
+  Q9 [label = 'Is the outcome binary?', shape = diamond,
+      fillcolor = '#fff3cd', color = '#b38600']
+  M_BIN [label = 'LPM or Logit\\n(LPM for interpretation;\\nlogit for bounded predictions)',
+         fillcolor = '#d5d8dc', color = '#2e4053']
+
+  M_DESC [label = 'Descriptive / exploratory:\\nsummary statistics, plots,\\nOLS for conditional means',
+          fillcolor = '#e8f8f5', color = '#117a65']
+
+  M_STOP [label = 'Stop.\\nRedefine the question or\\ngather more data.',
+          fillcolor = '#fadbd8', color = '#c0392b']
+
+  # Main flow
+  Q1 -> QD [label = 'descriptive']
+  Q1 -> QC [label = 'causal']
+
+  QD -> M_DESC
+
+  QC -> Q2
+  Q2 -> M_RCT [label = 'yes']
+  Q2 -> Q3 [label = 'no']
+
+  Q3 -> Q4 [label = 'yes']
+  Q3 -> Q7 [label = 'no']
+
+  Q4 -> M_RD [label = 'yes']
+  Q4 -> Q5 [label = 'no']
+
+  Q5 -> M_DID [label = 'yes']
+  Q5 -> Q6 [label = 'no']
+
+  Q6 -> M_IV [label = 'yes']
+  Q6 -> Q7 [label = 'no']
+
+  Q7 -> M_FE [label = 'yes']
+  Q7 -> Q8 [label = 'no']
+
+  Q8 -> M_OLS [label = 'yes, cautiously']
+  Q8 -> M_STOP [label = 'no']
+
+  # Side branch: binary outcomes modify any OLS-style step
+  M_OLS -> Q9 [label = 'binary y?', style = dashed]
+  Q9 -> M_BIN [label = 'yes', style = dashed]
+}
+")
+
+```
+
+:::
+
+::: {.content-hidden when-format="html"}
+
+**Method-selection flowchart (text version, for the PDF edition).** Start at step 1 and move down. At each step, "yes" leads to a method recommendation; "no" moves to the next step.
+
+1. **Is the question causal?** If no, use descriptive statistics, plots, and OLS for conditional means. If yes, continue.
+2. **Can you randomize treatment?** If yes, **RCT** (simple difference in means with robust SEs). If no, continue.
+3. **Does a cutoff in a running variable determine treatment?** If yes, **Regression Discontinuity** (sharp design; use `rdrobust`). If no, continue.
+4. **Do you observe treated and control units both before and after a treatment event?** If yes, **Difference-in-Differences** (2×2 or TWFE, event study, cluster SEs). If no, continue.
+5. **Do you have a credible instrument Z?** If yes, **Instrumental Variables** (2SLS; check first-stage F > 10; interpret as LATE). If no, continue.
+6. **Do you have panel data?** If yes, **Panel Fixed Effects** (unit + time FE; cluster SEs). If no, continue.
+7. **Are observed controls sufficient for conditional independence?** If yes (cautiously), **Multivariate OLS with controls**. If no, stop and redefine the question or gather more data.
+8. **Is the outcome binary?** Apply LPM or logit as appropriate on top of whichever method was selected above.
+
+Every branch should end with heteroskedasticity-robust standard errors (@sec-heteroskedasticity), and clustered at the treatment level when using panel-based designs (@sec-advanced-did).
+
+:::
+
+A few remarks on using this flowchart.
+
+First, this is a guide to the *highest-credibility* method you can plausibly use.
+Nothing prevents you from running, say, an OLS regression *in addition to* an RD or IV to show what a naive analysis would have concluded.
+In fact, most papers in applied economics show both.
+
+Second, the "yes" answers get harder as you move down the chart, because they demand more of your research setting.
+Most students' first instinct is to answer "yes" to @sec-multivariate and stop there.
+Your professional instinct, by the end of a career, should be the opposite:
+ask whether any of the rungs above are available *before* settling for conditional-on-observables OLS.
+
+Third, *every* branch of the chart ends with robust standard errors.
+This is because heteroskedasticity is the rule rather than the exception in applied work,
+and using robust SEs costs you almost nothing when there is no problem (see @sec-heteroskedasticity).
+
+
+## An Interactive Method Picker
+
+The flowchart is static, which is useful for learning.
+But once you have internalized it, the answers get faster.
+The interactive picker below asks you a handful of questions and assembles a recommendation in real time.
+Try it with a research question of your own.
+
+::: {.content-visible when-format="html"}
+
+```{=html}
+<div class="picker-container">
+<h3>Method Picker</h3>
+<p>Answer the questions below, and a recommendation will appear at the bottom. Change any answer to see the recommendation update.</p>
+
+<div class="picker-step">
+  <label>1. What kind of question are you asking?</label>
+  <select id="pq_goal" onchange="updatePicker()">
+    <option value="">-- Select --</option>
+    <option value="descriptive">Descriptive: I want to summarize patterns, not make a causal claim</option>
+    <option value="causal">Causal: I want to know the effect of D on Y</option>
+  </select>
+</div>
+
+<div class="picker-step">
+  <label>2. Can you (or someone) randomly assign the treatment?</label>
+  <select id="pq_rct" onchange="updatePicker()">
+    <option value="">-- Select --</option>
+    <option value="yes">Yes, I ran or have access to an RCT</option>
+    <option value="no">No, treatment is not randomized</option>
+  </select>
+</div>
+
+<div class="picker-step">
+  <label>3. Is there a cutoff in a continuous running variable (age, score, date, income) that determines treatment?</label>
+  <select id="pq_rd" onchange="updatePicker()">
+    <option value="">-- Select --</option>
+    <option value="sharp">Yes, it's a strict rule (sharp)</option>
+    <option value="no">No cutoff</option>
+  </select>
+</div>
+
+<div class="picker-step">
+  <label>4. Do you observe both treated and untreated units <em>before and after</em> a treatment event?</label>
+  <select id="pq_did" onchange="updatePicker()">
+    <option value="">-- Select --</option>
+    <option value="yes">Yes, there's a pre- and post-treatment period for both groups</option>
+    <option value="no">No</option>
+  </select>
+</div>
+
+<div class="picker-step">
+  <label>5. Do you have a variable Z that shifts treatment but <em>only</em> affects the outcome through treatment?</label>
+  <select id="pq_iv" onchange="updatePicker()">
+    <option value="">-- Select --</option>
+    <option value="yes">Yes, I can defend an exclusion restriction</option>
+    <option value="no">No</option>
+  </select>
+</div>
+
+<div class="picker-step">
+  <label>6. Do you observe the same units across multiple time periods?</label>
+  <select id="pq_panel" onchange="updatePicker()">
+    <option value="">-- Select --</option>
+    <option value="yes">Yes, panel data</option>
+    <option value="no">No, cross-section only</option>
+  </select>
+</div>
+
+<div class="picker-step">
+  <label>7. Is your outcome variable binary (0 or 1)?</label>
+  <select id="pq_binary" onchange="updatePicker()">
+    <option value="">-- Select --</option>
+    <option value="yes">Yes, binary outcome</option>
+    <option value="no">No, continuous outcome</option>
+  </select>
+</div>
+
+<div id="picker_result" class="picker-result empty">Answer the questions above to see a recommendation.</div>
+
+<button class="picker-reset" onclick="resetPicker()">Reset</button>
+</div>
+
+<script>
+function resetPicker() {
+  ['pq_goal','pq_rct','pq_rd','pq_did','pq_iv','pq_panel','pq_binary'].forEach(function(id){
+    document.getElementById(id).value = '';
+  });
+  updatePicker();
+}
+
+function updatePicker() {
+  var goal   = document.getElementById('pq_goal').value;
+  var rct    = document.getElementById('pq_rct').value;
+  var rd     = document.getElementById('pq_rd').value;
+  var did    = document.getElementById('pq_did').value;
+  var iv     = document.getElementById('pq_iv').value;
+  var panel  = document.getElementById('pq_panel').value;
+  var binary = document.getElementById('pq_binary').value;
+
+  var box = document.getElementById('picker_result');
+
+  if (!goal) {
+    box.className = 'picker-result empty';
+    box.innerHTML = 'Answer the questions above to see a recommendation.';
+    return;
+  }
+
+  var method = '', why = '', caveat = '', chapter = '';
+
+  if (goal === 'descriptive') {
+    method = 'Descriptive analysis (summary statistics + OLS)';
+    why = 'You are not trying to estimate a causal effect, so your goal is to describe the data clearly and honestly. Lead with summary statistics, distributions, and visualizations. Use OLS to describe conditional associations, not to make causal claims.';
+    caveat = 'Be careful with language: words like "effect," "impact," and "causes" should be reserved for causal claims. Use "associated with" or "correlates with" instead.';
+    chapter = 'Chapters 2, 4, and 5';
+  } else if (rct === 'yes') {
+    method = 'Randomized Control Trial';
+    why = 'Randomization is the gold standard. The simple difference in means between treated and control is an unbiased estimate of the ATE. All you really need is a t-test and some robust standard errors.';
+    caveat = 'Watch for non-compliance (use intent-to-treat and IV), attrition, and spillovers between treated and control units. Document your balance table.';
+    chapter = 'Chapter 3';
+  } else if (rd === 'sharp') {
+    method = 'Regression Discontinuity (sharp)';
+    why = 'A deterministic rule based on a running variable creates an as-good-as-random comparison of units just above and just below the cutoff. Estimate with local-linear regression on a narrow bandwidth using rdrobust.';
+    caveat = 'Check for manipulation (McCrary-style density test), show the graph, try multiple bandwidths, and verify covariate balance at the cutoff.';
+    chapter = 'Chapter 15';
+  } else if (did === 'yes') {
+    method = 'Difference-in-Differences';
+    why = 'With treated and untreated units observed before and after a treatment event, you can subtract off the control-group trend. Start with a 2×2 DiD or TWFE; add an event study to diagnose pre-trends.';
+    caveat = 'Parallel trends is the identifying assumption: examine pre-trends, think hard about whether the control group is a good counterfactual, and cluster standard errors at the unit (or treatment) level.';
+    chapter = 'Chapters 12 and 13';
+  } else if (iv === 'yes') {
+    method = 'Instrumental Variables (2SLS)';
+    why = 'You have an instrument Z that shifts D but does not affect Y except through D. 2SLS isolates the exogenous variation in D and uses only that to estimate the effect on Y.';
+    caveat = 'Verify the first-stage F-statistic is well above 10. Defend the exclusion restriction with economic reasoning, not statistics. Your estimate is a LATE for compliers; state who those are.';
+    chapter = 'Chapter 14';
+  } else if (panel === 'yes') {
+    method = 'Panel Fixed Effects';
+    why = 'Panel data lets you compare each unit to itself over time, sweeping out all time-invariant characteristics. Include unit and time fixed effects and cluster SEs at the unit level.';
+    caveat = 'Fixed effects do NOT address reverse causality, time-varying unobserved confounders, or differential trends. This is usually a "best available" rather than "gold standard" design.';
+    chapter = 'Chapter 11';
+  } else {
+    method = 'Multivariate OLS with controls';
+    why = 'Without randomization, a natural experiment, a panel, or an instrument, the most you can do is control for observed confounders and interpret the result as a conditional association.';
+    caveat = 'Assumes conditional independence of potential outcomes given X. This is rarely credible for most policy-relevant questions. Be explicit about what you cannot rule out.';
+    chapter = 'Chapters 4 and 5';
+  }
+
+  if (binary === 'yes' && (method.indexOf('OLS') !== -1 || method.indexOf('Fixed Effects') !== -1)) {
+    caveat += ' Because your outcome is binary, consider reporting both a Linear Probability Model (for interpretation as percentage-point effects) and a logit specification (to bound predictions in [0,1]). See Chapter 10.';
+  }
+
+  box.className = 'picker-result';
+  box.innerHTML =
+    '<div class="rec-method">Recommendation: ' + method + '</div>' +
+    '<div class="rec-why">' + why + '</div>' +
+    '<div class="rec-caveat"><strong>Key caveat:</strong> ' + caveat + '</div>' +
+    '<div class="rec-link">Review: ' + chapter + '</div>';
+}
+</script>
+```
+
+:::
+
+::: {.content-hidden when-format="html"}
+
+*The interactive method picker is available in the HTML version of this chapter. In essence, answer seven questions (causal vs. descriptive; randomization possible; cutoff in a running variable; panel with pre/post periods; credible instrument; panel data; binary outcome) and the picker returns the highest-credibility method on the identification ladder that your setting supports.*
+
+:::
+
+
+## Reading an Empirical Paper: A Checklist
+
+Once you know the methods, you can read empirical economics papers the way practitioners do.
+Every paper you read in the next few years should face this short interrogation:
+
+1. **What is the estimand?** ATE, ATT, LATE, intent-to-treat, or "local"? These are not interchangeable (@sec-rcts, @sec-iv, @sec-rdd).
+2. **What is the research design?** Where does the variation in D come from? If the paper does not have a clean answer, be skeptical of causal language.
+3. **What is the identifying assumption?** Conditional independence? Parallel trends? Exclusion? Smoothness at a cutoff?
+4. **How does the paper defend that assumption?** Balance tables, pre-trends, first-stage F, falsification tests, density tests, placebo cutoffs.
+5. **Are the standard errors appropriate?** Heteroskedasticity-robust? Clustered? At what level?
+6. **Does the external validity match the policy question?** An RD estimate at the cutoff may not speak to units far from it; a LATE for compliers may not be the ATT.
+7. **What is the *alternative* explanation the paper has not ruled out?** If you cannot name one, either the paper is airtight or you are not reading carefully enough.
+
+This is not a gotcha list.
+These are the questions that working economists use when they referee papers, teach classes, and write their own.
+
+
+## Two Mini Case Studies: Same Question, Different Designs
+
+To see how method choice drives conclusions, consider two case studies from the health economics literature we have touched on in prior chapters.
+
+### Case Study 1: Does Health Insurance Improve Health?
+
+We opened this book (@sec-introduction) with this question.
+Here is how each method would attack it.
+
+- **Naive OLS.** Regress health outcomes on an insurance dummy. Positive, "significant," and profoundly confounded by income, education, and employment. This is the textbook motivating example for why simple comparisons are not causal claims.
+- **OLS with controls.** Add income, education, age, gender. The estimated "effect" of insurance shrinks. We have handled the confounders we can measure---but what about risk aversion, health literacy, family support? These are unobserved and likely correlated with both insurance and health.
+- **Panel FE.** If we have longitudinal data, we can compare the same people before and after they gain coverage. Now time-invariant traits like long-run health habits are absorbed. But what about a health scare that simultaneously caused someone to buy insurance *and* caused a measurable change in their health? That is the time-varying confounder we can't fix.
+- **DiD.** Exploit a policy: the Affordable Care Act's Medicaid expansion gives us states that did and did not expand, before and after 2014. If parallel trends are credible, the expansion-vs-non-expansion change in health outcomes identifies the ATT (@sec-advanced-did).
+- **RD.** Oregon Medicaid had an income eligibility cutoff at various points; other Medicaid programs have sharp age cutoffs (e.g., Medicare at 65). Compare units just above and just below.
+- **RCT.** The Oregon Health Insurance Experiment (@sec-rcts) literally randomized insurance coverage via a lottery. This is the study that the other methods are trying to approximate.
+
+Each method gives a slightly different number, and each number answers a subtly different question.
+The OHIE's LATE applies to low-income adults who complied with the lottery;
+a Medicaid expansion DiD applies to the marginal state-and-population;
+a Medicare RD estimate applies to people *at* age 65, who may respond differently from people at age 30.
+No one method settles the question.
+Taken together, they paint a picture.
+
+### Case Study 2: Does Education Raise Wages?
+
+This is the running example throughout the OLS chapters.
+
+- **Naive OLS.** Wages regressed on years of schooling gives the "Mincer return," historically around 8--10% per year. Credible as an association, but clearly confounded by unobserved ability.
+- **OLS with controls.** Add IQ proxies, parental education, test scores. The return falls, but "ability" is not fully observable, and nothing rules out reverse causality (current wage prospects might influence schooling choices).
+- **Panel FE.** Follow individuals over time. But education barely varies within a person once they are an adult: fixed effects don't help much for a variable without within-unit variation.
+- **DiD.** Compulsory schooling laws change in one state but not another; compare cohorts exposed and not exposed before and after the law change.
+- **IV.** Quarter-of-birth (@angrist_credibility_2010), distance to the nearest college (Card 1995), Vietnam-draft lottery numbers. Each instrument shifts education through institutional plumbing; each identifies a LATE for a different set of compliers.
+- **RD.** School-entry age cutoffs that alter years of completed schooling; admissions cutoffs at selective institutions.
+- **RCT.** Rare, but programs like Opportunity NYC, Perry Preschool, and various scholarship RCTs have randomized educational inputs.
+
+Notice that in both case studies, the methods are *not* substitutes---they are complements.
+A mature literature stitches together what each method can and cannot identify and reasons about the consistency of the estimates.
+
+
+## A Few Things We Did Not Cover (And Where They Fit)
+
+You have learned the workhorses of applied microeconometrics.
+Here is a brief map of where the more advanced material fits on the same ladder, for when you continue your econometrics training.
+
+- **Synthetic control methods** sit between DiD (@sec-did) and IV (@sec-iv). They construct a data-driven control group as a weighted combination of untreated units. Used for case studies with one or few treated units, like California's 1988 tobacco control law or the 1990 German reunification shock on East German growth.
+- **Heterogeneous treatment effects** generalize the idea that treatment effects vary across units. Modern estimators (Callaway-Sant'Anna, de Chaisemartin-D'Haultfoeuille, Borusyak-Jaravel-Spiess) extend DiD to staggered adoption settings, which we flagged as a danger in @sec-advanced-did.
+- **Machine learning for causal inference** (double ML, causal forests) automates flexible control selection on the OLS rung of the ladder. Powerful, but does not relieve you of the obligation to think about identification.
+- **Matching and propensity-score methods** are cousins of multivariate OLS with controls. IPW-DiD (@sec-advanced-did) was your introduction to this family.
+- **Structural estimation** writes down a full economic model, estimates its primitive parameters, and uses it to run counterfactual simulations. The strengths and weaknesses are the mirror image of the "reduced-form" methods in this book: enormous flexibility for policy simulation, but much more assumption-heavy.
+- **Time-series econometrics** (ARIMA, VAR, cointegration) is its own world, built for forecasting and for macroeconomic questions where there is one "unit" (a country) and many observations over time.
+
+You have, in other words, a strong foundation for almost any empirical economics class you will take next.
+
+
+## Questions to Ask Yourself Before Running a Regression
+
+A compact field guide---useful when you are stuck on a problem set, starting an independent study, or facing a thesis adviser.
+
+1. What is the *causal* question in plain English?
+2. What is the *dependent* variable and what is the *treatment* variable?
+3. What is my *data structure*? Cross-section, time-series, or panel? (@sec-introduction)
+4. Where does the *variation* in treatment come from? Is it randomized, plausibly as-good-as-random, or neither?
+5. If it is neither, what is the *strongest* identification strategy I can honestly deploy (@fig-method-flowchart)?
+6. What is the *identifying assumption* I am making, and how will I defend it to a skeptic?
+7. What is the *estimand*? ATE, ATT, LATE, local-at-the-cutoff? Does it match the policy question?
+8. Are my *standard errors* appropriate (heteroskedasticity-robust? clustered?)?
+9. What *specification checks* will I run (pre-trends, bandwidth robustness, alternative controls, placebo outcomes, first-stage F)?
+10. What is the *one sentence* I could write in the abstract that honestly summarizes what I found and what I did not?
+
+If you cannot answer each of these, you are not yet ready to run the regression.
+
+## Summary
+
+This chapter pulled together the whole semester.
+A few ideas are worth holding onto when you forget the rest.
+
+- Every method in the book is a strategy for approximating the randomized control trial we usually cannot run.
+- The choice of method is the choice of *which assumption about unobservables you are willing to make.*
+- There is no universally "best" method. There is only the best method *for your question and your data.*
+- A research design is a credible argument---not a technique. OLS can be the most credible tool in the room if paired with a strong design, and the least credible tool in the room if paired with a weak one.
+- Robust, appropriately-clustered standard errors are a professional minimum. Write them into your code the way you write `library(tidyverse)`.
+- Read empirical papers with the identification question first, the methods second, and the numbers last.
+- Your first step in a new project is *not* to run a regression. Your first step is to ask: "Where does the variation in my treatment come from?" Most of applied economics is that question in costume.
+
+
+## Check Your Understanding
+
+:::: {.content-visible when-format="html"}
+
+For each question below, select the best answer from the dropdown menu.
+The dropdown will turn green if correct and red if incorrect.
+Click the "Show Explanation" toggle to see a full explanation of each answer after attempting.
+
+```{=html}
+<div class="question">
+<div class="answer-row">
+    <label>i. What is the "fundamental problem of causal inference" that motivates every method in this book? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Sample sizes are usually too small</option>
+        <option value="b">Economists disagree about theory</option>
+        <option value="c">For each unit, we observe only one of its potential outcomes, so the individual causal effect is never directly observable</option>
+        <option value="d">Data are often missing at random</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>ii. A researcher collects cross-sectional data on wages and schooling, controls for age and experience, and reports the OLS coefficient on years of schooling as "the causal return to education." What is the most important thing missing from this claim? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The R-squared should be reported</option>
+        <option value="b">A defense of the assumption that unobserved ability, motivation, and family background are uncorrelated with schooling once age and experience are controlled for</option>
+        <option value="c">Robust standard errors</option>
+        <option value="d">A log transformation of wages</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iii. You want to estimate the causal effect of a state Medicaid expansion on low-income adults' health outcomes. You have annual data on all 50 states from 2010--2022, with some states expanding in 2014 and others never expanding. Which method is the most natural starting point? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Bivariate OLS</option>
+        <option value="b">Logit model</option>
+        <option value="c">Difference-in-Differences with two-way fixed effects and cluster-robust SEs at the state level</option>
+        <option value="d">Regression discontinuity</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iv. The Social Security retirement earnings test is applied to workers over age 62. You want to study how the test affects labor supply. You have cross-sectional earnings data with workers' exact ages. Which method is most appropriate? </label>
+    <select onchange="checkAnswer(this, 'a')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Regression discontinuity using age 62 as the cutoff</option>
+        <option value="b">Multivariate OLS controlling for age</option>
+        <option value="c">Instrumental variables using gender as an instrument</option>
+        <option value="d">Fixed effects</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>v. A colleague claims, "We can't use DiD here because the treated and control groups have different <em>levels</em> of the outcome in the pre-period." Is this a fatal objection? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Yes, DiD requires identical pre-treatment levels</option>
+        <option value="b">No: DiD requires parallel <em>trends</em>, not identical <em>levels</em>. Different levels are fine; the difference in differences removes the level gap</option>
+        <option value="c">Yes, but only if the differences are statistically significant</option>
+        <option value="d">The colleague's objection is correct only for logistic models</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>vi. You run a 2SLS regression and the first-stage F-statistic is 3.5. What should you do? </label>
+    <select onchange="checkAnswer(this, 'd')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Report the 2SLS estimate and move on</option>
+        <option value="b">Use the reduced form only, since the first stage is irrelevant</option>
+        <option value="c">Conclude the exclusion restriction is violated</option>
+        <option value="d">Worry: the instrument is weak, and 2SLS estimates can be severely biased with weak instruments. Consider a stronger instrument or report both 2SLS and weak-instrument-robust inference</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>vii. You are studying the effect of a scholarship program. Recipients were chosen by a randomly-drawn lottery. Only 62% of lottery winners actually enroll. What estimand does a simple OLS regression of outcomes on lottery-winning status identify? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The average treatment effect (ATE) of enrolling in the scholarship</option>
+        <option value="b">The intent-to-treat (ITT) effect of being offered the scholarship, which differs from the effect of actually enrolling</option>
+        <option value="c">The local average treatment effect at the running-variable cutoff</option>
+        <option value="d">A biased estimate that cannot be interpreted</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>viii. A student runs an OLS regression with a dummy for "received job training" and finds a large positive coefficient on wages. They add fixed effects for industry, occupation, and education, and the coefficient shrinks by half. They conclude: "Half the effect of training is real, and half was confounded by sorting." Is this a sound interpretation? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Yes, this is exactly what multivariate OLS identifies</option>
+        <option value="b">No: the shrinkage is evidence that training actually hurts wages</option>
+        <option value="c">The shrinkage is consistent with the student's interpretation but does not prove it---there may still be unobserved factors (motivation, aptitude) correlated with both training and wages that are not in the controls</option>
+        <option value="d">The shrinkage has no economic meaning</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>ix. <b>(Challenge)</b> Consider two strategies for estimating the effect of community college attendance on wages. Strategy A uses distance to the nearest community college as an instrument in a 2SLS regression. Strategy B uses a sharp RD design based on a minimum-GPA cutoff for automatic admission. Which statement about these designs is most accurate? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The two designs identify the same treatment effect under the same assumptions</option>
+        <option value="b">The two designs identify different local average treatment effects---Strategy A for students whose attendance is swayed by nearness, Strategy B for students near the GPA cutoff---and each rests on a different untestable assumption (exclusion vs. smoothness)</option>
+        <option value="c">Only Strategy A produces a causal estimate</option>
+        <option value="d">Only Strategy B produces a causal estimate</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>x. <b>(Challenge)</b> A researcher estimates a TWFE regression of policy outcomes with a treatment variable turned on at different times in different units (staggered adoption). What is the most serious threat to interpreting the TWFE coefficient as a simple ATT? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Heteroskedasticity</option>
+        <option value="b">The treatment is not binary</option>
+        <option value="c">With heterogeneous treatment effects and staggered adoption, TWFE implicitly uses already-treated units as controls for not-yet-treated units. This can yield estimates that don't correspond to any well-defined average treatment effect; modern heterogeneous-effects estimators avoid this</option>
+        <option value="d">TWFE cannot handle unbalanced panels</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>xi. <b>(Challenge)</b> You fit a logistic regression and report an odds ratio of 1.8 for a binary predictor. Your reviewer asks "What is the marginal effect on the probability?" What is the most honest answer? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Marginal effect is always 0.8</option>
+        <option value="b">The odds ratio equals the marginal effect in probability</option>
+        <option value="c">The marginal effect depends on where in the distribution of covariates you evaluate it; common choices are the average marginal effect across observations, or the marginal effect at the mean. Report the corresponding number from your statistical software</option>
+        <option value="d">Marginal effects cannot be computed from logistic regression</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>xii. <b>(Challenge)</b> Which of the following is the single most defensible statement about method choice in applied econometrics? </label>
+    <select onchange="checkAnswer(this, 'd')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">RCTs are always better than observational methods</option>
+        <option value="b">2SLS is always better than OLS</option>
+        <option value="c">More complex methods produce more credible estimates</option>
+        <option value="d">The best method is the one that produces the most credible approximation to the counterfactual, given the research setting---and the research design, not the technique, is what ultimately makes an estimate credible</option>
+    </select>
+</div>
+
+</div>
+```
+
+::: {.callout-tip collapse="true"}
+## Show Explanation
+
+i. For each unit $i$, we imagine two potential outcomes: $Y_{1i}$ under treatment and $Y_{0i}$ under control. The individual causal effect is $\kappa_i = Y_{1i} - Y_{0i}$, but we can only observe *one* of these two quantities---whichever corresponds to the unit's actual treatment status. This is the fundamental problem introduced in @sec-rcts and implicitly underlies every method we have covered. Causal inference is, at heart, the challenge of filling in the missing potential outcome.
+
+ii. The problem with the stated claim is not statistical---it is identification-based. Without an argument that unobserved characteristics correlated with both schooling and wages have been accounted for (ability, family background, motivation), the coefficient is a conditional association, not a causal effect. The @sec-multivariate OVB formula tells us the direction of the bias ($\beta_2 \cdot \tilde{\delta}_1$), and reasonable guesses about the sign of each term suggest OLS overstates the true return.
+
+iii. This is the textbook DiD setup: treated units (expansion states) and control units (non-expansion states), with pre-treatment and post-treatment observations. A TWFE regression of outcomes on a treatment indicator that turns on at adoption, with state and year fixed effects, identifies the ATT under parallel trends (@sec-did). Cluster-robust SEs at the state level are essential (@sec-advanced-did). This also illustrates why staggered adoption deserves modern heterogeneous-effects estimators, but standard TWFE is the normal starting point.
+
+iv. The earnings test switches on at exactly age 62---a textbook sharp RD setup (@sec-rdd). Units just under 62 and just over 62 should be nearly identical in every respect other than their test status. Multivariate OLS controlling for age would impose a smooth relationship and might mask the jump; IV with gender is inappropriate because gender fails exclusion; FE requires panel data.
+
+v. Parallel trends is about the *slopes* of the pre-period outcomes, not their levels. Different levels are perfectly fine---indeed, they are the norm---because the first difference (change) strips out the level, and the second difference (DiD) strips out anything common to both groups. The relevant question is whether the change in the treated group's outcome absent treatment would have equaled the change in the control group's. This is the parallel trends assumption (@sec-did).
+
+vi. The rule-of-thumb threshold for first-stage F is 10; 3.5 is far below, indicating a weak instrument (@sec-iv). With weak instruments, 2SLS estimates can be severely biased toward OLS, and standard-error calculations are unreliable. The serious response is to look for a stronger instrument, use weak-instrument-robust inference (e.g., Anderson-Rubin), or honestly report the limitation. Dropping the first-stage check and reporting the 2SLS number as-is is the characteristic sin of beginner IV papers.
+
+vii. Under non-compliance, regressing the outcome on *treatment assignment* (offer, lottery-winning status) identifies the intent-to-treat (ITT) effect. This is valid and interpretable, but it is not the ATE of actually enrolling. To recover the effect of enrolling on those who comply, use treatment assignment as an instrument for actual enrollment: this 2SLS estimate is the LATE for compliers (@sec-iv). This is exactly the analytical strategy used in the Oregon Health Insurance Experiment (@sec-rcts).
+
+viii. This is a common interpretational trap. A coefficient that shrinks when you add controls is *consistent with* a story of partial confounding, but it does not *prove* that the remaining half is causal. There could still be unobserved factors (risk tolerance, family structure, long-term plans) that correlate with training and wages, and those factors are not captured by industry, occupation, or education dummies. The OVB formula (@sec-multivariate) is neutral about sign without structure, and without a research design that handles unobservables, the remaining coefficient is still an association.
+
+ix. Both designs are valid causal-inference strategies but they identify *different* LATEs. Strategy A (distance IV) identifies the effect on students whose attendance decision is shifted by proximity---probably a less-advantaged, rural-leaning subpopulation. Strategy B (GPA RD) identifies the effect for students *at* the GPA cutoff, who are the marginal applicants. The assumptions also differ: IV rests on exclusion (distance affects wages only through attendance), RD rests on smoothness at the cutoff. There is no strictly better design; each answers a different empirical question (@sec-iv, @sec-rdd).
+
+x. This is the staggered-adoption problem flagged in @sec-advanced-did. In a TWFE regression with staggered treatment timing and heterogeneous effects, the coefficient can be a weighted combination of comparisons where already-treated units serve as controls for not-yet-treated ones, and the weights can even be negative. Under homogeneous effects this does not matter, but under heterogeneous effects the TWFE coefficient may not correspond to any well-defined ATT. Modern estimators (Callaway-Sant'Anna, de Chaisemartin-D'Haultfoeuille, Borusyak et al.) avoid the contamination but are beyond the scope of this course.
+
+xi. Odds ratios and marginal effects are different quantities; neither equals the other in general (@sec-binary-outcomes). The marginal effect on the probability depends on where in the $X$-space you evaluate it, because the logistic function is nonlinear. Two conventions are standard: the average marginal effect (AME), averaged across every observation in your sample, and the marginal effect at the mean (MEM), evaluated at the sample mean covariate vector. Statistical software (`margins` in R, `margins` in Stata) computes both. This is also a reason many applied economists default to the LPM for interpretability, accepting that predictions can fall outside [0,1].
+
+xii. The whole point of this chapter is that the best method is the one whose assumptions are most credible in your setting. An OLS with a brilliant identification strategy (matching, good controls, or zero variation in unobservables) can be more credible than a mechanical 2SLS with a weak instrument. A simple DiD with credible parallel trends can outperform a sophisticated structural model with dubious exclusion restrictions. The technique is not the argument; the research design is.
+
+:::
+
+::::
+
+:::: {.content-hidden when-format="html"}
+
+*Note: This section contains interactive content only available in the HTML version.*
+
+::::

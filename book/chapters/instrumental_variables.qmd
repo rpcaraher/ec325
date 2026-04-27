@@ -148,6 +148,7 @@ Endogeneity arises from three main sources:
 
 **1. Omitted Variable Bias**
 
+We spent a lot of time discussing this in @sec-multivariate.
 We want to estimate the effect of education on wages,
 but ability affects both education choices and wages.
 Since we can't measure ability,
@@ -168,30 +169,29 @@ but high-crime areas get more police deployed.
 The causation runs both ways,
 making it impossible to isolate the effect of policing.
 
-### Formalizing the Problem
-
-Suppose we want to estimate:
-
-$$
-y = \beta_0 + \beta_1 x + \mu
-$$
-
-When $E[\mu | x] \neq 0$,
-the variable $x$ is **endogenous**.
-OLS will be biased and inconsistent---no matter how large our sample,
-we won't converge to the true $\beta_1$.
-
-We cannot interpret the OLS coefficient as a causal effect.
+If we have any of these problems in our regression,
+we cannot interpret the OLS coefficient as a causal effect.
 
 
 ## The Instrumental Variables Solution
 
-### The Key Insight
+### Endogenous vs. Exogenous Variation
 
-The IV approach finds a variable $Z$ that "shakes up" $X$ in a way that's unrelated to the error term.
+If we are worried that our OLS estimate is biased,
+and that our independent variable $X$ is **endogenous**,
+then we have a problem.
+
+The IV solution is to try to find an **exogenous** source of variation in $X$,
+which we can then use to learn about the causal effect of $X$ on $y$.
+
+In other words, the IV approach finds a variable $Z$,
+the *instrument*,
+that "shakes up" $X$ in a way that's unrelated to the error term.
 Think of it as finding a source of **exogenous variation** in $X$---variation that comes from outside the system and isn't contaminated by the factors causing endogeneity.
 
 ### Two Requirements for a Valid Instrument
+
+So how do we find a variable $Z$ that would work as our instrument?
 
 For $Z$ to be a valid instrument,
 it must satisfy two conditions:
@@ -211,110 +211,251 @@ There is no direct effect of $Z$ on $Y$.
 This is **not directly testable**---it requires economic reasoning and assumption.
 :::
 
+If either of these requirements fails,
+then our instrument $Z$ does not successfully isolate the exogenous variation in $X$,
+and our IV estimate will still be partially contaminated by the same bias OLS suffers from.
+
+### A Running Example: Fertility and Maternal Labor Supply
+
+Abstract letters are a lot easier to swallow when they are pinned to a real study,
+so before we draw the diagram,
+let's introduce the empirical application we will keep coming back to.
+
+**The research question.**
+What is the causal effect of having an additional child on a mother's labor force participation?
+This is a first-order question for
+understanding the gender wage gap,
+designing parental leave policy,
+and evaluating childcare subsidies.
+But we obviously cannot randomize fertility,
+and the decision to have children is deeply endogenous:
+
+- **Reverse causality:** women may time fertility around their careers.
+- **Selection:** women who are less career-oriented may choose larger families.
+- **Omitted variables:** unobserved preferences drive both fertility *and* work.
+
+Regressing a mother's employment on her number of children by OLS
+tangles all of these forces together with the causal effect we actually want.
+
+@angrist_children_1998 found a clever instrument for fertility:
+the **sex composition of the first two children**.
+The idea is that parents tend to prefer a mix of sexes among their children.
+Families whose first two children are the *same* sex (i.e., two boys or two girls)
+are more likely to try for a third child to "get" the other sex
+than families whose first two children are already one of each.
+Since the assigned sex at birth of a child is essentially biological chance,
+having same-sex versus mixed-sex first two children is essentially random.
+
+Translating this study into the language of the two IV assumptions:
+
+- **Relevance** ($\text{Cov}(Z, X) \neq 0$): parents of same-sex siblings ($Z$) are measurably more likely to have a third child ($X$). This is an empirical fact we can (and will) verify in the data.
+- **Exclusion** ($\text{Cov}(Z, \mu) = 0$): the sex mix of a woman's first two children ($Z$) is plausibly uncorrelated with her unobserved career orientation, her husband's earnings, or anything else that would shape her labor supply ($\mu$) *except through* its effect on fertility ($X$).
+
+
 ### Graphical Intuition
 
-The IV strategy can be visualized as a causal diagram:
+The cleanest way to see *why* IV works is with a **causal diagram**
+(a *directed acyclic graph*, or DAG).
+A DAG represents variables as nodes and causal relationships as arrows.
+@fig-iv-dag maps the four ingredients of the Angrist-Evans design
+onto the four generic roles every IV application has:
+an instrument $Z$ (here, same-sex first two children),
+an endogenous treatment $X$ (here, having a third child),
+an outcome $Y$ (here, the mother's labor force participation),
+and a set of unobserved confounders $\mu$ (here, career orientation and similar preferences).
 
 ```{r}
 #| echo: false
 #| message: false
 #| warning: false
 #| label: fig-iv-dag
-#| fig-cap: "The instrumental variables strategy. Z affects Y only through X (exclusion restriction), while unobservables (μ) affect both X and Y, creating endogeneity."
+#| fig-cap: "The instrumental variables DAG. Solid blue arrows trace the identified pathway: Z moves X (the first stage), and X causes Y (the effect we want). Dashed red arrows show the confounding pathway from unobservables (μ) that makes X endogenous in the first place. The crossed-out gray arrow marks the *exclusion restriction*: Z must have no direct effect on Y. IV recovers β by isolating the movement in X that can be traced back to Z."
+#| fig-height: 5.2
 
-# Create simple DAG visualization
-dag_data <- tibble(
-    x = c(1, 2, 3, 2.5),
-    y = c(0, 0, 0, 1),
-    label = c("Instrument\n(Z)", "Treatment\n(X)", "Outcome\n(Y)", "Unobservables\n(μ)")
+# Node positions and metadata -------------------------------------------------
+# Each node shows the abstract letter (Z / X / Y / mu) plus a concrete label
+# from the Angrist-Evans application, so the diagram reads at both levels.
+nodes <- tibble(
+    label   = c("Z", "X", "Y", "\u03bc"),
+    role    = c("Same-sex first\ntwo children",
+                "Had a\nthird child",
+                "Mother\nworks",
+                "Career orientation\n(unobserved)"),
+    x       = c(1, 3, 5, 4),
+    y       = c(0, 0, 0, 1.8),
+    role_y  = c(-0.70, -0.70, -0.70, 2.65),
+    fill_col = c("#2E86AB", "#F18F01", "#2E933C", "#9B3A74")
 )
 
-arrows <- tibble(
-    x_start = c(1, 2, 2.5, 2.5),
-    y_start = c(0, 0, 1, 1),
-    x_end = c(2, 3, 2, 3),
-    y_end = c(0, 0, 0, 0),
-    type = c("good", "good", "bad", "bad")
+# Identified ("good") arrows: Z -> X and X -> Y -------------------------------
+causal_arrows <- tibble(
+    x    = c(1.30, 3.30),
+    xend = c(2.70, 4.70),
+    y    = c(0, 0),
+    yend = c(0, 0)
+)
+
+# Confounding ("bad") arrows: mu -> X and mu -> Y -----------------------------
+confound_arrows <- tibble(
+    x    = c(3.82, 4.18),
+    xend = c(3.18, 4.82),
+    y    = c(1.58, 1.58),
+    yend = c(0.22, 0.22)
 )
 
 ggplot() +
-    # Draw arrows
-    geom_segment(data = arrows, 
-                 aes(x = x_start, y = y_start, xend = x_end, yend = y_end, color = type),
-                 arrow = arrow(length = unit(0.3, "cm"), type = "closed"),
-                 linewidth = 1.2) +
-    # Draw nodes
-    geom_point(data = dag_data, aes(x = x, y = y), size = 20, color = "white") +
-    geom_point(data = dag_data, aes(x = x, y = y), size = 18, 
-               color = c("#0072B2", "#E69F00", "#009E73", "#CC79A7")) +
-    # Add labels
-    geom_text(data = dag_data, aes(x = x, y = y, label = label), 
-              size = 3.5, fontface = "bold", color = "white") +
-    # Add annotation for exclusion
-    annotate("text", x = 1.5, y = -0.3, 
-             label = "Relevance:\nZ predicts X", size = 3, color = "#0072B2") +
-    annotate("text", x = 2.5, y = -0.3, 
-             label = "Causal effect\nwe want", size = 3, color = "#E69F00") +
-    annotate("text", x = 2.75, y = 0.6, 
-             label = "Endogeneity\nproblem", size = 3, color = "#CC79A7") +
-    scale_color_manual(values = c("good" = "#0072B2", "bad" = "#CC79A7")) +
-    coord_cartesian(xlim = c(0.5, 3.5), ylim = c(-0.5, 1.3)) +
+    # --- Excluded direct path from Z to Y -----------------------------------
+    geom_segment(aes(x = 1.3, xend = 4.7, y = -1.45, yend = -1.45),
+                 color = "gray65", linewidth = 0.7, linetype = "dashed",
+                 arrow = arrow(length = unit(0.22, "cm"), type = "closed")) +
+    # Red "X" crossing out the excluded arrow (drawn as two segments)
+    geom_segment(aes(x = 2.85, xend = 3.15, y = -1.62, yend = -1.28),
+                 color = "#C1272D", linewidth = 2) +
+    geom_segment(aes(x = 2.85, xend = 3.15, y = -1.28, yend = -1.62),
+                 color = "#C1272D", linewidth = 2) +
+    annotate("text", x = 3, y = -2.00,
+             label = "Exclusion restriction:\nno direct arrow from Z to Y",
+             color = "gray25", fontface = "italic", size = 3.2,
+             lineheight = 0.95) +
+
+    # --- Confounding arrows from mu -----------------------------------------
+    geom_segment(data = confound_arrows,
+                 aes(x = x, xend = xend, y = y, yend = yend),
+                 color = "#C1272D", linewidth = 1.1, linetype = "dashed",
+                 arrow = arrow(length = unit(0.28, "cm"), type = "closed")) +
+    annotate("text", x = 3.28, y = 1.00, label = "Biases X",
+             color = "#C1272D", size = 3.0, fontface = "italic", angle = 62) +
+    annotate("text", x = 4.72, y = 1.00, label = "Biases Y",
+             color = "#C1272D", size = 3.0, fontface = "italic", angle = -62) +
+
+    # --- Causal arrows Z -> X -> Y ------------------------------------------
+    geom_segment(data = causal_arrows,
+                 aes(x = x, xend = xend, y = y, yend = yend),
+                 color = "#1F5F8B", linewidth = 1.4,
+                 arrow = arrow(length = unit(0.35, "cm"), type = "closed")) +
+    annotate("text", x = 2, y = 0.28,
+             label = "First stage\nCov(Z, X) \u2260 0",
+             color = "#1F5F8B", size = 3.2, fontface = "bold",
+             lineheight = 0.95) +
+    annotate("text", x = 4, y = 0.28,
+             label = "Causal effect\nof interest (\u03b2)",
+             color = "#1F5F8B", size = 3.2, fontface = "bold",
+             lineheight = 0.95) +
+
+    # --- Nodes --------------------------------------------------------------
+    geom_point(data = nodes, aes(x = x, y = y, fill = fill_col),
+               shape = 21, size = 20, color = "gray25", stroke = 1.3) +
+    geom_text(data = nodes, aes(x = x, y = y, label = label),
+              size = 7, color = "white", fontface = "bold") +
+    geom_text(data = nodes, aes(x = x, y = role_y, label = role),
+              size = 3.2, color = "gray20", fontface = "bold",
+              lineheight = 0.95) +
+
+    scale_fill_identity() +
+    coord_cartesian(xlim = c(0.2, 5.8), ylim = c(-2.4, 3.1), clip = "off") +
     theme_void() +
-    theme(legend.position = "none") +
-    labs(title = "The IV Strategy: Using Exogenous Variation")
+    theme(plot.margin = margin(10, 10, 10, 10))
 ```
 
-The key insight:
-$X$ has two types of variation---"good" variation unrelated to $\mu$,
-and "bad" variation correlated with $\mu$.
-OLS uses both and is therefore biased.
-IV uses only the "good" variation induced by $Z$,
-giving us an unbiased estimate.
+What makes this a *valid* IV design has less to do with which arrows are drawn
+than with which arrows are deliberately *missing*.
+Let's walk through each of the five claims the diagram is making,
+starting from Angrist-Evans and pulling out the general principle each time.
+
+**1. $Z \to X$: the first stage.**
+Same-sex first two children ($Z$) push some families to have a third child ($X$).
+In general terms, this is the **relevance** condition, $\text{Cov}(Z, X) \neq 0$:
+the instrument must actually move the treatment around.
+If this arrow is missing or nearly so---if same-sex siblings *barely* budged fertility---
+we would have a **weak instrument problem**,
+which we return to later in this chapter.
+This is the *one* IV assumption we can test directly:
+we will verify it shortly by comparing the share of families with three or more kids
+across same-sex and mixed-sex households.
+
+**2. $X \to Y$: the causal effect we actually want.**
+This is the arrow we care about:
+the effect of having a third child on a mother's labor force participation.
+In generic notation, it is the parameter $\beta$.
+Everything else in the diagram is infrastructure we need in order to identify this one arrow.
+
+**3. $\mu \to X$ and $\mu \to Y$: the endogeneity problem.**
+These two arrows together are why OLS fails.
+Unobserved **career orientation** ($\mu$) affects both fertility and labor supply:
+strongly career-oriented women tend to have fewer children *and* are more likely to work,
+while women who prioritize family over career tend to have more children *and* work less.
+That creates a **backdoor path** from $X$ back to $Y$ running through the confounder:
+$X \leftarrow \mu \to Y$.
+When we regress labor force participation on number of children by OLS,
+we cannot tell which part of the correlation comes from the $X \to Y$ arrow we want
+and which part comes from the detour through $\mu$.
+Concretely, OLS will make children *look* like they depress maternal employment more than they do,
+because the women who have more kids are also the women who would have worked less anyway.
+
+**4. No arrow from $Z$ to $Y$: the exclusion restriction.**
+This is where the identification work actually happens.
+We are assuming the sex composition of the first two children
+has *no direct effect* on whether the mother works---
+its only pathway to labor supply runs through its effect on fertility.
+In generic notation, $Z$ affects $Y$ only through $X$.
+That is why the figure draws the $Z \to Y$ arrow in ghostly gray with a red "$\times$" across it:
+we are explicitly ruling that arrow out.
+This assumption is **not directly testable**;
+we have to defend it with economic reasoning.
+In Angrist-Evans it is defensible precisely because
+it is hard to tell a plausible story in which
+having two boys versus a boy and a girl directly changes a mother's attachment to the labor force,
+*except* through the fertility decision it triggers.
+
+**5. No arrow from $\mu$ to $Z$: the instrument is exogenous.**
+We also need the instrument itself to be uncorrelated with the unobservables:
+$\text{Cov}(Z, \mu) = 0$.
+If career orientation influenced the sex composition of a woman's first two children,
+then $Z$ would inherit the same endogeneity it was supposed to solve.
+In Angrist-Evans, the sex of a child is (to a first approximation) biological chance,
+which is why this assumption is easy to defend here---
+and a big reason the paper became a canonical IV reference.
+
+### Why this lets us recover the causal effect
+
+Put these five pieces together and you have the engine of IV.
+The instrument $Z$ injects clean, exogenous variation into $X$---
+variation that originates outside the confounded system.
+IV then asks a single, disciplined question:
+*of the movement in fertility that we can trace back to same-sex siblings,
+how much movement in maternal employment does it produce?*
+Because the $Z \to X \to Y$ pathway is the only channel through which $Z$ can reach $Y$,
+the answer to that question must be the causal effect of children on labor supply.
+
+Another way to put the same idea:
+the treatment $X$ has two kinds of variation.
+**"Good" variation** is the part that is unrelated to $\mu$---
+in our figure, the part induced by the $Z \to X$ arrow.
+In Angrist-Evans, this is the bit of family-size variation that comes from
+the random sex composition of the first two children.
+**"Bad" variation** is the part correlated with $\mu$---
+in our figure, the part induced by the $\mu \to X$ arrow.
+In Angrist-Evans, this is the bit of family-size variation that reflects
+a woman's (unobserved) career orientation.
+OLS uses both kinds indiscriminately, mixing identification with contamination.
+IV isolates only the good variation and discards the rest,
+at the cost of using a smaller slice of the data to learn the answer.
 
 
-## Application: Fertility and Labor Supply
+## Estimating IV
 
-### The Research Question
-
-What is the causal effect of having children on mothers' labor force participation?
-This question is crucial for understanding gender wage gaps,
-designing parental leave policies,
-and evaluating childcare subsidies.
-
-But we cannot randomize fertility!
-And the decision to have children is deeply endogenous:
-
-- **Reverse causality:** Women may time children based on career factors
-- **Selection:** Less career-oriented women may choose larger families
-- **Omitted variables:** Unobserved preferences affect both fertility and work
-
-### The Angrist and Evans (1998) Instrument
-
-In a landmark study,
-Angrist and Evans (1998) found a clever instrument for fertility:
-the **sex composition of the first two children**.
-
-The instrument works because parents prefer mixed-sex children.
-If your first two children are the same sex (both boys or both girls),
-you're more likely to try for a third child to "get" the other sex.
-
-**Why is this relevant?** ($Cov(Z, X) \neq 0$)
-
-- Parents with same-sex children are more likely to have a third child
-- This is an empirical fact we can verify
-
-**Why is this excludable?** ($Cov(Z, \mu) = 0$)
-
-- Sex of children is essentially random (about 50% boys, 50% girls)
-- Hard to imagine why same-sex vs. mixed-sex would *directly* affect labor supply
-- The only plausible channel is through fertility decisions
+With the identification strategy in hand,
+we can now bring the Angrist-Evans design to data and actually estimate $\beta$.
+We'll work with a simulated dataset designed to mimic the Angrist-Evans structure,
+which has the pedagogical advantage that we know the true causal effect
+(we built it in) and can judge how well OLS and IV recover it.
 
 ### Simulating the Angrist-Evans Setup
 
 Let's create simulated data that mirrors the Angrist-Evans setting to illustrate how IV works:
 
 ```{r}
-#| echo: false
+#| echo: true
 #| message: false
 #| warning: false
 
@@ -330,8 +471,11 @@ ae_sim <- tibble(
     # Same-sex instrument (random)
     samesex = rbinom(n, 1, 0.5),
     
-    # More than 2 kids: affected by samesex AND career orientation
-    morekids_latent = -0.5 + 0.07 * samesex - 0.3 * career_orientation + rnorm(n, 0, 0.5),
+    # More than 2 kids: affected by samesex AND career orientation.
+    # The 0.12 coefficient on samesex is calibrated to give a ~6 pp first-stage
+    # difference (the empirical magnitude in Angrist-Evans 1998) and a first-stage
+    # F well into the hundreds at n = 50,000.
+    morekids_latent = -0.5 + 0.12 * samesex - 0.3 * career_orientation + rnorm(n, 0, 0.5),
     morekids = as.integer(morekids_latent > 0),
     
     # Labor force participation: affected by morekids AND career orientation
@@ -383,7 +527,7 @@ ggplot(relevance_check, aes(x = samesex_lab, y = prop_morekids)) +
     )
 ```
 
-The difference is substantial---same-sex parents are about 7 percentage points more likely to have a third child.
+The difference is considerable---same-sex parents are about 6 percentage points more likely to have a third child.
 The instrument is relevant.
 
 ### Testing Excludability (Sort of)
@@ -415,7 +559,7 @@ ggplot(exclusion_check, aes(x = samesex_lab, y = prop_worked)) +
     )
 ```
 
-The difference is small (about 1-2 percentage points),
+The difference is small (around a percentage point),
 consistent with the effect operating through fertility rather than directly.
 Of course,
 this doesn't *prove* excludability---we must rely on economic reasoning to argue there's no direct channel.
@@ -503,7 +647,7 @@ first_stage <- lm(morekids ~ samesex, data = ae_sim)
 summary(first_stage)
 ```
 
-The F-statistic on `samesex` is very large (over 100),
+The F-statistic on `samesex` is very large (well into the hundreds),
 indicating a strong instrument.
 
 **Step 2: Get Predicted Values**
@@ -545,7 +689,28 @@ Always use a proper 2SLS estimator that computes correct standard errors.
 
 ### Proper 2SLS with `feols()`
 
-The `fixest` package provides proper 2SLS estimation with correct standard errors:
+In practice, we don't run the two stages by hand---we use a proper 2SLS estimator
+that handles the standard errors correctly.
+The `fixest` package's `feols()` function is the most common choice in modern applied work,
+and it is worth taking a few minutes to understand its syntax,
+because IV formulas look a bit intimidating the first time you see one.
+
+**The four-part `feols()` formula.**
+For IV estimation, `feols()` uses a formula with three vertical bars that split the right-hand side into four pieces:
+
+```r
+outcome ~ exogenous_controls | fixed_effects | endogenous ~ instrument(s)
+```
+
+Reading left to right:
+
+- **`outcome`**: the dependent variable $Y$ (here, `mom_worked`).
+- **`exogenous_controls`**: any covariates you want to include that are *not* endogenous---age, education, region dummies, and so on. If you have no controls, put `1` for an intercept-only specification.
+- **`fixed_effects`**: variables to absorb as fixed effects (e.g., state, year). Use `0` if you have none. `feols()` absorbs these efficiently rather than creating explicit dummies.
+- **`endogenous ~ instrument(s)`**: the first-stage formula. On the left is the endogenous regressor $X$ (here, `morekids`); on the right are one or more instruments $Z$ (here, `samesex`). `feols()` runs this as a separate first-stage regression internally and uses the predicted values in the second stage---but reports correct 2SLS standard errors.
+
+Our bare-bones Angrist-Evans specification has no controls and no fixed effects,
+so the first two slots are filled with `1` and `0`:
 
 ```{r}
 #| echo: true
@@ -553,14 +718,96 @@ The `fixest` package provides proper 2SLS estimation with correct standard error
 #| warning: false
 
 # Proper 2SLS estimation
-# Syntax: outcome ~ controls | fixed effects | endogenous ~ instrument
-tsls <- feols(mom_worked ~ 1 |  # Just intercept (no controls)
-                           0 |  # No fixed effects
-                           morekids ~ samesex,  # First stage
+# outcome    | exog. controls | fixed effects | first stage
+tsls <- feols(mom_worked ~ 1  |  0             | morekids ~ samesex,
               data = ae_sim)
 
 summary(tsls)
 ```
+
+A few things to notice in the output:
+
+- The coefficient on `fit_morekids` is the 2SLS estimate of $\beta$ (the `fit_` prefix is `fixest`'s way of flagging that this is the *fitted* endogenous variable, not the raw one).
+- The standard error is the correct 2SLS standard error, adjusted for the first-stage uncertainty that the manual two-step approach got wrong.
+- The header reports a first-stage F-statistic (sometimes labeled "IV F-test" or "F-test (1st stage)"). This is our first diagnostic for instrument strength, which we'll pick up in the next section.
+
+**Inspecting the first stage.**
+`feols()` estimates the first stage in the background but hides it by default.
+To view it, pass `stage = 1` to `summary()` (or `etable()` for a publication-ready table):
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# Look at the first-stage regression explicitly
+summary(tsls, stage = 1)
+```
+
+**Adding controls.**
+Suppose we wanted to control for the mother's age and education.
+These are exogenous (we are assuming they are uncorrelated with $\mu$) and go in the *first* slot of the formula.
+`feols()` automatically includes them in *both* the first and second stages---
+exactly what 2SLS requires:
+
+```r
+# Illustrative — not run in this chapter's data
+tsls_ctrl <- feols(mom_worked ~ age + education | 0 | morekids ~ samesex,
+                   data = ae_sim)
+```
+
+**Adding fixed effects.**
+If we wanted state fixed effects (to control for time-invariant features of states),
+we'd move `state` into the second slot:
+
+```r
+# Illustrative
+tsls_fe <- feols(mom_worked ~ age + education | state | morekids ~ samesex,
+                 data = ae_sim)
+```
+
+`feols()` absorbs the fixed effects using a demeaning algorithm that is much faster than creating explicit dummies, which matters a lot on large administrative datasets.
+
+**Multiple instruments.**
+If we had a *second* instrument for fertility---say, a twin-birth indicator, which Angrist and Evans also use---we'd list both on the right of the first-stage formula:
+
+```r
+# Illustrative
+tsls_multi <- feols(mom_worked ~ 1 | 0 | morekids ~ samesex + twins,
+                    data = ae_sim)
+```
+
+The model is now **overidentified** (two instruments for one endogenous variable),
+which opens up diagnostic tests like the Sargan/Hansen overidentification test
+(available via `fitstat(tsls_multi, ~ sargan)`).
+
+**Cluster-robust standard errors.**
+IV standard errors are sensitive to within-cluster correlation.
+You can cluster SEs at estimation time by passing `cluster = ~ cluster_var`,
+or after the fact with `summary()`:
+
+```r
+# Illustrative
+summary(tsls, cluster = ~ state)
+```
+
+**Weak-instrument diagnostics.**
+The most important post-estimation check for IV is the first-stage F-statistic.
+`feols()` reports it in `summary()`, but you can pull it out directly (along with other diagnostics) with `fitstat()`:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# Pull out IV diagnostics explicitly
+fitstat(tsls, ~ ivf + ivwald + wh)
+```
+
+The `ivf` output is the first-stage F-statistic,
+`ivwald` is the Wald version (robust to heteroskedasticity if you clustered),
+and `wh` is the Wu-Hausman test of whether `morekids` is actually endogenous.
+We interpret these in the next section.
 
 ### Comparing OLS and 2SLS
 
@@ -626,18 +873,32 @@ If the instrument is only weakly correlated with $X$,
 - Standard errors become unreliable
 - Inference is invalid
 
-### The F-Test Rule of Thumb
+### The First-Stage F-Test
 
-**Stock and Yogo (2005)** established a rule of thumb:
+The standard diagnostic for instrument strength is the **first-stage F-statistic**,
+which comes from the first-stage regression
+$$
+X_i = \pi_0 + \pi_1 Z_i + \nu_i
+$$
+and tests the null $H_0: \pi_1 = 0$ that the instruments have no predictive power for $X$.
+With a single instrument, the first-stage F is just the square of the t-statistic on $\pi_1$;
+with multiple instruments, it is the joint test that none of them predict $X$.
+A large F means the instruments are collectively doing real work---they move $X$ around a lot.
+`feols()` reports this statistic directly in its `summary()` output,
+or you can pull it out with `fitstat(tsls, ~ ivf)`.
 
-::: {.callout-note}
-## Weak Instrument Test
-The first-stage F-statistic should exceed **10** for the instrument to be considered strong.
-With F < 10, 2SLS estimates may be severely biased.
-:::
-
-In our example,
-the first-stage F-statistic is well over 100---a very strong instrument.
+The traditional rule of thumb, following @stock_testing_2005,
+is that a first-stage F of at least **10** is enough to consider an instrument "strong."
+That threshold has been the textbook standard for two decades.
+More recent work, however, suggests it is too lenient.
+@lee_valid_2022 show that the F-statistic needed to justify conventional t-test inference on the 2SLS coefficient
+is closer to **100** than to 10---
+so an instrument with, say, F = 20 may still produce fine point estimates,
+but its confidence intervals are likely too narrow.
+A safer modern default is to treat an F between 10 and roughly 100 with caution
+and to prefer much stronger first stages when they are available.
+In our running example the first-stage F is well into the hundreds,
+so the instrument clears both the classic and the modern bar comfortably.
 
 ### What Happens with a Weak Instrument?
 
@@ -780,6 +1041,91 @@ People who grew up closer to a college got more education.
 (only through education).
 
 **Finding:** Returns to education are actually *higher* than OLS suggests---the ability bias works in the opposite direction from what many expected.
+
+### Example: Acemoglu, Johnson, & Robinson (2001) - Institutions and Growth
+
+**Question:** Do institutions---property rights, rule of law, constraints on government---cause long-run economic growth?
+
+**Problem:** Institutions and income are jointly determined.
+Rich countries can afford (and demand) better institutions in part *because* they are rich,
+so OLS confuses the effect of institutions on growth with the effect of growth on institutions.
+Unobserved factors like geography and culture correlate with both.
+
+**Instrument:** Settler mortality rates faced by European colonizers in the 17th-19th centuries.
+Where Europeans faced high disease mortality (parts of sub-Saharan Africa, for instance),
+they set up "extractive" institutions designed to siphon resources rather than protect property.
+Where they could settle safely (North America, Australia, New Zealand),
+they transplanted European-style property-rights institutions.
+Those early institutional choices persisted for centuries.
+
+**Why relevant?** Historical settler mortality strongly predicts modern institutional quality,
+because colonial institutional form carried forward through independence.
+
+**Why excludable?** European mortality from disease hundreds of years ago
+should not directly affect a country's GDP today *except* through the institutions it shaped.
+The relevant diseases (malaria, yellow fever) had much smaller effects on indigenous populations with partial immunity
+than on European newcomers.
+
+**Finding:** Institutions have a large causal effect on GDP per capita;
+the IV estimate is larger than OLS.
+The paper sparked a broad "institutions vs. geography" debate in development economics.
+
+### Example: Levitt (1997) - Police and Crime
+
+**Question:** Does hiring more police cause crime to fall?
+
+**Problem:** Reverse causality.
+Cities with high crime hire more police in response,
+so OLS typically shows a positive correlation between police and crime---
+implying police *increase* crime, which is obviously backwards.
+
+**Instrument:** The timing of mayoral and gubernatorial elections.
+Police hiring in U.S. cities spikes in the year before an election
+because incumbents want to campaign on being tough on crime.
+
+**Why relevant?** Police staffing rises predictably in the run-up to elections,
+providing variation in police levels that is not driven by current crime trends.
+
+**Why excludable?** The electoral calendar is set by state law, not by recent crime fluctuations.
+There is no obvious direct channel from "an election is approaching" to "less crime this year"
+except through its effect on police hiring.
+
+**Finding:** Additional officers reduce crime substantially,
+and the IV estimate flips the sign of the naive OLS correlation.
+A coding error in the original paper was later flagged by @mccrary_using_2002
+and the estimates revised downward,
+but the qualitative conclusion---that more police reduce violent crime---survives.
+
+### Example: Angrist & Krueger (1991) - Quarter of Birth
+
+**Question:** What is the causal return to education on earnings?
+
+**Problem:** The same ability bias Card faces.
+Unobserved ability raises both schooling and wages,
+so OLS estimates of the return to education conflate education's causal effect
+with the effect of being able.
+
+**Instrument:** Quarter of birth.
+U.S. compulsory-schooling laws require children to start school
+the September of the year they turn 6, but allow them to drop out at 16.
+A child born in Q1 starts school older and hits the dropout age with less time in school;
+a child born in Q4 starts younger and is forced to stay in longer before becoming legally allowed to leave.
+People born late in the year therefore attain slightly more education,
+on average, than people born early in the year.
+
+**Why relevant?** First-stage regressions show a detectable (though modest) relationship
+between quarter of birth and total years of schooling.
+
+**Why excludable?** Quarter of birth should be essentially random
+with respect to ability, family background, and earnings potential.
+There is no obvious reason being born in January rather than October
+would directly affect adult wages other than through education.
+
+**Finding:** Returns to education estimated by IV are close to OLS,
+suggesting ability bias may be smaller than many feared.
+Later work [@bound_problems_1995] cautioned that quarter of birth is actually a fairly *weak* instrument---
+in fact, Angrist-Krueger is often cited as a motivating example for the weak-instrument literature
+we discussed in the previous section.
 
 
 ## Summary

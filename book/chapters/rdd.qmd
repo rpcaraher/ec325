@@ -9,7 +9,6 @@
 library(tidyverse)
 library(fixest)
 library(modelsummary)
-library(rdrobust)
 library(patchwork)
 
 options(scipen = 999)
@@ -111,7 +110,6 @@ function checkAnswer(selectElement, correctValue) {
 - What is a regression discontinuity (RD) design, and when can we use it?
 - How do cutoffs in the real world generate natural experiments?
 - What is a "running variable," and what role does it play?
-- What is the difference between **sharp** and **fuzzy** RD?
 - How do we choose between parametric and nonparametric RD, and what is a bandwidth?
 - How do we test whether an RD design is credible?
 :::
@@ -120,7 +118,6 @@ function checkAnswer(selectElement, correctValue) {
 ## **Suggested Readings**
 - Angrist & Pischke, *Mastering 'Metrics*, Chapter 4.
 - Carpenter & Dobkin (2009), "The Effect of Alcohol Consumption on Mortality: Regression Discontinuity Evidence from the Minimum Drinking Age," *American Economic Journal: Applied Economics*.
-- Abdulkadiroğlu, Angrist, & Pathak (2014), "The Elite Illusion: Achievement Effects at Boston and New York Exam Schools," *Econometrica*.
 :::
 
 
@@ -352,8 +349,7 @@ Two features of this setup matter:
 ## Key RD Vocabulary
 - The **running variable** (also called the *forcing variable* or *score*) is the continuous variable whose value determines treatment. In the MLDA example, it is age.
 - The **cutoff** (also called the *threshold*) is the value of the running variable at which treatment status changes. In the MLDA example, the cutoff is 21.
-- **Sharp RD** describes designs where treatment status is a deterministic function of the running variable, jumping cleanly from 0 to 1 (or vice versa) at the cutoff.
-- **Fuzzy RD** describes designs where the *probability* or *intensity* of treatment jumps at the cutoff, but treatment itself is not a perfect function of the running variable. We will take this up later.
+- **Sharp RD** describes designs where treatment status is a deterministic function of the running variable, jumping cleanly from 0 to 1 (or vice versa) at the cutoff. This chapter focuses on sharp RD. A *fuzzy* RD variant, where the cutoff shifts only the *probability* of treatment, is briefly noted at the end of the chapter.
 :::
 
 ### Why RD Is Different from Regression Control
@@ -785,103 +781,24 @@ The point estimates are broadly similar across bandwidths,
 though the standard errors grow noticeably as we shrink the window.
 This stability under bandwidth changes is another hallmark of a credible RD.
 
-### The `rdrobust` Package: Automating the Bandwidth Choice
+::: {.callout-tip}
+## The `rdrobust` Package: Worth Exploring if You Use RD
 
-Choosing a bandwidth by hand is a judgment call,
-but econometricians have developed sophisticated methods for picking one that optimally balances bias and variance.
-The gold-standard implementation in R is the **`rdrobust`** package by Calonico, Cattaneo, and Titiunik, which automates essentially every step of a modern nonparametric RD:
+Choosing a bandwidth by hand is a judgment call.
+For published work, most applied economists instead use the **`rdrobust`** package in R, developed by Calonico, Cattaneo, and Titiunik.
+It automates the whole modern pipeline:
+it picks an MSE-optimal bandwidth,
+fits a kernel-weighted local linear (or polynomial) regression on each side of the cutoff,
+and reports **bias-corrected** point estimates together with **robust standard errors** that remain valid even when the optimal bandwidth is imperfect.
+The companion function `rdplot()` produces the publication-ready "jump at the cutoff" graph that you see in RD papers.
 
-1. Select an optimal bandwidth (MSE-optimal or coverage-error-optimal).
-2. Fit a local linear (or local polynomial) regression on either side of the cutoff.
-3. Weight observations by a kernel that gives more weight to points near the cutoff.
-4. Compute bias-corrected point estimates and **robust** standard errors that correct for the bias introduced by kernel smoothing.
-
-The two main functions are `rdrobust()` for estimation and `rdplot()` for visualization.
-
-::: {.callout-note}
-## Why `rdrobust`?
-`rdrobust` has become the default in applied work for good reason. It implements state-of-the-art bandwidth selectors from @imbens_kalyanaraman_2012 and @calonico_2014, uses bias-correction techniques that let you report inferences that are valid even when the optimal bandwidth choice is imperfect, and produces well-formatted plots you can drop straight into a paper. Installing it is simple: `install.packages("rdrobust")`.
+We are not going to work through `rdrobust` in this course.
+The hand-coded `feols` RD above captures the essential idea:
+run a linear regression in a narrow window, and you have a local-linear nonparametric RD.
+But if you ever write a paper or thesis using an RD design, `rdrobust` is the tool to reach for.
+Useful references to start from are @imbens_kalyanaraman_2012 and @calonico_2014.
+Installing the package is simple: `install.packages("rdrobust")`.
 :::
-
-### Estimation with `rdrobust()`
-
-`rdrobust()` needs three pieces of information: the outcome, the running variable, and (optionally) the cutoff `c`. Here is a complete estimation on our MLDA data:
-
-```{r}
-#| echo: true
-#| message: false
-#| warning: false
-
-# Default local linear RD with MSE-optimal bandwidth
-rd_rb <- rdrobust(y = mlda_data$death_rate,
-                  x = mlda_data$months,
-                  c = 0)
-
-summary(rd_rb)
-```
-
-The output reports three related estimates:
-
-- **Conventional:** the standard local-linear point estimate and its usual standard error.
-- **Bias-corrected:** the same point estimate adjusted for the bias inherent in local-linear smoothing.
-- **Robust:** the bias-corrected estimate with standard errors that are valid under that bias correction. This is the inference method Calonico, Cattaneo, and Titiunik recommend reporting.
-
-The MSE-optimal bandwidth---chosen by the package automatically---is printed near the bottom.
-Under the hood, `rdrobust` is doing a weighted local linear regression,
-but the interface is completely automatic.
-
-### Plotting the Result with `rdplot()`
-
-The companion function `rdplot()` makes a clean visualization: it bins the running variable, averages the outcome within each bin, and fits a (polynomial) trend on each side of the cutoff.
-
-```{r}
-#| echo: true
-#| message: false
-#| warning: false
-#| label: fig-rdplot
-#| fig-cap: "RD plot using the `rdrobust::rdplot()` function. Dots are bin-averages of the outcome, and the lines are fitted polynomials. The jump at the cutoff is the RD estimate."
-
-rdplot(y = mlda_data$death_rate,
-       x = mlda_data$months,
-       c = 0,
-       p = 2,
-       title    = "",
-       x.label  = "Months from 21st birthday",
-       y.label  = "Death rate per 100,000")
-```
-
-Notice the automatic binning: `rdplot()` chose a bin width using a mean-squared-error criterion,
-so the resulting scatter shows the general shape of the data without drowning you in noise.
-The curves on each side of the cutoff are quadratic fits, and the vertical gap at zero is the estimated MLDA effect.
-
-### Hand-Coded vs. Package Estimation
-
-One of the themes of this book is that the packages make our lives easier, but the underlying regression is something you could write yourself.
-The `rdrobust` estimate with bandwidth $b$ (setting aside the kernel weighting and bias correction for a moment) is essentially the same as our hand-coded `feols` regression on `abs(months) <= b`.
-Using the same bandwidth, the two should deliver very similar point estimates:
-
-```{r}
-#| echo: true
-#| message: false
-#| warning: false
-
-# Extract the MSE-optimal bandwidth chosen by rdrobust
-opt_bw <- rd_rb$bws[1, 1]
-opt_bw
-
-# Hand-rolled local linear RD at that bandwidth
-rd_hand <- feols(death_rate ~ over21 + months + months:over21,
-                 vcov = "HC1",
-                 data = subset(mlda_data, abs(months) <= opt_bw))
-
-# Compare the point estimates
-coef(rd_hand)["over21"]            # hand-rolled
-rd_rb$coef[1]                      # rdrobust conventional estimate
-```
-
-The two estimates are very close---not exactly equal, because `rdrobust` uses a triangular kernel that down-weights points further from the cutoff,
-while our hand-coded version gives every observation in the window equal weight.
-But the intuition is the same: run a linear RD in a narrow window, and you have a local-linear nonparametric RD.
 
 
 ## Cause-Specific Effects: A Falsification Test
@@ -950,197 +867,21 @@ Alcohol is plausibly responsible for the first pattern and demonstrably not resp
 This is the kind of evidence that makes an RD design convincing to a skeptical reader.
 
 
-## Fuzzy RD: When the Cutoff Shifts Treatment Probability
+## A Brief Note on Fuzzy RD
 
-So far we have focused on sharp RD, where treatment *is* a function of the running variable.
-In many applications, however, the cutoff changes the **probability** of treatment---not treatment itself---or the **intensity** of treatment, as measured by some continuous exposure variable.
-This is called **fuzzy RD**.
+Everything above assumes **sharp RD**: the cutoff determines treatment status cleanly.
+In many real-world applications the cutoff does not assign treatment perfectly---it only shifts the *probability* or *intensity* of treatment.
+Think of a scholarship that most but not all qualifying students accept,
+or an elite school offer that many qualifying students decline and a few non-qualifying students circumvent.
+This setting is called **fuzzy RD**.
 
-### The Elite Illusion
+The intuition is straightforward if you have already seen IV (@sec-iv): the cutoff indicator is an **instrument** for the underlying treatment, and the causal effect is estimated by 2SLS.
+Specifically, you divide the jump in the outcome at the cutoff (the reduced form) by the jump in the treatment probability at the cutoff (the first stage).
+All the usual IV caveats apply---the first stage must be strong, and the exclusion restriction is the claim that clearing the cutoff affects the outcome only through treatment.
 
-AP's flagship fuzzy RD example comes from Abdulkadiroğlu, Angrist, and Pathak's (2014) study of Boston's elite exam schools.
-
-Every year, thousands of Boston middle schoolers take the Independent Schools Entrance Exam (ISEE) in hopes of winning a seat at Boston Latin School (BLS), the most selective public exam school in the city.
-Admission is determined by a sharp test-score cutoff.
-If your score is above the cutoff, you get an offer.
-If it is below, you do not.
-
-But notice that *attending BLS* is not a sharp function of the cutoff.
-Some students who qualify decline the offer and enroll elsewhere.
-Some students who miss the cutoff go on to attend another exam school (often Boston Latin Academy, one step down the hierarchy).
-So actual BLS attendance changes smoothly---but not cleanly---at the cutoff.
-
-The *probability* of enrolling at BLS does jump at the cutoff, but not from 0 to 1.
-Similarly, the *peer quality* a student experiences---average classmate test scores---jumps sharply at the cutoff as treated students are placed in much more selective classrooms.
-The cutoff is like a shove: it nudges students into (or out of) a more selective environment,
-even if it does not mechanically determine any one student's school.
-
-### From Reduced Form to 2SLS
-
-To formalize this, we distinguish three objects:
-
-1. **The reduced form** is a sharp-style RD regression of the outcome on a dummy for clearing the cutoff.
-   $$
-   Y_i = \alpha_0 + \rho D_i + \beta_0 R_i + e_{0i}
-   $$
-   Here $D_i = 1$ if applicant $i$ cleared the BLS cutoff, and $R_i$ is their running-variable score.
-2. **The first stage** is a sharp-style RD regression of the endogenous treatment (e.g., average peer quality $\bar{X}_{(i)}$) on the same cutoff dummy.
-   $$
-   \bar{X}_{(i)} = \alpha_1 + \phi D_i + \beta_1 R_i + e_{1i}
-   $$
-   Here $\phi$ captures the jump in peer quality induced by crossing the cutoff.
-3. **The second stage** is the causal relationship of interest: the effect of peer quality on the outcome.
-   $$
-   Y_i = \alpha_2 + \lambda \hat{\bar{X}}_{(i)} + \beta_2 R_i + e_{2i}
-   $$
-   where $\hat{\bar{X}}_{(i)}$ is the fitted value from the first stage.
-
-This is exactly the instrumental variables setup from @sec-iv: **clearing the cutoff** is an instrument for **peer quality**.
-The two-stage-least-squares (2SLS) estimator is:
-
-$$
-\hat{\lambda}_{\text{2SLS}} = \frac{\hat{\rho}}{\hat{\phi}} = \frac{\text{jump in outcome}}{\text{jump in peer quality}}
-$$ {#eq-fuzzy-rd}
-
-This is why fuzzy RD is often summarized as *"fuzzy RD is IV."*
-The running-variable cutoff is your instrument.
-The reduced form is the RD on the outcome.
-The first stage is the RD on the treatment.
-And 2SLS just divides one by the other.
-
-::: {.callout-important}
-## Fuzzy RD Is IV
-In a fuzzy design, the indicator for clearing the cutoff is an **instrument** for the underlying treatment (enrollment, exposure, intensity). The causal effect is the ratio of the outcome RD to the treatment RD. All the same IV assumptions apply: the instrument must be relevant (it must actually shift treatment), and it must satisfy the exclusion restriction (it can only affect outcomes through treatment).
-:::
-
-### A Simulated Fuzzy RD Example
-
-Let's simulate a simplified version of the BLS setup.
-Applicants have a running-variable score centered at the cutoff.
-Clearing the cutoff raises the probability of enrolling at BLS (and thus the peer quality of your classmates),
-but does not move all students cleanly from 0 to 1.
-
-```{r}
-#| echo: true
-#| message: false
-#| warning: false
-
-set.seed(7)
-n <- 2000
-exam_data <- tibble(
-    score = runif(n, -20, 20),          # running variable, centered at cutoff
-    offer = as.numeric(score >= 0)       # clearing the cutoff
-) |>
-    mutate(
-        # Peer quality jumps by ~0.8 sigma at the cutoff (mirroring Fig 4.8)
-        peer_quality = 0.02 * score + 0.8 * offer + rnorm(n, 0, 0.3),
-        # Outcome: seventh-grade math score.
-        # The TRUE effect of peer quality on math is zero (mirroring AP).
-        # But the underlying score--outcome relationship is smooth.
-        math = 0.04 * score + 0 * peer_quality + rnorm(n, 0, 0.5)
-    )
-
-head(exam_data)
-```
-
-Now we can estimate the reduced form, first stage, and 2SLS estimate by hand:
-
-```{r}
-#| echo: true
-#| message: false
-#| warning: false
-
-# Reduced form: effect of clearing the cutoff on math
-rf <- feols(math ~ offer + score, vcov = "HC1", data = exam_data)
-
-# First stage: effect of clearing the cutoff on peer quality
-fs <- feols(peer_quality ~ offer + score, vcov = "HC1", data = exam_data)
-
-# 2SLS: use "offer" as an instrument for "peer_quality",
-# controlling smoothly for the running variable (score).
-iv_fit <- feols(math ~ score | peer_quality ~ offer,
-                vcov = "HC1", data = exam_data)
-```
-
-```{r}
-#| echo: true
-#| message: false
-#| warning: false
-#| label: tbl-fuzzy
-#| tbl-cap: "Fuzzy RD estimation. The first stage shows a large jump in peer quality at the cutoff, the reduced form shows an approximately zero jump in math scores, and the 2SLS estimate of the peer-quality effect is approximately zero."
-
-modelsummary(
-    list("First stage: peer quality" = fs,
-         "Reduced form: math" = rf,
-         "2SLS: peer effect" = iv_fit),
-    stars = TRUE,
-    gof_omit = "AIC|BIC|Log|RMSE|Std|Within"
-)
-```
-
-The story is exactly the Abdulkadiroğlu-Angrist-Pathak story:
-
-- The **first stage** confirms that clearing the cutoff leads to a large jump in peer quality (around 0.8 standard deviations).
-- The **reduced form** shows essentially no jump in students' own math scores.
-- The **2SLS** estimate of the causal effect of peer quality on math achievement is a small, statistically-insignificant number---not the 0.25 that a naive OLS regression would give.
-
-The punchline is striking: despite the common intuition that "peers matter," the fuzzy RD design suggests that the huge boost in peer quality that comes with an elite exam school seat produces essentially *no* gain in own-student math achievement.
-This is the *elite illusion*: exam schools look great because they admit great students, not because they *make* their students great.
-
-### Visualizing the Fuzzy RD
-
-```{r}
-#| echo: true
-#| message: false
-#| warning: false
-#| label: fig-fuzzy
-#| fig-cap: "Three pictures of the fuzzy RD. Top: the first stage (jump in peer quality). Middle: the reduced form (no jump in math scores). Bottom: putting them together, the 2SLS estimate of peer effects is approximately zero."
-
-bin_means <- function(data, x, y, width = 1) {
-    data |>
-        mutate(bin = floor(.data[[x]] / width) * width + width / 2) |>
-        group_by(bin) |>
-        summarise(y_mean = mean(.data[[y]]), .groups = "drop")
-}
-
-first_stage_bins <- bin_means(exam_data, "score", "peer_quality")
-reduced_form_bins <- bin_means(exam_data, "score", "math")
-
-p1 <- ggplot() +
-    geom_point(data = first_stage_bins,
-               aes(x = bin, y = y_mean),
-               color = "grey40", size = 2, alpha = 0.8) +
-    geom_smooth(data = exam_data,
-                aes(x = score, y = peer_quality,
-                    group = offer, color = factor(offer)),
-                method = "lm", se = FALSE, linewidth = 1) +
-    geom_vline(xintercept = 0, linetype = "dashed") +
-    scale_color_manual(values = c("0" = "grey50", "1" = "#0072B2"),
-                       guide = "none") +
-    labs(x = NULL, y = "Peer quality", title = "First stage") +
-    theme_minimal(base_size = 12)
-
-p2 <- ggplot() +
-    geom_point(data = reduced_form_bins,
-               aes(x = bin, y = y_mean),
-               color = "grey40", size = 2, alpha = 0.8) +
-    geom_smooth(data = exam_data,
-                aes(x = score, y = math,
-                    group = offer, color = factor(offer)),
-                method = "lm", se = FALSE, linewidth = 1) +
-    geom_vline(xintercept = 0, linetype = "dashed") +
-    scale_color_manual(values = c("0" = "grey50", "1" = "#0072B2"),
-                       guide = "none") +
-    labs(x = "Score (centered at cutoff)",
-         y = "Math score", title = "Reduced form") +
-    theme_minimal(base_size = 12)
-
-p1 / p2
-```
-
-The first stage is a dramatic jump in peer quality at the cutoff.
-The reduced form is essentially flat.
-By @eq-fuzzy-rd, if the numerator (reduced form) is zero but the denominator (first stage) is large and positive, the ratio---the 2SLS estimate of the peer effect on math---is also zero.
+We will not estimate a fuzzy RD in this course.
+Just know that it exists, that a famous example is Abdulkadiroğlu, Angrist, and Pathak's (2014) study of Boston's elite exam schools (the "elite illusion"),
+and that the technique sits at the intersection of RD and IV.
 
 
 ## Assessing the Validity of an RD Design
@@ -1273,11 +1014,10 @@ It turns rigid rules and cutoffs into natural experiments by exploiting the fact
 The core ideas:
 
 1. **Running variables and cutoffs.** RD requires a continuous measured variable and a known cutoff at which treatment changes. The MLDA, admissions cutoffs, income eligibility thresholds, and close elections all fit the bill.
-2. **Sharp vs. fuzzy.** In a sharp design, treatment flips cleanly at the cutoff. In a fuzzy design, the probability or intensity of treatment jumps, but treatment is not a perfect function of the running variable. Fuzzy RD is estimated by 2SLS, using the cutoff dummy as an instrument.
+2. **Sharp RD.** We focused on *sharp* RD, where treatment is a deterministic function of the running variable. A *fuzzy* RD variant---where the cutoff only shifts the probability of treatment---exists and is handled by combining RD with IV. We flagged it but did not estimate one.
 3. **Modeling the running variable.** The RD estimate is the jump in the outcome at the cutoff after controlling for smooth trends in the running variable. Linear, interacted, and quadratic specifications are standard; higher-order polynomials are generally a bad idea.
-4. **Parametric vs. nonparametric.** Parametric RD fits a global polynomial to all the data. Nonparametric RD focuses on observations in a narrow bandwidth around the cutoff. Bandwidth choice is a bias-variance trade-off, and modern methods (implemented in `rdrobust`) automate the optimal choice.
-5. **The `rdrobust` package in R.** `rdrobust()` estimates local-polynomial RDs with MSE-optimal bandwidths and robust bias-corrected inference. `rdplot()` produces clean diagnostic plots. They are the tools of choice for modern applied RD.
-6. **Validity checks.** A credible RD paper shows (a) that pre-determined covariates are balanced across the cutoff, (b) that the density of the running variable is smooth through the cutoff (no manipulation), (c) that results are stable across bandwidth and polynomial choices, and (d) that "effects" vanish at placebo cutoffs and on falsification outcomes.
+4. **Parametric vs. nonparametric.** Parametric RD fits a global polynomial to all the data. Nonparametric RD focuses on observations in a narrow bandwidth around the cutoff. Bandwidth choice is a bias-variance trade-off, and modern implementations (notably the `rdrobust` package in R) automate the optimal choice and inference---worth exploring if you ever use an RD design in practice.
+5. **Validity checks.** A credible RD paper shows (a) that pre-determined covariates are balanced across the cutoff, (b) that the density of the running variable is smooth through the cutoff (no manipulation), (c) that results are stable across bandwidth and polynomial choices, and (d) that "effects" vanish at placebo cutoffs and on falsification outcomes.
 
 A credible RD tells a clear story: here is the rule, here is the cutoff, here is the jump, and here is why nothing else can explain it.
 When those pieces fall into place, RD can deliver causal estimates that are hard to argue with.
@@ -1337,18 +1077,7 @@ select the best answer from the dropdown menu.
 </div>
 
 <div class="answer-row">
-    <label>v. In a <b>fuzzy</b> RD design, the jump at the cutoff is... </label>
-    <select onchange="checkAnswer(this, 'c')">
-        <option value="">-- Select Answer --</option>
-        <option value="a">The causal effect of crossing the cutoff, with no further interpretation needed</option>
-        <option value="b">The probability that treatment fails</option>
-        <option value="c">In the <i>probability</i> or <i>intensity</i> of treatment, which we use as an instrument for the underlying treatment via 2SLS</option>
-        <option value="d">Only valid if a McCrary test passes</option>
-    </select>
-</div>
-
-<div class="answer-row">
-    <label>vi. If the density of the running variable shows a sharp pile-up just above the cutoff, this suggests... </label>
+    <label>v. If the density of the running variable shows a sharp pile-up just above the cutoff, this suggests... </label>
     <select onchange="checkAnswer(this, 'b')">
         <option value="">-- Select Answer --</option>
         <option value="a">The cutoff is not sharp enough</option>
@@ -1359,7 +1088,7 @@ select the best answer from the dropdown menu.
 </div>
 
 <div class="answer-row">
-    <label>vii. In the Carpenter & Dobkin (2009) MLDA study, why was finding a large jump in motor vehicle fatalities but <i>not</i> in internal-cause deaths important? </label>
+    <label>vi. In the Carpenter & Dobkin (2009) MLDA study, why was finding a large jump in motor vehicle fatalities but <i>not</i> in internal-cause deaths important? </label>
     <select onchange="checkAnswer(this, 'a')">
         <option value="">-- Select Answer --</option>
         <option value="a">It is a falsification test: the absence of effects on outcomes that alcohol should not affect increases confidence that the effects on outcomes it <i>should</i> affect are causal</option>
@@ -1370,18 +1099,7 @@ select the best answer from the dropdown menu.
 </div>
 
 <div class="answer-row">
-    <label>viii. In the Abdulkadiroğlu, Angrist, & Pathak (2014) exam school study, the 2SLS estimate of the peer-quality effect on math achievement is close to zero. What does this suggest? </label>
-    <select onchange="checkAnswer(this, 'd')">
-        <option value="">-- Select Answer --</option>
-        <option value="a">Exam schools do not admit talented students</option>
-        <option value="b">The running variable was mis-measured</option>
-        <option value="c">Peer quality does not exist as a construct</option>
-        <option value="d">Much of the apparent advantage of elite exam schools reflects selection of high-achieving students, not a causal effect of better peers</option>
-    </select>
-</div>
-
-<div class="answer-row">
-    <label>ix. <b>(Challenge)</b> Suppose an RD estimate is large and statistically significant when a researcher uses a 5th-order polynomial for the running variable, but small and insignificant when using a linear or quadratic control. What should we conclude? </label>
+    <label>vii. <b>(Challenge)</b> Suppose an RD estimate is large and statistically significant when a researcher uses a 5th-order polynomial for the running variable, but small and insignificant when using a linear or quadratic control. What should we conclude? </label>
     <select onchange="checkAnswer(this, 'c')">
         <option value="">-- Select Answer --</option>
         <option value="a">The effect is real and the higher-order polynomial is most accurate</option>
@@ -1392,7 +1110,7 @@ select the best answer from the dropdown menu.
 </div>
 
 <div class="answer-row">
-    <label>x. <b>(Challenge)</b> In a sharp RD design, the treatment dummy $D_a$ is determined entirely by the running variable $a$. Why does this mean there is <i>no classical omitted variable bias</i>, assuming the running variable is correctly modeled? </label>
+    <label>viii. <b>(Challenge)</b> In a sharp RD design, the treatment dummy $D_a$ is determined entirely by the running variable $a$. Why does this mean there is <i>no classical omitted variable bias</i>, assuming the running variable is correctly modeled? </label>
     <select onchange="checkAnswer(this, 'b')">
         <option value="">-- Select Answer --</option>
         <option value="a">Because treatment is random</option>
@@ -1410,23 +1128,19 @@ select the best answer from the dropdown menu.
 
 i. The **running variable** is the continuous measure whose value determines whether a unit is treated (above the cutoff) or not (below). In the MLDA example, it is age. In exam schools, it is the admissions test score. The running variable is the backbone of the RD design: it is both the source of treatment assignment and the variable we must control for smoothly.
 
-ii. In a **sharp** RD, $D_a$ is a deterministic, discontinuous function of the running variable: if your age is at least 21, you are treated, period. This is different from fuzzy RD, where the cutoff changes the *probability* of treatment.
+ii. In a **sharp** RD, $D_a$ is a deterministic, discontinuous function of the running variable: if your age is at least 21, you are treated, period. (In the *fuzzy* variant, briefly noted at the end of the chapter, the cutoff only changes the *probability* of treatment.)
 
 iii. Panel C of @fig-three-panels shows why we add polynomials. A naive linear fit will be forced to approximate a curved relationship with two straight lines, and if the curvature changes sign near the cutoff, it will *look* like a jump even when none exists. Adding a quadratic (or an interacted linear) term lets the regression model the curvature instead of mistaking it for treatment.
 
 iv. Bandwidth selection is a classic **bias-variance trade-off**. A narrower bandwidth means fewer observations (higher variance) but a smaller window in which nonlinearity can confuse us (lower bias). A wider bandwidth uses more data (lower variance) but may pick up nonlinear trends that are not really jumps (higher bias). Modern tools like `rdrobust` pick a bandwidth that minimizes the mean squared error.
 
-v. In a **fuzzy** design, treatment is not a deterministic function of the running variable---some units above the cutoff are untreated, or some units below are treated anyway. The *probability* or *intensity* of treatment jumps at the cutoff. Because the reduced-form RD estimates the effect of *crossing the cutoff* and the first-stage RD estimates the jump in treatment, the causal effect of treatment on the outcome is the ratio: $\hat{\lambda} = \hat{\rho} / \hat{\phi}$. This is 2SLS with the cutoff dummy as an instrument.
+v. A pile-up just above the cutoff is the signature of **manipulation**: units engineering their running-variable values to end up on the treated side. When this happens, units just above and just below the cutoff are no longer comparable, since the treated group disproportionately contains motivated manipulators. The McCrary density test (or its modern successor in `rddensity`) formalizes this diagnostic.
 
-vi. A pile-up just above the cutoff is the signature of **manipulation**: units engineering their running-variable values to end up on the treated side. When this happens, units just above and just below the cutoff are no longer comparable, since the treated group disproportionately contains motivated manipulators. The McCrary density test (or its modern successor in `rddensity`) formalizes this diagnostic.
+vi. Finding *no* jump in internal-cause deaths at the MLDA cutoff is a **falsification test** (or "balance test"): an outcome that drinking should not affect shows the expected null result, while outcomes that drinking *should* affect (motor vehicle deaths, suicides, alcohol-related illness) do show big jumps. The null results rule out alternative explanations---like some other policy changing at age 21, or some coincidental jump in mortality---because such explanations would have produced effects on both kinds of deaths.
 
-vii. Finding *no* jump in internal-cause deaths at the MLDA cutoff is a **falsification test** (or "balance test"): an outcome that drinking should not affect shows the expected null result, while outcomes that drinking *should* affect (motor vehicle deaths, suicides, alcohol-related illness) do show big jumps. The null results rule out alternative explanations---like some other policy changing at age 21, or some coincidental jump in mortality---because such explanations would have produced effects on both kinds of deaths.
+vii. @gelman_imbens_2019 make a strong case against high-order polynomials in RD: they give too much weight to extreme observations and can produce large, oscillating fits near the cutoff, generating spurious jumps. Modern best practice is to fit local linear (or at most local quadratic) regressions on a narrow bandwidth, and to show that results are stable across reasonable bandwidths and specifications. An estimate that appears only at polynomial order 5 is a warning sign, not evidence of a subtle true effect.
 
-viii. If peer quality truly had a large causal effect on a student's own achievement, we should see a jump in math scores that is roughly proportional to the jump in peer quality. We do not. Combined with the fact that exam schools admit students with large pre-existing advantages, this suggests that the raw achievement gap between exam school students and other public school students is largely a reflection of *selection*---who gets in---not a causal effect of the elite environment. This is the *elite illusion*.
-
-ix. @gelman_imbens_2019 make a strong case against high-order polynomials in RD: they give too much weight to extreme observations and can produce large, oscillating fits near the cutoff, generating spurious jumps. Modern best practice is to fit local linear (or at most local quadratic) regressions on a narrow bandwidth, and to show that results are stable across reasonable bandwidths and specifications. An estimate that appears only at polynomial order 5 is a warning sign, not evidence of a subtle true effect.
-
-x. OVB in a regression $Y = \beta_0 + \beta_1 D + e$ occurs when some omitted variable $Z$ is correlated with both $D$ and $Y$. But in sharp RD, $D$ is a *deterministic function* of the running variable $R$: $D = \mathbf{1}\{R \geq c\}$. So any $Z$ correlated with $D$ must also be correlated with $R$ (or some function of it). Once we correctly control for $R$ (via a sufficiently flexible polynomial or a sufficiently narrow bandwidth), there is no variation left in $D$ that is also correlated with any such $Z$. This is why RD has a much weaker reliance on observables than straight OLS---its credibility rests on modeling one variable (the running variable) correctly, rather than on controlling for everything that might confound treatment.
+viii. OVB in a regression $Y = \beta_0 + \beta_1 D + e$ occurs when some omitted variable $Z$ is correlated with both $D$ and $Y$. But in sharp RD, $D$ is a *deterministic function* of the running variable $R$: $D = \mathbf{1}\{R \geq c\}$. So any $Z$ correlated with $D$ must also be correlated with $R$ (or some function of it). Once we correctly control for $R$ (via a sufficiently flexible polynomial or a sufficiently narrow bandwidth), there is no variation left in $D$ that is also correlated with any such $Z$. This is why RD has a much weaker reliance on observables than straight OLS---its credibility rests on modeling one variable (the running variable) correctly, rather than on controlling for everything that might confound treatment.
 
 :::
 
