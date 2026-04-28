@@ -84,7 +84,7 @@ $$
 . . .
 
 - When this fails --- when $X$ is correlated with $\mu$ --- $\hat{\beta}_{OLS}$ is biased
-- Define $X$ as being **endogenous**
+- We call the variable $X$ causing the problem an **endogenous** variable
 
 . . .
 
@@ -310,21 +310,6 @@ The instrument affects $Y$ **only through** $X$. There is no direct effect of $Z
 # Graphical Intuition: The IV DAG
 
 
-## A Picture of the Problem {.smaller}
-
-- A **DAG** (directed acyclic graph) shows variables as nodes and causal relationships as arrows
-- Let's build one up piece-by-piece for the Angrist-Evans setting
-- We'll start with what we *want*, then add what gets in the way
-
-. . .
-
-- Four ingredients we'll need:
-  - Treatment $X$: had a third child
-  - Outcome $Y$: mother works
-  - Confounder $\mu$: career orientation (unobserved)
-  - Instrument $Z$: same-sex first two children
-
-
 ```{r}
 #| label: dag-helpers
 #| include: false
@@ -468,23 +453,6 @@ draw_iv_dag(show_mu = TRUE, show_z = TRUE, show_excluded = TRUE)
 - The exclusion restriction is what we *don't* see: no direct $Z \to Y$ arrow
 - $Z$ can reach $Y$ **only** by going through $X$
 - This is what makes IV identify $\beta$
-
-
-## DAG Summary {.smaller}
-
-```{r}
-#| label: dag-summary
-#| fig-height: 4.6
-#| fig-width: 9
-
-draw_iv_dag(show_mu = TRUE, show_z = TRUE, show_excluded = TRUE)
-```
-
-::: {.callout-note}
-## The IV DAG in one breath
-$Z \to X \to Y$ is the only path from $Z$ to $Y$.  So the movement in $Y$ that we can trace back to $Z$ must come through $X$ --- and that gives us $\beta$.
-:::
-
 
 
 # Simulating Angrist & Evans
@@ -1044,8 +1012,8 @@ ggplot(mc_df, aes(x = estimate, y = Model, color = Model)) +
 ## The Lesson
 
 - **Always check your first-stage F-statistic**
-- A weak instrument is often worse than no instrument
-- Better to admit you can't identify the effect than to publish unreliable estimates
+- A weak instrument can be more misleading than no instrument
+- So if you have a weak instrument, you need to stop
 
 
 
