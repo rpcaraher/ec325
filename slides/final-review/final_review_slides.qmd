@@ -95,7 +95,7 @@ function checkQ(selectEl, correct) {
 
 ## The Common Thread {.smaller}
 
-You have learned eight or nine methods this semester. On the page they look very different. They are all solving the same problem.
+You have learned a bunch methods this semester. On the page they look very different. They are all solving the same problem.
 
 ::: {.callout-important}
 ## The Fundamental Problem of Causal Inference
@@ -106,9 +106,9 @@ but we only ever observe **one** of $Y_{1i}$ or $Y_{0i}$, never both.
 
 . . .
 
-Estimating a causal effect is therefore a problem of constructing a **credible counterfactual** — what would have happened to the treated had they not been treated.
+Estimating a causal effect is therefore a problem of how we make **apples-to-apples** comparisons
 
-## Different Arrows, Same Destination {.smaller}
+## OVerview of Methods {.smaller}
 
 A randomized experiment delivers the counterfactual by construction. 
 When we cannot randomize, every other method approximates the same target:
@@ -124,11 +124,13 @@ When we cannot randomize, every other method approximates the same target:
 
 . . .
 
-The choice of method is the choice of *which assumption about unobservables you are willing to make*.
+The choice of method is the choice of *which assumption about unobserved confounding variables you are willing to make*.
 
 ## The Ladder of Identification {.smaller}
 
-Order the methods by how strong an assumption you are willing to make about what you cannot see:
+If we want to claim *causality*, here is general ordering of methods based on *how weak the assumptions about confounding variables* are:
+
+. . .
 
 | Rung | Method | Assumes |
 |:---:|:---|:---|
@@ -370,6 +372,8 @@ If $\hat{\beta}_2 < 0$: inverted-U. If $\hat{\beta}_2 > 0$: U-shape.
 
 . . .
 
+**This approximation only works for relatively small changes** (i.e., less than about 0.30)
+
 For small coefficients ($|\beta| < 0.20$): $100 \cdot \beta \approx$ percent change.
 
 For larger coefficients, use the exact formula: $100 \cdot (e^\beta - 1)$ %.
@@ -377,6 +381,19 @@ For larger coefficients, use the exact formula: $100 \cdot (e^\beta - 1)$ %.
 . . .
 
 **Don't log:** variables with zeros/negatives, rates/percentages, dummies.
+
+## Logarithm Interpretation Cheat Sheet
+
+| Model | Equation | Interpretation of $\hat{\beta}_1$ |
+|:------|:---------|:----------------------------------|
+| **Level-Level** | $Y = \beta_0 + \beta_1 X$ | 1-unit ↑ $X$ → $\beta_1$-unit Δ $Y$ |
+| **Log-Level** | $\ln(Y) = \beta_0 + \beta_1 X$ | 1-unit ↑ $X$ → $(100\beta_1)$% Δ $Y$ |
+| **Level-Log** | $Y = \beta_0 + \beta_1 \ln(X)$ | 1% ↑ $X$ → $\beta_1/100$ unit Δ $Y$ |
+| **Log-Log** | $\ln(Y) = \beta_0 + \beta_1 \ln(X)$ | 1% ↑ $X$ → $\beta_1$% Δ $Y$ (elasticity) |
+
+. . .
+
+If you see a log on one (or both) sides of the regression, think of *percent changes*
 
 ## Quick Check {.smaller .nonincremental}
 
@@ -392,16 +409,6 @@ For larger coefficients, use the exact formula: $100 \cdot (e^\beta - 1)$ %.
 </select>
 ```
 :::
-
-## Logarithm Interpretation Cheat Sheet
-
-| Model | Equation | Interpretation of $\hat{\beta}_1$ |
-|:------|:---------|:----------------------------------|
-| **Level-Level** | $Y = \beta_0 + \beta_1 X$ | 1-unit ↑ $X$ → $\beta_1$-unit Δ $Y$ |
-| **Log-Level** | $\ln(Y) = \beta_0 + \beta_1 X$ | 1-unit ↑ $X$ → $(100\beta_1)$% Δ $Y$ |
-| **Level-Log** | $Y = \beta_0 + \beta_1 \ln(X)$ | 1% ↑ $X$ → $\beta_1/100$ unit Δ $Y$ |
-| **Log-Log** | $\ln(Y) = \beta_0 + \beta_1 \ln(X)$ | 1% ↑ $X$ → $\beta_1$% Δ $Y$ (elasticity) |
-
 
 ## Interactions {.smaller}
 
@@ -487,20 +494,6 @@ In `feols()`: add `vcov = "HC1"`.
 
 The cost when not needed is small. The benefit when needed is large. Default to robust.
 
-## Quick Check {.smaller .nonincremental}
-
-::: {.qcheck}
-<p class="qprompt">Under heteroskedasticity, OLS coefficients are:</p>
-```{=html}
-<select onchange="checkQ(this, 'b')">
-  <option value="">-- Select an answer --</option>
-  <option value="a">Biased; standard errors are unbiased</option>
-  <option value="b">Unbiased; standard errors are typically too small</option>
-  <option value="c">Both biased</option>
-  <option value="d">Unbiased and standard errors are correct</option>
-</select>
-```
-:::
 
 # Part III: Binary Outcomes
 

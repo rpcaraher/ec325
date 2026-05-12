@@ -442,7 +442,7 @@
   <meta name="generator" content="quarto-1.9.37">
 
   <meta name="author" content="Prof. Caraher">
-  <meta name="dcterms.date" content="2026-05-11">
+  <meta name="dcterms.date" content="2026-05-12">
   <title>Final Exam Review</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1068,7 +1068,7 @@ Prof. Caraher
     </div>
 </div>
 
-  <p class="date">May 11, 2026</p>
+  <p class="date">May 12, 2026</p>
 </section>
 <section class="slide level2">
 
@@ -1137,7 +1137,7 @@ function checkQ(selectEl, correct) {
 </section>
 <section id="the-common-thread" class="slide level2 smaller">
 <h2>The Common Thread</h2>
-<p>You have learned eight or nine methods this semester. On the page they look very different. They are all solving the same problem.</p>
+<p>You have learned a bunch methods this semester. On the page they look very different. They are all solving the same problem.</p>
 <div class="callout callout-important callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -1152,11 +1152,11 @@ function checkQ(selectEl, correct) {
 </div>
 </div>
 <div class="fragment">
-<p>Estimating a causal effect is therefore a problem of constructing a <strong>credible counterfactual</strong> — what would have happened to the treated had they not been treated.</p>
+<p>Estimating a causal effect is therefore a problem of how we make <strong>apples-to-apples</strong> comparisons</p>
 </div>
 </section>
-<section id="different-arrows-same-destination" class="slide level2 smaller">
-<h2>Different Arrows, Same Destination</h2>
+<section id="overview-of-methods" class="slide level2 smaller">
+<h2>OVerview of Methods</h2>
 <p>A randomized experiment delivers the counterfactual by construction. When we cannot randomize, every other method approximates the same target:</p>
 <table class="caption-top">
 <thead>
@@ -1193,12 +1193,13 @@ function checkQ(selectEl, correct) {
 </tbody>
 </table>
 <div class="fragment">
-<p>The choice of method is the choice of <em>which assumption about unobservables you are willing to make</em>.</p>
+<p>The choice of method is the choice of <em>which assumption about unobserved confounding variables you are willing to make</em>.</p>
 </div>
 </section>
 <section id="the-ladder-of-identification" class="slide level2 smaller">
 <h2>The Ladder of Identification</h2>
-<p>Order the methods by how strong an assumption you are willing to make about what you cannot see:</p>
+<p>If we want to claim <em>causality</em>, here is general ordering of methods based on <em>how weak the assumptions about confounding variables</em> are:</p>
+<div class="fragment">
 <table class="caption-top">
 <thead>
 <tr class="header">
@@ -1245,6 +1246,7 @@ function checkQ(selectEl, correct) {
 </tr>
 </tbody>
 </table>
+</div>
 <div class="fragment">
 <p>Stronger assumptions at the bottom give more flexibility about where data come from but are harder to defend. Weaker assumptions at the top demand a more structured research design.</p>
 </div>
@@ -1472,26 +1474,12 @@ For <span class="math inline">\(\widehat{wage} = 4 + 0.50 \cdot exper - 0.010 \c
 <p><strong>Approximation:</strong> <span class="math inline">\(\ln(Y_1) - \ln(Y_0) \approx \frac{Y_1 - Y_0}{Y_0}\)</span></p>
 </div>
 <div class="fragment">
+<p><strong>This approximation only works for relatively small changes</strong> (i.e., less than about 0.30)</p>
 <p>For small coefficients (<span class="math inline">\(|\beta| &lt; 0.20\)</span>): <span class="math inline">\(100 \cdot \beta \approx\)</span> percent change.</p>
 <p>For larger coefficients, use the exact formula: <span class="math inline">\(100 \cdot (e^\beta - 1)\)</span> %.</p>
 </div>
 <div class="fragment">
 <p><strong>Don’t log:</strong> variables with zeros/negatives, rates/percentages, dummies.</p>
-</div>
-</section>
-<section id="quick-check-6" class="slide level2 smaller nonincremental">
-<h2>Quick Check</h2>
-<div class="qcheck">
-<p class="qprompt">
-In <span class="math inline">\(\ln(\widehat{wage}) = 1.5 + 0.07 \cdot educ\)</span>, an additional year of education is associated with:
-</p>
-<select onchange="checkQ(this, &#39;b&#39;)">
-  <option value>-- Select an answer --</option>
-  <option value="a">$0.07 higher hourly wages</option>
-  <option value="b">About 7% higher hourly wages</option>
-  <option value="c">0.07 percentage point change in wages</option>
-  <option value="d">A 7-unit change in log wages</option>
-</select>
 </div>
 </section>
 <section id="logarithm-interpretation-cheat-sheet" class="slide level2">
@@ -1532,6 +1520,24 @@ In <span class="math inline">\(\ln(\widehat{wage}) = 1.5 + 0.07 \cdot educ\)</sp
 </tr>
 </tbody>
 </table>
+<div class="fragment">
+<p>If you see a log on one (or both) sides of the regression, think of <em>percent changes</em></p>
+</div>
+</section>
+<section id="quick-check-6" class="slide level2 smaller nonincremental">
+<h2>Quick Check</h2>
+<div class="qcheck">
+<p class="qprompt">
+In <span class="math inline">\(\ln(\widehat{wage}) = 1.5 + 0.07 \cdot educ\)</span>, an additional year of education is associated with:
+</p>
+<select onchange="checkQ(this, &#39;b&#39;)">
+  <option value>-- Select an answer --</option>
+  <option value="a">$0.07 higher hourly wages</option>
+  <option value="b">About 7% higher hourly wages</option>
+  <option value="c">0.07 percentage point change in wages</option>
+  <option value="d">A 7-unit change in log wages</option>
+</select>
+</div>
 </section>
 <section id="interactions" class="slide level2 smaller">
 <h2>Interactions</h2>
@@ -1627,21 +1633,6 @@ In <span class="math inline">\(\ln(\widehat{wage}) = 1.20 + 0.083 \cdot educ - 0
 </div>
 <div class="fragment">
 <p>The cost when not needed is small. The benefit when needed is large. Default to robust.</p>
-</div>
-</section>
-<section id="quick-check-8" class="slide level2 smaller nonincremental">
-<h2>Quick Check</h2>
-<div class="qcheck">
-<p class="qprompt">
-Under heteroskedasticity, OLS coefficients are:
-</p>
-<select onchange="checkQ(this, &#39;b&#39;)">
-  <option value>-- Select an answer --</option>
-  <option value="a">Biased; standard errors are unbiased</option>
-  <option value="b">Unbiased; standard errors are typically too small</option>
-  <option value="c">Both biased</option>
-  <option value="d">Unbiased and standard errors are correct</option>
-</select>
 </div>
 </section></section>
 <section>
@@ -1802,7 +1793,7 @@ Under heteroskedasticity, OLS coefficients are:
 <p>Either way: robust SEs.</p>
 </div>
 </section>
-<section id="quick-check-9" class="slide level2 smaller nonincremental">
+<section id="quick-check-8" class="slide level2 smaller nonincremental">
 <h2>Quick Check</h2>
 <div class="qcheck">
 <p class="qprompt">
@@ -1940,7 +1931,7 @@ An LPM gives <span class="math inline">\(\hat{\beta}_{insurance} = 0.12\)</span>
 </div>
 </div>
 </section>
-<section id="quick-check-10" class="slide level2 smaller nonincremental">
+<section id="quick-check-9" class="slide level2 smaller nonincremental">
 <h2>Quick Check</h2>
 <div class="qcheck">
 <p class="qprompt">
@@ -2022,7 +2013,7 @@ In a county-year panel, what does adding county fixed effects absorb?
 <p>If parallel trends hold, the control group gives us a credible counterfactual.</p>
 </div>
 </section>
-<section id="quick-check-11" class="slide level2 smaller nonincremental">
+<section id="quick-check-10" class="slide level2 smaller nonincremental">
 <h2>Quick Check</h2>
 <div class="qcheck">
 <p class="qprompt">
@@ -2168,7 +2159,7 @@ A colleague says: “We can’t run a DiD here — the treated states have much 
 <p>Pre-period coefficients hug zero → parallel trends look credible. Post-period coefficients are positive and grow → a real treatment effect that builds over time.</p>
 </div>
 </section>
-<section id="quick-check-12" class="slide level2 smaller nonincremental">
+<section id="quick-check-11" class="slide level2 smaller nonincremental">
 <h2>Quick Check</h2>
 <div class="qcheck">
 <p class="qprompt">
@@ -2371,7 +2362,7 @@ In an event study, you observe that pre-treatment coefficients are statistically
 <p>Need at least 20–50 clusters for CRSEs to perform well.</p>
 </div>
 </section>
-<section id="quick-check-13" class="slide level2 smaller nonincremental">
+<section id="quick-check-12" class="slide level2 smaller nonincremental">
 <h2>Quick Check</h2>
 <div class="qcheck">
 <p class="qprompt">
@@ -2753,7 +2744,7 @@ The first-stage F is far below 10. What should you conclude?
 </ul>
 </div>
 </section>
-<section id="quick-check-14" class="slide level2 smaller nonincremental">
+<section id="quick-check-13" class="slide level2 smaller nonincremental">
 <h2>Quick Check</h2>
 <p>A merit scholarship is awarded to students with high-school GPA <span class="math inline">\(\geq 3.0\)</span>. Let <span class="math inline">\(a = \text{GPA} - 3.0\)</span> and <span class="math inline">\(D_a = \mathbf{1}\{a \geq 0\}\)</span>. The estimated sharp RD model is <span class="math display">\[\widehat{college\_GPA} = 2.50 + 0.20 \, D_a + 0.30 \, a.\]</span></p>
 <div class="qcheck">
