@@ -1,0 +1,1232 @@
+---
+title: "Instrumental Variables"
+subtitle: "EC 325: Econometrics"
+author: "Prof. Caraher"
+institute: "Colby College"
+date: today
+format:
+  revealjs:
+    theme: colby-theme.scss
+    slide-number: true
+    incremental: true
+    embed-resources: true
+    fig-align: center
+    code-overflow: wrap
+    footer: "EC325 | Unit 14 | Instrumental Variables"
+execute:
+  echo: false
+  message: false
+  warning: false
+  cache: true
+---
+
+```{r}
+#| label: setup
+
+library(tidyverse)
+library(fixest)
+library(modelsummary)
+library(patchwork)
+
+options(scipen = 999)
+
+theme_set(theme_minimal(base_size = 16) +
+          theme(plot.title = element_text(face = "bold", size = 18),
+                plot.subtitle = element_text(size = 13, color = "gray40"),
+                panel.grid.minor = element_blank()))
+```
+
+
+## Econometrics So Far {.smaller}
+
+- Causal inference toolkit:
+  - **RCTs**: gold standard, but rarely available
+  - **Multivariate OLS**: control variables for selection on observables
+  - **Fixed effects**: control for time-invariant unobservables in panel data
+  - **DiD**: control units instead of control variables
+- Each of these requires *something* to work:
+  - RCTs need randomization
+  - FE needs panel data and time-invariant confounding
+  - DiD needs a clean treatment vs. control comparison and parallel trends
+- What if we have **none** of these? Just one cross-section, treatment is endogenous, no natural experiment in sight?
+- Today: a different angle on causal inference --- **instrumental variables (IV)**
+
+
+## The Promise of IV
+
+- IV asks a *very* different question:
+
+. . .
+
+> *"Can we find some external force that 'shakes up' our endogenous variable in a way that has nothing to do with the things biasing OLS?"*
+
+. . .
+
+- If yes, we can use that external force --- the **instrument** --- to recover the causal effect
+
+- If no, we have to keep looking
+
+
+
+# The Endogeneity Problem
+
+
+## When OLS Fails {.smaller}
+
+- Recall the OLS unbiasedness condition: the **zero conditional mean assumption**
+
+. . .
+
+$$
+E[\mu \mid X] = 0
+$$
+
+. . .
+
+- When this fails --- when $X$ is correlated with $\mu$ --- $\hat{\beta}_{OLS}$ is biased
+- We call the variable $X$ causing the problem an **endogenous** variable
+
+. . .
+
+- Three classic sources of endogeneity:
+  1. **Omitted variable bias**
+  2. **Selection bias**
+  3. **Reverse causality**
+
+
+## Source 1: Omitted Variable Bias {.smaller}
+
+- We have discussed this a lot!
+- Suppose we want to estimate the effect of **education on wages**
+
+. . .
+
+$$
+wage_i = \beta_0 + \beta_1 educ_i + \mu_i
+$$
+
+. . .
+
+- **Ability** affects both education choices and wages
+- We can't measure ability $\rightarrow$ it gets absorbed into $\mu_i$
+- Result: $Cov(educ, \mu) \neq 0$, OLS is biased
+- This is the classic "ability bias"
+
+
+## Source 2: Selection Bias {.smaller}
+
+- Want to estimate the effect of **health insurance on health outcomes**
+
+. . .
+
+- Healthier people are *more likely* to purchase insurance
+- People with insurance are healthier *because* they were healthier to begin with
+- The comparison group is contaminated by selection
+
+. . .
+
+- Result: $Cov(insurance, \mu) \neq 0$, OLS overstates how much insurance "causes" good health
+
+
+## Source 3: Reverse Causality {.smaller}
+
+- Want to estimate the effect of **police on crime**
+
+. . .
+
+- High-crime areas get more police deployed
+- Causation runs both ways: police $\to$ crime, *and* crime $\to$ police
+- OLS conflates the two
+
+. . .
+
+- Result: positive correlation between police and crime --- making it look like police *cause* crime!
+
+
+## Common Thread
+
+- In all three cases, $X$ contains variation correlated with $\mu$
+  - $X$ contains ability; $X$ is contaminated with selection bias; or $X$ reverse-causes $Y$
+- We need a way to use **only the part of $X$ that is unrelated to $\mu$**
+
+. . .
+
+- Enter: **instrumental variables**
+
+
+
+# The Instrumental Variables Idea
+
+
+## Endogenous vs. Exogenous Variation {.smaller}
+
+- Think of total variation in $X$ as having two types:
+
+. . .
+
+:::: {.columns}
+::: {.column width="50%"}
+**Bad ("endogenous") variation**
+
+- The part of $X$ correlated with $\mu$
+- This is what biases OLS
+- We want to *throw it away*
+:::
+
+::: {.column width="50%"}
+**Good ("exogenous") variation**
+
+- The part of $X$ unrelated to $\mu$
+- This is what we want
+- We need to *isolate* it
+:::
+::::
+
+. . .
+
+- IV finds an external variable $Z$ --- the **instrument** --- that "zooms in" to exogenous variation in $X$
+- We then use *only* that variation to estimate the causal effect
+
+
+## What Makes an Instrument Valid?
+
+- For $Z$ to work as an instrument, it must satisfy **two assumptions**
+
+. . .
+
+1. **Relevance**
+2. **Exclusion restriction**
+
+. . .
+
+- Both must hold. If either one fails, the instrument does *not* isolate clean variation in $X$
+- We'll take them one at a time
+
+
+## Assumption 1: Relevance {.smaller}
+
+::: {.callout-important}
+## Relevance
+$$Cov(Z, X) \neq 0$$
+
+The instrument must move the endogenous variable.
+:::
+
+. . .
+
+- The instrument must actually do *some* work in shifting $X$
+- If $Z$ has no effect on $X$, then there's no exogenous variation to use --- IV gives nothing
+
+. . .
+
+- This is the **testable** IV assumption:
+  - Regress $X$ on $Z$
+  - Look at the first-stage F-statistic (more on this later in the deck)
+
+
+## Assumption 2: Exclusion Restriction {.smaller}
+
+::: {.callout-important}
+## Exclusion Restriction
+$$Cov(Z, \mu) = 0$$
+
+The instrument affects $Y$ **only through** $X$. There is no direct effect of $Z$ on $Y$.
+:::
+
+. . .
+
+- This is what turns a correlation into a causal effect
+- It says: *the only way $Z$ can move $Y$ is by first moving $X$*
+
+. . .
+
+- This assumption is **not testable** --- there's no statistical test for it
+- It has to be defended with **economic reasoning**
+- Most of the work in any IV paper is defending this assumption
+
+
+
+# A Running Example: Angrist & Evans (1998)
+
+
+## The Research Question {.smaller}
+
+- What is the causal effect of having an additional child on a mother's labor force participation?
+- Important for:
+  - Understanding the gender wage gap
+  - Designing parental leave and childcare policy
+
+- But fertility is **deeply endogenous**:
+
+. . .
+
+  - **Reverse causality**: women time fertility around their careers
+  - **Selection**: less career-oriented women may choose larger families
+  - **OVB**: unobserved preferences drive both fertility and work
+
+- OLS regression of employment on number of kids tangles all of this together
+
+
+## The Clever Instrument {.smaller}
+
+- Angrist and Evans (1998) propose using the **sex composition of the first two children**
+
+. . .
+
+- The idea: parents have a slight preference for **mixed-sex children**
+  - Two boys $\to$ slightly more likely to try for a third (hoping for a girl)
+  - Two girls $\to$ same logic in reverse
+  - One of each $\to$ less reason to have a third
+
+- The sex of a child is essentially biological chance $\to$ same-sex vs. mixed-sex is **as good as random**
+
+
+## Why This Is a Good Instrument {.smaller}
+
+:::: {.columns}
+::: {.column width="50%"}
+**Relevance** ($Cov(Z, X) \neq 0$)
+
+- Same-sex parents *are* more likely to have a third child
+- We can verify this in the data (and we will!)
+- This is testable
+:::
+
+::: {.column width="50%"}
+**Exclusion** ($Cov(Z, \mu) = 0$)
+
+- Sex composition is essentially random with respect to career orientation, husband's earnings, etc.
+- Hard to imagine a *direct* channel from "two boys" to "mom works less"
+- Plausible, but **not testable**
+:::
+::::
+
+. . .
+
+- With the study in hand, we can now draw the diagram
+
+
+
+# Graphical Intuition: The IV DAG
+
+
+```{r}
+#| label: dag-helpers
+#| include: false
+
+# Reusable function that draws (selected pieces of) the IV DAG.
+# Toggle which elements appear with show_z / show_mu / show_excluded.
+draw_iv_dag <- function(show_z = FALSE, show_mu = FALSE,
+                        show_excluded = FALSE) {
+
+    nodes <- tibble(
+        label   = c("Z", "X", "Y", "\u03bc"),
+        role    = c("Same-sex first\ntwo children",
+                    "Had a\nthird child",
+                    "Mother\nworks",
+                    "Career orientation\n(unobserved)"),
+        x       = c(1, 3, 5, 4),
+        y       = c(0, 0, 0, 1.8),
+        role_y  = c(-0.70, -0.70, -0.70, 2.65),
+        fill_col = c("#0072B2", "#E69F00", "#009E73", "#CC79A7"),
+        keep    = c(show_z, TRUE, TRUE, show_mu)
+    ) |>
+        dplyr::filter(keep)
+
+    p <- ggplot() +
+        # Always show X -> Y (the effect we want)
+        geom_segment(aes(x = 3.30, xend = 4.70, y = 0, yend = 0),
+                     color = "#1F5F8B", linewidth = 1.4,
+                     arrow = arrow(length = unit(0.35, "cm"),
+                                   type = "closed")) +
+        annotate("text", x = 4, y = 0.30,
+                 label = "Causal effect\nof interest (\u03b2)",
+                 color = "#1F5F8B", size = 4.4, fontface = "bold",
+                 lineheight = 0.95)
+
+    if (show_mu) {
+        p <- p +
+            geom_segment(aes(x = c(3.82, 4.18),
+                             xend = c(3.18, 4.82),
+                             y = c(1.58, 1.58),
+                             yend = c(0.22, 0.22)),
+                         color = "#C1272D", linewidth = 1.1,
+                         linetype = "dashed",
+                         arrow = arrow(length = unit(0.28, "cm"),
+                                       type = "closed")) +
+            annotate("text", x = 3.28, y = 1.00, label = "Biases X",
+                     color = "#C1272D", size = 4, fontface = "italic",
+                     angle = 62) +
+            annotate("text", x = 4.72, y = 1.00, label = "Biases Y",
+                     color = "#C1272D", size = 4, fontface = "italic",
+                     angle = -62)
+    }
+
+    if (show_z) {
+        p <- p +
+            geom_segment(aes(x = 1.30, xend = 2.70, y = 0, yend = 0),
+                         color = "#1F5F8B", linewidth = 1.4,
+                         arrow = arrow(length = unit(0.35, "cm"),
+                                       type = "closed")) +
+            annotate("text", x = 2, y = 0.30,
+                     label = "First stage\nCov(Z, X) \u2260 0",
+                     color = "#1F5F8B", size = 4.4, fontface = "bold",
+                     lineheight = 0.95)
+    }
+
+    if (show_excluded) {
+        p <- p +
+            geom_segment(aes(x = 1.3, xend = 4.7,
+                             y = -1.45, yend = -1.45),
+                         color = "gray65", linewidth = 0.7,
+                         linetype = "dashed",
+                         arrow = arrow(length = unit(0.22, "cm"),
+                                       type = "closed")) +
+            geom_segment(aes(x = 2.85, xend = 3.15,
+                             y = -1.62, yend = -1.28),
+                         color = "#C1272D", linewidth = 2) +
+            geom_segment(aes(x = 2.85, xend = 3.15,
+                             y = -1.28, yend = -1.62),
+                         color = "#C1272D", linewidth = 2) +
+            annotate("text", x = 3, y = -2.00,
+                     label = "Exclusion restriction:\nno direct arrow from Z to Y",
+                     color = "gray25", fontface = "italic", size = 4,
+                     lineheight = 0.95)
+    }
+
+    p +
+        geom_point(data = nodes, aes(x = x, y = y, fill = fill_col),
+                   shape = 21, size = 24, color = "gray25", stroke = 1.3) +
+        geom_text(data = nodes, aes(x = x, y = y, label = label),
+                  size = 9, color = "white", fontface = "bold") +
+        geom_text(data = nodes, aes(x = x, y = role_y, label = role),
+                  size = 4.2, color = "gray20", fontface = "bold",
+                  lineheight = 0.95) +
+        scale_fill_identity() +
+        coord_cartesian(xlim = c(0.2, 5.8),
+                        ylim = c(-2.4, 3.1), clip = "off") +
+        theme_void() +
+        theme(plot.margin = margin(10, 10, 10, 10))
+}
+```
+
+
+## Step 1: The Confounding Problem {.smaller}
+
+```{r}
+#| label: dag-step1
+#| fig-height: 4.8
+#| fig-width: 9
+
+draw_iv_dag(show_mu = TRUE)
+```
+
+- We *want* the $X \to Y$ arrow --- the parameter $\beta$
+- But the unobserved confounder $\mu$ creates a **backdoor path**: $X \leftarrow \mu \to Y$
+- Career-minded women have fewer kids *and* are more likely to work $\to$ OLS confuses the two channels
+
+
+## Step 2: Bring in the Instrument {.smaller}
+
+```{r}
+#| label: dag-step2
+#| fig-height: 4.8
+#| fig-width: 9
+
+draw_iv_dag(show_mu = TRUE, show_z = TRUE)
+```
+
+- $Z$ shifts $X$ but is *itself* unaffected by $\mu$
+- $Z$ injects clean, exogenous variation into $X$ that we can use
+
+
+## Step 3: The Crucial *Missing* Arrow {.smaller}
+
+```{r}
+#| label: dag-step3
+#| fig-height: 5.2
+#| fig-width: 9
+
+draw_iv_dag(show_mu = TRUE, show_z = TRUE, show_excluded = TRUE)
+```
+
+- The exclusion restriction is what we *don't* see: no direct $Z \to Y$ arrow
+- $Z$ can reach $Y$ **only** by going through $X$
+- This is what makes IV identify $\beta$
+
+
+# Simulating Angrist & Evans
+
+```{r}
+#| label: sim-data
+#| output: false
+
+set.seed(42)
+n <- 50000
+
+ae_sim <- tibble(
+    # Unobserved "career orientation" --- affects both fertility and work
+    career_orientation = rnorm(n, 0, 1),
+
+    # Same-sex instrument (random)
+    samesex = rbinom(n, 1, 0.5),
+
+    # More than 2 kids: affected by samesex AND career orientation
+    morekids_latent = -0.5 + 0.12 * samesex - 0.3 * career_orientation +
+        rnorm(n, 0, 0.5),
+    morekids = as.integer(morekids_latent > 0),
+
+    # Labor force participation: affected by morekids AND career orientation
+    # True causal effect of morekids is -0.10
+    worked_latent = 0.6 - 0.10 * morekids + 0.25 * career_orientation +
+        rnorm(n, 0, 0.3),
+    mom_worked = as.integer(worked_latent > 0.5)
+) |>
+    mutate(
+        samesex_lab  = if_else(samesex == 1,  "Same sex",   "Mixed sex"),
+        morekids_lab = if_else(morekids == 1, "> 2 kids", "\u2264 2 kids")
+    )
+
+# Fit OLS up-front so it's available throughout the deck
+# (the OLS vs. 2SLS section re-fits it visibly later)
+ols <- lm(mom_worked ~ morekids, data = ae_sim)
+```
+
+
+## The Simulated Setup {.smaller}
+
+- $N = 50{,}000$ mothers (synthetic data, but designed to match Angrist-Evans)
+- We *know* the truth because we built it:
+
+. . .
+
+| Variable | Description | Effect on... |
+|:---------|:------------|:-------------|
+| `career_orientation` | Unobserved $\mu$ | $\downarrow$ fertility, $\uparrow$ work |
+| `samesex` | Instrument $Z$ | $\uparrow$ fertility |
+| `morekids` | Treatment $X$ | $\downarrow$ work (true $\beta = -0.10$) |
+| `mom_worked` | Outcome $Y$ | --- |
+
+. . .
+
+- Goal: see whether OLS recovers $\beta = -0.10$. (Spoiler: it doesn't. IV does.)
+
+
+## Testing Relevance {.smaller}
+
+```{r}
+#| echo: true
+
+relevance_check <- ae_sim |>
+    group_by(samesex_lab) |>
+    summarize(prop_morekids = mean(morekids))
+
+relevance_check
+```
+
+. . .
+
+- Same-sex parents are noticeably more likely to have a third child
+
+
+## Testing Relevance {.smaller}
+
+```{r}
+#| label: fig-relevance
+#| fig-width: 8
+#| fig-height: 4.5
+
+ggplot(relevance_check, aes(x = samesex_lab, y = prop_morekids)) +
+    geom_col(fill = "#0072B2", alpha = 0.85, width = 0.55) +
+    geom_text(aes(label = scales::percent(prop_morekids, accuracy = 0.1)),
+              vjust = -0.5, size = 6, fontface = "bold", color = "#1F5F8B") +
+    scale_y_continuous(labels = scales::percent, limits = c(0, 0.4)) +
+    labs(title = "Relevance: Same-Sex Predicts Fertility",
+         subtitle = "Same-sex parents about 6 percentage points more likely to have 3+ kids",
+         x = "Sex composition of first two children",
+         y = "Share with > 2 kids")
+```
+
+
+## "Testing" Excludability {.smaller}
+
+- We **can't** directly test the exclusion restriction
+- But we can do a sanity check: is the *reduced-form* effect of $Z$ on $Y$ small?
+
+. . .
+
+```{r}
+#| label: fig-exclusion
+#| fig-width: 8
+#| fig-height: 4
+
+exclusion_check <- ae_sim |>
+    group_by(samesex_lab) |>
+    summarize(prop_worked = mean(mom_worked))
+
+ggplot(exclusion_check, aes(x = samesex_lab, y = prop_worked)) +
+    geom_col(fill = "#E69F00", alpha = 0.85, width = 0.55) +
+    geom_text(aes(label = scales::percent(prop_worked, accuracy = 0.1)),
+              vjust = -0.5, size = 6, fontface = "bold", color = "#a06700") +
+    scale_y_continuous(labels = scales::percent, limits = c(0, 0.7)) +
+    labs(title = "Exclusion check: small reduced-form effect",
+         subtitle = "Effect of Z on Y should be small (and only operate through X)",
+         x = "Sex composition of first two children",
+         y = "Share of mothers working")
+```
+
+
+## Reading the Reduced-Form
+
+- The difference is small (around a percentage point)
+- Consistent with the effect operating through fertility, not directly
+
+. . .
+
+- This **doesn't prove** excludability --- we still rely on the economic argument
+- But it's at least *consistent* with the assumption
+
+
+
+# Two-Stage Least Squares (2SLS)
+
+
+## The 2SLS Strategy {.smaller}
+
+- IV is typically estimated using **Two-Stage Least Squares (2SLS)**
+
+. . .
+
+**Stage 1 (First Stage):** regress endogenous variable on the instrument
+
+$$
+X_i = \pi_0 + \pi_1 Z_i + \nu_i
+$$
+
+. . .
+
+Get predicted values: $\hat{X}_i = \hat{\pi}_0 + \hat{\pi}_1 Z_i$
+
+These predicted values contain *only* the variation in $X$ that comes from $Z$
+
+. . .
+
+**Stage 2 (Second Stage):** regress outcome on the predicted values
+
+$$
+Y_i = \beta_0 + \beta_1 \hat{X}_i + \varepsilon_i
+$$
+
+The coefficient $\hat{\beta}_1^{2SLS}$ is our causal estimate
+
+
+## Why Does 2SLS Work? {.smaller}
+
+```{r}
+#| label: fig-variation
+#| fig-width: 9
+#| fig-height: 4.5
+
+variation_data <- tibble(
+    type = c("Total variation\nin X",
+             "Exogenous variation\n(from Z)",
+             "Endogenous variation\n(correlated with \u03bc)"),
+    value = c(100, 40, 60),
+    fill = c("total", "good", "bad")
+) |>
+    mutate(type = factor(type, levels = type))
+
+ggplot(variation_data, aes(x = type, y = value, fill = fill)) +
+    geom_col(width = 0.55) +
+    geom_text(aes(label = paste0(value, "%")),
+              vjust = -0.5, size = 6, fontface = "bold") +
+    scale_fill_manual(values = c("total" = "gray60",
+                                  "good"  = "#0072B2",
+                                  "bad"   = "#CC79A7")) +
+    scale_y_continuous(limits = c(0, 120)) +
+    labs(title = "2SLS uses only the 'good' variation",
+         subtitle = "OLS uses all variation; IV throws away the part correlated with \u03bc",
+         x = NULL, y = "Share of variation (%)") +
+    theme(legend.position = "none") +
+    annotate("text", x = 2, y = 55, label = "IV\nuses\nthis",
+             color = "#0072B2", fontface = "bold", size = 5) +
+    annotate("text", x = 3, y = 75, label = "IV\ndiscards\nthis",
+             color = "#CC79A7", fontface = "bold", size = 5)
+```
+
+
+## Manual 2SLS: Step 1 {.smaller}
+
+```{r}
+#| echo: true
+
+# First stage: regress endogenous variable on instrument
+first_stage <- lm(morekids ~ samesex, data = ae_sim)
+
+summary(first_stage)$coefficients
+```
+
+. . .
+
+- The first-stage coefficient on `samesex` says: if your first two kids are the same sex, your probability of having a third rises by ~6 percentage points
+- The F-statistic on the instrument is well into the hundreds: a strong first stage
+
+
+## Manual 2SLS: Step 2 {.smaller}
+
+```{r}
+#| echo: true
+
+# Get predicted values from first stage
+ae_sim <- ae_sim |>
+    mutate(morekids_hat = predict(first_stage))
+
+ae_sim |>
+    select(samesex, morekids, morekids_hat) |>
+    head(8)
+```
+
+- `morekids_hat` takes only **two values** --- one for each value of `samesex`
+- This is the *exogenous part* of `morekids`
+
+
+## Manual 2SLS: Step 3 {.smaller}
+
+```{r}
+#| echo: true
+
+# Second stage: regress outcome on predicted values
+second_stage_manual <- lm(mom_worked ~ morekids_hat, data = ae_sim)
+coef(second_stage_manual)["morekids_hat"]
+```
+
+. . .
+
+::: {.callout-warning}
+## Standard error warning
+The manual two-stage approach gives the *correct coefficient*, but the **standard errors are wrong** --- they don't account for first-stage uncertainty.
+
+**Always use a proper 2SLS estimator** (e.g. `feols()`).
+:::
+
+
+
+# Estimating IV with `feols()`
+
+
+## The `feols()` 4-Part Formula {.smaller}
+
+- `fixest::feols()` uses a formula with **three vertical bars**:
+
+. . .
+
+```r
+outcome ~ exogenous_controls | fixed_effects | endogenous ~ instrument(s)
+```
+
+. . .
+
+| Slot | What goes here |
+|:-----|:---------------|
+| `outcome` | Dependent variable $Y$ |
+| `exogenous_controls` | Covariates that are *not* endogenous; use `1` if none |
+| `fixed_effects` | Variables to absorb as FEs; use `0` if none |
+| `endogenous ~ instrument(s)` | The first-stage formula |
+
+
+## A Bare-Bones IV {.smaller}
+
+```{r}
+#| echo: true
+
+tsls <- feols(mom_worked ~ 1 |  0  | morekids ~ samesex,
+              data = ae_sim)
+
+summary(tsls)
+```
+
+
+## What to Look At {.smaller}
+
+- **`fit_morekids`**: the 2SLS estimate of $\beta$ (the `fit_` prefix flags the fitted endogenous variable)
+- **Std. error**: the *correct* 2SLS SE (not the broken manual one)
+- **F-test (1st stage)**: a built-in instrument-strength diagnostic
+- The 2SLS estimate should be close to the true $-0.10$ --- much closer than OLS will get
+
+
+## Inspecting the First Stage {.smaller}
+
+- `feols()` runs the first stage internally but hides it. Pass `stage = 1` to expose it:
+
+. . .
+
+```{r}
+#| echo: true
+
+summary(tsls, stage = 1)
+```
+
+
+## Adding Controls {.smaller}
+
+- Exogenous controls go in the **first slot**
+- They are automatically included in *both* stages
+
+. . .
+
+```r
+# Illustrative
+tsls_ctrl <- feols(mom_worked ~ age + education |
+                       0 |
+                       morekids ~ samesex,
+                   data = ae_sim)
+```
+
+. . .
+
+- Use this for variables you want to control for that aren't themselves endogenous (mother's age, education, etc.)
+
+
+## Adding Fixed Effects {.smaller}
+
+- Fixed effects go in the **second slot**
+- Absorbed efficiently --- much faster than creating dummies on big data
+
+. . .
+
+```r
+# Illustrative
+tsls_fe <- feols(mom_worked ~ age + education |
+                     state |
+                     morekids ~ samesex,
+                 data = ae_sim)
+```
+
+. . .
+
+- Equivalent to including state dummies in *both* stages, but vastly faster
+
+
+## Multiple Instruments {.smaller}
+
+- Adding a second instrument is just a `+` in the first-stage formula
+
+. . .
+
+```r
+# Illustrative: add 'twins' as a second instrument for fertility
+tsls_multi <- feols(mom_worked ~ 1 |
+                        0 |
+                        morekids ~ samesex + twins,
+                    data = ae_sim)
+```
+
+. . .
+
+**Why might you want multiple instruments?**
+
+- More first-stage variation in $X$ $\to$ generally smaller standard errors and tighter inference
+- Lets you *cross-check* your instruments: if two supposedly valid instruments produce very different 2SLS estimates, at least one is probably bad
+
+. . .
+
+**What does "overidentified" mean?**
+
+- More instruments than endogenous variables $\to$ the model is **overidentified**
+- 2SLS combines the instruments into a single weighted prediction of $X$
+
+. . .
+
+**But more instruments aren't free**
+
+- Each new instrument carries its **own exclusion restriction** to defend --- one bad instrument contaminates the whole estimate
+- The "**many weak instruments**" problem: adding marginally-relevant instruments can *amplify* finite-sample bias and drag 2SLS back toward OLS
+- A few strong instruments usually beat many weak ones
+
+
+## Cluster-Robust Standard Errors {.smaller}
+
+- IV standard errors are sensitive to within-cluster correlation
+- `feols()` makes this easy:
+
+. . .
+
+```r
+# Cluster at estimation time
+feols(mom_worked ~ 1 | 0 | morekids ~ samesex,
+      cluster = ~ state,
+      data = ae_sim)
+
+# Or after the fact
+summary(tsls, cluster = ~ state)
+```
+
+. . .
+
+- Same advice as for DiD: cluster at the level of treatment assignment
+
+
+# Weak Instruments
+
+
+## Why Weak Instruments Are Dangerous {.smaller}
+
+- If the instrument is only *weakly* correlated with $X$:
+  - Tiny changes in the data produce wild swings in $\hat{\beta}^{2SLS}$
+  - Estimates can become biased *toward* OLS (the very thing we were trying to escape!)
+  - Standard errors become unreliable
+  - Inference breaks
+
+. . .
+
+::: {.callout-warning}
+2SLS with a weak instrument is sometimes *worse* than just running OLS.
+:::
+
+
+## The First-Stage F-Test {.smaller}
+
+- The standard diagnostic for instrument strength is the **first-stage F-statistic**
+- It tests $H_0: \pi_1 = 0$ in the first-stage regression
+
+. . .
+
+$$
+X_i = \pi_0 + \pi_1 Z_i + \nu_i
+$$
+
+. . .
+
+- **Single instrument**: F is just the squared t-statistic on $\pi_1$
+- **Multiple instruments**: F is the joint test that *none* of them predict $X$
+- A large F means the instruments collectively move $X$ around a lot
+
+
+## The Traditional "F > 10" Rule {.smaller}
+
+- Long-standing rule of thumb: a first-stage **F above 10** is "strong enough"
+- Comes from Stock and Yogo (2005)
+- Has been the textbook standard for two decades
+
+. . .
+
+::: {.callout-note}
+## The classic rule
+$F \geq 10 \implies$ instrument is strong enough to trust 2SLS.
+:::
+
+
+## Recent Evidence: 10 Is Too Lenient {.smaller}
+
+- Lee, McCrary, Moreira, and Porter (2022) show: to justify standard t-test inference on the 2SLS coefficient, you need an F closer to **100** than 10
+
+. . .
+
+- An instrument with $F = 20$ may have fine point estimates, but its confidence intervals are **too narrow**
+- Lots of "significant" results in IV papers may not really be
+
+. . .
+
+::: {.callout-important}
+## A safer modern default
+Treat $F \in [10, 100]$ with caution. Prefer instruments with much higher first-stage F when you can find them.
+:::
+
+
+## What Happens with a Weak Instrument? {.smaller}
+
+```{r}
+#| label: weak-iv-setup
+#| echo: true
+
+# Replace samesex with random noise --- a useless instrument
+set.seed(123)
+ae_sim <- ae_sim |>
+    mutate(weak_instrument = rnorm(n()))
+
+weak_iv <- feols(mom_worked ~ 1 | 0 | morekids ~ weak_instrument,
+                 data = ae_sim)
+
+summary(weak_iv)
+```
+
+
+## Strong vs. Weak: 100 Random Instruments {.smaller}
+
+- Was that one wild fit a fluke? Let's run 2SLS with **100 different random instruments** and see how stable the estimates are.
+
+. . .
+
+```{r}
+#| label: fig-weak-iv
+#| fig-width: 9.5
+#| fig-height: 4.6
+
+set.seed(2026)
+n_sims <- 100
+
+# 100 different "instruments", each one pure noise
+weak_estimates <- replicate(n_sims, {
+    df <- ae_sim |> mutate(weak_z = rnorm(nrow(ae_sim)))
+    coef(feols(mom_worked ~ 1 | 0 | morekids ~ weak_z, data = df))["fit_morekids"]
+})
+
+mc_df <- bind_rows(
+    tibble(Model = "OLS",                                estimate = coef(ols)["morekids"]),
+    tibble(Model = "Strong 2SLS\n(same-sex)",            estimate = coef(tsls)["fit_morekids"]),
+    tibble(Model = "Weak 2SLS\n(100 random instruments)", estimate = weak_estimates)
+) |>
+    mutate(Model = factor(Model,
+                          levels = c("OLS",
+                                     "Strong 2SLS\n(same-sex)",
+                                     "Weak 2SLS\n(100 random instruments)")))
+
+# Cap the x-axis at +/-3; note how many weak-IV draws fall outside
+x_lo <- -3; x_hi <- 3
+n_offscreen <- sum(weak_estimates < x_lo | weak_estimates > x_hi)
+
+ggplot(mc_df, aes(x = estimate, y = Model, color = Model)) +
+    geom_vline(xintercept = -0.10, linetype = "dashed",
+               color = "darkgreen", linewidth = 1) +
+    geom_jitter(height = 0.18, alpha = 0.65, size = 2.8) +
+    annotate("text", x = -0.10, y = 3.55,
+             label = "True effect = -0.10",
+             color = "darkgreen", size = 4, hjust = -0.06) +
+    scale_color_manual(values = c(
+        "OLS"                                   = "#CC79A7",
+        "Strong 2SLS\n(same-sex)"               = "#0072B2",
+        "Weak 2SLS\n(100 random instruments)"   = "#D55E00")) +
+    coord_cartesian(xlim = c(x_lo, x_hi), clip = "off") +
+    labs(title = "Weak instruments are essentially random number generators",
+         subtitle = sprintf(
+             "OLS and strong 2SLS are stable; weak 2SLS scatters wildly (%d of 100 draws fall outside [−3, 3])",
+             n_offscreen),
+         x = "2SLS coefficient on `morekids`",
+         y = NULL) +
+    theme(legend.position = "none",
+          plot.margin = margin(10, 30, 10, 10))
+```
+
+
+
+## The Lesson
+
+- **Always check your first-stage F-statistic**
+- A weak instrument can be more misleading than no instrument
+- So if you have a weak instrument, you need to stop
+
+
+
+# IV Diagnostics
+
+
+## Computing the Diagnostics {.smaller}
+
+- After estimating, pull out the IV diagnostics with `fitstat()`:
+
+. . .
+
+```{r}
+#| echo: true
+
+fitstat(tsls, ~ ivf + ivwald + wh)
+```
+
+
+## What Each One Tests {.smaller}
+
+::: {.callout-note}
+## `ivf` --- First-stage F (homoskedastic)
+**Null:** the instrument doesn't predict $X$ ($\pi_1 = 0$).
+**Reads as:** large F = strong first stage; small F = weak instrument problem.
+**Use:** the standard relevance check.
+:::
+
+. . .
+
+::: {.callout-note}
+## `ivwald` --- Robust first-stage F (Wald form)
+**Null:** same as `ivf`, but computed with the robust variance-covariance matrix.
+**Reads as:** with clustered or heteroskedasticity-robust SEs, this is the version you should trust --- the homoskedastic `ivf` can mislead.
+**Use:** report instead of `ivf` whenever you cluster.
+:::
+
+. . .
+
+::: {.callout-note}
+## `wh` --- Wu-Hausman endogeneity test
+**Null:** $X$ is exogenous (so OLS would be unbiased).
+**Reads as:** compares OLS and 2SLS coefficients. Similar $\to$ fail to reject $\to$ OLS may suffice. Very different $\to$ reject $\to$ IV is doing necessary work.
+**Use:** sanity-check that you actually *need* IV in the first place.
+:::
+
+
+
+# OLS vs. 2SLS
+
+
+## Side-by-Side {.smaller}
+
+```{r}
+#| label: ols-fit
+#| echo: true
+
+# OLS for comparison (biased)
+ols <- lm(mom_worked ~ morekids, data = ae_sim)
+```
+
+. . .
+
+```{r}
+#| echo: true
+
+modelsummary::modelsummary(
+    list("OLS (biased)" = ols, "2SLS (IV)" = tsls),
+    coef_map = c("morekids" = "morekids", "fit_morekids" = "morekids"),
+    gof_map = c("nobs", "r.squared"),
+    output = "markdown"
+)
+```
+
+
+## OLS vs. 2SLS: Visual {.smaller}
+
+```{r}
+#| label: fig-ols-vs-iv
+#| fig-width: 9
+#| fig-height: 4.5
+
+coef_comp <- tibble(
+    Model = c("OLS (Biased)", "2SLS (IV)"),
+    Estimate = c(coef(ols)["morekids"], coef(tsls)["fit_morekids"]),
+    SE = c(summary(ols)$coefficients["morekids", "Std. Error"],
+           summary(tsls)$se["fit_morekids"])
+) |>
+    mutate(CI_lower = Estimate - 1.96 * SE,
+           CI_upper = Estimate + 1.96 * SE)
+
+ggplot(coef_comp, aes(x = Model, y = Estimate, color = Model)) +
+    geom_hline(yintercept = -0.10, linetype = "dashed",
+               color = "darkgreen", linewidth = 1) +
+    geom_point(size = 5) +
+    geom_errorbar(aes(ymin = CI_lower, ymax = CI_upper),
+                  width = 0.15, linewidth = 1) +
+    annotate("text", x = 2.35, y = -0.10, label = "True effect = -0.10",
+             color = "darkgreen", hjust = 0, size = 5) +
+    scale_color_manual(values = c("OLS (Biased)" = "#CC79A7",
+                                   "2SLS (IV)"    = "#0072B2")) +
+    coord_flip(clip = "off") +
+    labs(title = "OLS overshoots; 2SLS recovers the truth",
+         subtitle = "Selection on career orientation makes OLS too negative",
+         y = "Effect on labor force participation",
+         x = NULL) +
+    theme(legend.position = "none",
+          plot.margin = margin(10, 80, 10, 10))
+```
+
+
+## What Went Wrong with OLS? {.smaller}
+
+- OLS estimate is *more negative* than the truth
+- Because of selection on **career orientation**:
+  - Less career-oriented women have more children *and* work less
+  - $\rightarrow$ OLS makes children look worse for employment than they really are
+- 2SLS uses only the random variation from same-sex composition $\rightarrow$ recovers the truth
+
+
+
+# Classic IV Applications
+
+
+## A Map of the Greatest Hits {.smaller}
+
+| Study | Question | Instrument |
+|:------|:---------|:-----------|
+| **Card (1995)** | Returns to education | Distance to college |
+| **Acemoglu, Johnson & Robinson (2001)** | Do institutions cause growth? | Colonial settler mortality |
+| **Levitt (1997)** | Effect of police on crime | Electoral timing |
+| **Angrist & Krueger (1991)** | Returns to education | Quarter of birth |
+
+. . .
+
+- Each one uses the same recipe: question $\to$ source of endogeneity $\to$ instrument $\to$ defend exclusion
+
+
+## Card (1995): Returns to Education {.smaller}
+
+- **Question:** What is the causal effect of education on wages?
+- **Problem:** Ability is unobserved; biases OLS upward
+- **Instrument:** Distance to the nearest college growing up
+- **Why relevant?** Proximity reduces the cost of attending college
+- **Why excludable?** Distance to a college shouldn't directly affect wages decades later --- only through education
+
+. . .
+
+- **Finding:** Returns to education are *higher* than OLS suggests
+  - Ability bias works in the opposite direction from what many had assumed!
+
+
+## Acemoglu, Johnson & Robinson (2001): Institutions {.smaller}
+
+- **Question:** Do institutions (rule of law, property rights) cause long-run growth?
+- **Problem:** Rich countries can afford better institutions $\rightarrow$ reverse causality
+- **Instrument:** Colonial settler mortality rates (17th--19th century)
+  - High mortality $\rightarrow$ extractive colonies $\rightarrow$ bad institutions
+  - Low mortality $\rightarrow$ settler colonies $\rightarrow$ inclusive institutions
+- **Why relevant?** Colonial institutional form persisted to the present
+- **Why excludable?** European mortality from disease 200+ years ago shouldn't directly affect today's GDP --- only through the institutions it shaped
+
+. . .
+
+- **Finding:** Institutions have a *large* causal effect on GDP per capita; sparked the "institutions vs. geography" debate
+
+
+## Levitt (1997): Police and Crime {.smaller}
+
+- **Question:** Does hiring more police cause crime to fall?
+- **Problem:** Reverse causality --- high-crime cities hire more police, making OLS look like police *cause* crime
+- **Instrument:** Timing of mayoral and gubernatorial elections (police hiring spikes pre-election)
+- **Why relevant?** Police staffing rises predictably before elections
+- **Why excludable?** The electoral calendar is set by law, not by recent crime trends
+
+. . .
+
+- **Finding:** More police *substantially* reduce crime --- IV estimate flips the (wrong-signed) OLS correlation
+- A coding error was later corrected by McCrary (2002); the violent-crime effect survives but is smaller
+
+
+## Angrist & Krueger (1991): Quarter of Birth {.smaller}
+
+- **Question:** What is the causal return to schooling on earnings?
+- **Problem:** Ability bias (same as Card)
+- **Instrument:** Quarter of birth, interacted with compulsory schooling laws
+  - Q1 babies start school *older*, hit dropout age with *less* education
+  - Q4 babies start school *younger*, are forced to stay in *longer*
+- **Why relevant?** First-stage relationship is detectable but modest
+- **Why excludable?** Quarter of birth is essentially random with respect to ability/family background
+
+. . .
+
+- **Finding:** IV estimates close to OLS $\rightarrow$ ability bias may be smaller than feared
+- Bound, Jaeger, and Baker (1995) later showed quarter of birth is a *weak* instrument --- one of the motivating examples for the weak-IV literature
+
+
+
+# Wrapping Up
+
+
+## Key Takeaways {.smaller}
+
+::: {.callout-important}
+## What you need for IV to work
+**1. Relevance** ($Cov(Z, X) \neq 0$): the instrument predicts $X$. Testable via the first-stage F.
+
+**2. Exclusion** ($Cov(Z, \mu) = 0$): $Z$ affects $Y$ only through $X$. *Not* testable --- defend with economic reasoning.
+:::
+
+. . .
+
+- 2SLS uses *only* the exogenous variation in $X$ induced by $Z$
+- Weak instruments produce unreliable estimates --- check the first-stage F (and don't trust 10!)
+- `feols()` makes 2SLS easy: `outcome ~ controls | FEs | endogenous ~ instrument`
+

@@ -1,0 +1,599 @@
+---
+title: "Regression Discontinuity"
+subtitle: "EC 325: Econometrics"
+author: "Prof. Caraher"
+institute: "Colby College"
+date: today
+format:
+  revealjs:
+    theme: colby-theme.scss
+    slide-number: true
+    incremental: true
+    embed-resources: true
+    fig-align: center
+    code-overflow: wrap
+    footer: "EC325 | Unit 15 | Regression Discontinuity"
+execute:
+  echo: false
+  message: false
+  warning: false
+  cache: true
+---
+
+```{r}
+#| label: setup
+
+library(tidyverse)
+library(fixest)
+library(modelsummary)
+library(patchwork)
+
+options(scipen = 999)
+
+theme_set(theme_minimal(base_size = 16) +
+          theme(plot.title = element_text(face = "bold", size = 18),
+                plot.subtitle = element_text(size = 13, color = "gray40"),
+                panel.grid.minor = element_blank()))
+```
+
+
+## Where We've Been {.smaller}
+
+- Our causal inference toolkit so far:
+  - **RCTs**: random assignment by design
+  - **Multivariate OLS**: control for selection on observables
+  - **Fixed effects**: absorb time-invariant unobservables
+  - **DiD**: control units net out common trends
+  - **IV**: exogenous variation from an instrument
+- All require finding variation in $X$ that is **as good as random** or **totally exogenous**
+- Today: one more tool --- one of the cleanest --- **regression discontinuity (RD)**
+
+
+## The Big Idea {.smaller}
+
+- Modern life is full of **rigid rules and cutoffs**:
+
+. . .
+
+  - Turn 21 $\to$ legal drinking
+  - Score 70+ on an exam $\to$ admitted to a selective school
+  - Income below threshold $\to$ qualify for Medicaid
+  - 50.01% vote share $\to$ win the election
+
+- At the cutoff, treatment flips on (or off) **abruptly**
+- Units just above and just below are nearly identical *except* for treatment
+- $\to$ rigid rules generate **natural experiments**
+
+
+
+# The RD Intuition
+
+
+## A Jump at the Cutoff
+
+```{r}
+#| label: fig-intuition
+#| fig-width: 9
+#| fig-height: 4.6
+
+set.seed(1)
+n <- 300
+x <- runif(n, 0, 100)
+d <- as.numeric(x >= 50)
+y <- 30 + 0.5 * x + 8 * d + rnorm(n, 0, 4)
+intuition <- tibble(x = x, y = y, d = factor(d, labels = c("Untreated", "Treated")))
+
+ggplot(intuition, aes(x = x, y = y, color = d)) +
+    geom_point(alpha = 0.5, size = 2) +
+    geom_smooth(aes(group = d), method = "lm", se = FALSE, linewidth = 1.3) +
+    geom_vline(xintercept = 50, linetype = "dashed", color = "black") +
+    annotate("segment", x = 50, xend = 50, y = 55, yend = 63,
+             arrow = arrow(type = "closed", length = unit(0.3, "cm"),
+                           ends = "both"),
+             color = "#e7298a", linewidth = 1.2) +
+    annotate("text", x = 53, y = 59, label = "Causal\neffect",
+             hjust = 0, color = "#e7298a", size = 5, fontface = "bold") +
+    annotate("text", x = 50, y = 95, label = "Cutoff",
+             hjust = -0.1, size = 4.5) +
+    scale_color_manual(values = c("Untreated" = "grey50",
+                                  "Treated"   = "#0072B2")) +
+    labs(x = "Running Variable (X)", y = "Outcome (Y)", color = NULL) +
+    theme(legend.position = "bottom")
+```
+
+
+## Key Vocabulary {.smaller}
+
+::: {.callout-note}
+## Three terms you need to know
+- **Running variable** (or *forcing variable*): the continuous variable whose value determines treatment (e.g., age, test score, vote share).
+- **Cutoff** (or *threshold*): the value of the running variable at which treatment flips (e.g., age 21, 70%, 50%).
+- **Sharp RD**: treatment is a *deterministic* function of the running variable --- 0 below the cutoff, 1 above (or vice versa).
+:::
+
+. . .
+
+- Today we focus on **sharp** RD
+- A *fuzzy* variant exists (cutoff shifts the *probability* of treatment) --- handled with IV
+
+
+
+# Running Example: The MLDA
+
+
+## Birthdays and Funerals {.smaller}
+
+- Carpenter & Dobkin (2009): does the **minimum legal drinking age** of 21 save lives?
+
+. . .
+
+- Hard to answer with regular tools:
+  - Can't randomize legal drinking age
+  - Before/after comparisons confound aging with drinking
+- But the MLDA itself runs the experiment for us:
+  - On your 21st birthday, legal access flips on
+  - Yesterday's you and today's you are essentially identical, *except for the fact that you are now 21*
+- Compare death rates **just below** and **just above** age 21
+
+
+## Simulating Carpenter & Dobkin {.smaller}
+
+```{r}
+#| echo: true
+
+set.seed(234)
+
+mlda_data <- tibble(months = seq(-24, 23, by = 1)) |>
+    mutate(
+        over21 = as.numeric(months >= 0),
+        # True jump = 7.7 deaths per 100,000 (AP Table 4.1)
+        death_rate = 90 - 0.15 * months + 7.7 * over21 +
+                     rnorm(n(), 0, 1)
+    )
+```
+
+. . .
+
+```{r}
+#| label: fig-raw
+#| fig-width: 9
+#| fig-height: 3.6
+
+ggplot(mlda_data, aes(x = months, y = death_rate, color = factor(over21))) +
+    geom_point(size = 3, alpha = 0.85) +
+    geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+    scale_color_manual(values = c("0" = "grey50", "1" = "#0072B2"),
+                       labels = c("Under 21", "Over 21")) +
+    annotate("text", x = 0, y = 104, label = "21st birthday",
+             hjust = -0.05, size = 4.5) +
+    labs(x = "Age in months (0 = 21st birthday)",
+         y = "Death rate per 100,000",
+         color = NULL) +
+    theme(legend.position = "bottom")
+```
+
+
+
+# The Sharp RD Regression
+
+
+## A Linear Model {.smaller}
+
+- Simplest sharp RD specification:
+
+. . .
+
+$$
+Y_a = \alpha + \rho D_a + \gamma a + e_a
+$$
+
+. . .
+
+- $D_a = 1$ if $a \geq a_0$, else 0
+- $\gamma a$ controls for the **smooth trend** in the running variable
+- $\rho$ = the **vertical jump** at the cutoff $\to$ our causal estimate
+
+. . .
+
+::: {.callout-tip}
+## What makes RD special
+Treatment is a deterministic function of the running variable. Control for the running variable correctly $\to$ no classical OVB. The *whole* identification argument lives in modeling that one trend.
+:::
+
+
+## Estimating It {.smaller}
+
+```{r}
+#| echo: true
+
+simple_rd <- feols(death_rate ~ over21 + months,
+                   vcov = "HC1",
+                   data = mlda_data)
+
+summary(simple_rd)
+```
+
+- Coefficient on `over21` $\to$ estimate of the MLDA jump
+- Should land near the true $\rho = 7.7$
+
+
+## Visualizing the Fit
+
+```{r}
+#| label: fig-simple-fit
+#| fig-width: 9
+#| fig-height: 4.6
+
+mlda_data <- mlda_data |>
+    mutate(yhat_linear = predict(simple_rd))
+
+ggplot(mlda_data, aes(x = months, y = death_rate, color = factor(over21))) +
+    geom_point(size = 2.5, alpha = 0.7) +
+    geom_line(aes(y = yhat_linear), linewidth = 1.3) +
+    geom_vline(xintercept = 0, linetype = "dashed") +
+    scale_color_manual(values = c("0" = "grey50", "1" = "#0072B2"),
+                       labels = c("Under 21", "Over 21")) +
+    annotate("segment",
+             x = 0.1, xend = 0.1,
+             y = 90, yend = 90 + coef(simple_rd)["over21"],
+             arrow = arrow(type = "closed", length = unit(0.25, "cm"),
+                           ends = "both"),
+             color = "#e7298a", linewidth = 1.1) +
+    annotate("text", x = 1.5,
+             y = 95 + coef(simple_rd)["over21"] / 2,
+             label = paste0("ρ ≈ ",
+                            round(coef(simple_rd)["over21"], 1)),
+             color = "#e7298a", hjust = 0, size = 5.5,
+             fontface = "bold") +
+    labs(title = "The RD jump *is* the causal effect",
+         x = "Age in months (0 = 21st birthday)",
+         y = "Death rate per 100,000",
+         color = NULL) +
+    theme(legend.position = "bottom") +
+    coord_cartesian(ylim = c(75, 105))
+```
+
+
+
+## Linear Isn't Always Enough {.smaller}
+
+```{r}
+#| label: fig-three-panels
+#| fig-width: 10
+#| fig-height: 4.4
+
+set.seed(101)
+make_panel <- function(type) {
+    x <- seq(0.01, 0.99, length.out = 80)
+    d <- as.numeric(x >= 0.5)
+    y <- switch(type,
+        "A" = 0.3 + 0.8 * x + 0.6 * d + rnorm(length(x), 0, 0.05),
+        "B" = 0.0 + 2.2 * sqrt(x) - 0.9 * x + 0.5 * d +
+              rnorm(length(x), 0, 0.05),
+        "C" = 0.4 + 0.4 * x + 6 * (x - 0.5)^2 * sign(x - 0.5) +
+              rnorm(length(x), 0, 0.04)
+    )
+    tibble(x = x, y = y, d = d, panel = paste("Panel", type))
+}
+
+three_panels <- bind_rows(make_panel("A"), make_panel("B"), make_panel("C"))
+
+three_labels <- tibble(
+    panel = c("Panel A", "Panel B", "Panel C"),
+    label = c("True jump,\nlinear trend",
+              "True jump,\nnonlinear trend",
+              "No jump,\nbut nonlinear trend")
+)
+
+ggplot(three_panels, aes(x = x, y = y)) +
+    geom_point(aes(color = factor(d)), size = 1.6, alpha = 0.7) +
+    geom_smooth(aes(group = d), method = "loess", span = 0.9,
+                se = FALSE, linewidth = 0.6, color = "gray40",
+                linetype = "dotted") +
+    geom_smooth(aes(group = d, color = factor(d)),
+                method = "lm", se = FALSE, linewidth = 1.1) +
+    geom_vline(xintercept = 0.5, linetype = "dashed") +
+    geom_text(data = three_labels,
+              aes(x = 0.05, y = 2.55, label = label),
+              hjust = 0, size = 4, inherit.aes = FALSE) +
+    facet_wrap(~ panel) +
+    scale_color_manual(values = c("0" = "grey50", "1" = "#0072B2"),
+                       guide = "none") +
+    labs(x = "Running variable (X)", y = "Outcome (Y)",
+         caption = "Solid lines = naive linear fit on each side. Dotted = true smooth shape.") +
+    theme(strip.text = element_text(face = "bold"),
+          plot.caption = element_text(size = 10, color = "gray40"))
+```
+
+- Panel C is the danger: a **smooth curve** with no real jump can *look* like a jump under a naive linear fit
+
+
+
+## Two Ways to Handle Nonlinearity {.smaller}
+
+:::: {.columns}
+::: {.column width="50%"}
+**1. Parametric**
+
+- Add polynomials & interactions
+- Let the slope (and curvature) bend differently on each side of the cutoff
+- Uses *all* the data
+:::
+
+::: {.column width="50%"}
+**2. Nonparametric**
+
+- Restrict to a narrow window around the cutoff
+- Over a small window, any smooth curve looks linear
+- Uses only data *near* the cutoff
+:::
+::::
+
+. . .
+
+- Both are useful. Best practice: report **both** and show the answer is stable.
+
+
+## Parametric: Three Specifications {.smaller}
+
+```{r}
+#| echo: true
+
+rd_linear     <- feols(death_rate ~ over21 + months,
+                       vcov = "HC1", data = mlda_data)
+
+rd_linear_int <- feols(death_rate ~ over21 + months + months:over21,
+                       vcov = "HC1", data = mlda_data)
+
+rd_quad       <- feols(death_rate ~ over21 + months + I(months^2) +
+                           months:over21 + I(months^2):over21,
+                       vcov = "HC1", data = mlda_data)
+```
+
+. . .
+
+- **Linear**: same slope on each side
+- **Linear, interacted**: different slopes on each side
+- **Quadratic, interacted**: different curvatures, too
+
+
+## Parametric: Visual Comparison
+
+```{r}
+#| label: fig-parametric
+#| fig-width: 10
+#| fig-height: 4.4
+
+mlda_fits <- mlda_data |>
+    mutate(
+        fit_linear = predict(rd_linear),
+        fit_lint   = predict(rd_linear_int),
+        fit_quad   = predict(rd_quad)
+    ) |>
+    select(months, over21, death_rate,
+           fit_linear, fit_lint, fit_quad) |>
+    pivot_longer(starts_with("fit_"), names_to = "model", values_to = "yhat") |>
+    mutate(model = recode(model,
+        fit_linear = "Linear",
+        fit_lint   = "Linear, interacted",
+        fit_quad   = "Quadratic, interacted"
+    ),
+    model = factor(model, levels = c("Linear", "Linear, interacted",
+                                      "Quadratic, interacted")))
+
+ggplot(mlda_fits, aes(x = months)) +
+    geom_point(aes(y = death_rate, color = factor(over21)),
+               size = 1.7, alpha = 0.55) +
+    geom_line(aes(y = yhat, group = interaction(model, over21)),
+              linewidth = 1.1, color = "#d95f02") +
+    geom_vline(xintercept = 0, linetype = "dashed") +
+    facet_wrap(~ model) +
+    scale_color_manual(values = c("0" = "grey50", "1" = "#0072B2"),
+                       guide = "none") +
+    labs(x = "Age in months (0 = 21st birthday)",
+         y = "Death rate per 100,000") +
+    theme(strip.text = element_text(face = "bold"))
+```
+
+- Estimates are stable across specs $\to$ **a hallmark of credible RD**
+
+. . .
+
+::: {.callout-warning}
+## Don't go higher than quadratic
+4th- or 5th-order polynomials chase noise near the boundaries and *invent* jumps. Gelman & Imbens (2019) recommend stopping at quadratic and using local linear regression instead.
+:::
+
+
+
+# Nonparametric RD
+
+
+## Bandwidth: A Bias-Variance Tradeoff {.smaller}
+
+- Restrict to $|a - a_0| \leq b$ for some bandwidth $b$
+- Then run a simple linear RD inside the window
+
+. . .
+
+:::: {.columns}
+::: {.column width="50%"}
+**Narrow bandwidth**
+
+- Less data $\to$ bigger SE
+- Less room for nonlinearity to bite
+- $\to$ **lower bias, higher variance**
+:::
+
+::: {.column width="50%"}
+**Wide bandwidth**
+
+- More data $\to$ smaller SE
+- More chance to mistake curvature for a jump
+- $\to$ **higher bias, lower variance**
+:::
+::::
+
+
+## Trying Three Bandwidths {.smaller}
+
+```{r}
+#| echo: true
+
+rd_b24 <- feols(death_rate ~ over21 + months,
+                vcov = "HC1",
+                data = subset(mlda_data, abs(months) <= 24))
+
+rd_b12 <- feols(death_rate ~ over21 + months,
+                vcov = "HC1",
+                data = subset(mlda_data, abs(months) <= 12))
+
+rd_b06 <- feols(death_rate ~ over21 + months,
+                vcov = "HC1",
+                data = subset(mlda_data, abs(months) <= 6))
+```
+
+. . .
+
+```{r}
+#| label: fig-bandwidths
+#| fig-width: 9
+#| fig-height: 3.4
+
+bw_results <- tibble(
+    Bandwidth = factor(c("24 months", "12 months", "6 months"),
+                       levels = c("24 months", "12 months", "6 months")),
+    Estimate  = c(coef(rd_b24)["over21"],
+                  coef(rd_b12)["over21"],
+                  coef(rd_b06)["over21"]),
+    SE        = c(summary(rd_b24)$se["over21"],
+                  summary(rd_b12)$se["over21"],
+                  summary(rd_b06)$se["over21"])
+) |>
+    mutate(lo = Estimate - 1.96 * SE,
+           hi = Estimate + 1.96 * SE)
+
+ggplot(bw_results, aes(x = Bandwidth, y = Estimate)) +
+    geom_hline(yintercept = 7.7, linetype = "dashed",
+               color = "darkgreen", linewidth = 1) +
+    geom_point(color = "#0072B2", size = 5) +
+    geom_errorbar(aes(ymin = lo, ymax = hi),
+                  width = 0.15, color = "#0072B2", linewidth = 1) +
+    annotate("text", x = 3.4, y = 7.7, label = "Truth = 7.7",
+             color = "darkgreen", hjust = 0, size = 4.5) +
+    coord_flip(clip = "off") +
+    labs(title = "Estimates stable; SEs grow as bandwidth shrinks",
+         x = NULL, y = "MLDA effect on death rate") +
+    theme(plot.margin = margin(10, 80, 10, 10))
+```
+
+
+# Validity Checks
+
+
+## Falsification: Cause-Specific Effects {.smaller}
+
+- If we're really picking up the effect of *legal drinking*, the jump should appear in alcohol-driven causes (motor vehicles, suicide) but **not** in unrelated causes (heart disease, cancer)
+
+. . .
+
+```{r}
+#| label: fig-falsification
+#| fig-width: 9
+#| fig-height: 3.7
+
+set.seed(99)
+cause_data <- tibble(
+    months = seq(-24, 23, by = 1),
+    over21 = as.numeric(months >= 0),
+    mva    = 25 + 0.05 * months + 4.5 * over21 +
+             rnorm(length(months), 0, 1.2),
+    intern = 15 + 0.10 * months + 0.4 * over21 +
+             rnorm(length(months), 0, 1.0)
+) |>
+    pivot_longer(c(mva, intern), names_to = "cause", values_to = "rate") |>
+    mutate(cause = recode(cause,
+                          mva    = "Motor vehicle deaths",
+                          intern = "Internal-cause deaths"))
+
+ggplot(cause_data, aes(x = months, y = rate, color = cause)) +
+    geom_point(size = 2, alpha = 0.7) +
+    geom_smooth(aes(group = interaction(cause, over21)),
+                method = "lm", formula = y ~ poly(x, 2),
+                se = FALSE, linewidth = 1.1) +
+    geom_vline(xintercept = 0, linetype = "dashed") +
+    scale_color_manual(values = c("Motor vehicle deaths" = "#0072B2",
+                                  "Internal-cause deaths" = "grey50")) +
+    labs(x = "Age in months", y = "Rate per 100,000",
+         color = "Cause") +
+    theme(legend.position = "bottom")
+```
+
+- Big jump where alcohol matters; nothing where it doesn't $\to$ design looks credible
+
+
+## Manipulation: Density Tests {.smaller}
+
+- If units can **engineer** their position relative to the cutoff (think: a manager rounding test scores up), the design breaks
+- Diagnostic: plot the density of the running variable. A pile-up just on one side is a red flag.
+
+. . .
+
+```{r}
+#| label: fig-mccrary
+#| fig-width: 9
+#| fig-height: 3.4
+
+set.seed(3)
+smooth_x <- tibble(x = rnorm(4000),
+                   scenario = "Smooth density (no manipulation)")
+manip_x <- tibble(x = c(rnorm(3000),
+                        rnorm(1000, 0.6, 0.3)),
+                  scenario = "Pile-up above cutoff (manipulation)")
+
+bind_rows(smooth_x, manip_x) |>
+    ggplot(aes(x = x)) +
+    geom_histogram(bins = 40, fill = "#0072B2", color = "white",
+                   alpha = 0.85) +
+    geom_vline(xintercept = 0, linetype = "dashed") +
+    facet_wrap(~ scenario) +
+    labs(x = "Running variable (centered)",
+         y = "Number of observations") +
+    theme(strip.text = element_text(face = "bold"))
+```
+
+- Formal test: McCrary (2008); modern version in the `rddensity` package
+
+
+## Other Validity Checks {.smaller}
+
+::: {.callout-important}
+## A credible RD paper shows...
+1. **Covariate balance**: pre-determined characteristics (age, gender, prior outcomes) don't jump at the cutoff
+2. **Density smoothness**: no pile-up of the running variable on either side
+3. **Robustness**: the jump survives different bandwidths and polynomial orders
+4. **Placebo cutoffs**: estimating "effects" at fake cutoffs gives ~ 0
+5. **Falsification outcomes**: outcomes treatment shouldn't affect... aren't affected
+:::
+
+
+
+# Wrapping Up
+
+
+## Key Takeaways {.smaller}
+
+- **RD turns rigid rules into natural experiments** by comparing units just above and just below a cutoff
+- **Sharp RD**: treatment is a deterministic function of a running variable
+- The estimate $\rho$ is the **vertical jump** in the outcome at the cutoff
+- Two strategies for handling nonlinearity:
+  - **Parametric** (polynomials & interactions; stop at quadratic)
+  - **Nonparametric** (zoom in on a bandwidth; use `rdrobust` in practice)
+- Validate with covariate balance, density smoothness, falsification outcomes, and placebo cutoffs
+
+. . .
+
+::: {.callout-tip}
+## The RD pitch in one sentence
+*Here is the rule, here is the cutoff, here is the jump --- and here is why nothing else can explain it.*
+:::

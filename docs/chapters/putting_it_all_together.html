@@ -1,0 +1,1789 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>16&nbsp; Putting It All Together – EC325 Lecture Notes</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/references.html" rel="next">
+<link href="../chapters/rdd.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-5ccb035bea26c1e21f80f44cf7c27909.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link href="../site_libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
+<script src="../site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="../site_libs/viz-1.8.2/viz.js"></script>
+<link href="../site_libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet">
+<script src="../site_libs/grViz-binding-1.0.11/grViz.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/putting_it_all_together.html"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Putting It All Together</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">EC325 Lecture Notes</a> 
+        <div class="sidebar-tools-main">
+    <div class="dropdown">
+      <a href="" title="Download" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label="Download"><i class="bi bi-download"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="../EC325-Lecture-Notes.pdf">
+              <i class="bi bi-file-pdf pe-1"></i>
+            Download PDF
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="../EC325-Lecture-Notes.epub">
+              <i class="bi bi-journal pe-1"></i>
+            Download ePub
+            </a>
+          </li>
+      </ul>
+    </div>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/data_practices.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Good Data Practices</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/rcts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Causality and Randomized Control Trials</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/bivariate_ols.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Bivariate Regression and Ordinary Least Squares</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/multivariate_ols.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Multivariate Regression</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/statistical_inference.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Statistical Inference</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/dummies_nonlins.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Dummy Variables and Non-Linear Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/interaction_effects.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Interaction Effects</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/heteroskedasticity.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Heteroskedasticity</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/binary_outcomes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Binary Outcomes</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/panel_fe.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Panel Data and Fixed Effects</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/did.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/advanced_did.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Advanced Difference-in-Differences</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/instrumental_variables.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Instrumental Variables</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/rdd.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Regression Discontinuity</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/putting_it_all_together.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Putting It All Together</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/installingR.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Intro to R and RStudio</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/statsreview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Statistics and Probability Review</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/working_with_data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Importing and Working with Data</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/r_reference.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">R Functions and Packages Reference</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#the-common-thread" id="toc-the-common-thread" class="nav-link active" data-scroll-target="#the-common-thread"><span class="header-section-number">16.1</span> The Common Thread</a></li>
+  <li><a href="#a-ladder-of-identification" id="toc-a-ladder-of-identification" class="nav-link" data-scroll-target="#a-ladder-of-identification"><span class="header-section-number">16.2</span> A Ladder of Identification</a></li>
+  <li><a href="#the-anatomy-of-a-research-design" id="toc-the-anatomy-of-a-research-design" class="nav-link" data-scroll-target="#the-anatomy-of-a-research-design"><span class="header-section-number">16.3</span> The Anatomy of a Research Design</a></li>
+  <li><a href="#method-review-the-whole-semester-on-one-page" id="toc-method-review-the-whole-semester-on-one-page" class="nav-link" data-scroll-target="#method-review-the-whole-semester-on-one-page"><span class="header-section-number">16.4</span> Method Review: The Whole Semester on One Page</a></li>
+  <li><a href="#what-goes-wrong-where-a-unified-view-of-threats" id="toc-what-goes-wrong-where-a-unified-view-of-threats" class="nav-link" data-scroll-target="#what-goes-wrong-where-a-unified-view-of-threats"><span class="header-section-number">16.5</span> What Goes Wrong Where: A Unified View of Threats</a></li>
+  <li><a href="#choosing-a-method-the-flowchart" id="toc-choosing-a-method-the-flowchart" class="nav-link" data-scroll-target="#choosing-a-method-the-flowchart"><span class="header-section-number">16.6</span> Choosing a Method: The Flowchart</a></li>
+  <li><a href="#an-interactive-method-picker" id="toc-an-interactive-method-picker" class="nav-link" data-scroll-target="#an-interactive-method-picker"><span class="header-section-number">16.7</span> An Interactive Method Picker</a></li>
+  <li><a href="#reading-an-empirical-paper-a-checklist" id="toc-reading-an-empirical-paper-a-checklist" class="nav-link" data-scroll-target="#reading-an-empirical-paper-a-checklist"><span class="header-section-number">16.8</span> Reading an Empirical Paper: A Checklist</a></li>
+  <li><a href="#two-mini-case-studies-same-question-different-designs" id="toc-two-mini-case-studies-same-question-different-designs" class="nav-link" data-scroll-target="#two-mini-case-studies-same-question-different-designs"><span class="header-section-number">16.9</span> Two Mini Case Studies: Same Question, Different Designs</a>
+  <ul class="collapse">
+  <li><a href="#case-study-1-does-health-insurance-improve-health" id="toc-case-study-1-does-health-insurance-improve-health" class="nav-link" data-scroll-target="#case-study-1-does-health-insurance-improve-health"><span class="header-section-number">16.9.1</span> Case Study 1: Does Health Insurance Improve Health?</a></li>
+  <li><a href="#case-study-2-does-education-raise-wages" id="toc-case-study-2-does-education-raise-wages" class="nav-link" data-scroll-target="#case-study-2-does-education-raise-wages"><span class="header-section-number">16.9.2</span> Case Study 2: Does Education Raise Wages?</a></li>
+  </ul></li>
+  <li><a href="#a-few-things-we-did-not-cover-and-where-they-fit" id="toc-a-few-things-we-did-not-cover-and-where-they-fit" class="nav-link" data-scroll-target="#a-few-things-we-did-not-cover-and-where-they-fit"><span class="header-section-number">16.10</span> A Few Things We Did Not Cover (And Where They Fit)</a></li>
+  <li><a href="#questions-to-ask-yourself-before-running-a-regression" id="toc-questions-to-ask-yourself-before-running-a-regression" class="nav-link" data-scroll-target="#questions-to-ask-yourself-before-running-a-regression"><span class="header-section-number">16.11</span> Questions to Ask Yourself Before Running a Regression</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">16.12</span> Summary</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">16.13</span> Check Your Understanding</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span id="sec-putting-it-all-together" class="quarto-section-identifier"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Putting It All Together</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+
+<style>
+.problem {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+.context {
+    background-color: #e8f4f8;
+    padding: 12px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border-left: 4px solid #2874a6;
+}
+.question {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #fff3cd;
+    border-radius: 5px;
+}
+.answer-row {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.answer-row label {
+    min-width: 320px;
+    font-weight: 500;
+}
+select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    min-width: 300px;
+    cursor: pointer;
+}
+select:focus {
+    border-color: #2874a6;
+    outline: none;
+}
+.correct {
+    border-color: #28a745 !important;
+    background-color: #d4edda !important;
+}
+.incorrect {
+    border-color: #dc3545 !important;
+    background-color: #f8d7da !important;
+}
+.explanation {
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #e7f3ff;
+    border-radius: 5px;
+    border-left: 4px solid #2874a6;
+}
+.note {
+    font-size: 0.85em;
+    color: #666;
+    font-style: italic;
+}
+
+/* Method Picker Widget */
+.picker-container {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e8f4f8 100%);
+    border: 2px solid #2874a6;
+    border-radius: 12px;
+    padding: 25px;
+    margin: 25px 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+.picker-container h3 {
+    margin-top: 0;
+    color: #1a5276;
+}
+.picker-step {
+    margin: 18px 0;
+    padding: 14px 16px;
+    background: white;
+    border-radius: 8px;
+    border-left: 5px solid #2874a6;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.picker-step label {
+    font-weight: 600;
+    color: #1a5276;
+    display: block;
+    margin-bottom: 8px;
+    min-width: unset;
+}
+.picker-step select {
+    width: 100%;
+    max-width: 520px;
+    min-width: 260px;
+}
+.picker-result {
+    margin-top: 20px;
+    padding: 22px;
+    background: #fff;
+    border: 2px dashed #2874a6;
+    border-radius: 10px;
+    font-size: 1.02em;
+    line-height: 1.55;
+}
+.picker-result.empty {
+    background: #f4f6f8;
+    color: #6c757d;
+    font-style: italic;
+    border-style: dotted;
+    text-align: center;
+}
+.picker-result .rec-method {
+    font-size: 1.35em;
+    font-weight: 700;
+    color: #1a5276;
+    margin-bottom: 8px;
+}
+.picker-result .rec-why {
+    color: #333;
+    margin-bottom: 10px;
+}
+.picker-result .rec-caveat {
+    background: #fff3cd;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 0.95em;
+    border-left: 3px solid #f0ad4e;
+    margin-top: 10px;
+}
+.picker-result .rec-link {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 0.92em;
+    color: #1a5276;
+    font-weight: 600;
+}
+.picker-reset {
+    margin-top: 12px;
+    padding: 8px 16px;
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+.picker-reset:hover { background: #495057; }
+
+/* Method Review Cards */
+.method-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 18px;
+    margin: 20px 0;
+}
+.method-card {
+    border: 1px solid #dee2e6;
+    border-top: 5px solid #2874a6;
+    border-radius: 10px;
+    padding: 16px 18px;
+    background: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+}
+.method-card h4 {
+    margin-top: 0;
+    color: #1a5276;
+    font-size: 1.1em;
+}
+.method-card .mc-label {
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.85em;
+    margin-top: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+.method-card .mc-body {
+    font-size: 0.95em;
+    margin-top: 3px;
+    color: #333;
+}
+.method-card.ols { border-top-color: #2874a6; }
+.method-card.fe  { border-top-color: #117a65; }
+.method-card.did { border-top-color: #6c3483; }
+.method-card.iv  { border-top-color: #b9770e; }
+.method-card.rdd { border-top-color: #922b21; }
+.method-card.rct { border-top-color: #1e8449; }
+.method-card.lpm { border-top-color: #2e4053; }
+
+</style>
+
+<script>
+function checkAnswer(selectElement, correctValue) {
+    if (selectElement.value === '') {
+        selectElement.classList.remove('correct', 'incorrect');
+    } else if (selectElement.value === correctValue) {
+        selectElement.classList.remove('incorrect');
+        selectElement.classList.add('correct');
+    } else {
+        selectElement.classList.remove('correct');
+        selectElement.classList.add('incorrect');
+    }
+}
+</script>
+
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span><strong>Key Questions</strong>
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ul>
+<li>What is the common thread that runs through every method in this book?</li>
+<li>How do we decide which econometric method to use for a given research question?</li>
+<li>How do the assumptions behind each method trade off credibility and generality?</li>
+<li>What questions should we ask ourselves before committing to a research design?</li>
+<li>What is the difference between a technique and a <em>research design</em>?</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span><strong>Suggested Readings</strong>
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ul>
+<li><span class="citation" data-cites="angrist_mastering_2014">Angrist and Pischke (<a href="references.html#ref-angrist_mastering_2014" role="doc-biblioref">2014</a>)</span>, Ch. 1 and the concluding sections of each subsequent chapter</li>
+<li><span class="citation" data-cites="angrist_credibility_2010">Angrist and Pischke (<a href="references.html#ref-angrist_credibility_2010" role="doc-biblioref">2010</a>)</span>, for an engaging overview of how empirical economics has evolved</li>
+<li><span class="citation" data-cites="bailey_real_2020">Bailey (<a href="references.html#ref-bailey_real_2020" role="doc-biblioref">2020</a>)</span>, for practical advice on choosing and defending a research design</li>
+</ul>
+</div>
+</div>
+</div>
+<p>You have made it to the end of the semester – woohoo! A single-variable comparison that we were skeptical about in <a href="intro.html" class="quarto-xref"><span>Chapter 1</span></a> has, over fifteen chapters, grown into a full toolkit for doing honest causal work.</p>
+<p>The goal of this final chapter is not to teach you any <em>new</em> technique. Instead, it is to step back and see the forest for the trees. Every method we have covered—from the basic RCT in <a href="rcts.html" class="quarto-xref"><span>Chapter 3</span></a> to regression discontinuity in <a href="rdd.html" class="quarto-xref"><span>Chapter 15</span></a>—is trying to solve <strong>exactly the same problem</strong> in a slightly different way. Once you see that problem clearly, choosing the right method for a given question becomes less about memorizing decision rules and more about asking a small number of honest questions of your data and your research setting.</p>
+<p>This chapter does three things:</p>
+<ol type="1">
+<li><strong>Synthesizes the core problem of causal inference</strong> and shows how every method is an attempt to approximate the randomized control trial we can rarely run.</li>
+<li><strong>Reviews each method side by side</strong>, emphasizing what each one assumes, what each one identifies, and what each one <em>cannot</em> do.</li>
+<li><strong>Gives you concrete tools</strong>—a flowchart, a method picker, and a checklist—for choosing a research design in practice.</li>
+</ol>
+<section id="the-common-thread" class="level2" data-number="16.1">
+<h2 data-number="16.1" class="anchored" data-anchor-id="the-common-thread"><span class="header-section-number">16.1</span> The Common Thread</h2>
+<p>If you remember only one thing from this course, remember this:</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>The Fundamental Problem of Causal Inference
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For any unit <span class="math inline">\(i\)</span>, the individual causal effect of treatment is <span class="math display">\[
+\kappa_i = Y_{1i} - Y_{0i},
+\]</span> but we only ever observe one of <span class="math inline">\(Y_{1i}\)</span> or <span class="math inline">\(Y_{0i}\)</span>, never both. Estimating a causal effect is therefore a problem of constructing a <strong>credible counterfactual</strong>—a convincing estimate of what would have happened to the treated group had they not been treated.</p>
+</div>
+</div>
+<p>This is the same framework we introduced in <a href="rcts.html" class="quarto-xref"><span>Chapter 3</span></a> using the potential outcomes notation <span class="math inline">\((Y_{1i}, Y_{0i})\)</span>. It tells us that we are always working with incomplete information. Every single method in this book—from bivariate OLS to regression discontinuity—can be understood as a <em>different strategy for reconstructing the counterfactual.</em></p>
+<p>The reason the RCT is the gold standard is that random assignment eliminates selection bias by construction: the treated and control groups are, on average, identical in every way other than the treatment itself. When we can randomize, the counterfactual is delivered on a silver platter.</p>
+<p>Most of the time, we cannot randomize. So we look for strategies that approximate randomization: we control for observed differences, we exploit policy changes that are plausibly as-good-as-random, we find instruments that shift treatment without touching the outcome directly, or we zoom in on cutoffs where the two sides are essentially identical. These strategies define what <span class="citation" data-cites="angrist_credibility_2010">Angrist and Pischke (<a href="references.html#ref-angrist_credibility_2010" role="doc-biblioref">2010</a>)</span> call the <strong>credibility revolution</strong> in empirical economics.</p>
+<p><a href="#fig-counterfactual-strategies" class="quarto-xref">Figure&nbsp;<span>16.1</span></a> shows the core idea pictorially. Each method we have covered is a different arrow trying to get us back to the same destination: a plausible estimate of <span class="math inline">\(E[Y_{0i} \mid D_i = 1]\)</span>, the counterfactual average outcome for the treated group.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-counterfactual-strategies" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-counterfactual-strategies-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;16.1: Every method in this book is a strategy for recovering the same missing piece: the counterfactual for the treated.
+</figcaption>
+<div aria-describedby="fig-counterfactual-strategies-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="putting_it_all_together_files/figure-html/fig-counterfactual-strategies-1.png" class="img-fluid figure-img" width="864">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p>Once you hold this picture in your head, the rest of the chapter is just filling in details about <em>which</em> arrow is credible under which conditions.</p>
+</section>
+<section id="a-ladder-of-identification" class="level2" data-number="16.2">
+<h2 data-number="16.2" class="anchored" data-anchor-id="a-ladder-of-identification"><span class="header-section-number">16.2</span> A Ladder of Identification</h2>
+<p>A useful way to organize the methods we have studied is as a <strong>ladder of identification</strong>, ordered by how strong an assumption about unobservables you are willing to make. Strong assumptions buy you more flexibility about where your data come from, but they are also harder to defend. Weak assumptions are easier to defend but demand much more of your research design.</p>
+<p><a href="#fig-identification-ladder" class="quarto-xref">Figure&nbsp;<span>16.2</span></a> shows the ladder.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-identification-ladder" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-identification-ladder-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;16.2: The ladder of identification. Higher rungs require stronger assumptions about unobservables; lower rungs require a more structured research design.
+</figcaption>
+<div aria-describedby="fig-identification-ladder-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="putting_it_all_together_files/figure-html/fig-identification-ladder-1.png" class="img-fluid figure-img" width="960">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p>The ordering here is not strict—reasonable people might swap, say, panel FE and IV depending on the setting—but the intuition is reliable. When you read an empirical paper, ask yourself where on this ladder it sits. When you design your own research, ask what the <em>highest rung</em> you can credibly claim is.</p>
+</section>
+<section id="the-anatomy-of-a-research-design" class="level2" data-number="16.3">
+<h2 data-number="16.3" class="anchored" data-anchor-id="the-anatomy-of-a-research-design"><span class="header-section-number">16.3</span> The Anatomy of a Research Design</h2>
+<p>Before we review methods one by one, it is worth making a distinction that professional economists rely on all the time:</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Technique vs.&nbsp;Research Design
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A <strong>technique</strong> is a statistical tool: OLS, logistic regression, 2SLS, local-linear regression.</p>
+<p>A <strong>research design</strong> is a <em>credible argument</em> that the comparison being made approximates the apples-to-apples ideal of a randomized experiment. A research design answers the question: <em>“Why should I believe the comparison units look like the counterfactual?”</em></p>
+</div>
+</div>
+<p>The same technique—OLS—can support wildly different research designs. OLS on a cross-section of wages regressed on education is a <em>correlational</em> exercise. OLS on the <em>same</em> wage data with an instrument for education is an IV research design. OLS on panel wages with unit and time fixed effects is a panel FE research design. OLS on wages for workers near a schooling-reform cutoff is an RD research design.</p>
+<p>The technique is <em>OLS</em> in every case. The research design is what makes the estimate believable. This is why practicing econometricians spend enormous amounts of time worrying about identification strategy and relatively little time worrying about which package has the fanciest algorithm.</p>
+</section>
+<section id="method-review-the-whole-semester-on-one-page" class="level2" data-number="16.4">
+<h2 data-number="16.4" class="anchored" data-anchor-id="method-review-the-whole-semester-on-one-page"><span class="header-section-number">16.4</span> Method Review: The Whole Semester on One Page</h2>
+<p><a href="#fig-method-overview" class="quarto-xref">Figure&nbsp;<span>16.3</span></a> summarizes what each method <em>looks like</em> visually. The job of a research design is usually to demonstrate one of these pictures: a jump, a divergence, a parallel shift, a conditional gap.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-method-overview" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-method-overview-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;16.3: What the key methods ‘look like’ visually. Each panel is the picture a credible empirical paper shows the reader.
+</figcaption>
+<div aria-describedby="fig-method-overview-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="putting_it_all_together_files/figure-html/fig-method-overview-1.png" class="img-fluid figure-img" width="1056">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p>Now let’s review each method in words, emphasizing assumptions, the estimand, and the characteristic research-design question you have to answer.</p>
+<div class="method-grid">
+
+<div class="method-card rct">
+<h4 class="anchored">Randomized Control Trial</h4>
+<div class="mc-label">From</div>
+<div class="mc-body">Chapter <a href="rcts.html">3</a></div>
+<div class="mc-label">Key Idea</div>
+<div class="mc-body">Randomization creates groups identical in expectation; the simple difference in means <em>is</em> the causal effect.</div>
+<div class="mc-label">Identifying Assumption</div>
+<div class="mc-body">Successful random assignment; compliance; no spillovers.</div>
+<div class="mc-label">Estimand</div>
+<div class="mc-body">Average Treatment Effect (ATE) in the experimental sample.</div>
+<div class="mc-label">Key Risk</div>
+<div class="mc-body">Non-compliance; attrition; external validity.</div>
+</div>
+
+<div class="method-card ols">
+<h4 class="anchored">OLS (Bivariate and Multivariate)</h4>
+<div class="mc-label">From</div>
+<div class="mc-body">Chapters <a href="bivariate_ols.html">4</a>, <a href="multivariate_ols.html">5</a></div>
+<div class="mc-label">Key Idea</div>
+<div class="mc-body">Minimize sum of squared residuals; interpret slope as conditional change in y per unit change in x.</div>
+<div class="mc-label">Identifying Assumption</div>
+<div class="mc-body">Zero conditional mean: <em>E[μ | X] = 0</em>. Rarely credible without careful design.</div>
+<div class="mc-label">Estimand</div>
+<div class="mc-body">Conditional association (descriptive) or causal effect (if assumptions hold).</div>
+<div class="mc-label">Key Risk</div>
+<div class="mc-body">Omitted variable bias; see the OVB formula in <a href="multivariate_ols.html">Chapter 5</a>.</div>
+</div>
+
+<div class="method-card ols">
+<h4 class="anchored">Dummies, Nonlinearities, Interactions</h4>
+<div class="mc-label">From</div>
+<div class="mc-body">Chapters <a href="dummies_nonlins.html">7</a>, <a href="interaction_effects.html">8</a></div>
+<div class="mc-label">Key Idea</div>
+<div class="mc-body">Extend OLS to categorical and nonlinear relationships; different slopes for different groups.</div>
+<div class="mc-label">Identifying Assumption</div>
+<div class="mc-body">Same as OLS; functional form is correctly specified.</div>
+<div class="mc-label">Estimand</div>
+<div class="mc-body">Group-specific means or slopes; percentage changes via logs.</div>
+<div class="mc-label">Key Risk</div>
+<div class="mc-body">Dummy variable trap; misinterpreting interactions without main effects.</div>
+</div>
+
+<div class="method-card lpm">
+<h4 class="anchored">Binary Outcomes (LPM / Logit)</h4>
+<div class="mc-label">From</div>
+<div class="mc-body">Chapter <a href="binary_outcomes.html">10</a></div>
+<div class="mc-label">Key Idea</div>
+<div class="mc-body">When y ∈ {0,1}, model the probability <em>P(y=1|X)</em>. LPM uses OLS; logit uses a logistic link.</div>
+<div class="mc-label">Identifying Assumption</div>
+<div class="mc-body">Same identification issues as OLS; logit bounds predictions in [0,1].</div>
+<div class="mc-label">Estimand</div>
+<div class="mc-body">Change in probability (LPM) or log-odds/odds ratio (logit).</div>
+<div class="mc-label">Key Risk</div>
+<div class="mc-body">LPM predictions can escape [0,1]; logit coefficients are not marginal effects.</div>
+</div>
+
+<div class="method-card fe">
+<h4 class="anchored">Panel Fixed Effects</h4>
+<div class="mc-label">From</div>
+<div class="mc-body">Chapter <a href="panel_fe.html">11</a></div>
+<div class="mc-label">Key Idea</div>
+<div class="mc-body">Observing the same units over time lets us absorb all time-invariant characteristics of each unit.</div>
+<div class="mc-label">Identifying Assumption</div>
+<div class="mc-body">No time-varying unobserved confounders correlated with the regressor.</div>
+<div class="mc-label">Estimand</div>
+<div class="mc-body">Effect of within-unit changes in x on within-unit changes in y.</div>
+<div class="mc-label">Key Risk</div>
+<div class="mc-body">Absorbs cross-sectional variation; doesn't fix reverse causality or trends.</div>
+</div>
+
+<div class="method-card did">
+<h4 class="anchored">Difference-in-Differences</h4>
+<div class="mc-label">From</div>
+<div class="mc-body">Chapters <a href="did.html">12</a>, <a href="advanced_did.html">13</a></div>
+<div class="mc-label">Key Idea</div>
+<div class="mc-body">Use untreated units to subtract off the counterfactual trend from the treated units.</div>
+<div class="mc-label">Identifying Assumption</div>
+<div class="mc-body"><strong>Parallel trends</strong> in the absence of treatment (untestable; check pre-trends).</div>
+<div class="mc-label">Estimand</div>
+<div class="mc-body">Average Treatment Effect on the Treated (ATT).</div>
+<div class="mc-label">Key Risk</div>
+<div class="mc-body">Differential trends; staggered adoption; spillovers; poorly-matched controls.</div>
+</div>
+
+<div class="method-card iv">
+<h4 class="anchored">Instrumental Variables</h4>
+<div class="mc-label">From</div>
+<div class="mc-body">Chapter <a href="instrumental_variables.html">14</a></div>
+<div class="mc-label">Key Idea</div>
+<div class="mc-body">Use a variable Z that shifts treatment but affects outcome <em>only</em> through treatment.</div>
+<div class="mc-label">Identifying Assumption</div>
+<div class="mc-body">Relevance: Cov(Z, D) ≠ 0 (testable, F &gt; 10).<br>Exclusion: Cov(Z, μ) = 0 (untestable).</div>
+<div class="mc-label">Estimand</div>
+<div class="mc-body">Local Average Treatment Effect (LATE) for compliers.</div>
+<div class="mc-label">Key Risk</div>
+<div class="mc-body">Weak instruments; violated exclusion; LATE may differ from the effect of policy interest.</div>
+</div>
+
+<div class="method-card rdd">
+<h4 class="anchored">Regression Discontinuity</h4>
+<div class="mc-label">From</div>
+<div class="mc-body">Chapter <a href="rdd.html">15</a></div>
+<div class="mc-label">Key Idea</div>
+<div class="mc-body">At a sharp cutoff in a running variable, units just above and just below are nearly identical.</div>
+<div class="mc-label">Identifying Assumption</div>
+<div class="mc-body">Potential outcomes are smooth through the cutoff; no manipulation of the running variable.</div>
+<div class="mc-label">Estimand</div>
+<div class="mc-body">Treatment effect at the cutoff (local).</div>
+<div class="mc-label">Key Risk</div>
+<div class="mc-body">Manipulation (pile-up); over-fitting polynomials; narrow external validity.</div>
+</div>
+
+</div>
+</section>
+<section id="what-goes-wrong-where-a-unified-view-of-threats" class="level2" data-number="16.5">
+<h2 data-number="16.5" class="anchored" data-anchor-id="what-goes-wrong-where-a-unified-view-of-threats"><span class="header-section-number">16.5</span> What Goes Wrong Where: A Unified View of Threats</h2>
+<p>A complementary way to organize what we have learned is by the <em>kinds of threats</em> each method is designed to neutralize. The table below lays these out side by side.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header" style="background: #1a5276; color: white; text-align: left;">
+<th data-quarto-table-cell-role="th" style="padding: 10px">Threat</th>
+<th data-quarto-table-cell-role="th" style="padding: 10px">What it looks like</th>
+<th data-quarto-table-cell-role="th" style="padding: 10px">Methods that address it</th>
+<th data-quarto-table-cell-role="th" style="padding: 10px">Methods that don't</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd" style="border-bottom: 1px solid #dee2e6;">
+<td style="padding: 10px; font-weight: 600">Observed confounders</td>
+<td style="padding: 10px">Pre-treatment characteristics differ across treated/control and affect the outcome</td>
+<td style="padding: 10px">Multivariate OLS; IPW-DiD</td>
+<td style="padding: 10px">Bivariate OLS</td>
+</tr>
+<tr class="even" style="background: #f8f9fa; border-bottom: 1px solid #dee2e6;">
+<td style="padding: 10px; font-weight: 600">Unobserved, time-invariant confounders</td>
+<td style="padding: 10px">Persistent differences across units (culture, geography, innate ability)</td>
+<td style="padding: 10px">Panel FE; DiD; TWFE</td>
+<td style="padding: 10px">Cross-sectional OLS</td>
+</tr>
+<tr class="odd" style="border-bottom: 1px solid #dee2e6;">
+<td style="padding: 10px; font-weight: 600">Unobserved, time-varying shocks (common)</td>
+<td style="padding: 10px">Macroeconomic shocks, calendar seasonality, policy shifts that affect everyone</td>
+<td style="padding: 10px">Time FE; TWFE; DiD</td>
+<td style="padding: 10px">Unit FE alone</td>
+</tr>
+<tr class="even" style="background: #f8f9fa; border-bottom: 1px solid #dee2e6;">
+<td style="padding: 10px; font-weight: 600">Differential trends</td>
+<td style="padding: 10px">Treatment and control groups were trending differently before treatment</td>
+<td style="padding: 10px">Event-study DiD with careful pre-trend checks; RD (if a cutoff is available)</td>
+<td style="padding: 10px">Basic 2×2 DiD</td>
+</tr>
+<tr class="odd" style="border-bottom: 1px solid #dee2e6;">
+<td style="padding: 10px; font-weight: 600">Reverse causality / simultaneity</td>
+<td style="padding: 10px">Y causes D as well as the other way around</td>
+<td style="padding: 10px">IV with genuinely exogenous Z; RD; RCT</td>
+<td style="padding: 10px">OLS; FE; DiD (without further structure)</td>
+</tr>
+<tr class="even" style="background: #f8f9fa; border-bottom: 1px solid #dee2e6;">
+<td style="padding: 10px; font-weight: 600">Selection into treatment</td>
+<td style="padding: 10px">Units with higher potential outcomes are more likely to be treated</td>
+<td style="padding: 10px">RCT; IV; RD; conditional-on-observables designs if all relevant X are measured</td>
+<td style="padding: 10px">Bivariate OLS; simple comparisons</td>
+</tr>
+<tr class="odd" style="border-bottom: 1px solid #dee2e6;">
+<td style="padding: 10px; font-weight: 600">Heteroskedasticity</td>
+<td style="padding: 10px">Error variance differs across observations</td>
+<td style="padding: 10px">Heteroskedasticity-robust SEs (Chapter <a href="heteroskedasticity.html">9</a>)</td>
+<td style="padding: 10px">Classical SEs from <code>lm()</code> without correction</td>
+</tr>
+<tr class="even" style="background: #f8f9fa; border-bottom: 1px solid #dee2e6;">
+<td style="padding: 10px; font-weight: 600">Clustered errors (panel)</td>
+<td style="padding: 10px">Observations within a unit are correlated over time</td>
+<td style="padding: 10px">Cluster-robust SEs at the unit or policy level (Chapter <a href="advanced_did.html">13</a>)</td>
+<td style="padding: 10px">Observation-level robust SEs</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="choosing-a-method-the-flowchart" class="level2" data-number="16.6">
+<h2 data-number="16.6" class="anchored" data-anchor-id="choosing-a-method-the-flowchart"><span class="header-section-number">16.6</span> Choosing a Method: The Flowchart</h2>
+<p>Enough preamble.</p>
+<p><a href="#fig-method-flowchart" class="quarto-xref">Figure&nbsp;<span>16.4</span></a> is a flowchart that encodes the decisions applied economists actually make when they design a project. It is not the only possible flowchart, and applied economists sometimes do things differently. But if you follow these steps carefully, you will land on a research design that would not embarrass you at a seminar.</p>
+<div class="cell">
+<div id="fig-method-flowchart" class="cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-method-flowchart-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;16.4: A decision flowchart for choosing a method. Start at the top and follow the arrows based on your answer at each diamond.
+</figcaption>
+<div aria-describedby="fig-method-flowchart-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="grViz html-widget html-fill-item" id="htmlwidget-a188624c56eb1ca741ee" style="width:100%;height:531px;"></div>
+<script type="application/json" data-for="htmlwidget-a188624c56eb1ca741ee">{"x":{"diagram":"\ndigraph method_flowchart {\n  graph [layout = dot, rankdir = TB, bgcolor = \"white\",\n         fontname = \"Helvetica\", pad = 0.3, nodesep = 0.35, ranksep = 0.45]\n\n  node [shape = box, style = \"rounded,filled\", fontname = \"Helvetica\",\n        fontsize = 11, color = \"#2874a6\", penwidth = 1.5]\n  edge [fontname = \"Helvetica\", fontsize = 10, color = \"#495057\"]\n\n  Q1 [label = \"What is your\\nresearch question?\", shape = diamond,\n      fillcolor = \"#fff3cd\", color = \"#b38600\"]\n\n  QD [label = \"Descriptive / predictive\\n(no causal claim)\", fillcolor = \"#e8f4f8\"]\n  QC [label = \"Causal\\n(I want the effect of D on Y)\", shape = diamond,\n      fillcolor = \"#fff3cd\", color = \"#b38600\"]\n\n  Q2 [label = \"Can you randomize\\ntreatment?\", shape = diamond,\n      fillcolor = \"#fff3cd\", color = \"#b38600\"]\n  M_RCT [label = \"Randomized Control Trial\\n(simple diff in means +\\nrobust SEs)\",\n         fillcolor = \"#d4efdf\", color = \"#1e8449\"]\n\n  Q3 [label = \"Is there a natural experiment:\\na rule, reform, or cutoff\\nthat creates as-good-as-random\\nvariation in treatment?\", shape = diamond,\n      fillcolor = \"#fff3cd\", color = \"#b38600\"]\n\n  Q4 [label = \"Does a cutoff in a\\ncontinuous running variable\\ndetermine treatment?\", shape = diamond,\n      fillcolor = \"#fff3cd\", color = \"#b38600\"]\n  M_RD [label = \"Regression Discontinuity\\n(sharp design;\\nrdrobust)\",\n        fillcolor = \"#f5b7b1\", color = \"#922b21\"]\n\n  Q5 [label = \"Do you observe treated &\\ncontrol units both before and\\nafter the treatment event?\", shape = diamond,\n      fillcolor = \"#fff3cd\", color = \"#b38600\"]\n  M_DID [label = \"Difference-in-Differences\\n(2×2 or TWFE + event study +\\ncluster SEs at treatment level)\",\n         fillcolor = \"#d7bde2\", color = \"#6c3483\"]\n\n  Q6 [label = \"Do you have a credible\\ninstrument Z that shifts D\\nbut only affects Y through D?\", shape = diamond,\n      fillcolor = \"#fff3cd\", color = \"#b38600\"]\n  M_IV [label = \"Instrumental Variables (2SLS)\\ncheck first-stage F > 10,\\ninterpret as LATE for compliers\",\n        fillcolor = \"#fad7a0\", color = \"#b9770e\"]\n\n  Q7 [label = \"Do you have panel data\\non the same units over time?\", shape = diamond,\n      fillcolor = \"#fff3cd\", color = \"#b38600\"]\n  M_FE [label = \"Panel Fixed Effects\\n(unit + time FE;\\ncluster SEs at unit)\",\n        fillcolor = \"#a3e4d7\", color = \"#117a65\"]\n\n  Q8 [label = \"Do you believe observed\\ncontrols X are sufficient\\nfor conditional independence?\", shape = diamond,\n      fillcolor = \"#fff3cd\", color = \"#b38600\"]\n  M_OLS [label = \"Multivariate OLS with controls\\n(+ robust SEs; be humble\\nabout causal claims)\",\n         fillcolor = \"#aed6f1\", color = \"#2874a6\"]\n\n  Q9 [label = \"Is the outcome binary?\", shape = diamond,\n      fillcolor = \"#fff3cd\", color = \"#b38600\"]\n  M_BIN [label = \"LPM or Logit\\n(LPM for interpretation;\\nlogit for bounded predictions)\",\n         fillcolor = \"#d5d8dc\", color = \"#2e4053\"]\n\n  M_DESC [label = \"Descriptive / exploratory:\\nsummary statistics, plots,\\nOLS for conditional means\",\n          fillcolor = \"#e8f8f5\", color = \"#117a65\"]\n\n  M_STOP [label = \"Stop.\\nRedefine the question or\\ngather more data.\",\n          fillcolor = \"#fadbd8\", color = \"#c0392b\"]\n\n  # Main flow\n  Q1 -> QD [label = \"descriptive\"]\n  Q1 -> QC [label = \"causal\"]\n\n  QD -> M_DESC\n\n  QC -> Q2\n  Q2 -> M_RCT [label = \"yes\"]\n  Q2 -> Q3 [label = \"no\"]\n\n  Q3 -> Q4 [label = \"yes\"]\n  Q3 -> Q7 [label = \"no\"]\n\n  Q4 -> M_RD [label = \"yes\"]\n  Q4 -> Q5 [label = \"no\"]\n\n  Q5 -> M_DID [label = \"yes\"]\n  Q5 -> Q6 [label = \"no\"]\n\n  Q6 -> M_IV [label = \"yes\"]\n  Q6 -> Q7 [label = \"no\"]\n\n  Q7 -> M_FE [label = \"yes\"]\n  Q7 -> Q8 [label = \"no\"]\n\n  Q8 -> M_OLS [label = \"yes, cautiously\"]\n  Q8 -> M_STOP [label = \"no\"]\n\n  # Side branch: binary outcomes modify any OLS-style step\n  M_OLS -> Q9 [label = \"binary y?\", style = dashed]\n  Q9 -> M_BIN [label = \"yes\", style = dashed]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+</div>
+</figure>
+</div>
+</div>
+<p>A few remarks on using this flowchart.</p>
+<p>First, this is a guide to the <em>highest-credibility</em> method you can plausibly use. Nothing prevents you from running, say, an OLS regression <em>in addition to</em> an RD or IV to show what a naive analysis would have concluded. In fact, most papers in applied economics show both.</p>
+<p>Second, the “yes” answers get harder as you move down the chart, because they demand more of your research setting. Most students’ first instinct is to answer “yes” to <a href="multivariate_ols.html" class="quarto-xref"><span>Chapter 5</span></a> and stop there. Your professional instinct, by the end of a career, should be the opposite: ask whether any of the rungs above are available <em>before</em> settling for conditional-on-observables OLS.</p>
+<p>Third, <em>every</em> branch of the chart ends with robust standard errors. This is because heteroskedasticity is the rule rather than the exception in applied work, and using robust SEs costs you almost nothing when there is no problem (see <a href="heteroskedasticity.html" class="quarto-xref"><span>Chapter 9</span></a>).</p>
+</section>
+<section id="an-interactive-method-picker" class="level2" data-number="16.7">
+<h2 data-number="16.7" class="anchored" data-anchor-id="an-interactive-method-picker"><span class="header-section-number">16.7</span> An Interactive Method Picker</h2>
+<p>The flowchart is static, which is useful for learning. But once you have internalized it, the answers get faster. The interactive picker below asks you a handful of questions and assembles a recommendation in real time. Try it with a research question of your own.</p>
+<div class="picker-container">
+<h3 class="anchored">Method Picker</h3>
+<p>Answer the questions below, and a recommendation will appear at the bottom. Change any answer to see the recommendation update.</p>
+
+<div class="picker-step">
+  <label>1. What kind of question are you asking?</label>
+  <select id="pq_goal" onchange="updatePicker()">
+    <option value="">-- Select --</option>
+    <option value="descriptive">Descriptive: I want to summarize patterns, not make a causal claim</option>
+    <option value="causal">Causal: I want to know the effect of D on Y</option>
+  </select>
+</div>
+
+<div class="picker-step">
+  <label>2. Can you (or someone) randomly assign the treatment?</label>
+  <select id="pq_rct" onchange="updatePicker()">
+    <option value="">-- Select --</option>
+    <option value="yes">Yes, I ran or have access to an RCT</option>
+    <option value="no">No, treatment is not randomized</option>
+  </select>
+</div>
+
+<div class="picker-step">
+  <label>3. Is there a cutoff in a continuous running variable (age, score, date, income) that determines treatment?</label>
+  <select id="pq_rd" onchange="updatePicker()">
+    <option value="">-- Select --</option>
+    <option value="sharp">Yes, it's a strict rule (sharp)</option>
+    <option value="no">No cutoff</option>
+  </select>
+</div>
+
+<div class="picker-step">
+  <label>4. Do you observe both treated and untreated units <em>before and after</em> a treatment event?</label>
+  <select id="pq_did" onchange="updatePicker()">
+    <option value="">-- Select --</option>
+    <option value="yes">Yes, there's a pre- and post-treatment period for both groups</option>
+    <option value="no">No</option>
+  </select>
+</div>
+
+<div class="picker-step">
+  <label>5. Do you have a variable Z that shifts treatment but <em>only</em> affects the outcome through treatment?</label>
+  <select id="pq_iv" onchange="updatePicker()">
+    <option value="">-- Select --</option>
+    <option value="yes">Yes, I can defend an exclusion restriction</option>
+    <option value="no">No</option>
+  </select>
+</div>
+
+<div class="picker-step">
+  <label>6. Do you observe the same units across multiple time periods?</label>
+  <select id="pq_panel" onchange="updatePicker()">
+    <option value="">-- Select --</option>
+    <option value="yes">Yes, panel data</option>
+    <option value="no">No, cross-section only</option>
+  </select>
+</div>
+
+<div class="picker-step">
+  <label>7. Is your outcome variable binary (0 or 1)?</label>
+  <select id="pq_binary" onchange="updatePicker()">
+    <option value="">-- Select --</option>
+    <option value="yes">Yes, binary outcome</option>
+    <option value="no">No, continuous outcome</option>
+  </select>
+</div>
+
+<div id="picker_result" class="picker-result empty">Answer the questions above to see a recommendation.</div>
+
+<button class="picker-reset" onclick="resetPicker()">Reset</button>
+</div>
+
+<script>
+function resetPicker() {
+  ['pq_goal','pq_rct','pq_rd','pq_did','pq_iv','pq_panel','pq_binary'].forEach(function(id){
+    document.getElementById(id).value = '';
+  });
+  updatePicker();
+}
+
+function updatePicker() {
+  var goal   = document.getElementById('pq_goal').value;
+  var rct    = document.getElementById('pq_rct').value;
+  var rd     = document.getElementById('pq_rd').value;
+  var did    = document.getElementById('pq_did').value;
+  var iv     = document.getElementById('pq_iv').value;
+  var panel  = document.getElementById('pq_panel').value;
+  var binary = document.getElementById('pq_binary').value;
+
+  var box = document.getElementById('picker_result');
+
+  if (!goal) {
+    box.className = 'picker-result empty';
+    box.innerHTML = 'Answer the questions above to see a recommendation.';
+    return;
+  }
+
+  var method = '', why = '', caveat = '', chapter = '';
+
+  if (goal === 'descriptive') {
+    method = 'Descriptive analysis (summary statistics + OLS)';
+    why = 'You are not trying to estimate a causal effect, so your goal is to describe the data clearly and honestly. Lead with summary statistics, distributions, and visualizations. Use OLS to describe conditional associations, not to make causal claims.';
+    caveat = 'Be careful with language: words like "effect," "impact," and "causes" should be reserved for causal claims. Use "associated with" or "correlates with" instead.';
+    chapter = 'Chapters 2, 4, and 5';
+  } else if (rct === 'yes') {
+    method = 'Randomized Control Trial';
+    why = 'Randomization is the gold standard. The simple difference in means between treated and control is an unbiased estimate of the ATE. All you really need is a t-test and some robust standard errors.';
+    caveat = 'Watch for non-compliance (use intent-to-treat and IV), attrition, and spillovers between treated and control units. Document your balance table.';
+    chapter = 'Chapter 3';
+  } else if (rd === 'sharp') {
+    method = 'Regression Discontinuity (sharp)';
+    why = 'A deterministic rule based on a running variable creates an as-good-as-random comparison of units just above and just below the cutoff. Estimate with local-linear regression on a narrow bandwidth using rdrobust.';
+    caveat = 'Check for manipulation (McCrary-style density test), show the graph, try multiple bandwidths, and verify covariate balance at the cutoff.';
+    chapter = 'Chapter 15';
+  } else if (did === 'yes') {
+    method = 'Difference-in-Differences';
+    why = 'With treated and untreated units observed before and after a treatment event, you can subtract off the control-group trend. Start with a 2×2 DiD or TWFE; add an event study to diagnose pre-trends.';
+    caveat = 'Parallel trends is the identifying assumption: examine pre-trends, think hard about whether the control group is a good counterfactual, and cluster standard errors at the unit (or treatment) level.';
+    chapter = 'Chapters 12 and 13';
+  } else if (iv === 'yes') {
+    method = 'Instrumental Variables (2SLS)';
+    why = 'You have an instrument Z that shifts D but does not affect Y except through D. 2SLS isolates the exogenous variation in D and uses only that to estimate the effect on Y.';
+    caveat = 'Verify the first-stage F-statistic is well above 10. Defend the exclusion restriction with economic reasoning, not statistics. Your estimate is a LATE for compliers; state who those are.';
+    chapter = 'Chapter 14';
+  } else if (panel === 'yes') {
+    method = 'Panel Fixed Effects';
+    why = 'Panel data lets you compare each unit to itself over time, sweeping out all time-invariant characteristics. Include unit and time fixed effects and cluster SEs at the unit level.';
+    caveat = 'Fixed effects do NOT address reverse causality, time-varying unobserved confounders, or differential trends. This is usually a "best available" rather than "gold standard" design.';
+    chapter = 'Chapter 11';
+  } else {
+    method = 'Multivariate OLS with controls';
+    why = 'Without randomization, a natural experiment, a panel, or an instrument, the most you can do is control for observed confounders and interpret the result as a conditional association.';
+    caveat = 'Assumes conditional independence of potential outcomes given X. This is rarely credible for most policy-relevant questions. Be explicit about what you cannot rule out.';
+    chapter = 'Chapters 4 and 5';
+  }
+
+  if (binary === 'yes' && (method.indexOf('OLS') !== -1 || method.indexOf('Fixed Effects') !== -1)) {
+    caveat += ' Because your outcome is binary, consider reporting both a Linear Probability Model (for interpretation as percentage-point effects) and a logit specification (to bound predictions in [0,1]). See Chapter 10.';
+  }
+
+  box.className = 'picker-result';
+  box.innerHTML =
+    '<div class="rec-method">Recommendation: ' + method + '</div>' +
+    '<div class="rec-why">' + why + '</div>' +
+    '<div class="rec-caveat"><strong>Key caveat:</strong> ' + caveat + '</div>' +
+    '<div class="rec-link">Review: ' + chapter + '</div>';
+}
+</script>
+</section>
+<section id="reading-an-empirical-paper-a-checklist" class="level2" data-number="16.8">
+<h2 data-number="16.8" class="anchored" data-anchor-id="reading-an-empirical-paper-a-checklist"><span class="header-section-number">16.8</span> Reading an Empirical Paper: A Checklist</h2>
+<p>Once you know the methods, you can read empirical economics papers the way practitioners do. Every paper you read in the next few years should face this short interrogation:</p>
+<ol type="1">
+<li><strong>What is the estimand?</strong> ATE, ATT, LATE, intent-to-treat, or “local”? These are not interchangeable (<a href="rcts.html" class="quarto-xref"><span>Chapter 3</span></a>, <a href="instrumental_variables.html" class="quarto-xref"><span>Chapter 14</span></a>, <a href="rdd.html" class="quarto-xref"><span>Chapter 15</span></a>).</li>
+<li><strong>What is the research design?</strong> Where does the variation in D come from? If the paper does not have a clean answer, be skeptical of causal language.</li>
+<li><strong>What is the identifying assumption?</strong> Conditional independence? Parallel trends? Exclusion? Smoothness at a cutoff?</li>
+<li><strong>How does the paper defend that assumption?</strong> Balance tables, pre-trends, first-stage F, falsification tests, density tests, placebo cutoffs.</li>
+<li><strong>Are the standard errors appropriate?</strong> Heteroskedasticity-robust? Clustered? At what level?</li>
+<li><strong>Does the external validity match the policy question?</strong> An RD estimate at the cutoff may not speak to units far from it; a LATE for compliers may not be the ATT.</li>
+<li><strong>What is the <em>alternative</em> explanation the paper has not ruled out?</strong> If you cannot name one, either the paper is airtight or you are not reading carefully enough.</li>
+</ol>
+<p>This is not a gotcha list. These are the questions that working economists use when they referee papers, teach classes, and write their own.</p>
+</section>
+<section id="two-mini-case-studies-same-question-different-designs" class="level2" data-number="16.9">
+<h2 data-number="16.9" class="anchored" data-anchor-id="two-mini-case-studies-same-question-different-designs"><span class="header-section-number">16.9</span> Two Mini Case Studies: Same Question, Different Designs</h2>
+<p>To see how method choice drives conclusions, consider two case studies from the health economics literature we have touched on in prior chapters.</p>
+<section id="case-study-1-does-health-insurance-improve-health" class="level3" data-number="16.9.1">
+<h3 data-number="16.9.1" class="anchored" data-anchor-id="case-study-1-does-health-insurance-improve-health"><span class="header-section-number">16.9.1</span> Case Study 1: Does Health Insurance Improve Health?</h3>
+<p>We opened this book (<a href="intro.html" class="quarto-xref"><span>Chapter 1</span></a>) with this question. Here is how each method would attack it.</p>
+<ul>
+<li><strong>Naive OLS.</strong> Regress health outcomes on an insurance dummy. Positive, “significant,” and profoundly confounded by income, education, and employment. This is the textbook motivating example for why simple comparisons are not causal claims.</li>
+<li><strong>OLS with controls.</strong> Add income, education, age, gender. The estimated “effect” of insurance shrinks. We have handled the confounders we can measure—but what about risk aversion, health literacy, family support? These are unobserved and likely correlated with both insurance and health.</li>
+<li><strong>Panel FE.</strong> If we have longitudinal data, we can compare the same people before and after they gain coverage. Now time-invariant traits like long-run health habits are absorbed. But what about a health scare that simultaneously caused someone to buy insurance <em>and</em> caused a measurable change in their health? That is the time-varying confounder we can’t fix.</li>
+<li><strong>DiD.</strong> Exploit a policy: the Affordable Care Act’s Medicaid expansion gives us states that did and did not expand, before and after 2014. If parallel trends are credible, the expansion-vs-non-expansion change in health outcomes identifies the ATT (<a href="advanced_did.html" class="quarto-xref"><span>Chapter 13</span></a>).</li>
+<li><strong>RD.</strong> Oregon Medicaid had an income eligibility cutoff at various points; other Medicaid programs have sharp age cutoffs (e.g., Medicare at 65). Compare units just above and just below.</li>
+<li><strong>RCT.</strong> The Oregon Health Insurance Experiment (<a href="rcts.html" class="quarto-xref"><span>Chapter 3</span></a>) literally randomized insurance coverage via a lottery. This is the study that the other methods are trying to approximate.</li>
+</ul>
+<p>Each method gives a slightly different number, and each number answers a subtly different question. The OHIE’s LATE applies to low-income adults who complied with the lottery; a Medicaid expansion DiD applies to the marginal state-and-population; a Medicare RD estimate applies to people <em>at</em> age 65, who may respond differently from people at age 30. No one method settles the question. Taken together, they paint a picture.</p>
+</section>
+<section id="case-study-2-does-education-raise-wages" class="level3" data-number="16.9.2">
+<h3 data-number="16.9.2" class="anchored" data-anchor-id="case-study-2-does-education-raise-wages"><span class="header-section-number">16.9.2</span> Case Study 2: Does Education Raise Wages?</h3>
+<p>This is the running example throughout the OLS chapters.</p>
+<ul>
+<li><strong>Naive OLS.</strong> Wages regressed on years of schooling gives the “Mincer return,” historically around 8–10% per year. Credible as an association, but clearly confounded by unobserved ability.</li>
+<li><strong>OLS with controls.</strong> Add IQ proxies, parental education, test scores. The return falls, but “ability” is not fully observable, and nothing rules out reverse causality (current wage prospects might influence schooling choices).</li>
+<li><strong>Panel FE.</strong> Follow individuals over time. But education barely varies within a person once they are an adult: fixed effects don’t help much for a variable without within-unit variation.</li>
+<li><strong>DiD.</strong> Compulsory schooling laws change in one state but not another; compare cohorts exposed and not exposed before and after the law change.</li>
+<li><strong>IV.</strong> Quarter-of-birth (<span class="citation" data-cites="angrist_credibility_2010">Angrist and Pischke (<a href="references.html#ref-angrist_credibility_2010" role="doc-biblioref">2010</a>)</span>), distance to the nearest college (Card 1995), Vietnam-draft lottery numbers. Each instrument shifts education through institutional plumbing; each identifies a LATE for a different set of compliers.</li>
+<li><strong>RD.</strong> School-entry age cutoffs that alter years of completed schooling; admissions cutoffs at selective institutions.</li>
+<li><strong>RCT.</strong> Rare, but programs like Opportunity NYC, Perry Preschool, and various scholarship RCTs have randomized educational inputs.</li>
+</ul>
+<p>Notice that in both case studies, the methods are <em>not</em> substitutes—they are complements. A mature literature stitches together what each method can and cannot identify and reasons about the consistency of the estimates.</p>
+</section>
+</section>
+<section id="a-few-things-we-did-not-cover-and-where-they-fit" class="level2" data-number="16.10">
+<h2 data-number="16.10" class="anchored" data-anchor-id="a-few-things-we-did-not-cover-and-where-they-fit"><span class="header-section-number">16.10</span> A Few Things We Did Not Cover (And Where They Fit)</h2>
+<p>You have learned the workhorses of applied microeconometrics. Here is a brief map of where the more advanced material fits on the same ladder, for when you continue your econometrics training.</p>
+<ul>
+<li><strong>Synthetic control methods</strong> sit between DiD (<a href="did.html" class="quarto-xref"><span>Chapter 12</span></a>) and IV (<a href="instrumental_variables.html" class="quarto-xref"><span>Chapter 14</span></a>). They construct a data-driven control group as a weighted combination of untreated units. Used for case studies with one or few treated units, like California’s 1988 tobacco control law or the 1990 German reunification shock on East German growth.</li>
+<li><strong>Heterogeneous treatment effects</strong> generalize the idea that treatment effects vary across units. Modern estimators (Callaway-Sant’Anna, de Chaisemartin-D’Haultfoeuille, Borusyak-Jaravel-Spiess) extend DiD to staggered adoption settings, which we flagged as a danger in <a href="advanced_did.html" class="quarto-xref"><span>Chapter 13</span></a>.</li>
+<li><strong>Machine learning for causal inference</strong> (double ML, causal forests) automates flexible control selection on the OLS rung of the ladder. Powerful, but does not relieve you of the obligation to think about identification.</li>
+<li><strong>Matching and propensity-score methods</strong> are cousins of multivariate OLS with controls. IPW-DiD (<a href="advanced_did.html" class="quarto-xref"><span>Chapter 13</span></a>) was your introduction to this family.</li>
+<li><strong>Structural estimation</strong> writes down a full economic model, estimates its primitive parameters, and uses it to run counterfactual simulations. The strengths and weaknesses are the mirror image of the “reduced-form” methods in this book: enormous flexibility for policy simulation, but much more assumption-heavy.</li>
+<li><strong>Time-series econometrics</strong> (ARIMA, VAR, cointegration) is its own world, built for forecasting and for macroeconomic questions where there is one “unit” (a country) and many observations over time.</li>
+</ul>
+<p>You have, in other words, a strong foundation for almost any empirical economics class you will take next.</p>
+</section>
+<section id="questions-to-ask-yourself-before-running-a-regression" class="level2" data-number="16.11">
+<h2 data-number="16.11" class="anchored" data-anchor-id="questions-to-ask-yourself-before-running-a-regression"><span class="header-section-number">16.11</span> Questions to Ask Yourself Before Running a Regression</h2>
+<p>A compact field guide—useful when you are stuck on a problem set, starting an independent study, or facing a thesis adviser.</p>
+<ol type="1">
+<li>What is the <em>causal</em> question in plain English?</li>
+<li>What is the <em>dependent</em> variable and what is the <em>treatment</em> variable?</li>
+<li>What is my <em>data structure</em>? Cross-section, time-series, or panel? (<a href="intro.html" class="quarto-xref"><span>Chapter 1</span></a>)</li>
+<li>Where does the <em>variation</em> in treatment come from? Is it randomized, plausibly as-good-as-random, or neither?</li>
+<li>If it is neither, what is the <em>strongest</em> identification strategy I can honestly deploy (<a href="#fig-method-flowchart" class="quarto-xref">Figure&nbsp;<span>16.4</span></a>)?</li>
+<li>What is the <em>identifying assumption</em> I am making, and how will I defend it to a skeptic?</li>
+<li>What is the <em>estimand</em>? ATE, ATT, LATE, local-at-the-cutoff? Does it match the policy question?</li>
+<li>Are my <em>standard errors</em> appropriate (heteroskedasticity-robust? clustered?)?</li>
+<li>What <em>specification checks</em> will I run (pre-trends, bandwidth robustness, alternative controls, placebo outcomes, first-stage F)?</li>
+<li>What is the <em>one sentence</em> I could write in the abstract that honestly summarizes what I found and what I did not?</li>
+</ol>
+<p>If you cannot answer each of these, you are not yet ready to run the regression.</p>
+</section>
+<section id="summary" class="level2" data-number="16.12">
+<h2 data-number="16.12" class="anchored" data-anchor-id="summary"><span class="header-section-number">16.12</span> Summary</h2>
+<p>This chapter pulled together the whole semester. A few ideas are worth holding onto when you forget the rest.</p>
+<ul>
+<li>Every method in the book is a strategy for approximating the randomized control trial we usually cannot run.</li>
+<li>The choice of method is the choice of <em>which assumption about unobservables you are willing to make.</em></li>
+<li>There is no universally “best” method. There is only the best method <em>for your question and your data.</em></li>
+<li>A research design is a credible argument—not a technique. OLS can be the most credible tool in the room if paired with a strong design, and the least credible tool in the room if paired with a weak one.</li>
+<li>Robust, appropriately-clustered standard errors are a professional minimum. Write them into your code the way you write <code>library(tidyverse)</code>.</li>
+<li>Read empirical papers with the identification question first, the methods second, and the numbers last.</li>
+<li>Your first step in a new project is <em>not</em> to run a regression. Your first step is to ask: “Where does the variation in my treatment come from?” Most of applied economics is that question in costume.</li>
+</ul>
+</section>
+<section id="check-your-understanding" class="level2" data-number="16.13">
+<h2 data-number="16.13" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">16.13</span> Check Your Understanding</h2>
+<p>For each question below, select the best answer from the dropdown menu. The dropdown will turn green if correct and red if incorrect. Click the “Show Explanation” toggle to see a full explanation of each answer after attempting.</p>
+<div class="question">
+<div class="answer-row">
+    <label>i. What is the "fundamental problem of causal inference" that motivates every method in this book? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Sample sizes are usually too small</option>
+        <option value="b">Economists disagree about theory</option>
+        <option value="c">For each unit, we observe only one of its potential outcomes, so the individual causal effect is never directly observable</option>
+        <option value="d">Data are often missing at random</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>ii. A researcher collects cross-sectional data on wages and schooling, controls for age and experience, and reports the OLS coefficient on years of schooling as "the causal return to education." What is the most important thing missing from this claim? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The R-squared should be reported</option>
+        <option value="b">A defense of the assumption that unobserved ability, motivation, and family background are uncorrelated with schooling once age and experience are controlled for</option>
+        <option value="c">Robust standard errors</option>
+        <option value="d">A log transformation of wages</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iii. You want to estimate the causal effect of a state Medicaid expansion on low-income adults' health outcomes. You have annual data on all 50 states from 2010--2022, with some states expanding in 2014 and others never expanding. Which method is the most natural starting point? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Bivariate OLS</option>
+        <option value="b">Logit model</option>
+        <option value="c">Difference-in-Differences with two-way fixed effects and cluster-robust SEs at the state level</option>
+        <option value="d">Regression discontinuity</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iv. The Social Security retirement earnings test is applied to workers over age 62. You want to study how the test affects labor supply. You have cross-sectional earnings data with workers' exact ages. Which method is most appropriate? </label>
+    <select onchange="checkAnswer(this, 'a')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Regression discontinuity using age 62 as the cutoff</option>
+        <option value="b">Multivariate OLS controlling for age</option>
+        <option value="c">Instrumental variables using gender as an instrument</option>
+        <option value="d">Fixed effects</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>v. A colleague claims, "We can't use DiD here because the treated and control groups have different <em>levels</em> of the outcome in the pre-period." Is this a fatal objection? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Yes, DiD requires identical pre-treatment levels</option>
+        <option value="b">No: DiD requires parallel trends, not identical levels. Different levels are fine; the difference in differences removes the level gap</option>
+        <option value="c">Yes, but only if the differences are statistically significant</option>
+        <option value="d">The colleague's objection is correct only for logistic models</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>vi. You run a 2SLS regression and the first-stage F-statistic is 3.5. What should you do? </label>
+    <select onchange="checkAnswer(this, 'd')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Report the 2SLS estimate and move on</option>
+        <option value="b">Use the reduced form only, since the first stage is irrelevant</option>
+        <option value="c">Conclude the exclusion restriction is violated</option>
+        <option value="d">Worry: the instrument is weak, and 2SLS estimates can be severely biased with weak instruments. Consider a stronger instrument or report both 2SLS and weak-instrument-robust inference</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>vii. You are studying the effect of a scholarship program. Recipients were chosen by a randomly-drawn lottery. Only 62% of lottery winners actually enroll. What estimand does a simple OLS regression of outcomes on lottery-winning status identify? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The average treatment effect (ATE) of enrolling in the scholarship</option>
+        <option value="b">The intent-to-treat (ITT) effect of being offered the scholarship, which differs from the effect of actually enrolling</option>
+        <option value="c">The local average treatment effect at the running-variable cutoff</option>
+        <option value="d">A biased estimate that cannot be interpreted</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>viii. A student runs an OLS regression with a dummy for "received job training" and finds a large positive coefficient on wages. They add fixed effects for industry, occupation, and education, and the coefficient shrinks by half. They conclude: "Half the effect of training is real, and half was confounded by sorting." Is this a sound interpretation? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Yes, this is exactly what multivariate OLS identifies</option>
+        <option value="b">No: the shrinkage is evidence that training actually hurts wages</option>
+        <option value="c">The shrinkage is consistent with the student's interpretation but does not prove it---there may still be unobserved factors (motivation, aptitude) correlated with both training and wages that are not in the controls</option>
+        <option value="d">The shrinkage has no economic meaning</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>ix. <b>(Challenge)</b> Consider two strategies for estimating the effect of community college attendance on wages. Strategy A uses distance to the nearest community college as an instrument in a 2SLS regression. Strategy B uses a sharp RD design based on a minimum-GPA cutoff for automatic admission. Which statement about these designs is most accurate? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The two designs identify the same treatment effect under the same assumptions</option>
+        <option value="b">The two designs identify different local average treatment effects---Strategy A for students whose attendance is swayed by nearness, Strategy B for students near the GPA cutoff---and each rests on a different untestable assumption (exclusion vs. smoothness)</option>
+        <option value="c">Only Strategy A produces a causal estimate</option>
+        <option value="d">Only Strategy B produces a causal estimate</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>x. <b>(Challenge)</b> A researcher estimates a TWFE regression of policy outcomes with a treatment variable turned on at different times in different units (staggered adoption). What is the most serious threat to interpreting the TWFE coefficient as a simple ATT? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Heteroskedasticity</option>
+        <option value="b">The treatment is not binary</option>
+        <option value="c">With heterogeneous treatment effects and staggered adoption, TWFE implicitly uses already-treated units as controls for not-yet-treated units. This can yield estimates that don't correspond to any well-defined average treatment effect; modern heterogeneous-effects estimators avoid this</option>
+        <option value="d">TWFE cannot handle unbalanced panels</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>xi. <b>(Challenge)</b> You fit a logistic regression and report an odds ratio of 1.8 for a binary predictor. Your reviewer asks "What is the marginal effect on the probability?" What is the most honest answer? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Marginal effect is always 0.8</option>
+        <option value="b">The odds ratio equals the marginal effect in probability</option>
+        <option value="c">The marginal effect depends on where in the distribution of covariates you evaluate it; common choices are the average marginal effect across observations, or the marginal effect at the mean. Report the corresponding number from your statistical software</option>
+        <option value="d">Marginal effects cannot be computed from logistic regression</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>xii. <b>(Challenge)</b> Which of the following is the single most defensible statement about method choice in applied econometrics? </label>
+    <select onchange="checkAnswer(this, 'd')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">RCTs are always better than observational methods</option>
+        <option value="b">2SLS is always better than OLS</option>
+        <option value="c">More complex methods produce more credible estimates</option>
+        <option value="d">The best method is the one that produces the most credible approximation to the counterfactual, given the research setting---and the research design, not the technique, is what ultimately makes an estimate credible</option>
+    </select>
+</div>
+
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show Explanation
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="i">
+<li><p>For each unit <span class="math inline">\(i\)</span>, we imagine two potential outcomes: <span class="math inline">\(Y_{1i}\)</span> under treatment and <span class="math inline">\(Y_{0i}\)</span> under control. The individual causal effect is <span class="math inline">\(\kappa_i = Y_{1i} - Y_{0i}\)</span>, but we can only observe <em>one</em> of these two quantities—whichever corresponds to the unit’s actual treatment status. This is the fundamental problem introduced in <a href="rcts.html" class="quarto-xref"><span>Chapter 3</span></a> and implicitly underlies every method we have covered. Causal inference is, at heart, the challenge of filling in the missing potential outcome.</p></li>
+<li><p>The problem with the stated claim is not statistical—it is identification-based. Without an argument that unobserved characteristics correlated with both schooling and wages have been accounted for (ability, family background, motivation), the coefficient is a conditional association, not a causal effect. The <a href="multivariate_ols.html" class="quarto-xref"><span>Chapter 5</span></a> OVB formula tells us the direction of the bias (<span class="math inline">\(\beta_2 \cdot \tilde{\delta}_1\)</span>), and reasonable guesses about the sign of each term suggest OLS overstates the true return.</p></li>
+<li><p>This is the textbook DiD setup: treated units (expansion states) and control units (non-expansion states), with pre-treatment and post-treatment observations. A TWFE regression of outcomes on a treatment indicator that turns on at adoption, with state and year fixed effects, identifies the ATT under parallel trends (<a href="did.html" class="quarto-xref"><span>Chapter 12</span></a>). Cluster-robust SEs at the state level are essential (<a href="advanced_did.html" class="quarto-xref"><span>Chapter 13</span></a>). This also illustrates why staggered adoption deserves modern heterogeneous-effects estimators, but standard TWFE is the normal starting point.</p></li>
+<li><p>The earnings test switches on at exactly age 62—a textbook sharp RD setup (<a href="rdd.html" class="quarto-xref"><span>Chapter 15</span></a>). Units just under 62 and just over 62 should be nearly identical in every respect other than their test status. Multivariate OLS controlling for age would impose a smooth relationship and might mask the jump; IV with gender is inappropriate because gender fails exclusion; FE requires panel data.</p></li>
+<li><p>Parallel trends is about the <em>slopes</em> of the pre-period outcomes, not their levels. Different levels are perfectly fine—indeed, they are the norm—because the first difference (change) strips out the level, and the second difference (DiD) strips out anything common to both groups. The relevant question is whether the change in the treated group’s outcome absent treatment would have equaled the change in the control group’s. This is the parallel trends assumption (<a href="did.html" class="quarto-xref"><span>Chapter 12</span></a>).</p></li>
+<li><p>The rule-of-thumb threshold for first-stage F is 10; 3.5 is far below, indicating a weak instrument (<a href="instrumental_variables.html" class="quarto-xref"><span>Chapter 14</span></a>). With weak instruments, 2SLS estimates can be severely biased toward OLS, and standard-error calculations are unreliable. The serious response is to look for a stronger instrument, use weak-instrument-robust inference (e.g., Anderson-Rubin), or honestly report the limitation. Dropping the first-stage check and reporting the 2SLS number as-is is the characteristic sin of beginner IV papers.</p></li>
+<li><p>Under non-compliance, regressing the outcome on <em>treatment assignment</em> (offer, lottery-winning status) identifies the intent-to-treat (ITT) effect. This is valid and interpretable, but it is not the ATE of actually enrolling. To recover the effect of enrolling on those who comply, use treatment assignment as an instrument for actual enrollment: this 2SLS estimate is the LATE for compliers (<a href="instrumental_variables.html" class="quarto-xref"><span>Chapter 14</span></a>). This is exactly the analytical strategy used in the Oregon Health Insurance Experiment (<a href="rcts.html" class="quarto-xref"><span>Chapter 3</span></a>).</p></li>
+<li><p>This is a common interpretational trap. A coefficient that shrinks when you add controls is <em>consistent with</em> a story of partial confounding, but it does not <em>prove</em> that the remaining half is causal. There could still be unobserved factors (risk tolerance, family structure, long-term plans) that correlate with training and wages, and those factors are not captured by industry, occupation, or education dummies. The OVB formula (<a href="multivariate_ols.html" class="quarto-xref"><span>Chapter 5</span></a>) is neutral about sign without structure, and without a research design that handles unobservables, the remaining coefficient is still an association.</p></li>
+<li><p>Both designs are valid causal-inference strategies but they identify <em>different</em> LATEs. Strategy A (distance IV) identifies the effect on students whose attendance decision is shifted by proximity—probably a less-advantaged, rural-leaning subpopulation. Strategy B (GPA RD) identifies the effect for students <em>at</em> the GPA cutoff, who are the marginal applicants. The assumptions also differ: IV rests on exclusion (distance affects wages only through attendance), RD rests on smoothness at the cutoff. There is no strictly better design; each answers a different empirical question (<a href="instrumental_variables.html" class="quarto-xref"><span>Chapter 14</span></a>, <a href="rdd.html" class="quarto-xref"><span>Chapter 15</span></a>).</p></li>
+<li><p>This is the staggered-adoption problem flagged in <a href="advanced_did.html" class="quarto-xref"><span>Chapter 13</span></a>. In a TWFE regression with staggered treatment timing and heterogeneous effects, the coefficient can be a weighted combination of comparisons where already-treated units serve as controls for not-yet-treated ones, and the weights can even be negative. Under homogeneous effects this does not matter, but under heterogeneous effects the TWFE coefficient may not correspond to any well-defined ATT. Modern estimators (Callaway-Sant’Anna, de Chaisemartin-D’Haultfoeuille, Borusyak et al.) avoid the contamination but are beyond the scope of this course.</p></li>
+<li><p>Odds ratios and marginal effects are different quantities; neither equals the other in general (<a href="binary_outcomes.html" class="quarto-xref"><span>Chapter 10</span></a>). The marginal effect on the probability depends on where in the <span class="math inline">\(X\)</span>-space you evaluate it, because the logistic function is nonlinear. Two conventions are standard: the average marginal effect (AME), averaged across every observation in your sample, and the marginal effect at the mean (MEM), evaluated at the sample mean covariate vector. Statistical software (<code>margins</code> in R, <code>margins</code> in Stata) computes both. This is also a reason many applied economists default to the LPM for interpretability, accepting that predictions can fall outside [0,1].</p></li>
+<li><p>The whole point of this chapter is that the best method is the one whose assumptions are most credible in your setting. An OLS with a brilliant identification strategy (matching, good controls, or zero variation in unobservables) can be more credible than a mechanical 2SLS with a weak instrument. A simple DiD with credible parallel trends can outperform a sophisticated structural model with dubious exclusion restrictions. The technique is not the argument; the research design is.</p></li>
+</ol>
+</div>
+</div>
+</div>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
+<div id="ref-angrist_credibility_2010" class="csl-entry" role="listitem">
+Angrist, Joshua D., and Jörn-Steffen Pischke. 2010. <span>“The Credibility Revolution in Empirical Economics: How Better Research Design Is Taking the Con Out of Econometrics.”</span> <em>Journal of Economic Perspectives</em> 24 (2): 3–30. <a href="https://doi.org/10.1257/jep.24.2.3">https://doi.org/10.1257/jep.24.2.3</a>.
+</div>
+<div id="ref-angrist_mastering_2014" class="csl-entry" role="listitem">
+Angrist, Joshua D., and Jörn-Steffen Pischke. 2014. <em>Mastering ’Metrics: The Path from Cause to Effect</em>. Princeton University Press.
+</div>
+<div id="ref-bailey_real_2020" class="csl-entry" role="listitem">
+Bailey, Michael A. 2020. <em>Real Econometrics: The Right Tools to Answer Important Questions</em>. Oxford University Press.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/rdd.html" class="pagination-link" aria-label="Regression Discontinuity">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Regression Discontinuity</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/references.html" class="pagination-link" aria-label="References">
+        <span class="nav-page-text">References</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p><span class="faux-block"> © 2025-2026 Raymond Caraher. All rights reserved. </span></p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

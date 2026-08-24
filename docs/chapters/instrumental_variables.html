@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.36">
+<meta name="generator" content="quarto-1.9.37">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -58,7 +58,26 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -68,7 +87,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../chapters/references.html" rel="next">
+<link href="../chapters/rdd.html" rel="next">
 <link href="../chapters/advanced_did.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
@@ -76,7 +95,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../site_libs/bootstrap/bootstrap-5ccb035bea26c1e21f80f44cf7c27909.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -285,6 +304,18 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../chapters/rdd.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Regression Discontinuity</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/putting_it_all_together.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Putting It All Together</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../chapters/references.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">References</span></a>
   </div>
@@ -337,21 +368,20 @@ window.Quarto = {
   <li><a href="#the-fundamental-problem-endogeneity" id="toc-the-fundamental-problem-endogeneity" class="nav-link active" data-scroll-target="#the-fundamental-problem-endogeneity"><span class="header-section-number">14.1</span> The Fundamental Problem: Endogeneity</a>
   <ul class="collapse">
   <li><a href="#when-ols-fails" id="toc-when-ols-fails" class="nav-link" data-scroll-target="#when-ols-fails"><span class="header-section-number">14.1.1</span> When OLS Fails</a></li>
-  <li><a href="#formalizing-the-problem" id="toc-formalizing-the-problem" class="nav-link" data-scroll-target="#formalizing-the-problem"><span class="header-section-number">14.1.2</span> Formalizing the Problem</a></li>
   </ul></li>
   <li><a href="#the-instrumental-variables-solution" id="toc-the-instrumental-variables-solution" class="nav-link" data-scroll-target="#the-instrumental-variables-solution"><span class="header-section-number">14.2</span> The Instrumental Variables Solution</a>
   <ul class="collapse">
-  <li><a href="#the-key-insight" id="toc-the-key-insight" class="nav-link" data-scroll-target="#the-key-insight"><span class="header-section-number">14.2.1</span> The Key Insight</a></li>
+  <li><a href="#endogenous-vs.-exogenous-variation" id="toc-endogenous-vs.-exogenous-variation" class="nav-link" data-scroll-target="#endogenous-vs.-exogenous-variation"><span class="header-section-number">14.2.1</span> Endogenous vs.&nbsp;Exogenous Variation</a></li>
   <li><a href="#two-requirements-for-a-valid-instrument" id="toc-two-requirements-for-a-valid-instrument" class="nav-link" data-scroll-target="#two-requirements-for-a-valid-instrument"><span class="header-section-number">14.2.2</span> Two Requirements for a Valid Instrument</a></li>
-  <li><a href="#graphical-intuition" id="toc-graphical-intuition" class="nav-link" data-scroll-target="#graphical-intuition"><span class="header-section-number">14.2.3</span> Graphical Intuition</a></li>
+  <li><a href="#a-running-example-fertility-and-maternal-labor-supply" id="toc-a-running-example-fertility-and-maternal-labor-supply" class="nav-link" data-scroll-target="#a-running-example-fertility-and-maternal-labor-supply"><span class="header-section-number">14.2.3</span> A Running Example: Fertility and Maternal Labor Supply</a></li>
+  <li><a href="#graphical-intuition" id="toc-graphical-intuition" class="nav-link" data-scroll-target="#graphical-intuition"><span class="header-section-number">14.2.4</span> Graphical Intuition</a></li>
+  <li><a href="#why-this-lets-us-recover-the-causal-effect" id="toc-why-this-lets-us-recover-the-causal-effect" class="nav-link" data-scroll-target="#why-this-lets-us-recover-the-causal-effect"><span class="header-section-number">14.2.5</span> Why this lets us recover the causal effect</a></li>
   </ul></li>
-  <li><a href="#application-fertility-and-labor-supply" id="toc-application-fertility-and-labor-supply" class="nav-link" data-scroll-target="#application-fertility-and-labor-supply"><span class="header-section-number">14.3</span> Application: Fertility and Labor Supply</a>
+  <li><a href="#estimating-iv" id="toc-estimating-iv" class="nav-link" data-scroll-target="#estimating-iv"><span class="header-section-number">14.3</span> Estimating IV</a>
   <ul class="collapse">
-  <li><a href="#the-research-question" id="toc-the-research-question" class="nav-link" data-scroll-target="#the-research-question"><span class="header-section-number">14.3.1</span> The Research Question</a></li>
-  <li><a href="#the-angrist-and-evans-1998-instrument" id="toc-the-angrist-and-evans-1998-instrument" class="nav-link" data-scroll-target="#the-angrist-and-evans-1998-instrument"><span class="header-section-number">14.3.2</span> The Angrist and Evans (1998) Instrument</a></li>
-  <li><a href="#simulating-the-angrist-evans-setup" id="toc-simulating-the-angrist-evans-setup" class="nav-link" data-scroll-target="#simulating-the-angrist-evans-setup"><span class="header-section-number">14.3.3</span> Simulating the Angrist-Evans Setup</a></li>
-  <li><a href="#testing-the-relevance-condition" id="toc-testing-the-relevance-condition" class="nav-link" data-scroll-target="#testing-the-relevance-condition"><span class="header-section-number">14.3.4</span> Testing the Relevance Condition</a></li>
-  <li><a href="#testing-excludability-sort-of" id="toc-testing-excludability-sort-of" class="nav-link" data-scroll-target="#testing-excludability-sort-of"><span class="header-section-number">14.3.5</span> Testing Excludability (Sort of)</a></li>
+  <li><a href="#simulating-the-angrist-evans-setup" id="toc-simulating-the-angrist-evans-setup" class="nav-link" data-scroll-target="#simulating-the-angrist-evans-setup"><span class="header-section-number">14.3.1</span> Simulating the Angrist-Evans Setup</a></li>
+  <li><a href="#testing-the-relevance-condition" id="toc-testing-the-relevance-condition" class="nav-link" data-scroll-target="#testing-the-relevance-condition"><span class="header-section-number">14.3.2</span> Testing the Relevance Condition</a></li>
+  <li><a href="#testing-excludability-sort-of" id="toc-testing-excludability-sort-of" class="nav-link" data-scroll-target="#testing-excludability-sort-of"><span class="header-section-number">14.3.3</span> Testing Excludability (Sort of)</a></li>
   </ul></li>
   <li><a href="#two-stage-least-squares-2sls" id="toc-two-stage-least-squares-2sls" class="nav-link" data-scroll-target="#two-stage-least-squares-2sls"><span class="header-section-number">14.4</span> Two-Stage Least Squares (2SLS)</a>
   <ul class="collapse">
@@ -364,7 +394,7 @@ window.Quarto = {
   <li><a href="#testing-for-weak-instruments" id="toc-testing-for-weak-instruments" class="nav-link" data-scroll-target="#testing-for-weak-instruments"><span class="header-section-number">14.5</span> Testing for Weak Instruments</a>
   <ul class="collapse">
   <li><a href="#the-weak-instrument-problem" id="toc-the-weak-instrument-problem" class="nav-link" data-scroll-target="#the-weak-instrument-problem"><span class="header-section-number">14.5.1</span> The Weak Instrument Problem</a></li>
-  <li><a href="#the-f-test-rule-of-thumb" id="toc-the-f-test-rule-of-thumb" class="nav-link" data-scroll-target="#the-f-test-rule-of-thumb"><span class="header-section-number">14.5.2</span> The F-Test Rule of Thumb</a></li>
+  <li><a href="#the-first-stage-f-test" id="toc-the-first-stage-f-test" class="nav-link" data-scroll-target="#the-first-stage-f-test"><span class="header-section-number">14.5.2</span> The First-Stage F-Test</a></li>
   <li><a href="#what-happens-with-a-weak-instrument" id="toc-what-happens-with-a-weak-instrument" class="nav-link" data-scroll-target="#what-happens-with-a-weak-instrument"><span class="header-section-number">14.5.3</span> What Happens with a Weak Instrument?</a></li>
   </ul></li>
   <li><a href="#what-does-iv-estimate-the-late" id="toc-what-does-iv-estimate-the-late" class="nav-link" data-scroll-target="#what-does-iv-estimate-the-late"><span class="header-section-number">14.6</span> What Does IV Estimate? The LATE</a>
@@ -377,6 +407,9 @@ window.Quarto = {
   <li><a href="#classic-iv-applications" id="toc-classic-iv-applications" class="nav-link" data-scroll-target="#classic-iv-applications"><span class="header-section-number">14.7</span> Classic IV Applications</a>
   <ul class="collapse">
   <li><a href="#example-card-1995---returns-to-education" id="toc-example-card-1995---returns-to-education" class="nav-link" data-scroll-target="#example-card-1995---returns-to-education"><span class="header-section-number">14.7.1</span> Example: Card (1995) - Returns to Education</a></li>
+  <li><a href="#example-acemoglu-johnson-robinson-2001---institutions-and-growth" id="toc-example-acemoglu-johnson-robinson-2001---institutions-and-growth" class="nav-link" data-scroll-target="#example-acemoglu-johnson-robinson-2001---institutions-and-growth"><span class="header-section-number">14.7.2</span> Example: Acemoglu, Johnson, &amp; Robinson (2001) - Institutions and Growth</a></li>
+  <li><a href="#example-levitt-1997---police-and-crime" id="toc-example-levitt-1997---police-and-crime" class="nav-link" data-scroll-target="#example-levitt-1997---police-and-crime"><span class="header-section-number">14.7.3</span> Example: Levitt (1997) - Police and Crime</a></li>
+  <li><a href="#example-angrist-krueger-1991---quarter-of-birth" id="toc-example-angrist-krueger-1991---quarter-of-birth" class="nav-link" data-scroll-target="#example-angrist-krueger-1991---quarter-of-birth"><span class="header-section-number">14.7.4</span> Example: Angrist &amp; Krueger (1991) - Quarter of Birth</a></li>
   </ul></li>
   <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">14.8</span> Summary</a></li>
   <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">14.9</span> Check Your Understanding</a></li>
@@ -535,30 +568,25 @@ function checkAnswer(selectElement, correctValue) {
 <p>Recall that OLS provides unbiased estimates when the zero conditional mean assumption holds: <span class="math inline">\(E[\mu | X] = 0\)</span>. When this assumption fails—when <span class="math inline">\(X\)</span> is correlated with the error term—we say <span class="math inline">\(X\)</span> is <strong>endogenous</strong>, and OLS is biased.</p>
 <p>Endogeneity arises from three main sources:</p>
 <p><strong>1. Omitted Variable Bias</strong></p>
-<p>We want to estimate the effect of education on wages, but ability affects both education choices and wages. Since we can’t measure ability, it’s absorbed into the error term, biasing our estimate.</p>
+<p>We spent a lot of time discussing this in <a href="multivariate_ols.html" class="quarto-xref"><span>Chapter 5</span></a>. We want to estimate the effect of education on wages, but ability affects both education choices and wages. Since we can’t measure ability, it’s absorbed into the error term, biasing our estimate.</p>
 <p><strong>2. Selection Bias</strong></p>
 <p>We want to estimate the effect of health insurance on health outcomes, but healthier people are more likely to purchase insurance. Health status drives insurance decisions, contaminating our comparison.</p>
 <p><strong>3. Reverse Causality</strong></p>
 <p>We want to estimate the effect of police on crime, but high-crime areas get more police deployed. The causation runs both ways, making it impossible to isolate the effect of policing.</p>
-</section>
-<section id="formalizing-the-problem" class="level3" data-number="14.1.2">
-<h3 data-number="14.1.2" class="anchored" data-anchor-id="formalizing-the-problem"><span class="header-section-number">14.1.2</span> Formalizing the Problem</h3>
-<p>Suppose we want to estimate:</p>
-<p><span class="math display">\[
-y = \beta_0 + \beta_1 x + \mu
-\]</span></p>
-<p>When <span class="math inline">\(E[\mu | x] \neq 0\)</span>, the variable <span class="math inline">\(x\)</span> is <strong>endogenous</strong>. OLS will be biased and inconsistent—no matter how large our sample, we won’t converge to the true <span class="math inline">\(\beta_1\)</span>.</p>
-<p>We cannot interpret the OLS coefficient as a causal effect.</p>
+<p>If we have any of these problems in our regression, we cannot interpret the OLS coefficient as a causal effect.</p>
 </section>
 </section>
 <section id="the-instrumental-variables-solution" class="level2" data-number="14.2">
 <h2 data-number="14.2" class="anchored" data-anchor-id="the-instrumental-variables-solution"><span class="header-section-number">14.2</span> The Instrumental Variables Solution</h2>
-<section id="the-key-insight" class="level3" data-number="14.2.1">
-<h3 data-number="14.2.1" class="anchored" data-anchor-id="the-key-insight"><span class="header-section-number">14.2.1</span> The Key Insight</h3>
-<p>The IV approach finds a variable <span class="math inline">\(Z\)</span> that “shakes up” <span class="math inline">\(X\)</span> in a way that’s unrelated to the error term. Think of it as finding a source of <strong>exogenous variation</strong> in <span class="math inline">\(X\)</span>—variation that comes from outside the system and isn’t contaminated by the factors causing endogeneity.</p>
+<section id="endogenous-vs.-exogenous-variation" class="level3" data-number="14.2.1">
+<h3 data-number="14.2.1" class="anchored" data-anchor-id="endogenous-vs.-exogenous-variation"><span class="header-section-number">14.2.1</span> Endogenous vs.&nbsp;Exogenous Variation</h3>
+<p>If we are worried that our OLS estimate is biased, and that our independent variable <span class="math inline">\(X\)</span> is <strong>endogenous</strong>, then we have a problem.</p>
+<p>The IV solution is to try to find an <strong>exogenous</strong> source of variation in <span class="math inline">\(X\)</span>, which we can then use to learn about the causal effect of <span class="math inline">\(X\)</span> on <span class="math inline">\(y\)</span>.</p>
+<p>In other words, the IV approach finds a variable <span class="math inline">\(Z\)</span>, the <em>instrument</em>, that “shakes up” <span class="math inline">\(X\)</span> in a way that’s unrelated to the error term. Think of it as finding a source of <strong>exogenous variation</strong> in <span class="math inline">\(X\)</span>—variation that comes from outside the system and isn’t contaminated by the factors causing endogeneity.</p>
 </section>
 <section id="two-requirements-for-a-valid-instrument" class="level3" data-number="14.2.2">
 <h3 data-number="14.2.2" class="anchored" data-anchor-id="two-requirements-for-a-valid-instrument"><span class="header-section-number">14.2.2</span> Two Requirements for a Valid Instrument</h3>
+<p>So how do we find a variable <span class="math inline">\(Z\)</span> that would work as our instrument?</p>
 <p>For <span class="math inline">\(Z\)</span> to be a valid instrument, it must satisfy two conditions:</p>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -576,16 +604,34 @@ y = \beta_0 + \beta_1 x + \mu
 <p>The instrument affects <span class="math inline">\(Y\)</span> <strong>only through</strong> <span class="math inline">\(X\)</span>. There is no direct effect of <span class="math inline">\(Z\)</span> on <span class="math inline">\(Y\)</span>. This is <strong>not directly testable</strong>—it requires economic reasoning and assumption.</p>
 </div>
 </div>
+<p>If either of these requirements fails, then our instrument <span class="math inline">\(Z\)</span> does not successfully isolate the exogenous variation in <span class="math inline">\(X\)</span>, and our IV estimate will still be partially contaminated by the same bias OLS suffers from.</p>
 </section>
-<section id="graphical-intuition" class="level3" data-number="14.2.3">
-<h3 data-number="14.2.3" class="anchored" data-anchor-id="graphical-intuition"><span class="header-section-number">14.2.3</span> Graphical Intuition</h3>
-<p>The IV strategy can be visualized as a causal diagram:</p>
+<section id="a-running-example-fertility-and-maternal-labor-supply" class="level3" data-number="14.2.3">
+<h3 data-number="14.2.3" class="anchored" data-anchor-id="a-running-example-fertility-and-maternal-labor-supply"><span class="header-section-number">14.2.3</span> A Running Example: Fertility and Maternal Labor Supply</h3>
+<p>Abstract letters are a lot easier to swallow when they are pinned to a real study, so before we draw the diagram, let’s introduce the empirical application we will keep coming back to.</p>
+<p><strong>The research question.</strong> What is the causal effect of having an additional child on a mother’s labor force participation? This is a first-order question for understanding the gender wage gap, designing parental leave policy, and evaluating childcare subsidies. But we obviously cannot randomize fertility, and the decision to have children is deeply endogenous:</p>
+<ul>
+<li><strong>Reverse causality:</strong> women may time fertility around their careers.</li>
+<li><strong>Selection:</strong> women who are less career-oriented may choose larger families.</li>
+<li><strong>Omitted variables:</strong> unobserved preferences drive both fertility <em>and</em> work.</li>
+</ul>
+<p>Regressing a mother’s employment on her number of children by OLS tangles all of these forces together with the causal effect we actually want.</p>
+<p><span class="citation" data-cites="angrist_children_1998">Angrist and Evans (<a href="references.html#ref-angrist_children_1998" role="doc-biblioref">1998</a>)</span> found a clever instrument for fertility: the <strong>sex composition of the first two children</strong>. The idea is that parents tend to prefer a mix of sexes among their children. Families whose first two children are the <em>same</em> sex (i.e., two boys or two girls) are more likely to try for a third child to “get” the other sex than families whose first two children are already one of each. Since the assigned sex at birth of a child is essentially biological chance, having same-sex versus mixed-sex first two children is essentially random.</p>
+<p>Translating this study into the language of the two IV assumptions:</p>
+<ul>
+<li><strong>Relevance</strong> (<span class="math inline">\(\text{Cov}(Z, X) \neq 0\)</span>): parents of same-sex siblings (<span class="math inline">\(Z\)</span>) are measurably more likely to have a third child (<span class="math inline">\(X\)</span>). This is an empirical fact we can (and will) verify in the data.</li>
+<li><strong>Exclusion</strong> (<span class="math inline">\(\text{Cov}(Z, \mu) = 0\)</span>): the sex mix of a woman’s first two children (<span class="math inline">\(Z\)</span>) is plausibly uncorrelated with her unobserved career orientation, her husband’s earnings, or anything else that would shape her labor supply (<span class="math inline">\(\mu\)</span>) <em>except through</em> its effect on fertility (<span class="math inline">\(X\)</span>).</li>
+</ul>
+</section>
+<section id="graphical-intuition" class="level3" data-number="14.2.4">
+<h3 data-number="14.2.4" class="anchored" data-anchor-id="graphical-intuition"><span class="header-section-number">14.2.4</span> Graphical Intuition</h3>
+<p>The cleanest way to see <em>why</em> IV works is with a <strong>causal diagram</strong> (a <em>directed acyclic graph</em>, or DAG). A DAG represents variables as nodes and causal relationships as arrows. <a href="#fig-iv-dag" class="quarto-xref">Figure&nbsp;<span>14.1</span></a> maps the four ingredients of the Angrist-Evans design onto the four generic roles every IV application has: an instrument <span class="math inline">\(Z\)</span> (here, same-sex first two children), an endogenous treatment <span class="math inline">\(X\)</span> (here, having a third child), an outcome <span class="math inline">\(Y\)</span> (here, the mother’s labor force participation), and a set of unobserved confounders <span class="math inline">\(\mu\)</span> (here, career orientation and similar preferences).</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-iv-dag" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-iv-dag-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;14.1: The instrumental variables strategy. Z affects Y only through X (exclusion restriction), while unobservables (μ) affect both X and Y, creating endogeneity.
+Figure&nbsp;14.1: The instrumental variables DAG. Solid blue arrows trace the identified pathway: Z moves X (the first stage), and X causes Y (the effect we want). Dashed red arrows show the confounding pathway from unobservables (μ) that makes X endogenous in the first place. The crossed-out gray arrow marks the <em>exclusion restriction</em>: Z must have no direct effect on Y. IV recovers β by isolating the movement in X that can be traced back to Z.
 </figcaption>
 <div aria-describedby="fig-iv-dag-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="instrumental_variables_files/figure-html/fig-iv-dag-1.png" class="img-fluid figure-img" width="672">
@@ -594,57 +640,72 @@ Figure&nbsp;14.1: The instrumental variables strategy. Z affects Y only through 
 </div>
 </div>
 </div>
-<p>The key insight: <span class="math inline">\(X\)</span> has two types of variation—“good” variation unrelated to <span class="math inline">\(\mu\)</span>, and “bad” variation correlated with <span class="math inline">\(\mu\)</span>. OLS uses both and is therefore biased. IV uses only the “good” variation induced by <span class="math inline">\(Z\)</span>, giving us an unbiased estimate.</p>
+<p>What makes this a <em>valid</em> IV design has less to do with which arrows are drawn than with which arrows are deliberately <em>missing</em>. Let’s walk through each of the five claims the diagram is making, starting from Angrist-Evans and pulling out the general principle each time.</p>
+<p><strong>1. <span class="math inline">\(Z \to X\)</span>: the first stage.</strong> Same-sex first two children (<span class="math inline">\(Z\)</span>) push some families to have a third child (<span class="math inline">\(X\)</span>). In general terms, this is the <strong>relevance</strong> condition, <span class="math inline">\(\text{Cov}(Z, X) \neq 0\)</span>: the instrument must actually move the treatment around. If this arrow is missing or nearly so—if same-sex siblings <em>barely</em> budged fertility— we would have a <strong>weak instrument problem</strong>, which we return to later in this chapter. This is the <em>one</em> IV assumption we can test directly: we will verify it shortly by comparing the share of families with three or more kids across same-sex and mixed-sex households.</p>
+<p><strong>2. <span class="math inline">\(X \to Y\)</span>: the causal effect we actually want.</strong> This is the arrow we care about: the effect of having a third child on a mother’s labor force participation. In generic notation, it is the parameter <span class="math inline">\(\beta\)</span>. Everything else in the diagram is infrastructure we need in order to identify this one arrow.</p>
+<p><strong>3. <span class="math inline">\(\mu \to X\)</span> and <span class="math inline">\(\mu \to Y\)</span>: the endogeneity problem.</strong> These two arrows together are why OLS fails. Unobserved <strong>career orientation</strong> (<span class="math inline">\(\mu\)</span>) affects both fertility and labor supply: strongly career-oriented women tend to have fewer children <em>and</em> are more likely to work, while women who prioritize family over career tend to have more children <em>and</em> work less. That creates a <strong>backdoor path</strong> from <span class="math inline">\(X\)</span> back to <span class="math inline">\(Y\)</span> running through the confounder: <span class="math inline">\(X \leftarrow \mu \to Y\)</span>. When we regress labor force participation on number of children by OLS, we cannot tell which part of the correlation comes from the <span class="math inline">\(X \to Y\)</span> arrow we want and which part comes from the detour through <span class="math inline">\(\mu\)</span>. Concretely, OLS will make children <em>look</em> like they depress maternal employment more than they do, because the women who have more kids are also the women who would have worked less anyway.</p>
+<p><strong>4. No arrow from <span class="math inline">\(Z\)</span> to <span class="math inline">\(Y\)</span>: the exclusion restriction.</strong> This is where the identification work actually happens. We are assuming the sex composition of the first two children has <em>no direct effect</em> on whether the mother works— its only pathway to labor supply runs through its effect on fertility. In generic notation, <span class="math inline">\(Z\)</span> affects <span class="math inline">\(Y\)</span> only through <span class="math inline">\(X\)</span>. That is why the figure draws the <span class="math inline">\(Z \to Y\)</span> arrow in ghostly gray with a red “<span class="math inline">\(\times\)</span>” across it: we are explicitly ruling that arrow out. This assumption is <strong>not directly testable</strong>; we have to defend it with economic reasoning. In Angrist-Evans it is defensible precisely because it is hard to tell a plausible story in which having two boys versus a boy and a girl directly changes a mother’s attachment to the labor force, <em>except</em> through the fertility decision it triggers.</p>
+<p><strong>5. No arrow from <span class="math inline">\(\mu\)</span> to <span class="math inline">\(Z\)</span>: the instrument is exogenous.</strong> We also need the instrument itself to be uncorrelated with the unobservables: <span class="math inline">\(\text{Cov}(Z, \mu) = 0\)</span>. If career orientation influenced the sex composition of a woman’s first two children, then <span class="math inline">\(Z\)</span> would inherit the same endogeneity it was supposed to solve. In Angrist-Evans, the sex of a child is (to a first approximation) biological chance, which is why this assumption is easy to defend here— and a big reason the paper became a canonical IV reference.</p>
+</section>
+<section id="why-this-lets-us-recover-the-causal-effect" class="level3" data-number="14.2.5">
+<h3 data-number="14.2.5" class="anchored" data-anchor-id="why-this-lets-us-recover-the-causal-effect"><span class="header-section-number">14.2.5</span> Why this lets us recover the causal effect</h3>
+<p>Put these five pieces together and you have the engine of IV. The instrument <span class="math inline">\(Z\)</span> injects clean, exogenous variation into <span class="math inline">\(X\)</span>— variation that originates outside the confounded system. IV then asks a single, disciplined question: <em>of the movement in fertility that we can trace back to same-sex siblings, how much movement in maternal employment does it produce?</em> Because the <span class="math inline">\(Z \to X \to Y\)</span> pathway is the only channel through which <span class="math inline">\(Z\)</span> can reach <span class="math inline">\(Y\)</span>, the answer to that question must be the causal effect of children on labor supply.</p>
+<p>Another way to put the same idea: the treatment <span class="math inline">\(X\)</span> has two kinds of variation. <strong>“Good” variation</strong> is the part that is unrelated to <span class="math inline">\(\mu\)</span>— in our figure, the part induced by the <span class="math inline">\(Z \to X\)</span> arrow. In Angrist-Evans, this is the bit of family-size variation that comes from the random sex composition of the first two children. <strong>“Bad” variation</strong> is the part correlated with <span class="math inline">\(\mu\)</span>— in our figure, the part induced by the <span class="math inline">\(\mu \to X\)</span> arrow. In Angrist-Evans, this is the bit of family-size variation that reflects a woman’s (unobserved) career orientation. OLS uses both kinds indiscriminately, mixing identification with contamination. IV isolates only the good variation and discards the rest, at the cost of using a smaller slice of the data to learn the answer.</p>
 </section>
 </section>
-<section id="application-fertility-and-labor-supply" class="level2" data-number="14.3">
-<h2 data-number="14.3" class="anchored" data-anchor-id="application-fertility-and-labor-supply"><span class="header-section-number">14.3</span> Application: Fertility and Labor Supply</h2>
-<section id="the-research-question" class="level3" data-number="14.3.1">
-<h3 data-number="14.3.1" class="anchored" data-anchor-id="the-research-question"><span class="header-section-number">14.3.1</span> The Research Question</h3>
-<p>What is the causal effect of having children on mothers’ labor force participation? This question is crucial for understanding gender wage gaps, designing parental leave policies, and evaluating childcare subsidies.</p>
-<p>But we cannot randomize fertility! And the decision to have children is deeply endogenous:</p>
-<ul>
-<li><strong>Reverse causality:</strong> Women may time children based on career factors</li>
-<li><strong>Selection:</strong> Less career-oriented women may choose larger families</li>
-<li><strong>Omitted variables:</strong> Unobserved preferences affect both fertility and work</li>
-</ul>
-</section>
-<section id="the-angrist-and-evans-1998-instrument" class="level3" data-number="14.3.2">
-<h3 data-number="14.3.2" class="anchored" data-anchor-id="the-angrist-and-evans-1998-instrument"><span class="header-section-number">14.3.2</span> The Angrist and Evans (1998) Instrument</h3>
-<p>In a landmark study, Angrist and Evans (1998) found a clever instrument for fertility: the <strong>sex composition of the first two children</strong>.</p>
-<p>The instrument works because parents prefer mixed-sex children. If your first two children are the same sex (both boys or both girls), you’re more likely to try for a third child to “get” the other sex.</p>
-<p><strong>Why is this relevant?</strong> (<span class="math inline">\(Cov(Z, X) \neq 0\)</span>)</p>
-<ul>
-<li>Parents with same-sex children are more likely to have a third child</li>
-<li>This is an empirical fact we can verify</li>
-</ul>
-<p><strong>Why is this excludable?</strong> (<span class="math inline">\(Cov(Z, \mu) = 0\)</span>)</p>
-<ul>
-<li>Sex of children is essentially random (about 50% boys, 50% girls)</li>
-<li>Hard to imagine why same-sex vs.&nbsp;mixed-sex would <em>directly</em> affect labor supply</li>
-<li>The only plausible channel is through fertility decisions</li>
-</ul>
-</section>
-<section id="simulating-the-angrist-evans-setup" class="level3" data-number="14.3.3">
-<h3 data-number="14.3.3" class="anchored" data-anchor-id="simulating-the-angrist-evans-setup"><span class="header-section-number">14.3.3</span> Simulating the Angrist-Evans Setup</h3>
+<section id="estimating-iv" class="level2" data-number="14.3">
+<h2 data-number="14.3" class="anchored" data-anchor-id="estimating-iv"><span class="header-section-number">14.3</span> Estimating IV</h2>
+<p>With the identification strategy in hand, we can now bring the Angrist-Evans design to data and actually estimate <span class="math inline">\(\beta\)</span>. We’ll work with a simulated dataset designed to mimic the Angrist-Evans structure, which has the pedagogical advantage that we know the true causal effect (we built it in) and can judge how well OLS and IV recover it.</p>
+<section id="simulating-the-angrist-evans-setup" class="level3" data-number="14.3.1">
+<h3 data-number="14.3.1" class="anchored" data-anchor-id="simulating-the-angrist-evans-setup"><span class="header-section-number">14.3.1</span> Simulating the Angrist-Evans Setup</h3>
 <p>Let’s create simulated data that mirrors the Angrist-Evans setting to illustrate how IV works:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulate Angrist-Evans style data</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">50000</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate data</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>ae_sim <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Unobserved "career orientation" - affects both fertility and work</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">career_orientation =</span> <span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Same-sex instrument (random)</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">samesex =</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.5</span>),</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># More than 2 kids: affected by samesex AND career orientation.</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># The 0.12 coefficient on samesex is calibrated to give a ~6 pp first-stage</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># difference (the empirical magnitude in Angrist-Evans 1998) and a first-stage</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># F well into the hundreds at n = 50,000.</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">morekids_latent =</span> <span class="sc">-</span><span class="fl">0.5</span> <span class="sc">+</span> <span class="fl">0.12</span> <span class="sc">*</span> samesex <span class="sc">-</span> <span class="fl">0.3</span> <span class="sc">*</span> career_orientation <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="fl">0.5</span>),</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">morekids =</span> <span class="fu">as.integer</span>(morekids_latent <span class="sc">&gt;</span> <span class="dv">0</span>),</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Labor force participation: affected by morekids AND career orientation</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># True causal effect of morekids is -0.10</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">worked_latent =</span> <span class="fl">0.6</span> <span class="sc">-</span> <span class="fl">0.10</span> <span class="sc">*</span> morekids <span class="sc">+</span> <span class="fl">0.25</span> <span class="sc">*</span> career_orientation <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="fl">0.3</span>),</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">mom_worked =</span> <span class="fu">as.integer</span>(worked_latent <span class="sc">&gt;</span> <span class="fl">0.5</span>)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        <span class="at">samesex_lab =</span> <span class="fu">if_else</span>(samesex <span class="sc">==</span> <span class="dv">1</span>, <span class="st">"Same sex"</span>, <span class="st">"Mixed sex"</span>),</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>        <span class="at">morekids_lab =</span> <span class="fu">if_else</span>(morekids <span class="sc">==</span> <span class="dv">1</span>, <span class="st">"&gt; 2 kids"</span>, <span class="st">"≤ 2 kids"</span>)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
 </section>
-<section id="testing-the-relevance-condition" class="level3" data-number="14.3.4">
-<h3 data-number="14.3.4" class="anchored" data-anchor-id="testing-the-relevance-condition"><span class="header-section-number">14.3.4</span> Testing the Relevance Condition</h3>
+<section id="testing-the-relevance-condition" class="level3" data-number="14.3.2">
+<h3 data-number="14.3.2" class="anchored" data-anchor-id="testing-the-relevance-condition"><span class="header-section-number">14.3.2</span> Testing the Relevance Condition</h3>
 <p>First, let’s verify that same-sex siblings predict having more than two children:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check relevance: does samesex predict morekids?</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>relevance_check <span class="ot">&lt;-</span> ae_sim <span class="sc">|&gt;</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(samesex_lab) <span class="sc">|&gt;</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">prop_morekids =</span> <span class="fu">mean</span>(morekids))</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>relevance_check</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check relevance: does samesex predict morekids?</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>relevance_check <span class="ot">&lt;-</span> ae_sim <span class="sc">|&gt;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(samesex_lab) <span class="sc">|&gt;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">prop_morekids =</span> <span class="fu">mean</span>(morekids))</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>relevance_check</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 2
   samesex_lab prop_morekids
   &lt;chr&gt;               &lt;dbl&gt;
 1 Mixed sex           0.196
-2 Same sex            0.232</code></pre>
+2 Same sex            0.258</code></pre>
 </div>
 </div>
 <div class="cell">
@@ -661,10 +722,10 @@ Figure&nbsp;14.2: The relevance condition: parents with same-sex children are mo
 </div>
 </div>
 </div>
-<p>The difference is substantial—same-sex parents are about 7 percentage points more likely to have a third child. The instrument is relevant.</p>
+<p>The difference is considerable—same-sex parents are about 6 percentage points more likely to have a third child. The instrument is relevant.</p>
 </section>
-<section id="testing-excludability-sort-of" class="level3" data-number="14.3.5">
-<h3 data-number="14.3.5" class="anchored" data-anchor-id="testing-excludability-sort-of"><span class="header-section-number">14.3.5</span> Testing Excludability (Sort of)</h3>
+<section id="testing-excludability-sort-of" class="level3" data-number="14.3.3">
+<h3 data-number="14.3.3" class="anchored" data-anchor-id="testing-excludability-sort-of"><span class="header-section-number">14.3.3</span> Testing Excludability (Sort of)</h3>
 <p>We cannot directly test the exclusion restriction, but we can check whether the instrument has a small <em>reduced-form</em> relationship with the outcome:</p>
 <div class="cell">
 <div class="cell-output-display">
@@ -680,7 +741,7 @@ Figure&nbsp;14.3: Checking excludability: the direct relationship between same-s
 </div>
 </div>
 </div>
-<p>The difference is small (about 1-2 percentage points), consistent with the effect operating through fertility rather than directly. Of course, this doesn’t <em>prove</em> excludability—we must rely on economic reasoning to argue there’s no direct channel.</p>
+<p>The difference is small (around a percentage point), consistent with the effect operating through fertility rather than directly. Of course, this doesn’t <em>prove</em> excludability—we must rely on economic reasoning to argue there’s no direct channel.</p>
 </section>
 </section>
 <section id="two-stage-least-squares-2sls" class="level2" data-number="14.4">
@@ -721,9 +782,9 @@ Figure&nbsp;14.4: 2SLS uses only the variation in X that comes from the instrume
 <p>Let’s estimate the model step by step:</p>
 <p><strong>Step 1: The First Stage</strong></p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># First stage: regress endogenous variable on instrument</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>first_stage <span class="ot">&lt;-</span> <span class="fu">lm</span>(morekids <span class="sc">~</span> samesex, <span class="at">data =</span> ae_sim)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(first_stage)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># First stage: regress endogenous variable on instrument</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>first_stage <span class="ot">&lt;-</span> <span class="fu">lm</span>(morekids <span class="sc">~</span> samesex, <span class="at">data =</span> ae_sim)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(first_stage)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
@@ -731,56 +792,56 @@ lm(formula = morekids ~ samesex, data = ae_sim)
 
 Residuals:
     Min      1Q  Median      3Q     Max 
--0.2316 -0.2316 -0.1963 -0.1963  0.8037 
+-0.2578 -0.2578 -0.1963 -0.1963  0.8037 
 
 Coefficients:
             Estimate Std. Error t value            Pr(&gt;|t|)    
-(Intercept) 0.196288   0.002585  75.931 &lt;0.0000000000000002 ***
-samesex     0.035260   0.003664   9.623 &lt;0.0000000000000002 ***
+(Intercept) 0.196288   0.002636   74.46 &lt;0.0000000000000002 ***
+samesex     0.061536   0.003736   16.47 &lt;0.0000000000000002 ***
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-Residual standard error: 0.4096 on 49998 degrees of freedom
-Multiple R-squared:  0.001849,  Adjusted R-squared:  0.001829 
-F-statistic: 92.61 on 1 and 49998 DF,  p-value: &lt; 0.00000000000000022</code></pre>
+Residual standard error: 0.4177 on 49998 degrees of freedom
+Multiple R-squared:  0.005396,  Adjusted R-squared:  0.005376 
+F-statistic: 271.3 on 1 and 49998 DF,  p-value: &lt; 0.00000000000000022</code></pre>
 </div>
 </div>
-<p>The F-statistic on <code>samesex</code> is very large (over 100), indicating a strong instrument.</p>
+<p>The F-statistic on <code>samesex</code> is very large (well into the hundreds), indicating a strong instrument.</p>
 <p><strong>Step 2: Get Predicted Values</strong></p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get predicted values from first stage</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>ae_sim <span class="ot">&lt;-</span> ae_sim <span class="sc">|&gt;</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">morekids_hat =</span> <span class="fu">predict</span>(first_stage))</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Look at the predictions</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>ae_sim <span class="sc">|&gt;</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(samesex, morekids, morekids_hat) <span class="sc">|&gt;</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">head</span>(<span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get predicted values from first stage</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>ae_sim <span class="ot">&lt;-</span> ae_sim <span class="sc">|&gt;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">morekids_hat =</span> <span class="fu">predict</span>(first_stage))</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Look at the predictions</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>ae_sim <span class="sc">|&gt;</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(samesex, morekids, morekids_hat) <span class="sc">|&gt;</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">head</span>(<span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 10 × 3
    samesex morekids morekids_hat
      &lt;int&gt;    &lt;int&gt;        &lt;dbl&gt;
- 1       1        0        0.232
+ 1       1        0        0.258
  2       0        0        0.196
  3       0        1        0.196
- 4       1        0        0.232
- 5       1        0        0.232
- 6       1        0        0.232
- 7       1        0        0.232
- 8       1        0        0.232
+ 4       1        0        0.258
+ 5       1        0        0.258
+ 6       1        0        0.258
+ 7       1        0        0.258
+ 8       1        0        0.258
  9       0        0        0.196
 10       0        0        0.196</code></pre>
 </div>
 </div>
 <p><strong>Step 3: The Second Stage</strong></p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Second stage: regress outcome on predicted values</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: Standard errors from this approach are WRONG</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>second_stage_manual <span class="ot">&lt;-</span> <span class="fu">lm</span>(mom_worked <span class="sc">~</span> morekids_hat, <span class="at">data =</span> ae_sim)</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(second_stage_manual)[<span class="st">"morekids_hat"</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Second stage: regress outcome on predicted values</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: Standard errors from this approach are WRONG</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>second_stage_manual <span class="ot">&lt;-</span> <span class="fu">lm</span>(mom_worked <span class="sc">~</span> morekids_hat, <span class="at">data =</span> ae_sim)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(second_stage_manual)[<span class="st">"morekids_hat"</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>morekids_hat 
-  -0.2002152 </code></pre>
+  -0.1584669 </code></pre>
 </div>
 </div>
 <div class="callout callout-style-default callout-warning callout-titled">
@@ -799,16 +860,24 @@ F-statistic: 92.61 on 1 and 49998 DF,  p-value: &lt; 0.00000000000000022</code><
 </section>
 <section id="proper-2sls-with-feols" class="level3" data-number="14.4.4">
 <h3 data-number="14.4.4" class="anchored" data-anchor-id="proper-2sls-with-feols"><span class="header-section-number">14.4.4</span> Proper 2SLS with <code>feols()</code></h3>
-<p>The <code>fixest</code> package provides proper 2SLS estimation with correct standard errors:</p>
+<p>In practice, we don’t run the two stages by hand—we use a proper 2SLS estimator that handles the standard errors correctly. The <code>fixest</code> package’s <code>feols()</code> function is the most common choice in modern applied work, and it is worth taking a few minutes to understand its syntax, because IV formulas look a bit intimidating the first time you see one.</p>
+<p><strong>The four-part <code>feols()</code> formula.</strong> For IV estimation, <code>feols()</code> uses a formula with three vertical bars that split the right-hand side into four pieces:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>outcome <span class="sc">~</span> exogenous_controls <span class="sc">|</span> fixed_effects <span class="sc">|</span> endogenous <span class="sc">~</span> <span class="fu">instrument</span>(s)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Reading left to right:</p>
+<ul>
+<li><strong><code>outcome</code></strong>: the dependent variable <span class="math inline">\(Y\)</span> (here, <code>mom_worked</code>).</li>
+<li><strong><code>exogenous_controls</code></strong>: any covariates you want to include that are <em>not</em> endogenous—age, education, region dummies, and so on. If you have no controls, put <code>1</code> for an intercept-only specification.</li>
+<li><strong><code>fixed_effects</code></strong>: variables to absorb as fixed effects (e.g., state, year). Use <code>0</code> if you have none. <code>feols()</code> absorbs these efficiently rather than creating explicit dummies.</li>
+<li><strong><code>endogenous ~ instrument(s)</code></strong>: the first-stage formula. On the left is the endogenous regressor <span class="math inline">\(X\)</span> (here, <code>morekids</code>); on the right are one or more instruments <span class="math inline">\(Z\)</span> (here, <code>samesex</code>). <code>feols()</code> runs this as a separate first-stage regression internally and uses the predicted values in the second stage—but reports correct 2SLS standard errors.</li>
+</ul>
+<p>Our bare-bones Angrist-Evans specification has no controls and no fixed effects, so the first two slots are filled with <code>1</code> and <code>0</code>:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Proper 2SLS estimation</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Syntax: outcome ~ controls | fixed effects | endogenous ~ instrument</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>tsls <span class="ot">&lt;-</span> <span class="fu">feols</span>(mom_worked <span class="sc">~</span> <span class="dv">1</span> <span class="sc">|</span>  <span class="co"># Just intercept (no controls)</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                           <span class="dv">0</span> <span class="sc">|</span>  <span class="co"># No fixed effects</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>                           morekids <span class="sc">~</span> samesex,  <span class="co"># First stage</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>              <span class="at">data =</span> ae_sim)</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(tsls)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Proper 2SLS estimation</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># outcome    | exog. controls | fixed effects | first stage</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>tsls <span class="ot">&lt;-</span> <span class="fu">feols</span>(mom_worked <span class="sc">~</span> <span class="dv">1</span>  <span class="sc">|</span>  <span class="dv">0</span>             <span class="sc">|</span> morekids <span class="sc">~</span> samesex,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">data =</span> ae_sim)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(tsls)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>TSLS estimation - Dep. Var.: mom_worked
                   Endo.    : morekids
@@ -817,21 +886,75 @@ Second stage: Dep. Var.: mom_worked
 Observations: 50,000
 Standard-errors: IID 
               Estimate Std. Error  t value  Pr(&gt;|t|)    
-(Intercept)   0.621714   0.026008 23.90457 &lt; 2.2e-16 ***
-fit_morekids -0.200215   0.121213 -1.65176   0.09859 .  
+(Intercept)   0.613519   0.015972 38.41160 &lt; 2.2e-16 ***
+fit_morekids -0.158467   0.069749 -2.27196  0.023093 *  
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-RMSE: 0.477825   Adj. R2: 3.111e-5
-F-test (1st stage), morekids: stat = 92.6067, p &lt; 2.2e-16 , on 1 and 49,998 DoF.
-                  Wu-Hausman: stat =  1.1581, p = 0.281862, on 1 and 49,997 DoF.</code></pre>
+RMSE: 0.479855   Adj. R2: 7.743e-5
+F-test (1st stage), morekids: stat = 271.2683, p &lt; 2.2e-16 , on 1 and 49,998 DoF.
+                  Wu-Hausman: stat =   5.9324, p = 0.014869, on 1 and 49,997 DoF.</code></pre>
 </div>
 </div>
+<p>A few things to notice in the output:</p>
+<ul>
+<li>The coefficient on <code>fit_morekids</code> is the 2SLS estimate of <span class="math inline">\(\beta\)</span> (the <code>fit_</code> prefix is <code>fixest</code>’s way of flagging that this is the <em>fitted</em> endogenous variable, not the raw one).</li>
+<li>The standard error is the correct 2SLS standard error, adjusted for the first-stage uncertainty that the manual two-step approach got wrong.</li>
+<li>The header reports a first-stage F-statistic (sometimes labeled “IV F-test” or “F-test (1st stage)”). This is our first diagnostic for instrument strength, which we’ll pick up in the next section.</li>
+</ul>
+<p><strong>Inspecting the first stage.</strong> <code>feols()</code> estimates the first stage in the background but hides it by default. To view it, pass <code>stage = 1</code> to <code>summary()</code> (or <code>etable()</code> for a publication-ready table):</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Look at the first-stage regression explicitly</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(tsls, <span class="at">stage =</span> <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>TSLS estimation - Dep. Var.: morekids
+                  Endo.    : morekids
+                  Instr.   : samesex
+First stage: Dep. Var.: morekids
+Observations: 50,000
+Standard-errors: IID 
+            Estimate Std. Error t value  Pr(&gt;|t|)    
+(Intercept) 0.196288   0.002636 74.4637 &lt; 2.2e-16 ***
+samesex     0.061536   0.003736 16.4702 &lt; 2.2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.417709   Adj. R2: 0.005376
+F-test (1st stage): stat = 271.27, p &lt; 2.2e-16, on 1 and 49,998 DoF.</code></pre>
+</div>
+</div>
+<p><strong>Adding controls.</strong> Suppose we wanted to control for the mother’s age and education. These are exogenous (we are assuming they are uncorrelated with <span class="math inline">\(\mu\)</span>) and go in the <em>first</em> slot of the formula. <code>feols()</code> automatically includes them in <em>both</em> the first and second stages— exactly what 2SLS requires:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Illustrative — not run in this chapter's data</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>tsls_ctrl <span class="ot">&lt;-</span> <span class="fu">feols</span>(mom_worked <span class="sc">~</span> age <span class="sc">+</span> education <span class="sc">|</span> <span class="dv">0</span> <span class="sc">|</span> morekids <span class="sc">~</span> samesex,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">data =</span> ae_sim)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Adding fixed effects.</strong> If we wanted state fixed effects (to control for time-invariant features of states), we’d move <code>state</code> into the second slot:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Illustrative</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>tsls_fe <span class="ot">&lt;-</span> <span class="fu">feols</span>(mom_worked <span class="sc">~</span> age <span class="sc">+</span> education <span class="sc">|</span> state <span class="sc">|</span> morekids <span class="sc">~</span> samesex,</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">data =</span> ae_sim)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>feols()</code> absorbs the fixed effects using a demeaning algorithm that is much faster than creating explicit dummies, which matters a lot on large administrative datasets.</p>
+<p><strong>Multiple instruments.</strong> If we had a <em>second</em> instrument for fertility—say, a twin-birth indicator, which Angrist and Evans also use—we’d list both on the right of the first-stage formula:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Illustrative</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>tsls_multi <span class="ot">&lt;-</span> <span class="fu">feols</span>(mom_worked <span class="sc">~</span> <span class="dv">1</span> <span class="sc">|</span> <span class="dv">0</span> <span class="sc">|</span> morekids <span class="sc">~</span> samesex <span class="sc">+</span> twins,</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">data =</span> ae_sim)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The model is now <strong>overidentified</strong> (two instruments for one endogenous variable), which opens up diagnostic tests like the Sargan/Hansen overidentification test (available via <code>fitstat(tsls_multi, ~ sargan)</code>).</p>
+<p><strong>Cluster-robust standard errors.</strong> IV standard errors are sensitive to within-cluster correlation. You can cluster SEs at estimation time by passing <code>cluster = ~ cluster_var</code>, or after the fact with <code>summary()</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Illustrative</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(tsls, <span class="at">cluster =</span> <span class="sc">~</span> state)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Weak-instrument diagnostics.</strong> The most important post-estimation check for IV is the first-stage F-statistic. <code>feols()</code> reports it in <code>summary()</code>, but you can pull it out directly (along with other diagnostics) with <code>fitstat()</code>:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Pull out IV diagnostics explicitly</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fitstat</span>(tsls, <span class="sc">~</span> ivf <span class="sc">+</span> ivwald <span class="sc">+</span> wh)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>F-test (1st stage), morekids: stat = 271.2683, p &lt; 2.2e-16 , on 1 and 49,998 DoF.
+Wald (1st stage), morekids  : stat = 271.2683, p &lt; 2.2e-16 , on 1 and 49,998 DoF, VCOV: IID.
+                  Wu-Hausman: stat =   5.9324, p = 0.014869, on 1 and 49,997 DoF.</code></pre>
+</div>
+</div>
+<p>The <code>ivf</code> output is the first-stage F-statistic, <code>ivwald</code> is the Wald version (robust to heteroskedasticity if you clustered), and <code>wh</code> is the Wu-Hausman test of whether <code>morekids</code> is actually endogenous. We interpret these in the next section.</p>
 </section>
 <section id="comparing-ols-and-2sls" class="level3" data-number="14.4.5">
 <h3 data-number="14.4.5" class="anchored" data-anchor-id="comparing-ols-and-2sls"><span class="header-section-number">14.4.5</span> Comparing OLS and 2SLS</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># OLS for comparison (biased)</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>ols <span class="ot">&lt;-</span> <span class="fu">lm</span>(mom_worked <span class="sc">~</span> morekids, <span class="at">data =</span> ae_sim)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># OLS for comparison (biased)</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>ols <span class="ot">&lt;-</span> <span class="fu">lm</span>(mom_worked <span class="sc">~</span> morekids, <span class="at">data =</span> ae_sim)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell">
 <div class="cell-output-display">
@@ -862,36 +985,25 @@ Figure&nbsp;14.5: Comparing OLS (biased) and 2SLS (unbiased) estimates. OLS over
 <li>Inference is invalid</li>
 </ul>
 </section>
-<section id="the-f-test-rule-of-thumb" class="level3" data-number="14.5.2">
-<h3 data-number="14.5.2" class="anchored" data-anchor-id="the-f-test-rule-of-thumb"><span class="header-section-number">14.5.2</span> The F-Test Rule of Thumb</h3>
-<p><strong>Stock and Yogo (2005)</strong> established a rule of thumb:</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Weak Instrument Test
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>The first-stage F-statistic should exceed <strong>10</strong> for the instrument to be considered strong. With F &lt; 10, 2SLS estimates may be severely biased.</p>
-</div>
-</div>
-<p>In our example, the first-stage F-statistic is well over 100—a very strong instrument.</p>
+<section id="the-first-stage-f-test" class="level3" data-number="14.5.2">
+<h3 data-number="14.5.2" class="anchored" data-anchor-id="the-first-stage-f-test"><span class="header-section-number">14.5.2</span> The First-Stage F-Test</h3>
+<p>The standard diagnostic for instrument strength is the <strong>first-stage F-statistic</strong>, which comes from the first-stage regression <span class="math display">\[
+X_i = \pi_0 + \pi_1 Z_i + \nu_i
+\]</span> and tests the null <span class="math inline">\(H_0: \pi_1 = 0\)</span> that the instruments have no predictive power for <span class="math inline">\(X\)</span>. With a single instrument, the first-stage F is just the square of the t-statistic on <span class="math inline">\(\pi_1\)</span>; with multiple instruments, it is the joint test that none of them predict <span class="math inline">\(X\)</span>. A large F means the instruments are collectively doing real work—they move <span class="math inline">\(X\)</span> around a lot. <code>feols()</code> reports this statistic directly in its <code>summary()</code> output, or you can pull it out with <code>fitstat(tsls, ~ ivf)</code>.</p>
+<p>The traditional rule of thumb, following <span class="citation" data-cites="stock_testing_2005">Stock and Yogo (<a href="references.html#ref-stock_testing_2005" role="doc-biblioref">2005</a>)</span>, is that a first-stage F of at least <strong>10</strong> is enough to consider an instrument “strong.” That threshold has been the textbook standard for two decades. More recent work, however, suggests it is too lenient. <span class="citation" data-cites="lee_valid_2022">Lee et al. (<a href="references.html#ref-lee_valid_2022" role="doc-biblioref">2022</a>)</span> show that the F-statistic needed to justify conventional t-test inference on the 2SLS coefficient is closer to <strong>100</strong> than to 10— so an instrument with, say, F = 20 may still produce fine point estimates, but its confidence intervals are likely too narrow. A safer modern default is to treat an F between 10 and roughly 100 with caution and to prefer much stronger first stages when they are available. In our running example the first-stage F is well into the hundreds, so the instrument clears both the classic and the modern bar comfortably.</p>
 </section>
 <section id="what-happens-with-a-weak-instrument" class="level3" data-number="14.5.3">
 <h3 data-number="14.5.3" class="anchored" data-anchor-id="what-happens-with-a-weak-instrument"><span class="header-section-number">14.5.3</span> What Happens with a Weak Instrument?</h3>
 <p>Let’s see what happens when we use a weak (essentially random) instrument:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a weak instrument (random noise)</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>ae_sim <span class="ot">&lt;-</span> ae_sim <span class="sc">|&gt;</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">weak_instrument =</span> <span class="fu">rnorm</span>(<span class="fu">n</span>()))</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Try 2SLS with weak instrument</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>weak_iv <span class="ot">&lt;-</span> <span class="fu">feols</span>(mom_worked <span class="sc">~</span> <span class="dv">1</span> <span class="sc">|</span> <span class="dv">0</span> <span class="sc">|</span> morekids <span class="sc">~</span> weak_instrument,</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>                 <span class="at">data =</span> ae_sim)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a weak instrument (random noise)</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>ae_sim <span class="ot">&lt;-</span> ae_sim <span class="sc">|&gt;</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">weak_instrument =</span> <span class="fu">rnorm</span>(<span class="fu">n</span>()))</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Try 2SLS with weak instrument</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>weak_iv <span class="ot">&lt;-</span> <span class="fu">feols</span>(mom_worked <span class="sc">~</span> <span class="dv">1</span> <span class="sc">|</span> <span class="dv">0</span> <span class="sc">|</span> morekids <span class="sc">~</span> weak_instrument,</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>                 <span class="at">data =</span> ae_sim)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell">
 <div class="cell-output-display">
@@ -1043,6 +1155,33 @@ Figure&nbsp;14.6: With a weak instrument (random noise), the 2SLS estimate becom
 <p><strong>Why excludable?</strong> Distance to a college shouldn’t directly affect wages decades later (only through education).</p>
 <p><strong>Finding:</strong> Returns to education are actually <em>higher</em> than OLS suggests—the ability bias works in the opposite direction from what many expected.</p>
 </section>
+<section id="example-acemoglu-johnson-robinson-2001---institutions-and-growth" class="level3" data-number="14.7.2">
+<h3 data-number="14.7.2" class="anchored" data-anchor-id="example-acemoglu-johnson-robinson-2001---institutions-and-growth"><span class="header-section-number">14.7.2</span> Example: Acemoglu, Johnson, &amp; Robinson (2001) - Institutions and Growth</h3>
+<p><strong>Question:</strong> Do institutions—property rights, rule of law, constraints on government—cause long-run economic growth?</p>
+<p><strong>Problem:</strong> Institutions and income are jointly determined. Rich countries can afford (and demand) better institutions in part <em>because</em> they are rich, so OLS confuses the effect of institutions on growth with the effect of growth on institutions. Unobserved factors like geography and culture correlate with both.</p>
+<p><strong>Instrument:</strong> Settler mortality rates faced by European colonizers in the 17th-19th centuries. Where Europeans faced high disease mortality (parts of sub-Saharan Africa, for instance), they set up “extractive” institutions designed to siphon resources rather than protect property. Where they could settle safely (North America, Australia, New Zealand), they transplanted European-style property-rights institutions. Those early institutional choices persisted for centuries.</p>
+<p><strong>Why relevant?</strong> Historical settler mortality strongly predicts modern institutional quality, because colonial institutional form carried forward through independence.</p>
+<p><strong>Why excludable?</strong> European mortality from disease hundreds of years ago should not directly affect a country’s GDP today <em>except</em> through the institutions it shaped. The relevant diseases (malaria, yellow fever) had much smaller effects on indigenous populations with partial immunity than on European newcomers.</p>
+<p><strong>Finding:</strong> Institutions have a large causal effect on GDP per capita; the IV estimate is larger than OLS. The paper sparked a broad “institutions vs.&nbsp;geography” debate in development economics.</p>
+</section>
+<section id="example-levitt-1997---police-and-crime" class="level3" data-number="14.7.3">
+<h3 data-number="14.7.3" class="anchored" data-anchor-id="example-levitt-1997---police-and-crime"><span class="header-section-number">14.7.3</span> Example: Levitt (1997) - Police and Crime</h3>
+<p><strong>Question:</strong> Does hiring more police cause crime to fall?</p>
+<p><strong>Problem:</strong> Reverse causality. Cities with high crime hire more police in response, so OLS typically shows a positive correlation between police and crime— implying police <em>increase</em> crime, which is obviously backwards.</p>
+<p><strong>Instrument:</strong> The timing of mayoral and gubernatorial elections. Police hiring in U.S. cities spikes in the year before an election because incumbents want to campaign on being tough on crime.</p>
+<p><strong>Why relevant?</strong> Police staffing rises predictably in the run-up to elections, providing variation in police levels that is not driven by current crime trends.</p>
+<p><strong>Why excludable?</strong> The electoral calendar is set by state law, not by recent crime fluctuations. There is no obvious direct channel from “an election is approaching” to “less crime this year” except through its effect on police hiring.</p>
+<p><strong>Finding:</strong> Additional officers reduce crime substantially, and the IV estimate flips the sign of the naive OLS correlation. A coding error in the original paper was later flagged by <span class="citation" data-cites="mccrary_using_2002">McCrary (<a href="references.html#ref-mccrary_using_2002" role="doc-biblioref">2002</a>)</span> and the estimates revised downward, but the qualitative conclusion—that more police reduce violent crime—survives.</p>
+</section>
+<section id="example-angrist-krueger-1991---quarter-of-birth" class="level3" data-number="14.7.4">
+<h3 data-number="14.7.4" class="anchored" data-anchor-id="example-angrist-krueger-1991---quarter-of-birth"><span class="header-section-number">14.7.4</span> Example: Angrist &amp; Krueger (1991) - Quarter of Birth</h3>
+<p><strong>Question:</strong> What is the causal return to education on earnings?</p>
+<p><strong>Problem:</strong> The same ability bias Card faces. Unobserved ability raises both schooling and wages, so OLS estimates of the return to education conflate education’s causal effect with the effect of being able.</p>
+<p><strong>Instrument:</strong> Quarter of birth. U.S. compulsory-schooling laws require children to start school the September of the year they turn 6, but allow them to drop out at 16. A child born in Q1 starts school older and hits the dropout age with less time in school; a child born in Q4 starts younger and is forced to stay in longer before becoming legally allowed to leave. People born late in the year therefore attain slightly more education, on average, than people born early in the year.</p>
+<p><strong>Why relevant?</strong> First-stage regressions show a detectable (though modest) relationship between quarter of birth and total years of schooling.</p>
+<p><strong>Why excludable?</strong> Quarter of birth should be essentially random with respect to ability, family background, and earnings potential. There is no obvious reason being born in January rather than October would directly affect adult wages other than through education.</p>
+<p><strong>Finding:</strong> Returns to education estimated by IV are close to OLS, suggesting ability bias may be smaller than many feared. Later work <span class="citation" data-cites="bound_problems_1995">(<a href="references.html#ref-bound_problems_1995" role="doc-biblioref">Bound et al. 1995</a>)</span> cautioned that quarter of birth is actually a fairly <em>weak</em> instrument— in fact, Angrist-Krueger is often cited as a motivating example for the weak-instrument literature we discussed in the previous section.</p>
+</section>
 </section>
 <section id="summary" class="level2" data-number="14.8">
 <h2 data-number="14.8" class="anchored" data-anchor-id="summary"><span class="header-section-number">14.8</span> Summary</h2>
@@ -1133,7 +1272,7 @@ Figure&nbsp;14.6: With a weak instrument (random noise), the 2SLS estimate becom
 </div>
 
 <div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1142,7 +1281,7 @@ Figure&nbsp;14.6: With a weak instrument (random noise), the 2SLS estimate becom
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="i">
 <li><p>Endogeneity means the explanatory variable is correlated with the error term: Cov(X, μ) ≠ 0. This violates the key OLS assumption and causes bias. Common sources include omitted variables, selection, and reverse causality.</p></li>
@@ -1157,6 +1296,23 @@ Figure&nbsp;14.6: With a weak instrument (random noise), the 2SLS estimate becom
 </div>
 
 
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
+<div id="ref-angrist_children_1998" class="csl-entry" role="listitem">
+Angrist, Joshua D., and William N. Evans. 1998. <span>“Children and <span>Their</span> <span>Parents</span>’ <span>Labor</span> <span>Supply</span>: <span>Evidence</span> from <span>Exogenous</span> <span>Variation</span> in <span>Family</span> <span>Size</span>.”</span> <em>American Economic Review</em> 88 (3): 450–77. <a href="https://www.jstor.org/stable/116844">https://www.jstor.org/stable/116844</a>.
+</div>
+<div id="ref-bound_problems_1995" class="csl-entry" role="listitem">
+Bound, John, David A. Jaeger, and Regina M. Baker. 1995. <span>“Problems with <span>Instrumental</span> <span>Variables</span> <span>Estimation</span> When the <span>Correlation</span> Between the <span>Instruments</span> and the <span>Endogenous</span> <span>Explanatory</span> <span>Variable</span> Is <span>Weak</span>.”</span> <em>Journal of the American Statistical Association</em> 90 (430): 443–50. <a href="https://doi.org/10.2307/2291055">https://doi.org/10.2307/2291055</a>.
+</div>
+<div id="ref-lee_valid_2022" class="csl-entry" role="listitem">
+Lee, David S., Justin McCrary, Marcelo J. Moreira, and Jack Porter. 2022. <span>“Valid t-Ratio <span>Inference</span> for <span>IV</span>.”</span> <em>American Economic Review</em> 112 (10): 3260–90. <a href="https://doi.org/10.1257/aer.20211063">https://doi.org/10.1257/aer.20211063</a>.
+</div>
+<div id="ref-mccrary_using_2002" class="csl-entry" role="listitem">
+McCrary, Justin. 2002. <span>“Using <span>Electoral</span> <span>Cycles</span> in <span>Police</span> <span>Hiring</span> to <span>Estimate</span> the <span>Effect</span> of <span>Police</span> on <span>Crime</span>: <span>Comment</span>.”</span> <em>American Economic Review</em> 92 (4): 1236–43. <a href="https://doi.org/10.1257/000282802762024610">https://doi.org/10.1257/000282802762024610</a>.
+</div>
+<div id="ref-stock_testing_2005" class="csl-entry" role="listitem">
+Stock, James H., and Motohiro Yogo. 2005. <span>“Testing for <span>Weak</span> <span>Instruments</span> in <span>Linear</span> <span>IV</span> <span>Regression</span>.”</span> In <em>Identification and <span>Inference</span> for <span>Econometric</span> <span>Models</span>: <span>Essays</span> in <span>Honor</span> of <span>Thomas</span> <span>Rothenberg</span></em>, edited by Donald W. K. Andrews and James H. Stock. Cambridge University Press.
+</div>
+</div>
 </section>
 
 </main> <!-- /main -->
@@ -1567,8 +1723,8 @@ Figure&nbsp;14.6: With a weak instrument (random noise), the 2SLS estimate becom
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../chapters/references.html" class="pagination-link" aria-label="References">
-        <span class="nav-page-text">References</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../chapters/rdd.html" class="pagination-link" aria-label="Regression Discontinuity">
+        <span class="nav-page-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Regression Discontinuity</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
@@ -1579,7 +1735,7 @@ Figure&nbsp;14.6: With a weak instrument (random noise), the 2SLS estimate becom
       &nbsp;
     </div>   
     <div class="nav-footer-center">
-<p><span class="faux-block"> © 2025 Raymond Caraher. All rights reserved. </span></p>
+<p><span class="faux-block"> © 2025-2026 Raymond Caraher. All rights reserved. </span></p>
 </div>
     <div class="nav-footer-right">
       &nbsp;

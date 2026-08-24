@@ -1,0 +1,435 @@
+---
+title: "Final Exam Study Guide"
+subtitle: "EC325: Econometrics | Colby College"
+author: "Prof. Caraher"
+date: "last-modified"
+date-format: "[Spring 2026]"
+embed-resources: true
+format:
+  pdf:
+    toc: false
+    colorlinks: true
+  html:
+    toc: true
+---
+
+# Unit 7: Dummy Variables and Non-Linearities
+
+### Dummy Variables
+
+- A **dummy variable** translates a qualitative characteristic into 0/1 form: $D = 1$ if the characteristic is present, $D = 0$ otherwise
+
+### Interpreting Dummies
+
+- In $score = \beta_0 + \beta_1(hsgpa) + \beta_2(calculus) + \mu$, $\hat{\beta}_2$ is the **difference in intercepts** between the two groups
+- Both groups share the same slope; the dummy shifts the regression line up or down
+
+### The Dummy Variable Trap
+
+- For a categorical variable with $g$ categories, include only $g - 1$ dummies; the omitted category is the **baseline**
+- Including a dummy for every group creates perfect multicollinearity
+- Dummy coefficients are always interpreted **relative to the baseline**
+
+### Choosing a Baseline
+
+- Changing the baseline does not change the coefficients on other variables
+- Pick a baseline that makes interpretation natural (e.g., male as baseline for the gender wage gap)
+
+### Quadratic Models
+
+- $Y = \beta_0 + \beta_1 X + \beta_2 X^2 + \mu$
+- $\beta_2 > 0$: U-shape; $\beta_2 < 0$: inverted-U
+- Marginal effect is **not constant**: $\frac{\partial Y}{\partial X} = \beta_1 + 2\beta_2 X$
+- Peak/trough at $x^* = -\frac{\beta_1}{2\beta_2}$
+
+### Log Transformations
+
+- Difference in logs ≈ proportional change: $\ln(Y_1) - \ln(Y_0) \approx \frac{Y_1 - Y_0}{Y_0}$
+- Approximation works well for small coefficients ($|\beta| < 0.20$)
+- Exact formula: $100 \times (e^{\beta} - 1)$%
+- Don't log: variables with zeros/negatives, rates/percentages, dummies
+
+### Functional Form Reference
+
+| Model | Equation | Interpretation of $\hat{\beta}_1$ |
+|:------|:---------|:----------------------------------|
+| **Level-Level** | $Y = \beta_0 + \beta_1 X$ | 1-unit ↑ $X$ → $\beta_1$-unit Δ $Y$ |
+| **Log-Level** | $\ln(Y) = \beta_0 + \beta_1 X$ | 1-unit ↑ $X$ → $(100\beta_1)$% Δ $Y$ |
+| **Level-Log** | $Y = \beta_0 + \beta_1 \ln(X)$ | 1% ↑ $X$ → $\beta_1/100$ unit Δ $Y$ |
+| **Log-Log** | $\ln(Y) = \beta_0 + \beta_1 \ln(X)$ | 1% ↑ $X$ → $\beta_1$% Δ $Y$ (elasticity) |
+| **Quadratic** | $Y = \beta_0 + \beta_1 X + \beta_2 X^2$ | Marginal effect = $\beta_1 + 2\beta_2 X$ |
+| **Dummy** | $Y = \beta_0 + \beta_1 D$ | Difference between $D=1$ and baseline |
+| **Dummy in Log-Y** | $\ln(Y) = \beta_0 + \beta_1 D$ | ≈ $(100\beta_1)$% diff. from baseline |
+
+# Unit 8: Interaction Effects
+
+### Why Interactions?
+
+- Dummies alone shift the **intercept** and force both groups to share the same slope
+- Interactions let the effect of one variable **depend on** the value of another
+- Built by including the **product** of two variables on the RHS
+
+### Two Dummies Interacted
+
+- $\ln(wage) = \beta_0 + \beta_1(female) + \beta_2(married) + \beta_3(female \times married) + \mu$
+- The interaction equals 1 only when both dummies equal 1
+- The baseline group is where both dummies equal 0 (here, unmarried men)
+
+| Group | female | married | Predicted $\ln(wage)$ |
+|:------|:------:|:-------:|:----------------------|
+| Unmarried men (baseline) | 0 | 0 | $\beta_0$ |
+| Unmarried women | 1 | 0 | $\beta_0 + \beta_1$ |
+| Married men | 0 | 1 | $\beta_0 + \beta_2$ |
+| Married women | 1 | 1 | $\beta_0 + \beta_1 + \beta_2 + \beta_3$ |
+
+- $\beta_3$ is the **additional** effect of being both female and married, beyond the sum of the individual effects
+
+### Dummy × Continuous
+
+- $\ln(wage) = \beta_0 + \beta_1(female) + \beta_2(educ) + \beta_3(female \times educ) + \mu$
+- Men: $\ln(wage) = \beta_0 + \beta_2(educ)$
+- Women: $\ln(wage) = (\beta_0 + \beta_1) + (\beta_2 + \beta_3)(educ)$
+- $\beta_1$ = intercept difference; $\beta_3$ = **slope difference**
+- The interaction lets lines have different slopes — they can converge, diverge, or cross
+
+### Total Effects
+
+- The total effect of a variable includes **all terms where it appears**
+- Effect of education: $\beta_2 + \beta_3 \cdot female$ (different for men vs. women)
+- Effect of being female: $\beta_1 + \beta_3 \cdot educ$ (depends on education)
+
+
+# Unit 9: Heteroskedasticity
+
+### What Heteroskedasticity Is
+
+- GM5 (homoskedasticity): $Var(\mu \mid x_1, \ldots, x_k) = \sigma^2$ — constant error variance
+- **Heteroskedasticity:** the error variance changes with $x$
+- Common in economic data: income & spending, firm size & profits, experience & wages
+
+### What Breaks
+
+- OLS coefficients are still **unbiased** (depends only on GM 1–4)
+- But standard errors are wrong — typically too small
+- $t$-statistics too large, p-values too small → **Type I errors inflated**
+
+### The Fix: Robust SEs
+
+- Heteroskedasticity-robust SEs weight each squared residual by $(x_i - \bar{x})^2$
+- Coefficients unchanged; only SEs differ
+
+### When Not Needed
+
+- Robust SEs are slightly larger than OLS SEs under homoskedasticity
+- Cost is small; benefit when needed is large
+- Default to Heteroskedasticity-robust SEs
+
+# Unit 10: Binary Outcomes
+
+### The Linear Probability Model (LPM)
+
+- OLS with a dummy/binary $y$ estimates a **probability**: $\hat{y} = \hat{P}(y = 1 \mid \mathbf{x})$
+- $\hat{\beta}_j$ = change in the **probability** of $y = 1$ for a one-unit increase in $x_j$
+- **Interpret in percentage points, not percent.** A coefficient of $-0.15$ is a 15 *percentage point* drop, not 15%
+
+### Two Problems with the LPM
+
+1. **Always heteroskedastic:** $Var(\mu \mid \mathbf{x}) = p(\mathbf{x})[1 - p(\mathbf{x})]$, which depends on $\mathbf{x}$. Fix with robust SEs.
+2. **Out-of-bounds predictions:** straight line can produce $\hat{p} < 0$ or $\hat{p} > 1$
+
+### Logit Regression
+
+- Wraps the linear index in the logistic function $G(z) = e^z / (1 + e^z)$, so predictions stay in $(0, 1)$
+- Estimated by **MLE**, not OLS
+
+### Three Ways to Interpret Logit Coefficients
+
+1. **Log-odds:** $\hat{\beta}_j$ is the change in log-odds. Mostly useful for *direction* (positive/negative).
+2. **Odds ratios:** $\exp(\hat{\beta}_j)$. OR > 1 increases the odds; OR < 1 decreases.
+3. **Marginal effects:** the change in **probability** for a one-unit change in $x_j$. Effect depends on where you start.
+
+### Marginal Effect at the Mean
+
+- Standard practice: evaluate the marginal effect at the mean of all explanatory variables
+- Compute the predicted probability at the mean, then at the mean with $x_j$ increased by one unit; the difference is the marginal effect
+
+### LPM vs. Logit
+
+- The logistic function is nearly linear in the middle of its range
+- Near $p \approx 0.5$, LPM and logit give similar marginal effects
+- They diverge mostly at the tails ($p$ near 0 or 1)
+- LPM useful when interpretation is the goal; Logit is best when prediction is the goal
+
+# Unit 11: Panel Data and Fixed Effects
+
+### Panel Data
+
+- **Cross-sectional:** units observed at one point in time
+- **Panel:** same units observed at multiple points in time
+- Panel structure lets us control for time-invariant unobservables
+
+### Between vs. Within Variation
+
+- **Between:** comparing different units (confounded by all the ways units differ)
+- **Within:** comparing each unit to itself over time (unit-level confounders cancel)
+- FE methods exploit within variation
+
+### The Fixed Effects Model
+
+$$
+y_{it} = \beta_0 + \beta_1 x_{it} + a_i + \mu_{it}
+$$
+
+- $a_i$ is the **unit fixed effect** — captures all time-invariant characteristics of unit $i$
+
+### The Within Transformation
+
+- For each unit, subtract the time-average of every variable: $\ddot{y}_{it} = y_{it} - \bar{y}_i$
+- $a_i$ drops out (since $a_i - \bar{a}_i = 0$)
+- $\beta_1$ is identified from within-unit variation only
+
+### Two-Way Fixed Effects
+
+- Add **time fixed effects** to absorb shocks common to all units in a period:
+$$
+y_{it} = \beta_1 x_{it} + a_i + \tau_t + \mu_{it}
+$$
+- Equivalent to including dummies for each unit and each time period (minus the omitted ones)
+
+### What FE Do and Don't Control For
+
+- **Unit FE:** anything specific to a unit that is constant over time
+- **Time FE:** anything that hits all units equally in a given period
+- **Neither:** unit-specific, time-varying confounders (must be controlled for explicitly)
+- You can't include time-invariant variables — they're collinear with the unit FE
+
+# Unit 12: Difference-in-Differences
+
+### Motivation
+
+- DiD uses **control units** rather than (just) **control variables**
+- Strategy: find a **natural experiment** where treatment is as good as randomly assigned
+
+### The ATT and the Counterfactual
+
+- Average Treatment Effect on the Treated:
+$$
+ATT = E[Y_{i1}(1) \mid D_i = 1] - E[Y_{i1}(0) \mid D_i = 1]
+$$
+- We observe the first term; the second is the unobservable counterfactual
+
+### Parallel Trends Assumption
+
+- Without treatment, the treated group would have followed the **same trend** as the control group:
+$$
+E[Y_{i1} - Y_{i0} \mid D_i = 1] = E[Y_{i1} - Y_{i0} \mid D_i = 0]
+$$
+- This is the **core assumption** of DiD — and it's not testable directly
+
+### The DiD Estimator
+
+$$
+ATT = \underbrace{(E[Y_{i1} \mid D_i = 1] - E[Y_{i0} \mid D_i = 1])}_{\text{trend, treated}} - \underbrace{(E[Y_{i1} \mid D_i = 0] - E[Y_{i0} \mid D_i = 0])}_{\text{trend, control}}
+$$
+
+### The DiD Regression
+
+$$
+y_{it} = \beta_0 + \beta_1 D_i + \beta_2 P_t + \delta(D_i \times P_t) + \mu_{it}
+$$
+
+- $D_i = 1$ for treated; $P_t = 1$ for post-period
+- $\delta$ on the interaction term is the DiD estimate (the ATT)
+
+| Group | $D_i$ | $P_t$ | Predicted $\hat{y}_{it}$ |
+|:------|:-----:|:-----:|:-------------------------|
+| Control, Pre | 0 | 0 | $\beta_0$ |
+| Control, Post | 0 | 1 | $\beta_0 + \beta_2$ |
+| Treated, Pre | 1 | 0 | $\beta_0 + \beta_1$ |
+| Treated, Post | 1 | 1 | $\beta_0 + \beta_1 + \beta_2 + \delta$ |
+
+### Two-Way Fixed Effects DiD
+
+$$
+y_{it} = \delta D_{it} + \alpha_i + \tau_t + \mu_{it}
+$$
+
+- $D_{it} = 1$ only for treated units in post-treatment periods
+- In the 2×2 case, gives the same $\hat{\delta}$ as the standard DiD regression
+- Generalizes to many units and many time periods
+
+### Choosing Good Controls
+
+- DiD estimate is only as good as the implied counterfactual
+- **Levels don't matter; trends do.** A control with a different level but the same pre-trend is fine
+- Direction of bias from bad controls:
+  - Control declines faster than treated → bias **toward zero**
+  - Control declines slower or rises → bias **away from zero**
+
+### Two Approaches to Controls
+
+- **Intuition-driven:** based on theory, geography, institutional knowledge (Card & Krueger 1994: NJ vs. PA fast-food on the border)
+- **Data-driven:** algorithms that match on observables (synthetic controls, propensity scores, etc.)
+
+### Common Threats to DiD
+
+- **Differential pre-trends:** groups already diverging before treatment
+- **Anticipation effects:** units change behavior before treatment arrives
+- **Spillovers:** treatment affects control units too
+- **Composition changes:** the mix of units changes over time
+
+# Unit 13: Advanced DiD
+
+### IPW-DiD
+
+- When treated and control units differ systematically, parallel trends may fail
+- IPW reweights controls to look more like treated units on observables
+
+### The IPW-DiD Algorithm
+
+1. Estimate propensity scores from a logit on pre-treatment covariates: $P(D_i = 1 \mid \mathbf{x})$
+2. Compute weights: $IPW_i = D_i + (1 - D_i)\frac{\hat{P}_i}{1 - \hat{P}_i}$
+3. Estimate the TWFE DiD using $IPW_i$ as observation weights
+
+### What the Weights Do
+
+- Treated units get weight 1
+- Controls that *look like* treated units (high $\hat{P}_i$) get **large** weights
+- Controls that look very different get **small** weights
+- IPW-DiD is only as good as your propensity score model
+
+### Dynamic DiD
+
+- Estimates separate treatment effects for each post-treatment period
+- Uses **relative time** $k$: $k = 0$ in the year of treatment, $k = -1$ one year before, $k = 1$ one year after
+
+$$
+y_{it} = \sum_{j=-J}^{-2}\beta_j D^j_{it} + \sum_{k=0}^{K}\beta_k D^k_{it} + \alpha_i + \tau_t + \mu_{it}
+$$
+
+- $D^k_{it} = 1$ if the unit is treated and relative time equals $k$
+- **Omit** the dummy for $k = -1$ as the reference period
+
+### Interpreting Dynamic DiD
+
+- Each $\hat{\beta}_k$ is the treatment effect at relative time $k$, relative to the period just before treatment
+- Pre-treatment coefficients ($k < -1$) test parallel trends — they should be ≈ 0
+- Post-treatment coefficients trace out the dynamic effect over time
+- Present results as an **event study plot** (coefficient + 95% CI vs. relative time)
+
+### Cluster-Robust Standard Errors (CRSEs)
+
+- A **cluster** is a group of observations whose errors are correlated with each other but independent across groups (students within classrooms, individuals within states)
+- Within-cluster correlation violates OLS independence
+- Ignoring it makes SEs too small → massive Type I error inflation
+- HC1 corrects for heteroskedasticity but **not** for within-cluster correlation
+
+### Choosing the Cluster Level
+
+- Coefficients are unchanged; only SEs change (typically larger)
+- **Rule:** cluster at the level of treatment assignment
+- Need at least 20–50 clusters; when in doubt, cluster at a broader level
+
+# Unit 14: Instrumental Variables
+
+### The Endogeneity Problem
+
+- OLS requires $E[\mu \mid X] = 0$
+- When $Cov(X, \mu) \neq 0$, $X$ is **endogenous** and OLS is biased
+- Three classic sources:
+  1. Omitted variable bias (e.g., ability bias)
+  2. Selection bias (e.g., healthier people buy insurance)
+  3. Reverse causality (e.g., crime → police hiring)
+
+### The IV Idea
+
+- Variation in $X$ has two parts:
+  - Endogenous (correlated with $\mu$) — biases OLS
+  - Exogenous (unrelated to $\mu$) — what we want
+- An **instrument** $Z$ isolates the exogenous variation in $X$
+
+### The Two IV Assumptions
+
+1. **Relevance:** $Cov(Z, X) \neq 0$ — the instrument moves $X$. Testable via the first-stage F.
+2. **Exclusion restriction:** $Cov(Z, \mu) = 0$ — $Z$ affects $Y$ only through $X$. Not testable; defended with economic reasoning.
+
+### Angrist & Evans (1998)
+
+- Question: causal effect of additional children on mothers' labor force participation
+- Endogeneity: career orientation drives both fertility and work
+- Instrument: **sex composition of the first two children** (parents prefer mixed-sex; same-sex parents are more likely to have a third)
+- Relevance: same-sex parents are ≈6 pp more likely to have a third child
+- Exclusion: child sex is biological chance
+
+### Two-Stage Least Squares (2SLS)
+
+- **Stage 1:** $X_i = \pi_0 + \pi_1 Z_i + \nu_i$, get $\hat{X}_i$
+- **Stage 2:** $Y_i = \beta_0 + \beta_1 \hat{X}_i + \varepsilon_i$
+- $\hat{\beta}_1^{2SLS}$ is the IV estimate
+- Running the two stages by hand gives correct *coefficients* but wrong *standard errors* — use a proper 2SLS estimator that adjusts SEs for first-stage uncertainty
+
+### Multiple Instruments
+
+- More instruments → more first-stage variation, smaller SEs
+- More instruments than endogenous variables → **overidentified** model
+- Each instrument needs its own exclusion restriction defended
+- A few strong instruments usually beat many weak ones
+
+### Weak Instruments
+
+- A weak instrument barely moves $X$ → wild swings in $\hat{\beta}^{2SLS}$, unreliable inference
+- Standard diagnostic: **first-stage F-statistic**
+- Old rule of thumb: $F > 10$ (Stock & Yogo 2005)
+- Recent evidence (Lee, McCrary, Moreira & Porter 2022): need $F$ closer to 100 for reliable inference
+
+### Diagnostics
+
+- **First-stage F (homoskedastic):** standard relevance check
+- **Robust first-stage F (Wald form):** preferred when clustering or with heteroskedasticity
+- **Wu-Hausman test:** compares OLS and 2SLS coefficients to check whether $X$ is in fact endogenous (a sanity check that IV is doing necessary work)
+
+# Unit 15: Regression Discontinuity
+
+### The RD Idea
+
+- Modern life is full of rigid cutoffs (turn 21, score 70+, vote share > 50%)
+- At the cutoff, treatment flips on/off abruptly
+- Units just above and just below the cutoff are nearly identical except for treatment
+- Rigid rules generate natural experiments
+
+### Vocabulary
+
+- **Running variable:** the continuous variable that determines treatment (age, test score)
+- **Cutoff (threshold):** the value at which treatment flips
+- **Sharp RD:** treatment is a deterministic function of the running variable
+- **Fuzzy RD:** the cutoff shifts the *probability* of treatment (handled with IV — beyond this course)
+
+### MLDA Example
+
+- Carpenter & Dobkin (2009): does the minimum legal drinking age save lives?
+- Compare death rates just below and just above age 21
+- The "jump" at the cutoff is the causal effect
+
+### The Sharp RD Regression
+
+$$
+Y_a = \alpha + \rho D_a + \gamma a + e_a
+$$
+
+- $D_a = 1$ if $a \geq a_0$
+- $\gamma a$ controls for the smooth trend in the running variable
+- $\rho$ — the **vertical jump** at the cutoff — is the causal estimate
+
+### Handling Nonlinearity
+
+- A naive linear fit can mistake a smooth curve for a jump
+- Two approaches:
+  - **Parametric:** add polynomials and interactions; let slope/curvature differ on each side
+  - **Nonparametric:** restrict to a narrow window where any smooth curve looks linear
+- Best practice: report several specifications and show estimates are stable
+- Don't use polynomials higher than quadratic — they invent jumps near the boundaries
+
+### Bandwidth: a Bias-Variance Tradeoff
+
+- Narrow bandwidth: less data → bigger SE, but less room for nonlinearity (low bias, high variance)
+- Wide bandwidth: more data → smaller SE, but more room to mistake curvature for a jump (high bias, low variance)

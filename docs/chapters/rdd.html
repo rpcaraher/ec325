@@ -1,0 +1,2006 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>15&nbsp; Regression Discontinuity – EC325 Lecture Notes</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/putting_it_all_together.html" rel="next">
+<link href="../chapters/instrumental_variables.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-5ccb035bea26c1e21f80f44cf7c27909.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/rdd.html"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Regression Discontinuity</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">EC325 Lecture Notes</a> 
+        <div class="sidebar-tools-main">
+    <div class="dropdown">
+      <a href="" title="Download" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label="Download"><i class="bi bi-download"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="../EC325-Lecture-Notes.pdf">
+              <i class="bi bi-file-pdf pe-1"></i>
+            Download PDF
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="../EC325-Lecture-Notes.epub">
+              <i class="bi bi-journal pe-1"></i>
+            Download ePub
+            </a>
+          </li>
+      </ul>
+    </div>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/data_practices.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Good Data Practices</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/rcts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Causality and Randomized Control Trials</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/bivariate_ols.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Bivariate Regression and Ordinary Least Squares</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/multivariate_ols.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Multivariate Regression</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/statistical_inference.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Statistical Inference</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/dummies_nonlins.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Dummy Variables and Non-Linear Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/interaction_effects.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Interaction Effects</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/heteroskedasticity.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Heteroskedasticity</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/binary_outcomes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Binary Outcomes</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/panel_fe.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Panel Data and Fixed Effects</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/did.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Difference-in-Differences</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/advanced_did.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Advanced Difference-in-Differences</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/instrumental_variables.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Instrumental Variables</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/rdd.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Regression Discontinuity</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/putting_it_all_together.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Putting It All Together</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/installingR.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Intro to R and RStudio</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/statsreview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Statistics and Probability Review</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/working_with_data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Importing and Working with Data</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/r_reference.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">R Functions and Packages Reference</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#from-control-units-to-cutoffs" id="toc-from-control-units-to-cutoffs" class="nav-link active" data-scroll-target="#from-control-units-to-cutoffs"><span class="header-section-number">15.1</span> From Control Units to Cutoffs</a>
+  <ul class="collapse">
+  <li><a href="#where-rd-fits-in-our-toolkit" id="toc-where-rd-fits-in-our-toolkit" class="nav-link" data-scroll-target="#where-rd-fits-in-our-toolkit"><span class="header-section-number">15.1.1</span> Where RD Fits in Our Toolkit</a></li>
+  <li><a href="#why-rigid-rules-create-experiments" id="toc-why-rigid-rules-create-experiments" class="nav-link" data-scroll-target="#why-rigid-rules-create-experiments"><span class="header-section-number">15.1.2</span> Why Rigid Rules Create Experiments</a></li>
+  <li><a href="#why-this-is-a-natural-experiment" id="toc-why-this-is-a-natural-experiment" class="nav-link" data-scroll-target="#why-this-is-a-natural-experiment"><span class="header-section-number">15.1.3</span> Why This Is a Natural Experiment</a></li>
+  </ul></li>
+  <li><a href="#the-minimum-drinking-age" id="toc-the-minimum-drinking-age" class="nav-link" data-scroll-target="#the-minimum-drinking-age"><span class="header-section-number">15.2</span> The Minimum Drinking Age</a>
+  <ul class="collapse">
+  <li><a href="#birthdays-and-funerals" id="toc-birthdays-and-funerals" class="nav-link" data-scroll-target="#birthdays-and-funerals"><span class="header-section-number">15.2.1</span> Birthdays and Funerals</a></li>
+  <li><a href="#a-first-look-at-the-data" id="toc-a-first-look-at-the-data" class="nav-link" data-scroll-target="#a-first-look-at-the-data"><span class="header-section-number">15.2.2</span> A First Look at the Data</a></li>
+  </ul></li>
+  <li><a href="#the-sharp-rd-setup" id="toc-the-sharp-rd-setup" class="nav-link" data-scroll-target="#the-sharp-rd-setup"><span class="header-section-number">15.3</span> The Sharp RD Setup</a>
+  <ul class="collapse">
+  <li><a href="#running-variables-and-treatment-rules" id="toc-running-variables-and-treatment-rules" class="nav-link" data-scroll-target="#running-variables-and-treatment-rules"><span class="header-section-number">15.3.1</span> Running Variables and Treatment Rules</a></li>
+  <li><a href="#why-rd-is-different-from-regression-control" id="toc-why-rd-is-different-from-regression-control" class="nav-link" data-scroll-target="#why-rd-is-different-from-regression-control"><span class="header-section-number">15.3.2</span> Why RD Is Different from Regression Control</a></li>
+  <li><a href="#why-rd-has-no-classical-omitted-variable-bias" id="toc-why-rd-has-no-classical-omitted-variable-bias" class="nav-link" data-scroll-target="#why-rd-has-no-classical-omitted-variable-bias"><span class="header-section-number">15.3.3</span> Why RD Has No Classical Omitted Variable Bias</a></li>
+  </ul></li>
+  <li><a href="#the-simple-sharp-rd-regression" id="toc-the-simple-sharp-rd-regression" class="nav-link" data-scroll-target="#the-simple-sharp-rd-regression"><span class="header-section-number">15.4</span> The Simple Sharp RD Regression</a>
+  <ul class="collapse">
+  <li><a href="#a-linear-model" id="toc-a-linear-model" class="nav-link" data-scroll-target="#a-linear-model"><span class="header-section-number">15.4.1</span> A Linear Model</a></li>
+  <li><a href="#estimating-the-simple-model" id="toc-estimating-the-simple-model" class="nav-link" data-scroll-target="#estimating-the-simple-model"><span class="header-section-number">15.4.2</span> Estimating the Simple Model</a></li>
+  <li><a href="#visualizing-the-rd-fit" id="toc-visualizing-the-rd-fit" class="nav-link" data-scroll-target="#visualizing-the-rd-fit"><span class="header-section-number">15.4.3</span> Visualizing the RD Fit</a></li>
+  </ul></li>
+  <li><a href="#running-variable-controls-going-beyond-linear" id="toc-running-variable-controls-going-beyond-linear" class="nav-link" data-scroll-target="#running-variable-controls-going-beyond-linear"><span class="header-section-number">15.5</span> Running Variable Controls: Going Beyond Linear</a>
+  <ul class="collapse">
+  <li><a href="#why-linear-might-not-be-enough" id="toc-why-linear-might-not-be-enough" class="nav-link" data-scroll-target="#why-linear-might-not-be-enough"><span class="header-section-number">15.5.1</span> Why Linear Might Not Be Enough</a></li>
+  <li><a href="#two-strategies-for-handling-nonlinearity" id="toc-two-strategies-for-handling-nonlinearity" class="nav-link" data-scroll-target="#two-strategies-for-handling-nonlinearity"><span class="header-section-number">15.5.2</span> Two Strategies for Handling Nonlinearity</a></li>
+  </ul></li>
+  <li><a href="#parametric-rd-polynomials-and-interactions" id="toc-parametric-rd-polynomials-and-interactions" class="nav-link" data-scroll-target="#parametric-rd-polynomials-and-interactions"><span class="header-section-number">15.6</span> Parametric RD: Polynomials and Interactions</a>
+  <ul class="collapse">
+  <li><a href="#adding-a-quadratic-term" id="toc-adding-a-quadratic-term" class="nav-link" data-scroll-target="#adding-a-quadratic-term"><span class="header-section-number">15.6.1</span> Adding a Quadratic Term</a></li>
+  <li><a href="#allowing-different-slopes-on-each-side-of-the-cutoff" id="toc-allowing-different-slopes-on-each-side-of-the-cutoff" class="nav-link" data-scroll-target="#allowing-different-slopes-on-each-side-of-the-cutoff"><span class="header-section-number">15.6.2</span> Allowing Different Slopes on Each Side of the Cutoff</a></li>
+  <li><a href="#a-richer-model" id="toc-a-richer-model" class="nav-link" data-scroll-target="#a-richer-model"><span class="header-section-number">15.6.3</span> A Richer Model</a></li>
+  <li><a href="#estimating-the-polynomial-models" id="toc-estimating-the-polynomial-models" class="nav-link" data-scroll-target="#estimating-the-polynomial-models"><span class="header-section-number">15.6.4</span> Estimating the Polynomial Models</a></li>
+  <li><a href="#visualizing-the-three-fits" id="toc-visualizing-the-three-fits" class="nav-link" data-scroll-target="#visualizing-the-three-fits"><span class="header-section-number">15.6.5</span> Visualizing the Three Fits</a></li>
+  </ul></li>
+  <li><a href="#nonparametric-rd-zooming-in-on-the-cutoff" id="toc-nonparametric-rd-zooming-in-on-the-cutoff" class="nav-link" data-scroll-target="#nonparametric-rd-zooming-in-on-the-cutoff"><span class="header-section-number">15.7</span> Nonparametric RD: Zooming In on the Cutoff</a>
+  <ul class="collapse">
+  <li><a href="#the-idea-of-local-estimation" id="toc-the-idea-of-local-estimation" class="nav-link" data-scroll-target="#the-idea-of-local-estimation"><span class="header-section-number">15.7.1</span> The Idea of Local Estimation</a></li>
+  <li><a href="#a-hands-on-bandwidth-example" id="toc-a-hands-on-bandwidth-example" class="nav-link" data-scroll-target="#a-hands-on-bandwidth-example"><span class="header-section-number">15.7.2</span> A Hands-On Bandwidth Example</a></li>
+  </ul></li>
+  <li><a href="#cause-specific-effects-a-falsification-test" id="toc-cause-specific-effects-a-falsification-test" class="nav-link" data-scroll-target="#cause-specific-effects-a-falsification-test"><span class="header-section-number">15.8</span> Cause-Specific Effects: A Falsification Test</a>
+  <ul class="collapse">
+  <li><a href="#the-idea" id="toc-the-idea" class="nav-link" data-scroll-target="#the-idea"><span class="header-section-number">15.8.1</span> The Idea</a></li>
+  <li><a href="#a-simulated-illustration" id="toc-a-simulated-illustration" class="nav-link" data-scroll-target="#a-simulated-illustration"><span class="header-section-number">15.8.2</span> A Simulated Illustration</a></li>
+  </ul></li>
+  <li><a href="#a-brief-note-on-fuzzy-rd" id="toc-a-brief-note-on-fuzzy-rd" class="nav-link" data-scroll-target="#a-brief-note-on-fuzzy-rd"><span class="header-section-number">15.9</span> A Brief Note on Fuzzy RD</a></li>
+  <li><a href="#assessing-the-validity-of-an-rd-design" id="toc-assessing-the-validity-of-an-rd-design" class="nav-link" data-scroll-target="#assessing-the-validity-of-an-rd-design"><span class="header-section-number">15.10</span> Assessing the Validity of an RD Design</a>
+  <ul class="collapse">
+  <li><a href="#what-could-go-wrong" id="toc-what-could-go-wrong" class="nav-link" data-scroll-target="#what-could-go-wrong"><span class="header-section-number">15.10.1</span> What Could Go Wrong</a></li>
+  <li><a href="#covariate-balance-tests" id="toc-covariate-balance-tests" class="nav-link" data-scroll-target="#covariate-balance-tests"><span class="header-section-number">15.10.2</span> Covariate Balance Tests</a></li>
+  <li><a href="#density-tests-for-manipulation" id="toc-density-tests-for-manipulation" class="nav-link" data-scroll-target="#density-tests-for-manipulation"><span class="header-section-number">15.10.3</span> Density Tests for Manipulation</a></li>
+  <li><a href="#placebo-cutoffs" id="toc-placebo-cutoffs" class="nav-link" data-scroll-target="#placebo-cutoffs"><span class="header-section-number">15.10.4</span> Placebo Cutoffs</a></li>
+  </ul></li>
+  <li><a href="#a-summary-picture-sharp-rd-in-one-figure" id="toc-a-summary-picture-sharp-rd-in-one-figure" class="nav-link" data-scroll-target="#a-summary-picture-sharp-rd-in-one-figure"><span class="header-section-number">15.11</span> A Summary Picture: Sharp RD in One Figure</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">15.12</span> Summary</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">15.13</span> Check Your Understanding</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span id="sec-rdd" class="quarto-section-identifier"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Regression Discontinuity</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+
+<style>
+.problem {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+.context {
+    background-color: #e8f4f8;
+    padding: 12px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border-left: 4px solid #2874a6;
+}
+.question {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #fff3cd;
+    border-radius: 5px;
+}
+.answer-row {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.answer-row label {
+    min-width: 320px;
+    font-weight: 500;
+}
+select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    min-width: 300px;
+    cursor: pointer;
+}
+select:focus {
+    border-color: #2874a6;
+    outline: none;
+}
+.correct {
+    border-color: #28a745 !important;
+    background-color: #d4edda !important;
+}
+.incorrect {
+    border-color: #dc3545 !important;
+    background-color: #f8d7da !important;
+}
+.explanation {
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #e7f3ff;
+    border-radius: 5px;
+    border-left: 4px solid #2874a6;
+}
+.note {
+    font-size: 0.85em;
+    color: #666;
+    font-style: italic;
+}
+</style>
+
+<script>
+function checkAnswer(selectElement, correctValue) {
+    if (selectElement.value === '') {
+        selectElement.classList.remove('correct', 'incorrect');
+    } else if (selectElement.value === correctValue) {
+        selectElement.classList.remove('incorrect');
+        selectElement.classList.add('correct');
+    } else {
+        selectElement.classList.remove('correct');
+        selectElement.classList.add('incorrect');
+    }
+}
+</script>
+
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span><strong>Key Questions</strong>
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ul>
+<li>What is a regression discontinuity (RD) design, and when can we use it?</li>
+<li>How do cutoffs in the real world generate natural experiments?</li>
+<li>What is a “running variable,” and what role does it play?</li>
+<li>How do we choose between parametric and nonparametric RD, and what is a bandwidth?</li>
+<li>How do we test whether an RD design is credible?</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span><strong>Suggested Readings</strong>
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ul>
+<li>Angrist &amp; Pischke, <em>Mastering ’Metrics</em>, Chapter 4.</li>
+<li>Carpenter &amp; Dobkin (2009), “The Effect of Alcohol Consumption on Mortality: Regression Discontinuity Evidence from the Minimum Drinking Age,” <em>American Economic Journal: Applied Economics</em>.</li>
+</ul>
+</div>
+</div>
+</div>
+<p>Up to this point, we have built a toolkit of causal inference methods that rely on finding variation in treatment that is <em>as good as random</em>. Randomized trials give us random assignment directly. Multivariate regression controls for observables. Fixed effects absorb time-invariant unobservables. Difference-in-differences uses control units to net out common trends.</p>
+<p>Each of these methods takes the same basic approach: find a comparison group whose outcomes plausibly resemble what the treated group <em>would have done</em> without treatment. The tricky part is always making a credible case that this is true.</p>
+<p>This chapter introduces one more tool—arguably the cleanest and most transparent design in the applied economist’s kit—<strong>regression discontinuity (RD)</strong>. RD takes advantage of a feature of modern life that may seem, at first, to be an obstacle to causal inference: the many rigid rules and cutoffs that determine who gets what. Speed limits, age thresholds, grade cutoffs, income ceilings for benefits, geographic borders, test-score minimums, and vote shares in close elections all share a common feature: a <strong>sharp change in treatment at a known cutoff</strong>. As we will see, rigid rules that at first glance seem to eliminate randomness actually generate valuable experiments.</p>
+<section id="from-control-units-to-cutoffs" class="level2" data-number="15.1">
+<h2 data-number="15.1" class="anchored" data-anchor-id="from-control-units-to-cutoffs"><span class="header-section-number">15.1</span> From Control Units to Cutoffs</h2>
+<section id="where-rd-fits-in-our-toolkit" class="level3" data-number="15.1.1">
+<h3 data-number="15.1.1" class="anchored" data-anchor-id="where-rd-fits-in-our-toolkit"><span class="header-section-number">15.1.1</span> Where RD Fits in Our Toolkit</h3>
+<p>Recall from <a href="did.html" class="quarto-xref"><span>Chapter 12</span></a> that the difference-in-differences design relies on <em>control units</em>—a comparison group that tells us what would have happened to the treated group in the absence of treatment. Its credibility rests on parallel trends: absent treatment, treated and control outcomes would have moved together.</p>
+<p>Regression discontinuity takes a very different approach. Instead of comparing units across groups over time, it compares units <strong>just above and just below a cutoff</strong> on some measured variable. The logic is simple: units right next to the cutoff are almost identical in every way that matters, <em>except</em> that one group receives treatment and the other does not. If the cutoff is truly a bright line that determines treatment—and if units cannot precisely manipulate their position on either side of it—then whether you fall to the left or right of the cutoff is essentially a coin flip.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Regression Discontinuity Design
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A <strong>regression discontinuity (RD) design</strong> estimates the causal effect of a treatment by comparing units that fall on either side of a known cutoff value of a continuous “running variable.” Because treatment assignment changes abruptly at the cutoff while other factors change smoothly, the jump in outcomes at the cutoff can be interpreted as the causal effect of treatment.</p>
+</div>
+</div>
+</section>
+<section id="why-rigid-rules-create-experiments" class="level3" data-number="15.1.2">
+<h3 data-number="15.1.2" class="anchored" data-anchor-id="why-rigid-rules-create-experiments"><span class="header-section-number">15.1.2</span> Why Rigid Rules Create Experiments</h3>
+<p>Human behavior is constrained by rules. In the United States:</p>
+<ul>
+<li>The <strong>minimum legal drinking age (MLDA)</strong> is 21. Someone who turns 21 on Tuesday has legal access to alcohol; someone who turns 21 on Wednesday does not (until Wednesday).</li>
+<li><strong>Public school funding</strong> often changes based on class-size thresholds. A school with 40 students in a grade gets one teacher per section; a school with 41 students hires a second teacher and splits the class in half.</li>
+<li><strong>Selective schools</strong> admit students whose test scores exceed a cutoff but reject those just below it.</li>
+<li><strong>Means-tested programs</strong> like Medicaid and SNAP provide benefits to families below an income threshold and not to families above it.</li>
+<li>In <strong>close elections</strong>, the candidate with 50.01% of the vote takes office while the candidate with 49.99% does not.</li>
+</ul>
+<p>In each case, a small change in the relevant variable—a few days of age, a percent of the vote, a single test-score point—flips a binary treatment on or off. This is the signature of an RD design.</p>
+</section>
+<section id="why-this-is-a-natural-experiment" class="level3" data-number="15.1.3">
+<h3 data-number="15.1.3" class="anchored" data-anchor-id="why-this-is-a-natural-experiment"><span class="header-section-number">15.1.3</span> Why This Is a Natural Experiment</h3>
+<p>Consider someone who turns 21 tomorrow versus someone who turned 21 yesterday. Over a two-day interval, they are nearly indistinguishable in terms of physical maturity, social environment, and life experience. The <em>only</em> meaningful difference between them is that one is legally allowed to walk into a bar and the other is not.</p>
+<p>If we were designing the ideal experiment to measure the effect of legal alcohol access, we could not do much better than this. A true RCT on drinking would be unethical and impossible to implement. But the MLDA has, in effect, run exactly such an experiment—for decades, on a massive scale, across the entire country. The only challenge is that the “treatment group” (age <span class="math inline">\(\geq\)</span> 21) and “control group” (age &lt; 21) differ in one obvious way: <em>age itself</em>. As we will see, managing this complication is the central methodological challenge of RD.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-rd-intuition" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-rd-intuition-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;15.1: The core intuition of RD: units just above and just below a cutoff are nearly identical in every way except treatment status. The jump in outcomes at the cutoff reveals the causal effect.
+</figcaption>
+<div aria-describedby="fig-rd-intuition-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="rdd_files/figure-html/fig-rd-intuition-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p><a href="#fig-rd-intuition" class="quarto-xref">Figure&nbsp;<span>15.1</span></a> shows the core idea. The running variable <span class="math inline">\(X\)</span> could be an age, a test score, a vote share, or an income threshold. Below the cutoff, we observe only untreated units (grey). Above the cutoff, we observe only treated units (blue). Both groups follow smooth trends in <span class="math inline">\(X\)</span>, but at the cutoff there is a sudden jump in the outcome. This jump <em>is</em> the causal effect.</p>
+</section>
+</section>
+<section id="the-minimum-drinking-age" class="level2" data-number="15.2">
+<h2 data-number="15.2" class="anchored" data-anchor-id="the-minimum-drinking-age"><span class="header-section-number">15.2</span> The Minimum Drinking Age</h2>
+<section id="birthdays-and-funerals" class="level3" data-number="15.2.1">
+<h3 data-number="15.2.1" class="anchored" data-anchor-id="birthdays-and-funerals"><span class="header-section-number">15.2.1</span> Birthdays and Funerals</h3>
+<p>Our path into RD follows Carpenter and Dobkin’s (2009) classic study of the minimum legal drinking age, which Angrist and Pischke use as the flagship example in their Chapter 4.</p>
+<p>The American MLDA is 21. Critics of this rule—including college presidents who have signed on to the Amethyst Initiative—argue that a lower drinking age would promote responsible, moderate alcohol consumption and reduce dangerous binge drinking. Proponents counter that the MLDA, blunt as it is, saves lives by restricting young people’s access to alcohol. Who is right?</p>
+<p>This is a hard question to answer. We cannot randomly assign legal drinking access to some 21-year-olds and not others. We cannot persuade a state to randomize the MLDA at the individual level for research purposes. And simple before-and-after comparisons are contaminated by all sorts of developmental trends as young people mature.</p>
+<p>Fortunately, the MLDA itself generates a natural experiment. On the day a young person turns 21, her legal access to alcohol changes instantly. Her physical, emotional, and cognitive maturity has not changed appreciably—she is, biologically speaking, the same person she was yesterday. But the law sees her differently.</p>
+<p>Carpenter and Dobkin compared death rates for young people just below age 21 to those just above. Their findings echo Animal House: there is a striking and persistent increase in mortality at the 21st birthday, driven primarily by motor vehicle accidents, suicides, and other alcohol-related deaths.</p>
+</section>
+<section id="a-first-look-at-the-data" class="level3" data-number="15.2.2">
+<h3 data-number="15.2.2" class="anchored" data-anchor-id="a-first-look-at-the-data"><span class="header-section-number">15.2.2</span> A First Look at the Data</h3>
+<p>To build intuition, let’s simulate data that mirrors the patterns Carpenter and Dobkin documented. We will work with death rates by month of age (a 30-day interval) from age 19 to age 23, which is the window in AP Table 4.1.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create simulated data mirroring Carpenter &amp; Dobkin (2009)</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>mlda_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Month of age, centered at 21st birthday (0 = 21st birthday)</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">months =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">24</span>, <span class="dv">23</span>, <span class="at">by =</span> <span class="dv">1</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">age =</span> <span class="dv">21</span> <span class="sc">+</span> months <span class="sc">/</span> <span class="dv">12</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Legal drinking treatment dummy</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">over21 =</span> <span class="fu">as.numeric</span>(months <span class="sc">&gt;=</span> <span class="dv">0</span>),</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        <span class="co"># True data-generating process:</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        <span class="co"># - slight downward trend in death rates with age</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        <span class="co"># - jump of 7.7 per 100,000 at the 21 cutoff (AP Table 4.1, Col 1)</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        <span class="co"># - small amount of noise</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        <span class="at">death_rate =</span> <span class="dv">95</span> <span class="sc">-</span> <span class="fl">0.15</span> <span class="sc">*</span> months <span class="sc">+</span> <span class="fl">7.7</span> <span class="sc">*</span> over21 <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="fu">n</span>(), <span class="dv">0</span>, <span class="fl">2.0</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(mlda_data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 4
+  months   age over21 death_rate
+   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;      &lt;dbl&gt;
+1    -24  19        0       99.8
+2    -23  19.1      0       98.5
+3    -22  19.2      0       99.8
+4    -21  19.2      0      101. 
+5    -20  19.3      0       98.7
+6    -19  19.4      0       97.5</code></pre>
+</div>
+</div>
+<p>Here, <code>months</code> is the running variable—time in months relative to the 21st birthday. The variable <code>over21</code> is the <strong>treatment indicator</strong>, equal to 1 on or after the birthday and 0 before. The outcome <code>death_rate</code> is deaths per 100,000 per year.</p>
+<p>Let’s plot it:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(mlda_data, <span class="fu">aes</span>(<span class="at">x =</span> months, <span class="at">y =</span> death_rate,</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">color =</span> <span class="fu">factor</span>(over21))) <span class="sc">+</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">2.5</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"0"</span> <span class="ot">=</span> <span class="st">"grey50"</span>, <span class="st">"1"</span> <span class="ot">=</span> <span class="st">"#0072B2"</span>),</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Under 21"</span>, <span class="st">"Over 21"</span>)) <span class="sc">+</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="dv">0</span>, <span class="at">y =</span> <span class="dv">103</span>, <span class="at">label =</span> <span class="st">"MLDA cutoff"</span>,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>             <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.05</span>, <span class="at">size =</span> <span class="fl">3.5</span>) <span class="sc">+</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Age in Months (0 = 21st birthday)"</span>,</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">y =</span> <span class="st">"Death Rate per 100,000"</span>,</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">color =</span> <span class="st">""</span>) <span class="sc">+</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-mlda-raw" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-mlda-raw-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;15.2: Simulated death rates by month of age, in the style of Carpenter and Dobkin (2009). Each dot is one monthly interval. The vertical line at zero marks the 21st birthday.
+</figcaption>
+<div aria-describedby="fig-mlda-raw-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="rdd_files/figure-html/fig-mlda-raw-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p>Eyeballing <a href="#fig-mlda-raw" class="quarto-xref">Figure&nbsp;<span>15.2</span></a>, there is a visible upward shift in death rates when the running variable crosses zero. Death rates below the cutoff cluster around 95; rates above the cutoff look noticeably higher. The goal of RD is to put a number on this visual pattern.</p>
+</section>
+</section>
+<section id="the-sharp-rd-setup" class="level2" data-number="15.3">
+<h2 data-number="15.3" class="anchored" data-anchor-id="the-sharp-rd-setup"><span class="header-section-number">15.3</span> The Sharp RD Setup</h2>
+<section id="running-variables-and-treatment-rules" class="level3" data-number="15.3.1">
+<h3 data-number="15.3.1" class="anchored" data-anchor-id="running-variables-and-treatment-rules"><span class="header-section-number">15.3.1</span> Running Variables and Treatment Rules</h3>
+<p>The MLDA gives us a clean example of a <strong>sharp RD design</strong>, where treatment status is a deterministic, discontinuous function of a running variable.</p>
+<p>Let <span class="math inline">\(a\)</span> denote age and <span class="math inline">\(D_a\)</span> denote the treatment indicator for legal drinking:</p>
+<p><span id="eq-sharp-rd-treatment"><span class="math display">\[
+D_a = \begin{cases} 1 &amp; \text{if } a \geq 21 \\ 0 &amp; \text{if } a &lt; 21 \end{cases}
+\tag{15.1}\]</span></span></p>
+<p>Two features of this setup matter:</p>
+<ol type="1">
+<li><strong>Deterministic assignment.</strong> Once we know a person’s age, we know their treatment status with certainty. There is no randomness in the assignment rule.</li>
+<li><strong>Discontinuous assignment.</strong> No matter how close age gets to 21, <span class="math inline">\(D_a\)</span> does not change until age actually crosses 21.</li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Key RD Vocabulary
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>The <strong>running variable</strong> (also called the <em>forcing variable</em> or <em>score</em>) is the continuous variable whose value determines treatment. In the MLDA example, it is age.</li>
+<li>The <strong>cutoff</strong> (also called the <em>threshold</em>) is the value of the running variable at which treatment status changes. In the MLDA example, the cutoff is 21.</li>
+<li><strong>Sharp RD</strong> describes designs where treatment status is a deterministic function of the running variable, jumping cleanly from 0 to 1 (or vice versa) at the cutoff. This chapter focuses on sharp RD. A <em>fuzzy</em> RD variant, where the cutoff shifts only the <em>probability</em> of treatment, is briefly noted at the end of the chapter.</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="why-rd-is-different-from-regression-control" class="level3" data-number="15.3.2">
+<h3 data-number="15.3.2" class="anchored" data-anchor-id="why-rd-is-different-from-regression-control"><span class="header-section-number">15.3.2</span> Why RD Is Different from Regression Control</h3>
+<p>It is tempting to think of RD as “just regression with a dummy for being over the cutoff.” Mechanically, that is what we will do. Conceptually, however, RD is quite different from the kind of regression adjustment we did in <a href="multivariate_ols.html" class="quarto-xref"><span>Chapter 5</span></a>.</p>
+<p>In multivariate OLS, we compare treated and control units <em>at the same values of the controls</em>, hoping that after conditioning we are comparing apples to apples. In RD, there is <strong>no</strong> overlapping region. There is no age at which we observe both 20-year-olds with legal access to alcohol and 21-year-olds without it. Every unit below the cutoff is untreated, and every unit above it is treated.</p>
+<p>This means the validity of RD rests on a willingness to <strong>extrapolate</strong>—but only a tiny distance, across the cutoff. We need to believe that, had the MLDA not existed, the relationship between age and death rates would have continued smoothly through age 21. The jump at age 21 is the “extra” mortality caused by legal alcohol access, because the smooth age trend has been extrapolated from one side of the cutoff to the other.</p>
+</section>
+<section id="why-rd-has-no-classical-omitted-variable-bias" class="level3" data-number="15.3.3">
+<h3 data-number="15.3.3" class="anchored" data-anchor-id="why-rd-has-no-classical-omitted-variable-bias"><span class="header-section-number">15.3.3</span> Why RD Has No Classical Omitted Variable Bias</h3>
+<p>Here is a remarkable property of sharp RD: <em>if we correctly model the relationship between the running variable and the outcome,</em> the design suffers no classical omitted variable bias. Why? Because treatment is a deterministic function of the running variable, any omitted variable that is correlated with treatment is also correlated with (a function of) the running variable. Controlling for the running variable adequately therefore automatically controls for every such omitted variable.</p>
+<p>This is the great strength of RD: you can explain in one or two sentences why the design is credible, and the argument is transparent enough that a skeptical reader can push back on specific steps. It is also the great weakness: “correctly modeling the running variable” is easier said than done, as we will see in a moment.</p>
+</section>
+</section>
+<section id="the-simple-sharp-rd-regression" class="level2" data-number="15.4">
+<h2 data-number="15.4" class="anchored" data-anchor-id="the-simple-sharp-rd-regression"><span class="header-section-number">15.4</span> The Simple Sharp RD Regression</h2>
+<section id="a-linear-model" class="level3" data-number="15.4.1">
+<h3 data-number="15.4.1" class="anchored" data-anchor-id="a-linear-model"><span class="header-section-number">15.4.1</span> A Linear Model</h3>
+<p>The simplest sharp RD regression uses a linear control for the running variable:</p>
+<p><span id="eq-rd-simple"><span class="math display">\[
+Y_a = \alpha + \rho D_a + \gamma a + e_a
+\tag{15.2}\]</span></span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(Y_a\)</span> is the outcome (e.g., the death rate in month of age <span class="math inline">\(a\)</span>)</li>
+<li><span class="math inline">\(D_a = 1\)</span> if <span class="math inline">\(a \geq a_0\)</span> (the cutoff) and 0 otherwise</li>
+<li><span class="math inline">\(a\)</span> is the running variable (age in months)</li>
+<li><span class="math inline">\(\rho\)</span> is the <strong>RD estimate</strong>—the causal effect of treatment</li>
+<li><span class="math inline">\(\gamma\)</span> captures the smooth trend in outcomes as the running variable changes</li>
+<li><span class="math inline">\(e_a\)</span> is an error term</li>
+</ul>
+<p>The interpretation of <span class="math inline">\(\rho\)</span> is simple: it is the <em>vertical jump</em> in the fitted regression line at the cutoff. Holding the running variable fixed at <span class="math inline">\(a_0\)</span>, the predicted outcome just below the cutoff is <span class="math inline">\(\alpha + \gamma a_0\)</span>. Just above the cutoff, it is <span class="math inline">\(\alpha + \gamma a_0 + \rho\)</span>. The difference is exactly <span class="math inline">\(\rho\)</span>.</p>
+</section>
+<section id="estimating-the-simple-model" class="level3" data-number="15.4.2">
+<h3 data-number="15.4.2" class="anchored" data-anchor-id="estimating-the-simple-model"><span class="header-section-number">15.4.2</span> Estimating the Simple Model</h3>
+<p>Let’s estimate <a href="#eq-rd-simple" class="quarto-xref">Equation&nbsp;<span>15.2</span></a> on our simulated MLDA data. We will use <code>feols()</code> from <code>fixest</code>, with heteroskedasticity-robust standard errors:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Simple linear RD with over-21 dummy and linear control for age</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>simple_rd <span class="ot">&lt;-</span> <span class="fu">feols</span>(death_rate <span class="sc">~</span> over21 <span class="sc">+</span> months,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">vcov =</span> <span class="st">"HC1"</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">data =</span> mlda_data)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(simple_rd)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>OLS estimation, Dep. Var.: death_rate
+Observations: 48
+Standard-errors: Heteroskedasticity-robust 
+             Estimate Std. Error   t value    Pr(&gt;|t|)    
+(Intercept) 96.306147   0.758703 126.93520   &lt; 2.2e-16 ***
+over21       5.651080   1.219646   4.63338 0.000030843 ***
+months      -0.099812   0.039602  -2.52035 0.015339076 *  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 1.93699   Adj. R2: 0.430343</code></pre>
+</div>
+</div>
+<p>The coefficient on <code>over21</code> is our estimate of <span class="math inline">\(\rho\)</span>. It should be close to the true treatment effect of 7.7. This is very close to Carpenter and Dobkin’s estimate from Table 4.1, column (1) of AP.</p>
+<p>The coefficient on <code>months</code> is the slope <span class="math inline">\(\gamma\)</span>, capturing the smooth (mildly declining) trend in death rates as young people age.</p>
+</section>
+<section id="visualizing-the-rd-fit" class="level3" data-number="15.4.3">
+<h3 data-number="15.4.3" class="anchored" data-anchor-id="visualizing-the-rd-fit"><span class="header-section-number">15.4.3</span> Visualizing the RD Fit</h3>
+<p>The right way to present a sharp RD result is to show the regression graphically. We compute fitted values from the model and overlay them on the scatter.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>mlda_data <span class="ot">&lt;-</span> mlda_data <span class="sc">|&gt;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">yhat_linear =</span> <span class="fu">predict</span>(simple_rd))</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(mlda_data, <span class="fu">aes</span>(<span class="at">x =</span> months, <span class="at">y =</span> death_rate, <span class="at">color =</span> <span class="fu">factor</span>(over21))) <span class="sc">+</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">2.2</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> yhat_linear), <span class="at">linewidth =</span> <span class="fl">1.1</span>) <span class="sc">+</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"0"</span> <span class="ot">=</span> <span class="st">"grey50"</span>, <span class="st">"1"</span> <span class="ot">=</span> <span class="st">"#0072B2"</span>),</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>                       <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Under 21"</span>, <span class="st">"Over 21"</span>)) <span class="sc">+</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">annotate</span>(<span class="st">"segment"</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>             <span class="at">x =</span> <span class="fl">0.1</span>, <span class="at">xend =</span> <span class="fl">0.1</span>,</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>             <span class="at">y =</span> <span class="dv">95</span>, <span class="at">yend =</span> <span class="dv">95</span> <span class="sc">+</span> <span class="fu">coef</span>(simple_rd)[<span class="st">"over21"</span>],</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>             <span class="at">arrow =</span> <span class="fu">arrow</span>(<span class="at">type =</span> <span class="st">"closed"</span>, <span class="at">length =</span> <span class="fu">unit</span>(<span class="fl">0.2</span>, <span class="st">"cm"</span>),</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>                           <span class="at">ends =</span> <span class="st">"both"</span>),</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">"#e7298a"</span>) <span class="sc">+</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="fl">1.2</span>,</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>             <span class="at">y =</span> <span class="dv">95</span> <span class="sc">+</span> <span class="fu">coef</span>(simple_rd)[<span class="st">"over21"</span>] <span class="sc">/</span> <span class="dv">2</span>,</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>             <span class="at">label =</span> <span class="fu">paste0</span>(<span class="st">"Jump \u2248 "</span>, <span class="fu">round</span>(<span class="fu">coef</span>(simple_rd)[<span class="st">"over21"</span>], <span class="dv">1</span>)),</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">"#e7298a"</span>, <span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">size =</span> <span class="fl">4.2</span>) <span class="sc">+</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Age in Months (0 = 21st birthday)"</span>,</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">y =</span> <span class="st">"Death Rate per 100,000"</span>,</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>         <span class="at">color =</span> <span class="st">""</span>) <span class="sc">+</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-simple-rd" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-simple-rd-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;15.3: Simple RD regression. The linear fit jumps at the cutoff; the size of the jump is our estimate of the MLDA effect on mortality.
+</figcaption>
+<div aria-describedby="fig-simple-rd-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="rdd_files/figure-html/fig-simple-rd-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p>The two line segments in <a href="#fig-simple-rd" class="quarto-xref">Figure&nbsp;<span>15.3</span></a> share the same slope—<span class="math inline">\(\gamma\)</span> in <a href="#eq-rd-simple" class="quarto-xref">Equation&nbsp;<span>15.2</span></a>—but are offset from each other by <span class="math inline">\(\rho\)</span> at the cutoff. That vertical gap is our RD estimate.</p>
+</section>
+</section>
+<section id="running-variable-controls-going-beyond-linear" class="level2" data-number="15.5">
+<h2 data-number="15.5" class="anchored" data-anchor-id="running-variable-controls-going-beyond-linear"><span class="header-section-number">15.5</span> Running Variable Controls: Going Beyond Linear</h2>
+<section id="why-linear-might-not-be-enough" class="level3" data-number="15.5.1">
+<h3 data-number="15.5.1" class="anchored" data-anchor-id="why-linear-might-not-be-enough"><span class="header-section-number">15.5.1</span> Why Linear Might Not Be Enough</h3>
+<p>The simple model assumes the relationship between the running variable and the outcome is <em>linear</em> on both sides of the cutoff. That might be good enough, but it might not. If the true relationship is curved, a linear fit will be forced to compromise—and may mistake nonlinearity in the underlying trend for a treatment effect.</p>
+<p><a href="#fig-three-panels" class="quarto-xref">Figure&nbsp;<span>15.4</span></a> makes this point clearly, echoing Figure 4.3 in AP. Three different data-generating processes produce three different RD situations.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-three-panels" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-three-panels-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;15.4: Three RD situations. Panel A: a linear relationship with a true discontinuity. Panel B: a nonlinear relationship with a true discontinuity. Panel C: a nonlinear relationship with no discontinuity—but a naive linear fit would find one.
+</figcaption>
+<div aria-describedby="fig-three-panels-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="rdd_files/figure-html/fig-three-panels-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p>Panel A shows the ideal case: the relationship is linear, and the jump at the cutoff is the true treatment effect. Panel B shows a slightly more complicated case where the underlying relationship has some curvature, but the discontinuity is still obvious. Panel C is the dangerous one. Here the true relationship is a smooth (if weirdly-shaped) curve with <em>no</em> treatment effect at all, but a naive linear fit on each side of the cutoff would produce two segments with a large gap at the cutoff.</p>
+<p>Panel C illustrates the central challenge of RD: how do we make sure a nonlinear trend in the running variable is not being misread as a jump?</p>
+</section>
+<section id="two-strategies-for-handling-nonlinearity" class="level3" data-number="15.5.2">
+<h3 data-number="15.5.2" class="anchored" data-anchor-id="two-strategies-for-handling-nonlinearity"><span class="header-section-number">15.5.2</span> Two Strategies for Handling Nonlinearity</h3>
+<p>There are two broad approaches—neither perfect, both useful.</p>
+<ol type="1">
+<li><strong>Model the nonlinearity.</strong> Include higher-order terms in the running variable (quadratic, cubic) and possibly allow the slope to differ on either side of the cutoff. This is the <strong>parametric</strong> approach.</li>
+<li><strong>Zoom in on the cutoff.</strong> Restrict attention to observations within a narrow window of the cutoff. Near the boundary, nonlinearities become much less of a worry, because any smooth curve looks roughly linear over a short interval. This is the <strong>nonparametric</strong> (or <em>local</em>) approach.</li>
+</ol>
+<p>We will look at both in turn.</p>
+</section>
+</section>
+<section id="parametric-rd-polynomials-and-interactions" class="level2" data-number="15.6">
+<h2 data-number="15.6" class="anchored" data-anchor-id="parametric-rd-polynomials-and-interactions"><span class="header-section-number">15.6</span> Parametric RD: Polynomials and Interactions</h2>
+<section id="adding-a-quadratic-term" class="level3" data-number="15.6.1">
+<h3 data-number="15.6.1" class="anchored" data-anchor-id="adding-a-quadratic-term"><span class="header-section-number">15.6.1</span> Adding a Quadratic Term</h3>
+<p>The simplest extension to our linear model adds a quadratic term:</p>
+<p><span id="eq-rd-quad"><span class="math display">\[
+Y_a = \alpha + \rho D_a + \gamma_1 a + \gamma_2 a^2 + e_a
+\tag{15.3}\]</span></span></p>
+<p>Here <span class="math inline">\(\gamma_1 a + \gamma_2 a^2\)</span> is a smooth quadratic function of the running variable. <span class="math inline">\(\rho\)</span> is still the jump at the cutoff.</p>
+</section>
+<section id="allowing-different-slopes-on-each-side-of-the-cutoff" class="level3" data-number="15.6.2">
+<h3 data-number="15.6.2" class="anchored" data-anchor-id="allowing-different-slopes-on-each-side-of-the-cutoff"><span class="header-section-number">15.6.2</span> Allowing Different Slopes on Each Side of the Cutoff</h3>
+<p>A related modification allows the relationship between age and death rates to have <em>different slopes</em> on either side of the cutoff. Maybe the decline in death rates slows (or accelerates) once drinking becomes legal. We can allow this by interacting the running variable with the treatment dummy.</p>
+<p>To keep the interpretation of <span class="math inline">\(\rho\)</span> clean, it is standard to <em>center</em> the running variable at the cutoff—that is, replace <span class="math inline">\(a\)</span> with <span class="math inline">\((a - a_0)\)</span>. In our data the running variable <code>months</code> is already centered (it equals 0 at the 21st birthday), so we can use it directly.</p>
+<p>The interacted model is:</p>
+<p><span id="eq-rd-interact"><span class="math display">\[
+Y_a = \alpha + \rho D_a + \gamma (a - a_0) + \delta (a - a_0) D_a + e_a
+\tag{15.4}\]</span></span></p>
+<p>With the running variable centered at the cutoff, <span class="math inline">\(\rho\)</span> is still the jump in average outcomes at the cutoff, and <span class="math inline">\(\delta\)</span> tells us how the slope <em>changes</em> after treatment.</p>
+</section>
+<section id="a-richer-model" class="level3" data-number="15.6.3">
+<h3 data-number="15.6.3" class="anchored" data-anchor-id="a-richer-model"><span class="header-section-number">15.6.3</span> A Richer Model</h3>
+<p>We can combine both ideas to allow a different quadratic function on each side of the cutoff:</p>
+<p><span id="eq-rd-fancy"><span class="math display">\[
+\begin{aligned}
+Y_a = &amp;\alpha + \rho D_a + \gamma_1 (a - a_0) + \gamma_2 (a - a_0)^2 \\
+      &amp;+ \delta_1 (a - a_0) D_a + \delta_2 (a - a_0)^2 D_a + e_a
+\end{aligned}
+\tag{15.5}\]</span></span></p>
+<p>This is AP’s equation (4.4). In this model, both the slope and the curvature of the age-death relationship can shift at the cutoff, so the functional form is very flexible. <span class="math inline">\(\rho\)</span> remains the causal parameter of interest.</p>
+</section>
+<section id="estimating-the-polynomial-models" class="level3" data-number="15.6.4">
+<h3 data-number="15.6.4" class="anchored" data-anchor-id="estimating-the-polynomial-models"><span class="header-section-number">15.6.4</span> Estimating the Polynomial Models</h3>
+<p>Let’s run all three parametric RD regressions.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Model 1: linear</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>rd_linear <span class="ot">&lt;-</span> <span class="fu">feols</span>(death_rate <span class="sc">~</span> over21 <span class="sc">+</span> months,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">vcov =</span> <span class="st">"HC1"</span>, <span class="at">data =</span> mlda_data)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Model 2: linear, interacted (different slopes)</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>rd_linear_int <span class="ot">&lt;-</span> <span class="fu">feols</span>(death_rate <span class="sc">~</span> over21 <span class="sc">+</span> months <span class="sc">+</span> months<span class="sc">:</span>over21,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">vcov =</span> <span class="st">"HC1"</span>, <span class="at">data =</span> mlda_data)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Model 3: fancy quadratic, interacted (AP eq. 4.4)</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>rd_fancy <span class="ot">&lt;-</span> <span class="fu">feols</span>(death_rate <span class="sc">~</span> over21 <span class="sc">+</span> months <span class="sc">+</span> <span class="fu">I</span>(months<span class="sc">^</span><span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>                      months<span class="sc">:</span>over21 <span class="sc">+</span> <span class="fu">I</span>(months<span class="sc">^</span><span class="dv">2</span>)<span class="sc">:</span>over21,</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>                  <span class="at">vcov =</span> <span class="st">"HC1"</span>, <span class="at">data =</span> mlda_data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Let’s compare the coefficients on <code>over21</code> across the three specifications:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">modelsummary</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="st">"Linear"</span>              <span class="ot">=</span> rd_linear,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>         <span class="st">"Linear, interacted"</span>  <span class="ot">=</span> rd_linear_int,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>         <span class="st">"Quadratic, interacted"</span> <span class="ot">=</span> rd_fancy),</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">coef_map =</span> <span class="fu">c</span>(<span class="st">"over21"</span> <span class="ot">=</span> <span class="st">"Over 21"</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"months"</span> <span class="ot">=</span> <span class="st">"Age (months)"</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"I(months^2)"</span> <span class="ot">=</span> <span class="st">"Age squared"</span>,</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"months:over21"</span> <span class="ot">=</span> <span class="st">"Age \u00d7 Over 21"</span>,</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"I(months^2):over21"</span> <span class="ot">=</span> <span class="st">"Age squared \u00d7 Over 21"</span>),</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">stars =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">gof_omit =</span> <span class="st">"AIC|BIC|Log|RMSE|Std"</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="tbl-rd-parametric" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-rd-parametric-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;15.1: Parametric RD estimates of the MLDA effect on mortality, using linear, interacted-linear, and fancy-quadratic specifications. The coefficient on <code>over21</code> is our estimate of the jump at the cutoff.
+</figcaption>
+<div aria-describedby="tbl-rd-parametric-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<!-- preamble start -->
+
+    <script src="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.js"></script>
+
+    <script>
+      // Create table-specific functions using external factory
+      const tableFns_a6hxm0csminbwl0og9le = TinyTable.createTableFunctions("tinytable_a6hxm0csminbwl0og9le");
+      // tinytable span after
+      window.addEventListener('load', function () {
+          var cellsToStyle = [
+            // tinytable style arrays after
+          { positions: [ { i: '7', j: 2 }, { i: '7', j: 3 }, { i: '7', j: 4 } ], css_id: 'tinytable_css_hq5t449gxoi5da5bcabv',}, 
+          { positions: [ { i: '4', j: 2 }, { i: '4', j: 3 }, { i: '4', j: 4 } ], css_id: 'tinytable_css_0q2p65ag1dl8pc3odk3m',}, 
+          { positions: [ { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '5', j: 2 }, { i: '6', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '3', j: 3 }, { i: '5', j: 3 }, { i: '6', j: 3 }, { i: '1', j: 4 }, { i: '2', j: 4 }, { i: '3', j: 4 }, { i: '5', j: 4 }, { i: '6', j: 4 } ], css_id: 'tinytable_css_23cczpzp8lzu9rx1x6d8',}, 
+          { positions: [ { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 } ], css_id: 'tinytable_css_0wuzzf863yesuaekxffg',}, 
+          { positions: [ { i: '7', j: 1 } ], css_id: 'tinytable_css_i35mkp51pid6o2n0do9e',}, 
+          { positions: [ { i: '4', j: 1 } ], css_id: 'tinytable_css_am9726qgigrcmp5m8tbo',}, 
+          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '5', j: 1 }, { i: '6', j: 1 } ], css_id: 'tinytable_css_pqfpwjnwvwb20aba0jxm',}, 
+          { positions: [ { i: '0', j: 1 } ], css_id: 'tinytable_css_q4blgc7ek9isjuhvrqbc',}, 
+          ];
+
+          // Loop over the arrays to style the cells
+          cellsToStyle.forEach(function (group) {
+              group.positions.forEach(function (cell) {
+                  tableFns_a6hxm0csminbwl0og9le.styleCell(cell.i, cell.j, group.css_id);
+              });
+          });
+      });
+    </script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
+    <style>
+    /* tinytable css entries after */
+    #tinytable_a6hxm0csminbwl0og9le td.tinytable_css_hq5t449gxoi5da5bcabv, #tinytable_a6hxm0csminbwl0og9le th.tinytable_css_hq5t449gxoi5da5bcabv {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_a6hxm0csminbwl0og9le td.tinytable_css_0q2p65ag1dl8pc3odk3m, #tinytable_a6hxm0csminbwl0og9le th.tinytable_css_0q2p65ag1dl8pc3odk3m {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_a6hxm0csminbwl0og9le td.tinytable_css_23cczpzp8lzu9rx1x6d8, #tinytable_a6hxm0csminbwl0og9le th.tinytable_css_23cczpzp8lzu9rx1x6d8 { text-align: center }
+    #tinytable_a6hxm0csminbwl0og9le td.tinytable_css_0wuzzf863yesuaekxffg, #tinytable_a6hxm0csminbwl0og9le th.tinytable_css_0wuzzf863yesuaekxffg {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_a6hxm0csminbwl0og9le td.tinytable_css_i35mkp51pid6o2n0do9e, #tinytable_a6hxm0csminbwl0og9le th.tinytable_css_i35mkp51pid6o2n0do9e {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_a6hxm0csminbwl0og9le td.tinytable_css_am9726qgigrcmp5m8tbo, #tinytable_a6hxm0csminbwl0og9le th.tinytable_css_am9726qgigrcmp5m8tbo {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_a6hxm0csminbwl0og9le td.tinytable_css_pqfpwjnwvwb20aba0jxm, #tinytable_a6hxm0csminbwl0og9le th.tinytable_css_pqfpwjnwvwb20aba0jxm { text-align: left }
+    #tinytable_a6hxm0csminbwl0og9le td.tinytable_css_q4blgc7ek9isjuhvrqbc, #tinytable_a6hxm0csminbwl0og9le th.tinytable_css_q4blgc7ek9isjuhvrqbc {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    </style>
+    <div class="container">
+      <table class="tinytable" id="tinytable_a6hxm0csminbwl0og9le" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+        
+        <thead>
+              <tr>
+                <th scope="col" data-row="0" data-col="1"> </th>
+                <th scope="col" data-row="0" data-col="2">Linear</th>
+                <th scope="col" data-row="0" data-col="3">Linear, interacted</th>
+                <th scope="col" data-row="0" data-col="4">Quadratic, interacted</th>
+              </tr>
+        </thead>
+        <tfoot><tr><td colspan="4">+ p &lt; 0.1, * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001</td></tr></tfoot>
+        <tbody>
+                <tr>
+                  <td data-row="1" data-col="1">Over 21</td>
+                  <td data-row="1" data-col="2">5.651***</td>
+                  <td data-row="1" data-col="3">5.651***</td>
+                  <td data-row="1" data-col="4">2.971+</td>
+                </tr>
+                <tr>
+                  <td data-row="2" data-col="1"></td>
+                  <td data-row="2" data-col="2">(1.220)</td>
+                  <td data-row="2" data-col="3">(1.247)</td>
+                  <td data-row="2" data-col="4">(1.722)</td>
+                </tr>
+                <tr>
+                  <td data-row="3" data-col="1">Age (months)</td>
+                  <td data-row="3" data-col="2">-0.100*</td>
+                  <td data-row="3" data-col="3">-0.100</td>
+                  <td data-row="3" data-col="4">0.392</td>
+                </tr>
+                <tr>
+                  <td data-row="4" data-col="1"></td>
+                  <td data-row="4" data-col="2">(0.040)</td>
+                  <td data-row="4" data-col="3">(0.062)</td>
+                  <td data-row="4" data-col="4">(0.239)</td>
+                </tr>
+                <tr>
+                  <td data-row="5" data-col="1">Num.Obs.</td>
+                  <td data-row="5" data-col="2">48</td>
+                  <td data-row="5" data-col="3">48</td>
+                  <td data-row="5" data-col="4">48</td>
+                </tr>
+                <tr>
+                  <td data-row="6" data-col="1">R2</td>
+                  <td data-row="6" data-col="2">0.455</td>
+                  <td data-row="6" data-col="3">0.455</td>
+                  <td data-row="6" data-col="4">0.512</td>
+                </tr>
+                <tr>
+                  <td data-row="7" data-col="1">R2 Adj.</td>
+                  <td data-row="7" data-col="2">0.430</td>
+                  <td data-row="7" data-col="3">0.417</td>
+                  <td data-row="7" data-col="4">0.453</td>
+                </tr>
+        </tbody>
+      </table>
+    </div>
+<!-- hack to avoid NA insertion in last line -->
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>Three important things to notice:</p>
+<ol type="1">
+<li><strong>The estimated MLDA effect is similar across specifications.</strong> This is reassuring—the result is not an artifact of a specific functional form. This is exactly the kind of robustness check Angrist and Pischke emphasize: a credible RD produces stable estimates as you vary the model for the running variable.</li>
+<li><strong>Standard errors grow as we add parameters.</strong> Each new term we estimate burns some degrees of freedom, which increases the standard error of <span class="math inline">\(\hat{\rho}\)</span>. The quadratic-interacted model is the most flexible, but it is also the most imprecise.</li>
+<li><strong>Interpretation.</strong> In the linear model, the slope of the age-death relationship is forced to be the same on both sides of the cutoff. In the interacted and quadratic models, the relationship can bend and curve differently on each side.</li>
+</ol>
+</section>
+<section id="visualizing-the-three-fits" class="level3" data-number="15.6.5">
+<h3 data-number="15.6.5" class="anchored" data-anchor-id="visualizing-the-three-fits"><span class="header-section-number">15.6.5</span> Visualizing the Three Fits</h3>
+<p>Since all three models estimate similar effects but with different functional forms, it is especially useful to plot the fits.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>mlda_fits <span class="ot">&lt;-</span> mlda_data <span class="sc">|&gt;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">fit_linear       =</span> <span class="fu">predict</span>(rd_linear),</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">fit_linear_int   =</span> <span class="fu">predict</span>(rd_linear_int),</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">fit_fancy        =</span> <span class="fu">predict</span>(rd_fancy)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(months, over21, death_rate,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>           fit_linear, fit_linear_int, fit_fancy) <span class="sc">|&gt;</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">starts_with</span>(<span class="st">"fit_"</span>),</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>                 <span class="at">names_to  =</span> <span class="st">"model"</span>,</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>                 <span class="at">values_to =</span> <span class="st">"yhat"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">model =</span> <span class="fu">recode</span>(model,</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">fit_linear     =</span> <span class="st">"Linear"</span>,</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">fit_linear_int =</span> <span class="st">"Linear, interacted"</span>,</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>        <span class="at">fit_fancy      =</span> <span class="st">"Quadratic, interacted"</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">model =</span> <span class="fu">factor</span>(model, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Linear"</span>, <span class="st">"Linear, interacted"</span>,</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"Quadratic, interacted"</span>)))</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(mlda_fits, <span class="fu">aes</span>(<span class="at">x =</span> months)) <span class="sc">+</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">y =</span> death_rate, <span class="at">color =</span> <span class="fu">factor</span>(over21)),</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>               <span class="at">size =</span> <span class="fl">1.6</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> yhat, <span class="at">group =</span> <span class="fu">interaction</span>(model, over21),</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>                  <span class="at">linetype =</span> <span class="fu">factor</span>(over21)),</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>              <span class="at">linewidth =</span> <span class="fl">1.0</span>, <span class="at">color =</span> <span class="st">"#d95f02"</span>) <span class="sc">+</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span>model) <span class="sc">+</span></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"0"</span> <span class="ot">=</span> <span class="st">"grey50"</span>, <span class="st">"1"</span> <span class="ot">=</span> <span class="st">"#0072B2"</span>),</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>                       <span class="at">guide =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_linetype_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"0"</span> <span class="ot">=</span> <span class="st">"solid"</span>, <span class="st">"1"</span> <span class="ot">=</span> <span class="st">"solid"</span>),</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>                          <span class="at">guide =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Age in Months (0 = 21st birthday)"</span>,</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>         <span class="at">y =</span> <span class="st">"Death Rate per 100,000"</span>) <span class="sc">+</span></span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-parametric-fits" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-parametric-fits-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;15.5: Three parametric RD fits. Each line is the predicted death rate from one model. The jump at the cutoff is the MLDA effect under that specification.
+</figcaption>
+<div aria-describedby="fig-parametric-fits-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="rdd_files/figure-html/fig-parametric-fits-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p>The three fits tell the same basic story. The quadratic-interacted model catches a little extra curvature right after the cutoff—consistent with the idea that young people party hard on their 21st birthday and then taper off—but the estimated jump is essentially the same.</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>The Danger of Over-Fitting
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Adding higher-order polynomials—quartics, quintics, and beyond—sounds like a way to be safe by letting the data tell us the shape of the trend. In practice, it is the opposite. Higher-order polynomials chase noise near the boundaries, producing wild swings that can invent spurious jumps at the cutoff. <span class="citation" data-cites="gelman_imbens_2019">Gelman and Imbens (<a href="references.html#ref-gelman_imbens_2019" role="doc-biblioref">2019</a>)</span> argue strongly against global polynomial fits of order higher than 2, recommending local linear or local quadratic fits on a narrow bandwidth instead. Most applied RD papers today stop at quadratic.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="nonparametric-rd-zooming-in-on-the-cutoff" class="level2" data-number="15.7">
+<h2 data-number="15.7" class="anchored" data-anchor-id="nonparametric-rd-zooming-in-on-the-cutoff"><span class="header-section-number">15.7</span> Nonparametric RD: Zooming In on the Cutoff</h2>
+<section id="the-idea-of-local-estimation" class="level3" data-number="15.7.1">
+<h3 data-number="15.7.1" class="anchored" data-anchor-id="the-idea-of-local-estimation"><span class="header-section-number">15.7.1</span> The Idea of Local Estimation</h3>
+<p>Instead of modeling the full age-death relationship with a global polynomial, the <strong>nonparametric</strong> approach focuses only on observations <em>near</em> the cutoff. Over a narrow enough window, any smooth function looks approximately linear—so a simple linear regression in that window should give a reasonable estimate of the jump.</p>
+<p>The econometric procedure that implements this trade-off is called <strong>local linear regression</strong>. We estimate the same linear RD as before:</p>
+<p><span id="eq-rd-local"><span class="math display">\[
+Y_a = \alpha + \rho D_a + \gamma a + e_a \quad \text{for } a_0 - b \leq a \leq a_0 + b
+\tag{15.6}\]</span></span></p>
+<p>but only using observations whose running variable lies within a <strong>bandwidth</strong> <span class="math inline">\(b\)</span> of the cutoff.</p>
+<p>Choosing a bandwidth is a classic bias-variance trade-off:</p>
+<ul>
+<li>A <strong>narrow</strong> bandwidth minimizes bias (less room for nonlinearity to confuse us) but uses less data, increasing the standard error.</li>
+<li>A <strong>wide</strong> bandwidth gives us more observations (lower variance) but risks picking up smooth nonlinearities that are not really jumps.</li>
+</ul>
+</section>
+<section id="a-hands-on-bandwidth-example" class="level3" data-number="15.7.2">
+<h3 data-number="15.7.2" class="anchored" data-anchor-id="a-hands-on-bandwidth-example"><span class="header-section-number">15.7.2</span> A Hands-On Bandwidth Example</h3>
+<p>Let’s estimate the same RD on narrower and narrower windows around the cutoff.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Subset to age 19--23 (bandwidth = 24 months)</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>rd_b24 <span class="ot">&lt;-</span> <span class="fu">feols</span>(death_rate <span class="sc">~</span> over21 <span class="sc">+</span> months,</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">vcov =</span> <span class="st">"HC1"</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">data =</span> <span class="fu">subset</span>(mlda_data, <span class="fu">abs</span>(months) <span class="sc">&lt;=</span> <span class="dv">24</span>))</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Subset to age 20--22 (bandwidth = 12 months)</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>rd_b12 <span class="ot">&lt;-</span> <span class="fu">feols</span>(death_rate <span class="sc">~</span> over21 <span class="sc">+</span> months,</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">vcov =</span> <span class="st">"HC1"</span>,</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">data =</span> <span class="fu">subset</span>(mlda_data, <span class="fu">abs</span>(months) <span class="sc">&lt;=</span> <span class="dv">12</span>))</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Subset to age 20.5--21.5 (bandwidth = 6 months)</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>rd_b06 <span class="ot">&lt;-</span> <span class="fu">feols</span>(death_rate <span class="sc">~</span> over21 <span class="sc">+</span> months,</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>                <span class="at">vcov =</span> <span class="st">"HC1"</span>,</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>                <span class="at">data =</span> <span class="fu">subset</span>(mlda_data, <span class="fu">abs</span>(months) <span class="sc">&lt;=</span> <span class="dv">6</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">modelsummary</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="st">"Bandwidth = 24 months"</span> <span class="ot">=</span> rd_b24,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>         <span class="st">"Bandwidth = 12 months"</span> <span class="ot">=</span> rd_b12,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>         <span class="st">"Bandwidth = 6 months"</span>  <span class="ot">=</span> rd_b06),</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">coef_map =</span> <span class="fu">c</span>(<span class="st">"over21"</span> <span class="ot">=</span> <span class="st">"Over 21"</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"months"</span> <span class="ot">=</span> <span class="st">"Age (months)"</span>),</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">stars =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">gof_omit =</span> <span class="st">"AIC|BIC|Log|RMSE|Std"</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="tbl-bandwidths" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-bandwidths-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;15.2: RD estimates of the MLDA effect at three different bandwidths. Narrower bandwidths mean fewer observations and larger standard errors, but also less risk of confusing a nonlinear trend for a jump.
+</figcaption>
+<div aria-describedby="tbl-bandwidths-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<!-- preamble start -->
+
+    <script src="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.js"></script>
+
+    <script>
+      // Create table-specific functions using external factory
+      const tableFns_yjilr67pt7idnty7fcxn = TinyTable.createTableFunctions("tinytable_yjilr67pt7idnty7fcxn");
+      // tinytable span after
+      window.addEventListener('load', function () {
+          var cellsToStyle = [
+            // tinytable style arrays after
+          { positions: [ { i: '7', j: 2 }, { i: '7', j: 3 }, { i: '7', j: 4 } ], css_id: 'tinytable_css_bxb5afiebl7654fejffb',}, 
+          { positions: [ { i: '4', j: 2 }, { i: '4', j: 3 }, { i: '4', j: 4 } ], css_id: 'tinytable_css_envje85knjlrgho2ovup',}, 
+          { positions: [ { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '5', j: 2 }, { i: '6', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '3', j: 3 }, { i: '5', j: 3 }, { i: '6', j: 3 }, { i: '1', j: 4 }, { i: '2', j: 4 }, { i: '3', j: 4 }, { i: '5', j: 4 }, { i: '6', j: 4 } ], css_id: 'tinytable_css_q1rae4vs5j03nom5crlb',}, 
+          { positions: [ { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 } ], css_id: 'tinytable_css_rhgj58mq3d2mcqtubtpc',}, 
+          { positions: [ { i: '7', j: 1 } ], css_id: 'tinytable_css_8emvfw41k1nwc5tyvt4s',}, 
+          { positions: [ { i: '4', j: 1 } ], css_id: 'tinytable_css_pz2l77xdwnsq3j0n26xe',}, 
+          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '5', j: 1 }, { i: '6', j: 1 } ], css_id: 'tinytable_css_xf8ueu9l40fxe6isbwds',}, 
+          { positions: [ { i: '0', j: 1 } ], css_id: 'tinytable_css_tclta6gnktrqxwgkknfv',}, 
+          ];
+
+          // Loop over the arrays to style the cells
+          cellsToStyle.forEach(function (group) {
+              group.positions.forEach(function (cell) {
+                  tableFns_yjilr67pt7idnty7fcxn.styleCell(cell.i, cell.j, group.css_id);
+              });
+          });
+      });
+    </script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
+    <style>
+    /* tinytable css entries after */
+    #tinytable_yjilr67pt7idnty7fcxn td.tinytable_css_bxb5afiebl7654fejffb, #tinytable_yjilr67pt7idnty7fcxn th.tinytable_css_bxb5afiebl7654fejffb {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_yjilr67pt7idnty7fcxn td.tinytable_css_envje85knjlrgho2ovup, #tinytable_yjilr67pt7idnty7fcxn th.tinytable_css_envje85knjlrgho2ovup {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_yjilr67pt7idnty7fcxn td.tinytable_css_q1rae4vs5j03nom5crlb, #tinytable_yjilr67pt7idnty7fcxn th.tinytable_css_q1rae4vs5j03nom5crlb { text-align: center }
+    #tinytable_yjilr67pt7idnty7fcxn td.tinytable_css_rhgj58mq3d2mcqtubtpc, #tinytable_yjilr67pt7idnty7fcxn th.tinytable_css_rhgj58mq3d2mcqtubtpc {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_yjilr67pt7idnty7fcxn td.tinytable_css_8emvfw41k1nwc5tyvt4s, #tinytable_yjilr67pt7idnty7fcxn th.tinytable_css_8emvfw41k1nwc5tyvt4s {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_yjilr67pt7idnty7fcxn td.tinytable_css_pz2l77xdwnsq3j0n26xe, #tinytable_yjilr67pt7idnty7fcxn th.tinytable_css_pz2l77xdwnsq3j0n26xe {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_yjilr67pt7idnty7fcxn td.tinytable_css_xf8ueu9l40fxe6isbwds, #tinytable_yjilr67pt7idnty7fcxn th.tinytable_css_xf8ueu9l40fxe6isbwds { text-align: left }
+    #tinytable_yjilr67pt7idnty7fcxn td.tinytable_css_tclta6gnktrqxwgkknfv, #tinytable_yjilr67pt7idnty7fcxn th.tinytable_css_tclta6gnktrqxwgkknfv {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    </style>
+    <div class="container">
+      <table class="tinytable" id="tinytable_yjilr67pt7idnty7fcxn" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+        
+        <thead>
+              <tr>
+                <th scope="col" data-row="0" data-col="1"> </th>
+                <th scope="col" data-row="0" data-col="2">Bandwidth = 24 months</th>
+                <th scope="col" data-row="0" data-col="3">Bandwidth = 12 months</th>
+                <th scope="col" data-row="0" data-col="4">Bandwidth = 6 months</th>
+              </tr>
+        </thead>
+        <tfoot><tr><td colspan="4">+ p &lt; 0.1, * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001</td></tr></tfoot>
+        <tbody>
+                <tr>
+                  <td data-row="1" data-col="1">Over 21</td>
+                  <td data-row="1" data-col="2">5.651***</td>
+                  <td data-row="1" data-col="3">4.389*</td>
+                  <td data-row="1" data-col="4">2.873</td>
+                </tr>
+                <tr>
+                  <td data-row="2" data-col="1"></td>
+                  <td data-row="2" data-col="2">(1.220)</td>
+                  <td data-row="2" data-col="3">(1.569)</td>
+                  <td data-row="2" data-col="4">(2.367)</td>
+                </tr>
+                <tr>
+                  <td data-row="3" data-col="1">Age (months)</td>
+                  <td data-row="3" data-col="2">-0.100*</td>
+                  <td data-row="3" data-col="3">-0.017</td>
+                  <td data-row="3" data-col="4">0.199</td>
+                </tr>
+                <tr>
+                  <td data-row="4" data-col="1"></td>
+                  <td data-row="4" data-col="2">(0.040)</td>
+                  <td data-row="4" data-col="3">(0.096)</td>
+                  <td data-row="4" data-col="4">(0.379)</td>
+                </tr>
+                <tr>
+                  <td data-row="5" data-col="1">Num.Obs.</td>
+                  <td data-row="5" data-col="2">48</td>
+                  <td data-row="5" data-col="3">25</td>
+                  <td data-row="5" data-col="4">13</td>
+                </tr>
+                <tr>
+                  <td data-row="6" data-col="1">R2</td>
+                  <td data-row="6" data-col="2">0.455</td>
+                  <td data-row="6" data-col="3">0.527</td>
+                  <td data-row="6" data-col="4">0.507</td>
+                </tr>
+                <tr>
+                  <td data-row="7" data-col="1">R2 Adj.</td>
+                  <td data-row="7" data-col="2">0.430</td>
+                  <td data-row="7" data-col="3">0.484</td>
+                  <td data-row="7" data-col="4">0.409</td>
+                </tr>
+        </tbody>
+      </table>
+    </div>
+<!-- hack to avoid NA insertion in last line -->
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>The point estimates are broadly similar across bandwidths, though the standard errors grow noticeably as we shrink the window. This stability under bandwidth changes is another hallmark of a credible RD.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>The <code>rdrobust</code> Package: Worth Exploring if You Use RD
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Choosing a bandwidth by hand is a judgment call. For published work, most applied economists instead use the <strong><code>rdrobust</code></strong> package in R, developed by Calonico, Cattaneo, and Titiunik. It automates the whole modern pipeline: it picks an MSE-optimal bandwidth, fits a kernel-weighted local linear (or polynomial) regression on each side of the cutoff, and reports <strong>bias-corrected</strong> point estimates together with <strong>robust standard errors</strong> that remain valid even when the optimal bandwidth is imperfect. The companion function <code>rdplot()</code> produces the publication-ready “jump at the cutoff” graph that you see in RD papers.</p>
+<p>We are not going to work through <code>rdrobust</code> in this course. The hand-coded <code>feols</code> RD above captures the essential idea: run a linear regression in a narrow window, and you have a local-linear nonparametric RD. But if you ever write a paper or thesis using an RD design, <code>rdrobust</code> is the tool to reach for. Useful references to start from are <span class="citation" data-cites="imbens_kalyanaraman_2012">Imbens and Kalyanaraman (<a href="references.html#ref-imbens_kalyanaraman_2012" role="doc-biblioref">2012</a>)</span> and <span class="citation" data-cites="calonico_2014">Calonico et al. (<a href="references.html#ref-calonico_2014" role="doc-biblioref">2014</a>)</span>. Installing the package is simple: <code>install.packages("rdrobust")</code>.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="cause-specific-effects-a-falsification-test" class="level2" data-number="15.8">
+<h2 data-number="15.8" class="anchored" data-anchor-id="cause-specific-effects-a-falsification-test"><span class="header-section-number">15.8</span> Cause-Specific Effects: A Falsification Test</h2>
+<section id="the-idea" class="level3" data-number="15.8.1">
+<h3 data-number="15.8.1" class="anchored" data-anchor-id="the-idea"><span class="header-section-number">15.8.1</span> The Idea</h3>
+<p>If our RD estimate really reflects the causal effect of legal drinking, we should see it for outcomes that alcohol plausibly affects—motor vehicle accidents, alcohol-related disease—but not for outcomes it has no good reason to affect—cancer, heart disease, or other internal causes.</p>
+<p>This is exactly what Carpenter and Dobkin found. In AP Table 4.1, the MLDA effect on all deaths is about 7.7 per 100,000, driven by roughly:</p>
+<ul>
+<li><strong>Motor vehicle accidents:</strong> 4.5 per 100,000</li>
+<li><strong>Suicide:</strong> 1.8</li>
+<li><strong>Other external causes:</strong> 0.8</li>
+<li><strong>All internal causes:</strong> 0.4 (statistically indistinguishable from zero)</li>
+</ul>
+<p>The near-zero effect on internal causes is our evidence that what we are picking up is not some mysterious coincidence of poor health at age 21, but rather the real effect of drinking behavior. It is a <strong>falsification test</strong>: an outcome that <em>should</em> show no effect is used to stress-test the design.</p>
+</section>
+<section id="a-simulated-illustration" class="level3" data-number="15.8.2">
+<h3 data-number="15.8.2" class="anchored" data-anchor-id="a-simulated-illustration"><span class="header-section-number">15.8.2</span> A Simulated Illustration</h3>
+<p>Let’s simulate two separate causes of death—a large MLDA effect on motor vehicle fatalities and a near-zero effect on internal causes—and plot them:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">99</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>cause_months <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">24</span>, <span class="dv">23</span>, <span class="at">by =</span> <span class="dv">1</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>cause_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">months =</span> cause_months,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">over21 =</span> <span class="fu">as.numeric</span>(months <span class="sc">&gt;=</span> <span class="dv">0</span>),</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">mva    =</span> <span class="dv">25</span> <span class="sc">+</span> <span class="fl">0.05</span> <span class="sc">*</span> months <span class="sc">+</span> <span class="fl">4.5</span> <span class="sc">*</span> over21 <span class="sc">+</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>             <span class="fu">rnorm</span>(<span class="fu">length</span>(cause_months), <span class="dv">0</span>, <span class="fl">1.2</span>),</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">intern =</span> <span class="dv">15</span> <span class="sc">+</span> <span class="fl">0.10</span> <span class="sc">*</span> months <span class="sc">+</span> <span class="fl">0.4</span> <span class="sc">*</span> over21 <span class="sc">+</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>             <span class="fu">rnorm</span>(<span class="fu">length</span>(cause_months), <span class="dv">0</span>, <span class="fl">1.0</span>)</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_longer</span>(<span class="fu">c</span>(mva, intern), <span class="at">names_to =</span> <span class="st">"cause"</span>, <span class="at">values_to =</span> <span class="st">"rate"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">cause =</span> <span class="fu">recode</span>(cause,</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>                          <span class="at">mva    =</span> <span class="st">"Motor vehicle fatalities"</span>,</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>                          <span class="at">intern =</span> <span class="st">"Deaths from internal causes"</span>))</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(cause_data, <span class="fu">aes</span>(<span class="at">x =</span> months, <span class="at">y =</span> rate, <span class="at">color =</span> cause)) <span class="sc">+</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">1.8</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="fu">aes</span>(<span class="at">group =</span> <span class="fu">interaction</span>(cause, over21)),</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>                <span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">formula =</span> y <span class="sc">~</span> <span class="fu">poly</span>(x, <span class="dv">2</span>),</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>                <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Motor vehicle fatalities"</span> <span class="ot">=</span> <span class="st">"#0072B2"</span>,</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>                                  <span class="st">"Deaths from internal causes"</span> <span class="ot">=</span> <span class="st">"grey50"</span>)) <span class="sc">+</span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Age in Months (0 = 21st birthday)"</span>,</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>         <span class="at">y =</span> <span class="st">"Death Rate per 100,000"</span>,</span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>         <span class="at">color =</span> <span class="st">"Cause of death"</span>) <span class="sc">+</span></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-cause-specific" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-cause-specific-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;15.6: A visual falsification test: motor vehicle fatalities (blue) jump sharply at the MLDA cutoff, while deaths from internal causes (gray) show essentially no jump. This pattern supports a causal interpretation of the MLDA effect.
+</figcaption>
+<div aria-describedby="fig-cause-specific-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="rdd_files/figure-html/fig-cause-specific-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p>The picture says it all. Motor vehicle fatalities jump sharply at the cutoff; deaths from internal causes barely budge. Alcohol is plausibly responsible for the first pattern and demonstrably not responsible for the second. This is the kind of evidence that makes an RD design convincing to a skeptical reader.</p>
+</section>
+</section>
+<section id="a-brief-note-on-fuzzy-rd" class="level2" data-number="15.9">
+<h2 data-number="15.9" class="anchored" data-anchor-id="a-brief-note-on-fuzzy-rd"><span class="header-section-number">15.9</span> A Brief Note on Fuzzy RD</h2>
+<p>Everything above assumes <strong>sharp RD</strong>: the cutoff determines treatment status cleanly. In many real-world applications the cutoff does not assign treatment perfectly—it only shifts the <em>probability</em> or <em>intensity</em> of treatment. Think of a scholarship that most but not all qualifying students accept, or an elite school offer that many qualifying students decline and a few non-qualifying students circumvent. This setting is called <strong>fuzzy RD</strong>.</p>
+<p>The intuition is straightforward if you have already seen IV (<a href="instrumental_variables.html" class="quarto-xref"><span>Chapter 14</span></a>): the cutoff indicator is an <strong>instrument</strong> for the underlying treatment, and the causal effect is estimated by 2SLS. Specifically, you divide the jump in the outcome at the cutoff (the reduced form) by the jump in the treatment probability at the cutoff (the first stage). All the usual IV caveats apply—the first stage must be strong, and the exclusion restriction is the claim that clearing the cutoff affects the outcome only through treatment.</p>
+<p>We will not estimate a fuzzy RD in this course. Just know that it exists, that a famous example is Abdulkadiroğlu, Angrist, and Pathak’s (2014) study of Boston’s elite exam schools (the “elite illusion”), and that the technique sits at the intersection of RD and IV.</p>
+</section>
+<section id="assessing-the-validity-of-an-rd-design" class="level2" data-number="15.10">
+<h2 data-number="15.10" class="anchored" data-anchor-id="assessing-the-validity-of-an-rd-design"><span class="header-section-number">15.10</span> Assessing the Validity of an RD Design</h2>
+<section id="what-could-go-wrong" class="level3" data-number="15.10.1">
+<h3 data-number="15.10.1" class="anchored" data-anchor-id="what-could-go-wrong"><span class="header-section-number">15.10.1</span> What Could Go Wrong</h3>
+<p>RD rests on one fundamental assumption: <strong>in the absence of treatment, the outcome would be a smooth function of the running variable through the cutoff</strong>. If that assumption holds, any jump in the outcome at the cutoff must be caused by treatment. If it fails, our estimate of <span class="math inline">\(\rho\)</span> could reflect all sorts of non-treatment factors.</p>
+<p>Two things in particular can break this assumption:</p>
+<ol type="1">
+<li><strong>Manipulation of the running variable.</strong> If units can precisely control where they fall relative to the cutoff, they can “choose” their own treatment status. This breaks the as-good-as-random comparison right at the cutoff. Canonical worry: a test-based scholarship where test administrators give some students an extra point to push them over the threshold; or a minimum income threshold for benefits where families can plausibly report income just below the cutoff.</li>
+<li><strong>Other things changing at the cutoff.</strong> If some other policy or treatment shifts at exactly the same cutoff, we may be picking up a mixture of effects. Example: if legal drinking at 21 coincides with eligibility for some other 21+ privilege (like a different insurance rate), the MLDA effect we estimate includes both.</li>
+</ol>
+</section>
+<section id="covariate-balance-tests" class="level3" data-number="15.10.2">
+<h3 data-number="15.10.2" class="anchored" data-anchor-id="covariate-balance-tests"><span class="header-section-number">15.10.2</span> Covariate Balance Tests</h3>
+<p>A good RD paper tests whether <em>pre-determined covariates</em>—variables measured before treatment is assigned, or that treatment could not plausibly affect—are balanced across the cutoff. If applicants who barely cleared the cutoff differ from those who barely missed it on variables like parental income, prior test scores, or gender, that is evidence that something other than pure randomization is happening at the boundary. Conversely, if these variables are smooth through the cutoff, the design looks more credible.</p>
+<p>In practice, we run RD regressions of <em>each covariate</em> on the cutoff dummy (with controls for the running variable) and check that <span class="math inline">\(\hat{\rho}\)</span> is close to zero. This is exactly what Abdulkadiroğlu, Angrist, and Pathak did for their exam school study: they showed that applicants’ own prior test scores, family background, and demographics do <strong>not</strong> jump at the cutoff, which is necessary for the RD interpretation to hold.</p>
+</section>
+<section id="density-tests-for-manipulation" class="level3" data-number="15.10.3">
+<h3 data-number="15.10.3" class="anchored" data-anchor-id="density-tests-for-manipulation"><span class="header-section-number">15.10.3</span> Density Tests for Manipulation</h3>
+<p>If units manipulate the running variable to end up on their preferred side of the cutoff, we would expect to see a “pile-up” just above or just below. A plot of the density of the running variable should be smooth through the cutoff; a sharp spike or dip is a red flag.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-mccrary" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-mccrary-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;15.7: Two density plots. Left: smooth density through the cutoff—no evidence of manipulation. Right: a clear pile-up just above the cutoff, suggesting units may be manipulating their running-variable values to qualify for treatment.
+</figcaption>
+<div aria-describedby="fig-mccrary-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="rdd_files/figure-html/fig-mccrary-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p>The formal test for this is the <strong>McCrary density test</strong> (<span class="citation" data-cites="mccrary_2008">McCrary (<a href="references.html#ref-mccrary_2008" role="doc-biblioref">2008</a>)</span>), which estimates the densities on either side of the cutoff and checks for a discontinuity. The <code>rddensity</code> package in R (from the same authors as <code>rdrobust</code>) implements a modern version due to <span class="citation" data-cites="cattaneo_2020">Cattaneo et al. (<a href="references.html#ref-cattaneo_2020" role="doc-biblioref">2020</a>)</span>.</p>
+</section>
+<section id="placebo-cutoffs" class="level3" data-number="15.10.4">
+<h3 data-number="15.10.4" class="anchored" data-anchor-id="placebo-cutoffs"><span class="header-section-number">15.10.4</span> Placebo Cutoffs</h3>
+<p>Another useful check is to estimate “effects” at fake cutoffs—values of the running variable where, in fact, nothing changes. If we find an “effect” of comparable size at, say, age 20 or age 22, our original finding at age 21 looks less credible: it suggests that the fitted model is just picking up some kind of noise or curvature that happens to jump at whatever value we plug in. If the fake cutoffs produce precisely-zero estimates, the real cutoff looks more convincing.</p>
+</section>
+</section>
+<section id="a-summary-picture-sharp-rd-in-one-figure" class="level2" data-number="15.11">
+<h2 data-number="15.11" class="anchored" data-anchor-id="a-summary-picture-sharp-rd-in-one-figure"><span class="header-section-number">15.11</span> A Summary Picture: Sharp RD in One Figure</h2>
+<p>To bring everything together, <a href="#fig-rd-summary" class="quarto-xref">Figure&nbsp;<span>15.8</span></a> shows a complete stylized sharp RD in one picture.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-rd-summary" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-fig" id="fig-rd-summary-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;15.8: Anatomy of a sharp RD. The smooth curve in each region is the expected outcome given the running variable. The jump at the cutoff is the causal effect. Extrapolating the left-hand curve across the cutoff (dashed line) gives the counterfactual outcome for the treated group.
+</figcaption>
+<div aria-describedby="fig-rd-summary-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="rdd_files/figure-html/fig-rd-summary-1.png" class="img-fluid figure-img" width="672">
+</div>
+</figure>
+</div>
+</div>
+</div>
+<p>The pink bracket shows the causal effect <span class="math inline">\(\rho\)</span>: the vertical distance between what we actually observe just above the cutoff and what we <em>would have observed</em> had the trend below the cutoff continued smoothly.</p>
+</section>
+<section id="summary" class="level2" data-number="15.12">
+<h2 data-number="15.12" class="anchored" data-anchor-id="summary"><span class="header-section-number">15.12</span> Summary</h2>
+<p>Regression discontinuity is one of the most transparent and credible causal-inference designs available. It turns rigid rules and cutoffs into natural experiments by exploiting the fact that units just above and just below a threshold are almost identical except for treatment.</p>
+<p>The core ideas:</p>
+<ol type="1">
+<li><strong>Running variables and cutoffs.</strong> RD requires a continuous measured variable and a known cutoff at which treatment changes. The MLDA, admissions cutoffs, income eligibility thresholds, and close elections all fit the bill.</li>
+<li><strong>Sharp RD.</strong> We focused on <em>sharp</em> RD, where treatment is a deterministic function of the running variable. A <em>fuzzy</em> RD variant—where the cutoff only shifts the probability of treatment—exists and is handled by combining RD with IV. We flagged it but did not estimate one.</li>
+<li><strong>Modeling the running variable.</strong> The RD estimate is the jump in the outcome at the cutoff after controlling for smooth trends in the running variable. Linear, interacted, and quadratic specifications are standard; higher-order polynomials are generally a bad idea.</li>
+<li><strong>Parametric vs.&nbsp;nonparametric.</strong> Parametric RD fits a global polynomial to all the data. Nonparametric RD focuses on observations in a narrow bandwidth around the cutoff. Bandwidth choice is a bias-variance trade-off, and modern implementations (notably the <code>rdrobust</code> package in R) automate the optimal choice and inference—worth exploring if you ever use an RD design in practice.</li>
+<li><strong>Validity checks.</strong> A credible RD paper shows (a) that pre-determined covariates are balanced across the cutoff, (b) that the density of the running variable is smooth through the cutoff (no manipulation), (c) that results are stable across bandwidth and polynomial choices, and (d) that “effects” vanish at placebo cutoffs and on falsification outcomes.</li>
+</ol>
+<p>A credible RD tells a clear story: here is the rule, here is the cutoff, here is the jump, and here is why nothing else can explain it. When those pieces fall into place, RD can deliver causal estimates that are hard to argue with.</p>
+</section>
+<section id="check-your-understanding" class="level2" data-number="15.13">
+<h2 data-number="15.13" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">15.13</span> Check Your Understanding</h2>
+<p>For each question below, select the best answer from the dropdown menu.</p>
+<div class="question">
+<div class="answer-row">
+    <label>i. What is a "running variable" in an RD design? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">A variable that changes randomly over time</option>
+        <option value="b">The dependent variable in the RD regression</option>
+        <option value="c">The continuous variable whose value determines treatment assignment at a cutoff</option>
+        <option value="d">A variable that must be included as a control in the regression</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>ii. In a <b>sharp</b> RD design, the treatment variable is... </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Randomly assigned by a coin flip</option>
+        <option value="b">A deterministic function of the running variable, switching from 0 to 1 (or vice versa) at the cutoff</option>
+        <option value="c">A noisy function of a latent variable</option>
+        <option value="d">Determined by the researcher's choice of bandwidth</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iii. Why do we add polynomial terms of the running variable in parametric RD? </label>
+    <select onchange="checkAnswer(this, 'a')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">To ensure we do not mistake nonlinear trends in the running variable for a jump at the cutoff</option>
+        <option value="b">To increase the statistical power of the estimate</option>
+        <option value="c">Because the outcome is always nonlinear</option>
+        <option value="d">To satisfy the exclusion restriction</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>iv. What trade-off does bandwidth selection involve in nonparametric RD? </label>
+    <select onchange="checkAnswer(this, 'd')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Between linearity and nonlinearity of the running variable</option>
+        <option value="b">Between treatment and control units</option>
+        <option value="c">Between point estimates and standard errors, unrelated to bias</option>
+        <option value="d">Between bias (wider bandwidths risk more) and variance (narrower bandwidths have less data)</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>v. If the density of the running variable shows a sharp pile-up just above the cutoff, this suggests... </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The cutoff is not sharp enough</option>
+        <option value="b">Units may be manipulating the running variable, threatening the validity of the RD design</option>
+        <option value="c">The model should use a quadratic term</option>
+        <option value="d">The bandwidth is too wide</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>vi. In the Carpenter &amp; Dobkin (2009) MLDA study, why was finding a large jump in motor vehicle fatalities but <i>not</i> in internal-cause deaths important? </label>
+    <select onchange="checkAnswer(this, 'a')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">It is a falsification test: the absence of effects on outcomes that alcohol should not affect increases confidence that the effects on outcomes it should affect are causal</option>
+        <option value="b">It proved that the MLDA is the correct policy</option>
+        <option value="c">It demonstrates that internal causes of death are under-reported</option>
+        <option value="d">It shows that the bandwidth was correctly chosen</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>vii. <b>(Challenge)</b> Suppose an RD estimate is large and statistically significant when a researcher uses a 5th-order polynomial for the running variable, but small and insignificant when using a linear or quadratic control. What should we conclude? </label>
+    <select onchange="checkAnswer(this, 'c')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">The effect is real and the higher-order polynomial is most accurate</option>
+        <option value="b">The linear model has too few parameters and should be rejected</option>
+        <option value="c">High-order polynomials are known to produce unreliable estimates in RD; the stability of simpler specifications should be treated as more credible evidence</option>
+        <option value="d">More data are needed before any conclusion can be reached</option>
+    </select>
+</div>
+
+<div class="answer-row">
+    <label>viii. <b>(Challenge)</b> In a sharp RD design, the treatment dummy $D_a$ is determined entirely by the running variable $a$. Why does this mean there is <i>no classical omitted variable bias</i>, assuming the running variable is correctly modeled? </label>
+    <select onchange="checkAnswer(this, 'b')">
+        <option value="">-- Select Answer --</option>
+        <option value="a">Because treatment is random</option>
+        <option value="b">Because any omitted variable correlated with treatment must also be correlated with (a function of) the running variable, so adequately controlling for the running variable also controls for every such omitted variable</option>
+        <option value="c">Because RD uses many covariates</option>
+        <option value="d">Because the sample size near the cutoff is small</option>
+    </select>
+</div>
+
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show Explanation
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="i">
+<li><p>The <strong>running variable</strong> is the continuous measure whose value determines whether a unit is treated (above the cutoff) or not (below). In the MLDA example, it is age. In exam schools, it is the admissions test score. The running variable is the backbone of the RD design: it is both the source of treatment assignment and the variable we must control for smoothly.</p></li>
+<li><p>In a <strong>sharp</strong> RD, <span class="math inline">\(D_a\)</span> is a deterministic, discontinuous function of the running variable: if your age is at least 21, you are treated, period. (In the <em>fuzzy</em> variant, briefly noted at the end of the chapter, the cutoff only changes the <em>probability</em> of treatment.)</p></li>
+<li><p>Panel C of <a href="#fig-three-panels" class="quarto-xref">Figure&nbsp;<span>15.4</span></a> shows why we add polynomials. A naive linear fit will be forced to approximate a curved relationship with two straight lines, and if the curvature changes sign near the cutoff, it will <em>look</em> like a jump even when none exists. Adding a quadratic (or an interacted linear) term lets the regression model the curvature instead of mistaking it for treatment.</p></li>
+<li><p>Bandwidth selection is a classic <strong>bias-variance trade-off</strong>. A narrower bandwidth means fewer observations (higher variance) but a smaller window in which nonlinearity can confuse us (lower bias). A wider bandwidth uses more data (lower variance) but may pick up nonlinear trends that are not really jumps (higher bias). Modern tools like <code>rdrobust</code> pick a bandwidth that minimizes the mean squared error.</p></li>
+<li><p>A pile-up just above the cutoff is the signature of <strong>manipulation</strong>: units engineering their running-variable values to end up on the treated side. When this happens, units just above and just below the cutoff are no longer comparable, since the treated group disproportionately contains motivated manipulators. The McCrary density test (or its modern successor in <code>rddensity</code>) formalizes this diagnostic.</p></li>
+<li><p>Finding <em>no</em> jump in internal-cause deaths at the MLDA cutoff is a <strong>falsification test</strong> (or “balance test”): an outcome that drinking should not affect shows the expected null result, while outcomes that drinking <em>should</em> affect (motor vehicle deaths, suicides, alcohol-related illness) do show big jumps. The null results rule out alternative explanations—like some other policy changing at age 21, or some coincidental jump in mortality—because such explanations would have produced effects on both kinds of deaths.</p></li>
+<li><p><span class="citation" data-cites="gelman_imbens_2019">Gelman and Imbens (<a href="references.html#ref-gelman_imbens_2019" role="doc-biblioref">2019</a>)</span> make a strong case against high-order polynomials in RD: they give too much weight to extreme observations and can produce large, oscillating fits near the cutoff, generating spurious jumps. Modern best practice is to fit local linear (or at most local quadratic) regressions on a narrow bandwidth, and to show that results are stable across reasonable bandwidths and specifications. An estimate that appears only at polynomial order 5 is a warning sign, not evidence of a subtle true effect.</p></li>
+<li><p>OVB in a regression <span class="math inline">\(Y = \beta_0 + \beta_1 D + e\)</span> occurs when some omitted variable <span class="math inline">\(Z\)</span> is correlated with both <span class="math inline">\(D\)</span> and <span class="math inline">\(Y\)</span>. But in sharp RD, <span class="math inline">\(D\)</span> is a <em>deterministic function</em> of the running variable <span class="math inline">\(R\)</span>: <span class="math inline">\(D = \mathbf{1}\{R \geq c\}\)</span>. So any <span class="math inline">\(Z\)</span> correlated with <span class="math inline">\(D\)</span> must also be correlated with <span class="math inline">\(R\)</span> (or some function of it). Once we correctly control for <span class="math inline">\(R\)</span> (via a sufficiently flexible polynomial or a sufficiently narrow bandwidth), there is no variation left in <span class="math inline">\(D\)</span> that is also correlated with any such <span class="math inline">\(Z\)</span>. This is why RD has a much weaker reliance on observables than straight OLS—its credibility rests on modeling one variable (the running variable) correctly, rather than on controlling for everything that might confound treatment.</p></li>
+</ol>
+</div>
+</div>
+</div>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
+<div id="ref-calonico_2014" class="csl-entry" role="listitem">
+Calonico, Sebastian, Matias D. Cattaneo, and Rocío Titiunik. 2014. <span>“Robust Nonparametric Confidence Intervals for Regression-Discontinuity Designs.”</span> <em>Econometrica</em> 82 (6): 2295–326. <a href="https://www.jstor.org/stable/24029383">https://www.jstor.org/stable/24029383</a>.
+</div>
+<div id="ref-cattaneo_2020" class="csl-entry" role="listitem">
+Cattaneo, Matias D., Michael Jansson, and Xinwei Ma. 2020. <span>“Simple Local Polynomial Density Estimators.”</span> <em>Journal of the American Statistical Association</em> 115 (531): 1449–55. <a href="https://doi.org/10.1080/01621459.2019.1635480">https://doi.org/10.1080/01621459.2019.1635480</a>.
+</div>
+<div id="ref-gelman_imbens_2019" class="csl-entry" role="listitem">
+Gelman, Andrew, and Guido Imbens. 2019. <span>“Why High-Order Polynomials Should Not Be Used in Regression Discontinuity Designs.”</span> <em>Journal of Business &amp; Economic Statistics</em> 37 (3): 447–56. <a href="https://doi.org/10.1080/07350015.2017.1366909">https://doi.org/10.1080/07350015.2017.1366909</a>.
+</div>
+<div id="ref-imbens_kalyanaraman_2012" class="csl-entry" role="listitem">
+Imbens, Guido, and Karthik Kalyanaraman. 2012. <span>“Optimal Bandwidth Choice for the Regression Discontinuity Estimator.”</span> <em>The Review of Economic Studies</em> 79 (3): 933–59. <a href="https://doi.org/10.1093/restud/rdr043">https://doi.org/10.1093/restud/rdr043</a>.
+</div>
+<div id="ref-mccrary_2008" class="csl-entry" role="listitem">
+McCrary, Justin. 2008. <span>“Manipulation of the Running Variable in the Regression Discontinuity Design: A Density Test.”</span> <em>Journal of Econometrics</em> 142 (2): 698–714. <a href="https://doi.org/10.1016/j.jeconom.2007.05.005">https://doi.org/10.1016/j.jeconom.2007.05.005</a>.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/instrumental_variables.html" class="pagination-link" aria-label="Instrumental Variables">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Instrumental Variables</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/putting_it_all_together.html" class="pagination-link" aria-label="Putting It All Together">
+        <span class="nav-page-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Putting It All Together</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p><span class="faux-block"> © 2025-2026 Raymond Caraher. All rights reserved. </span></p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
