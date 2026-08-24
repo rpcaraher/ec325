@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Prof. Caraher">
-<meta name="dcterms.date" content="2026-02-03">
+<meta name="dcterms.date" content="2026-08-24">
 
 <title>Software Installation Guide</title>
 <style>
@@ -3097,6 +3097,13 @@ vertical-align: -.125em;
   <li><a href="#step-5-configure-git" id="toc-step-5-configure-git" class="nav-link" data-scroll-target="#step-5-configure-git">Step 5: Configure Git</a></li>
   <li><a href="#step-6-clone-the-course-repository" id="toc-step-6-clone-the-course-repository" class="nav-link" data-scroll-target="#step-6-clone-the-course-repository">Step 6: Clone the Course Repository</a></li>
   <li><a href="#step-7-verify-your-setup" id="toc-step-7-verify-your-setup" class="nav-link" data-scroll-target="#step-7-verify-your-setup">Step 7: Verify Your Setup</a></li>
+  <li><a href="#troubleshooting" id="toc-troubleshooting" class="nav-link" data-scroll-target="#troubleshooting">Troubleshooting</a>
+  <ul class="collapse">
+  <li><a href="#version-control-git-is-missing-or-greyed-out" id="toc-version-control-git-is-missing-or-greyed-out" class="nav-link" data-scroll-target="#version-control-git-is-missing-or-greyed-out">“Version Control → Git” is missing or greyed out</a></li>
+  <li><a href="#the-mac-command-line-developer-tools-install-fails-or-hangs" id="toc-the-mac-command-line-developer-tools-install-fails-or-hangs" class="nav-link" data-scroll-target="#the-mac-command-line-developer-tools-install-fails-or-hangs">The Mac Command Line Developer Tools install fails or hangs</a></li>
+  <li><a href="#the-clone-worked-but-i-dont-see-the-files" id="toc-the-clone-worked-but-i-dont-see-the-files" class="nav-link" data-scroll-target="#the-clone-worked-but-i-dont-see-the-files">The clone worked but I don’t see the files</a></li>
+  <li><a href="#something-else" id="toc-something-else" class="nav-link" data-scroll-target="#something-else">Something else</a></li>
+  </ul></li>
   </ul>
 <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="../ec325_installation_guide.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
 </div>
@@ -3122,7 +3129,7 @@ vertical-align: -.125em;
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">February 3, 2026</p>
+      <p class="date">August 24, 2026</p>
     </div>
   </div>
   
@@ -3135,7 +3142,8 @@ vertical-align: -.125em;
 
 
 <p>This guide walks you through installing everything you need for EC325: Econometrics. Please complete these steps <strong>the first week of class</strong>.</p>
-<p>If you have any issues, please send me an email or come to office hours.</p>
+<p>Work through the steps in order—each one builds on the last. Set aside about an hour, and do it somewhere with a solid internet connection.</p>
+<p>If you have any issues, check the <a href="#troubleshooting">Troubleshooting</a> section at the end of this guide first. If that doesn’t solve it, please send me an email or come to office hours.</p>
 <section id="step-1-install-r" class="level2">
 <h2 class="anchored" data-anchor-id="step-1-install-r">Step 1: Install R</h2>
 <p>R is the statistical programming language we’ll use throughout the course.</p>
@@ -3144,6 +3152,19 @@ vertical-align: -.125em;
 <li>Click the download link for your operating system (Windows, macOS, or Linux)</li>
 <li>Follow the installation instructions</li>
 </ol>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Already Have R From Another Class?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If you installed R for a previous course, you may have an older version. This course uses features that require <strong>R 4.1 or newer</strong>. Open RStudio and run <code>R.version.string</code> in the console to check. If you’re below 4.1, install the current version using the link above—you can have both, and RStudio will use the newest one.</p>
+</div>
+</div>
 </section>
 <section id="step-2-install-rstudio" class="level2">
 <h2 class="anchored" data-anchor-id="step-2-install-rstudio">Step 2: Install RStudio</h2>
@@ -3187,6 +3208,7 @@ Important
 <li>If Git isn’t installed, you’ll see a pop-up prompting you to install the Command Line Developer Tools—click “Install”</li>
 <li>Wait for the installation to complete</li>
 </ol>
+<p>The Command Line Developer Tools download is large and can take 10–30 minutes depending on your connection. Let it finish before moving on.</p>
 </section>
 <section id="windows-users" class="level3">
 <h3 class="anchored" data-anchor-id="windows-users">Windows Users</h3>
@@ -3197,6 +3219,19 @@ Important
 <li><strong>Use the default settings</strong> for all options (just keep clicking “Next”)</li>
 <li>Click “Install” and then “Finish”</li>
 </ol>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Install Git Before You Reopen RStudio
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>RStudio only looks for Git when it starts up. If RStudio was already open while you installed Git, quit it completely and reopen it now, or it won’t find Git in the next step.</p>
+</div>
+</div>
 </section>
 </section>
 <section id="step-5-configure-git" class="level2">
@@ -3207,9 +3242,9 @@ Important
 <li>Go to <strong>Tools → Terminal → New Terminal</strong></li>
 <li>Type the following commands, pressing Enter after each line:</li>
 </ol>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> config <span class="at">--global</span> user.name <span class="st">&quot;Your username&quot;</span></span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> config <span class="at">--global</span> user.name <span class="st">&quot;Your Name&quot;</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> config <span class="at">--global</span> user.email <span class="st">&quot;your.email@colby.edu&quot;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Replace <code>Your username</code> with your actual GitHub username name and <code>your.email@colby.edu</code> with your Colby email (or whatever email you used for your GitHub account).</p>
+<p>Replace <code>Your Name</code> with your name (or your GitHub username) and <code>your.email@colby.edu</code> with your Colby email (or whatever email you used for your GitHub account). Keep the quotation marks.</p>
 <p>To verify it worked, type:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> config <span class="at">--global</span> user.name</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> config <span class="at">--global</span> user.email</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -3222,10 +3257,37 @@ Important
 <li>Open RStudio</li>
 <li>Go to <strong>File → New Project → Version Control → Git</strong></li>
 <li>Enter the repository URL: <code>https://github.com/rpcaraher/ec325.git</code></li>
-<li>Choose where to save the folder on your computer (e.g., your Documents folder)</li>
+<li>Choose where to save the folder on your computer (see the warning below)</li>
 <li>Click “Create Project”</li>
 </ol>
-<p>You now have all course materials! To get updates throughout the semester, click the <strong>Pull</strong> button in the Git tab (usually in the top-right panel of RStudio).</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Don’t Put It in a Cloud-Synced Folder
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Do <strong>not</strong> save the project inside iCloud Drive, OneDrive, Dropbox, or Google Drive. These services sync files in the background and will fight with Git, which can corrupt the repository and produce errors that are genuinely painful to untangle.</p>
+<p>On most Macs, your <strong>Desktop and Documents folders are synced to iCloud by default</strong>, so avoid those. A good choice is a new folder in your home directory, such as <code>~/GitHub/</code> on Mac or <code>C:\Users\YourName\GitHub\</code> on Windows.</p>
+</div>
+</div>
+<p>You now have all course materials! To get updates throughout the semester, click the <strong>Pull</strong> button (the down arrow) in the Git tab, usually in the top-right panel of RStudio.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Pull Only—Never Push
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The Git tab has <strong>Commit</strong> and <strong>Push</strong> buttons sitting right next to <strong>Pull</strong>. You only ever need <strong>Pull</strong>. Committing changes to the course files is what causes merge conflicts later, and Push will just fail with a login prompt, since you don’t have write access to my repository. Keep your own work in the <code>student-work/</code> folder and you’ll never have a problem.</p>
+</div>
+</div>
 </section>
 <section id="step-7-verify-your-setup" class="level2">
 <h2 class="anchored" data-anchor-id="step-7-verify-your-setup">Step 7: Verify Your Setup</h2>
@@ -3234,8 +3296,52 @@ Important
 <li>Open RStudio</li>
 <li>In the Console (bottom-left panel), type <code>2 + 2</code> and press Enter</li>
 <li>You should see <code>[1] 4</code></li>
+<li>Check that the <strong>Git</strong> tab is present in the upper-right panel of RStudio</li>
 </ol>
 <p>If that works, you’re ready for class!</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+What About R Packages?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>R’s add-on packages extend what it can do, and we’ll use a number of them this semester. You don’t need to install any of them now—we’ll install each one together in class as we get to it.</p>
+</div>
+</div>
+</section>
+<section id="troubleshooting" class="level2">
+<h2 class="anchored" data-anchor-id="troubleshooting">Troubleshooting</h2>
+<section id="version-control-git-is-missing-or-greyed-out" class="level3">
+<h3 class="anchored" data-anchor-id="version-control-git-is-missing-or-greyed-out">“Version Control → Git” is missing or greyed out</h3>
+<p>This is the most common issue, and it almost always means RStudio was open before Git finished installing.</p>
+<ol type="1">
+<li>Quit RStudio completely (not just close the window) and reopen it</li>
+<li>If it’s still missing, go to <strong>Tools → Global Options → Git/SVN</strong></li>
+<li>Make sure <strong>“Enable version control interface for RStudio projects”</strong> is checked</li>
+<li>Check that the Git executable path is filled in. If it’s blank, click “Browse” and set it to:
+<ul>
+<li><strong>Mac:</strong> <code>/usr/bin/git</code></li>
+<li><strong>Windows:</strong> <code>C:/Program Files/Git/bin/git.exe</code></li>
+</ul></li>
+<li>Restart RStudio</li>
+</ol>
+</section>
+<section id="the-mac-command-line-developer-tools-install-fails-or-hangs" class="level3">
+<h3 class="anchored" data-anchor-id="the-mac-command-line-developer-tools-install-fails-or-hangs">The Mac Command Line Developer Tools install fails or hangs</h3>
+<p>Try again on a different network, or open Terminal and run <code>xcode-select --install</code> to restart the process.</p>
+</section>
+<section id="the-clone-worked-but-i-dont-see-the-files" class="level3">
+<h3 class="anchored" data-anchor-id="the-clone-worked-but-i-dont-see-the-files">The clone worked but I don’t see the files</h3>
+<p>Check that RStudio actually opened the new project. The project name should appear in the top-right corner of the RStudio window. If it says “Project: (None),” go to <strong>File → Open Project</strong> and navigate to the folder you created in Step 6.</p>
+</section>
+<section id="something-else" class="level3">
+<h3 class="anchored" data-anchor-id="something-else">Something else</h3>
+<p>Email me at <a href="mailto:rcaraher@colby.edu">rcaraher@colby.edu</a> or come to office hours. Copy and paste the full error message into your email if there is one—it makes it much easier for me to figure out what happened.</p>
+</section>
 </section>
 
 </main>
