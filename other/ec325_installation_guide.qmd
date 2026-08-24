@@ -15,7 +15,10 @@ format:
 
 This guide walks you through installing everything you need for EC325: Econometrics. Please complete these steps **the first week of class**.
 
-If you have any issues, please send me an email or come to office hours.
+Work through the steps in order---each one builds on the last.
+Set aside about an hour, and do it somewhere with a solid internet connection.
+
+If you have any issues, check the [Troubleshooting](#troubleshooting) section at the end of this guide first. If that doesn't solve it, please send me an email or come to office hours.
 
 ## Step 1: Install R
 
@@ -24,6 +27,14 @@ R is the statistical programming language we'll use throughout the course.
 1. Go to <https://cloud.r-project.org/>
 2. Click the download link for your operating system (Windows, macOS, or Linux)
 3. Follow the installation instructions
+
+::: {.callout-note}
+## Already Have R From Another Class?
+If you installed R for a previous course, you may have an older version.
+This course uses features that require **R 4.1 or newer**.
+Open RStudio and run `R.version.string` in the console to check.
+If you're below 4.1, install the current version using the link above---you can have both, and RStudio will use the newest one.
+:::
 
 ## Step 2: Install RStudio
 
@@ -46,6 +57,12 @@ We use GitHub to share course materials.
 2. Click "Sign up" and create a free account
 3. **Use your @colby.edu email** to get free GitHub Pro access (optional but recommended)
 
+::: {.callout-note}
+## You Won't Need to Log In
+The course repository is public, so downloading and updating materials never requires you to sign in to GitHub.
+The account is worth having for the free Pro features and for your own future projects, but nothing in this course depends on it.
+:::
+
 ## Step 4: Install Git
 
 Git is version control software that lets you download and update course materials.
@@ -57,6 +74,8 @@ Git is version control software that lets you download and update course materia
 3. If Git isn't installed, you'll see a pop-up prompting you to install the Command Line Developer Tools—click "Install"
 4. Wait for the installation to complete
 
+The Command Line Developer Tools download is large and can take 10--30 minutes depending on your connection. Let it finish before moving on.
+
 ### Windows Users
 
 1. Go to <https://git-scm.com/download/win>
@@ -64,6 +83,12 @@ Git is version control software that lets you download and update course materia
 3. Run the installer
 4. **Use the default settings** for all options (just keep clicking "Next")
 5. Click "Install" and then "Finish"
+
+::: {.callout-important}
+## Install Git Before You Reopen RStudio
+RStudio only looks for Git when it starts up.
+If RStudio was already open while you installed Git, quit it completely and reopen it now, or it won't find Git in the next step.
+:::
 
 ## Step 5: Configure Git
 
@@ -74,11 +99,11 @@ Before using Git, you need to tell it your name and email. This information is a
 3. Type the following commands, pressing Enter after each line:
 
 ```bash
-git config --global user.name "Your username"
+git config --global user.name "Your Name"
 git config --global user.email "your.email@colby.edu"
 ```
 
-Replace `Your username` with your actual GitHub username name and `your.email@colby.edu` with your Colby email (or whatever email you used for your GitHub account).
+Replace `Your Name` with your name (or your GitHub username) and `your.email@colby.edu` with your Colby email (or whatever email you used for your GitHub account). Keep the quotation marks.
 
 To verify it worked, type:
 
@@ -98,10 +123,27 @@ Now let's download the course materials to your computer.
 1. Open RStudio
 2. Go to **File → New Project → Version Control → Git**
 3. Enter the repository URL: `https://github.com/rpcaraher/ec325.git`
-4. Choose where to save the folder on your computer (e.g., your Documents folder)
+4. Choose where to save the folder on your computer (see the warning below)
 5. Click "Create Project"
 
-You now have all course materials! To get updates throughout the semester, click the **Pull** button in the Git tab (usually in the top-right panel of RStudio).
+::: {.callout-warning}
+## Don't Put It in a Cloud-Synced Folder
+Do **not** save the project inside iCloud Drive, OneDrive, Dropbox, or Google Drive.
+These services sync files in the background and will fight with Git, which can corrupt the repository and produce errors that are genuinely painful to untangle.
+
+On most Macs, your **Desktop and Documents folders are synced to iCloud by default**, so avoid those.
+A good choice is a new folder in your home directory, such as `~/GitHub/` on Mac or `C:\Users\YourName\GitHub\` on Windows.
+:::
+
+You now have all course materials! To get updates throughout the semester, click the **Pull** button (the down arrow) in the Git tab, usually in the top-right panel of RStudio.
+
+::: {.callout-important}
+## Pull Only---Never Push
+The Git tab has **Commit** and **Push** buttons sitting right next to **Pull**.
+You only ever need **Pull**.
+Committing changes to the course files is what causes merge conflicts later, and Push will just fail with a login prompt, since you don't have write access to my repository.
+Keep your own work in the `student-work/` folder and you'll never have a problem.
+:::
 
 ## Step 7: Verify Your Setup
 
@@ -110,5 +152,39 @@ To make sure everything works:
 1. Open RStudio
 2. In the Console (bottom-left panel), type `2 + 2` and press Enter
 3. You should see `[1] 4`
+4. Check that the **Git** tab is present in the upper-right panel of RStudio
 
 If that works, you're ready for class!
+
+::: {.callout-note}
+## What About R Packages?
+R's add-on packages extend what it can do, and we'll use a number of them this semester.
+You don't need to install any of them now---we'll install each one together in class as we get to it.
+:::
+
+## Troubleshooting {#troubleshooting}
+
+### "Version Control → Git" is missing or greyed out
+
+This is the most common issue, and it almost always means RStudio was open before Git finished installing.
+
+1. Quit RStudio completely (not just close the window) and reopen it
+2. If it's still missing, go to **Tools → Global Options → Git/SVN**
+3. Make sure **"Enable version control interface for RStudio projects"** is checked
+4. Check that the Git executable path is filled in. If it's blank, click "Browse" and set it to:
+    - **Mac:** `/usr/bin/git`
+    - **Windows:** `C:/Program Files/Git/bin/git.exe`
+5. Restart RStudio
+
+### The Mac Command Line Developer Tools install fails or hangs
+
+Try again on a different network, or open Terminal and run `xcode-select --install` to restart the process.
+
+### The clone worked but I don't see the files
+
+Check that RStudio actually opened the new project. The project name should appear in the top-right corner of the RStudio window. If it says "Project: (None)," go to **File → Open Project** and navigate to the folder you created in Step 6.
+
+### Something else
+
+Email me at [rcaraher@colby.edu](mailto:rcaraher@colby.edu) or come to office hours.
+Copy and paste the full error message into your email if there is one---it makes it much easier for me to figure out what happened.

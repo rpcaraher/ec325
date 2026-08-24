@@ -7,14 +7,14 @@ date: "Spring 2026"
 embed-resources: true
 format:
   revealjs:
-    theme: simple
+    theme: colby-theme.scss
     slide-number: true
-    incremental: false
-    link-external-newwindow: true
+    incremental: true
     footer: "EC325 | Unit 1 | Introduction"
 execute:
   echo: false
   warning: false
+  message: false
 ---
 
 ```{r}
@@ -27,7 +27,7 @@ library(tidyverse)
 
 I am a recent PhD from UMass Amherst. My research focuses on the relationship between public/economic policy and maternal, infant, and child health and racial/ethnic health disparities.
 
-This is my first year at Colby!
+This is my second year at Colby!
 
 - Email: [rcaraher@colby.edu](mailto:rcaraher@colby.edu). I will do my best to respond within 24 hours on weekdays.
 - Office: 365 Diamond Bldg.
@@ -37,15 +37,23 @@ This is my first year at Colby!
 
 ## What is this Class About?
 
+From a classic textbook:
+
+. . .
+
 **Econometrics:** "...statistical methods for estimating economic relationships, testing economic theories, and evaluating and implementing government and business policy."
 
 ## What is this Class About?
 
-Or, in my opinion,
+In my opinion:
+
+. . .
 
 **Econometrics:** The practice of using statistical, quantitative methods to study social phenomena and provide insights into public policy
 
-Modern econometrics has really focused on identifying the **causal effects** of social phenomena/policy as opposed to **correlations**
+. . .
+
+Modern econometrics has really focused on developing techniques to identify the **causal effects** of social phenomena/policy as opposed to **correlations**
 
 
 ## The US is Unhealthy Relative to Peer Countries
@@ -71,19 +79,15 @@ Discuss with a classmate
 - But does that mean health insurance **causes** better health?
 :::
 
-## Does having health insurance make you healthier?
-
-- Health insurance coverage is **correlated** with better health outcomes
-- But does that mean health insurance **causes** better health?
+. . .
 
 **Econometrics** can help us answer this question!
 
 ## Other examples of causal inference questions
 
 ::: {.incremental}
-- Do tariffs increase domestic production?
 - Does a college degree increase your earnings?
-- Is immigration bad for native workers?
+- Is immigration bad for native workers wages?
 - Do police reduce crime?
 :::
 
@@ -110,15 +114,16 @@ $$ wage = \beta_{0} + \beta_{1} educ + \beta_{2} exper + \beta_{3} training + \e
 
 ## What Is the Broad Process for Econometric Analysis?
 
-Step 2: Find and explore the data (easier said then done!)
+Step 2: *Find and explore* the data (easier said then done!)
+
+. . .
 
 Many different types of data:
 
 ::: {.incremental}
 - cross-sectional (most common): a sample of individuals, households, firms, countries, or any other unit observed at a given point in time
-- Data for econometric is organized (or needs to be organized) as a **matrix** or **dataframe**
+- Data for econometric is organized (or needs to be organized) as a **matrix** or **dataframe** (very similar to a spreadsheet!)
 :::
-
 
 ```{r}
 #| label: create-test-data
@@ -137,6 +142,33 @@ test_data_2 <- tibble("educ" = rnorm(50, mean = 10, sd = 2),
 
 ## What Is the Broad Process for Econometric Analysis?
 
+:::: {.columns}
+::: {.column width="72%"}
+```{r}
+#| label: show-data-table
+
+test_data |>
+  knitr::kable(
+    format = "html",
+    col.names = c("Person", "Wage ($/hr)", "Education (yrs)",
+                  "Experience (yrs)", "Training (weeks)"),
+    align = "ccccc",
+    digits = 2
+  )
+```
+:::
+
+::: {.column width="28%"}
+::: {.smaller}
+Each **row** is an *observation* (a person)
+
+Each **column** is a *variable*
+:::
+:::
+::::
+
+## What Is the Broad Process for Econometric Analysis?
+
 ```{r}
 #| label: show-data
 
@@ -144,6 +176,10 @@ print(test_data)
 ```
 
 ## What Is the Broad Process for Econometric Analysis?
+
+Once we have our data, we need to *explore* and *understand it*
+
+. . .
 
 - Are we missing a lot of values for our data? 
 - Are there outliers, obvious data-entry errors, or other oddities we need to deal with?
@@ -175,74 +211,21 @@ summary(reg1)
 
 Step 4: *Interpret* the estimates
 
+. . .
+
 What does our estimate mean?
 
 ::: {.incremental}
 - There is a literal, *mathematical interpretation*
-- In our made-up estimate above, each additional year of education suggests an increase in wages of 10%
-- But what does this really mean? Is it big or small? Is it economically important?
+- In our made-up estimate above, each additional year of education suggests an increase in wages of 11%
+- More importantly: what does this *really* mean? Is it big or small? Is it economically important?
 :::
-
-
-## What Is the Broad Process for Econometric Analysis?
-
-Step 4: *Interpret* the estimates
-
-What does our estimate mean?
-
-- There is a literal, *mathematical interpretation*
-- In our made-up estimate above, each additional year of education suggests an increase in wages of about 12%
-- But what does this really mean? Is it big or small? Is it economically important?
-
-In this course, we will learn how to do **all four** of these steps!
-
-
-# Econometrics with Statistical Software
-
-## Statistical Software {.smaller}
-
-Much of the econometric process is done using specialized **statistical software**.
-
-We use this software to:
-
-1. "Clean" our data and organize it so we can do econometric analysis
-2. Use our data to explore our questions using descriptive statistics and data visualizations
-3. Estimate our models and calculate the statistical uncertainty
-4. Output our results as tables and figures so we can write/present them
-
-## Examples of Statistical Software
-
-::: {.incremental}
-- **Stata:** Proprietary software purpose-built for econometrics
-- **R:** Open-source source programming language with a focus on statistical analysis
-- **Python:** Open-source source programming language with a focus on data-science more broadly
-- **EViews:** Proprietary software with a focus on time series
-:::
-
-
-## R and R Studio {.smaller}
-
-In this class, we will focus our learning on the **R** programming language
-
-Why R?
-
-- **Open-source:** Free to use, with a large community which have built (literally) thousands of packages to extend the capabilities of R
-- **Object-Orientated:** Can store multiple "objects" in its memory, giving it far more flexibility in cleaning, organizing, and compiling data
-- **Not Just Econometrics:** Specialized uses of R in dozens of fields, in academia and the private sector
 
 . . .
 
-**R Studio:** An integrated development environment (IDE) designed for working with the R programming language. It provides a user-friendly interface and a set of tools that make it easier to write, run, and manage R code and projects.
+In this course, we will learn how to do **all four** of these steps!
 
-## R and R Studio
-
-In this class, we will focus our learning on the **R** programming language
-
-
-## R and R Studio
-
-There are instructions on how to install this software in the appendix of the Lecture Notes. Review them and install R and R Studio as soon as you can!
-
+ 
 # Learning Econometrics in EC 325
 
 ## What We Will Learn in This Class {.smaller}
@@ -261,9 +244,9 @@ There are instructions on how to install this software in the appendix of the Le
 
 ## TA Info
 
-TA:
+TAs:
 
-- Amrit Shakya (ashaky26@colby.edu)
+- TBD
 
 TA Help Hours:
 
@@ -341,7 +324,7 @@ Your grade will be determined by:
 ## Concept Checks
 
 - Short, weekly coding assignments testing your understanding of the readings and lectures
-- Due each Friday at 11:59pm (with some exceptions)
+- Due each Sunday at 11:59pm (with some exceptions)
 - Graded on a 3-point scale (0 = no attempt, 3 = excellent)
 - Lowest 2 grades dropped at end of semester
 
@@ -385,6 +368,10 @@ What counts:
 - Coordinating among group members
 - Helping classmates with the course material
 
+. . .
+
+After the midterm, I will assign a "preliminary" EL grade in Moodle so you know where you are at
+
 ## Attendance
 
 - All classes are **in-person** (unless otherwise noted, maybe due to weather) and attendance is **required**
@@ -409,16 +396,65 @@ You will have to turn in:
 5. A final written report (last day of finals)
 6. A peer review evaluating your and your group members' contributions (last day of finals)
 
+# Econometrics with Statistical Software
+
+## Statistical Software {.smaller}
+
+Much of the econometric process is done using specialized **statistical software**.
+
+. . .
+
+We use this software to:
+
+1. "Clean" our data and organize it in a format so we can do econometric analysis
+2. Explore our data using descriptive statistics and data visualizations
+3. Estimate our models and calculate the statistical uncertainty
+4. Output our results as tables and figures so we can present and interpret them in their *broader context*
+
+## Examples of Statistical Software
+
+::: {.incremental}
+- **Stata:** Proprietary software purpose-built for econometrics
+- **R:** Open-source source programming language with a focus on statistical analysis
+- **Python:** Open-source source programming language with a focus on data-science more broadly
+- **EViews:** Proprietary software with a focus on time series
+:::
+
+
+## R and R Studio {.smaller}
+
+In this class, we will focus our learning on the **R** programming language
+
+Why R?
+
+- **Open-source:** Free to use, with a large community which have built (literally) thousands of packages to extend the capabilities of R
+- **Object-Orientated:** Can store multiple "objects" in its memory, giving it far more flexibility in cleaning, organizing, and compiling data
+- **Not Just Econometrics:** Specialized uses of R in dozens of fields, in academia and the private sector
+
+. . .
+
+**R Studio:** An integrated development environment (IDE) designed for working with the R programming language. It provides a user-friendly interface and a set of tools that make it easier to write, run, and manage R code and projects.
+
+. . .
+
+**R** is the engine; **RStudio** is the driver's seat
+
+## R and R Studio
+
+There are instructions on how to install this software in the appendix of the Lecture Notes. Review them and install R and R Studio as soon as you can!
+
+
 ## About you!
 
 1. Name
 2. Pronoun
-3. Year
-4. What you did over Jan Plan
+3. Your summer highlight
 
 ## For Next Time
 
-- Concept Check 1 (due Monday!)
+- Read **unit 1 and unit 2** of the lecture notes (will help with Concept Check 1!)
+- Follow the [EC325 Installation Guide](https://www.raymondcaraher.com/ec325/ec325_installation_guide.html) to get set up with R, RStudio, and Git!
+- Concept Check 1 (review of Key Concepts from Statistics - due this Sunday!)
 - Fill out the survey so I can assign groups!
-- Get software installed
-- Read **unit 1 and unit 2** of the lecture notes
+- Make a Github account
+

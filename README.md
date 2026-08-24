@@ -42,6 +42,14 @@ When I announce updates to the course materials:
 
 That's it! Your materials are now up to date.
 
+> [!IMPORTANT]
+> **Use Pull only—never Commit or Push.**
+> The Git tab puts **Commit** and **Push** right next to **Pull**, but you don't need
+> either one. Committing changes to my files is what causes the merge conflicts
+> described below, and Push will just throw a login prompt at you since you don't
+> have write access to this repository. If you keep your work in `student-work/`,
+> Pull is the only button you'll ever touch.
+
 ## Repository Structure
 
 ```
@@ -49,9 +57,9 @@ ec325/
 ├── slides/            # The slides and code used to generate them
 ├── book/              # Raw code for generating book chapters
 ├── data/              # Datasets for labs and problem sets
-├── labs/              # In-class lab exercises
 ├── student-work/      # YOUR work goes here (not tracked by Git!)
 ├── other/             # Other documents and files I use
+├── syllabus/          # Course syllabus
 └── docs/              # Rendered book (also viewable online at link below)
 ```
 
@@ -74,22 +82,62 @@ This folder is ignored by Git, so:
 
 ## Troubleshooting
 
-### "I'm getting merge conflicts"
+### "Pull isn't working" or I get an error about local changes
 
-This usually means you edited the course files I make directly. To fix:
+The most common pull errors look like one of these:
 
-1. Save any work you want to keep somewhere else
-2. In the Terminal tab, run: `git checkout .`
-3. Pull again
+```
+error: Your local changes to the following files would be overwritten by merge
+```
 
-To avoid this, always work in the `student-work/` folder.
+```
+CONFLICT (content): Merge conflict in ...
+```
+
+Both mean the same thing: you changed one of *my* files, and Git doesn't know whether
+to keep your version or mine. This usually happens by accident—an autosave, a stray
+keystroke, or clicking **Commit** in the Git tab.
+
+**The fix:**
+
+1. First, move any work you want to keep out of the repository folder entirely
+   (drag it to your Desktop for now). Anything in `student-work/` is safe and does
+   not need to be moved.
+2. In RStudio, go to **Tools → Terminal → New Terminal**
+3. Run these two commands:
+
+```bash
+git fetch origin
+git reset --hard origin/main
+```
+
+4. Click **Pull** again
+
+This throws away every change you made to my files and makes your copy match mine
+exactly. It does **not** touch anything in `student-work/`, because Git isn't tracking
+that folder.
+
+To avoid this in the first place, always work in the `student-work/` folder.
 You are more than welcome to mess around with the files I use to generate course content,
 but I recommend you do so by copy-pasting the content from this directory to some other
 directory not associated with Git.
 
-### "Pull isn't working"
+### "There is no package called ..."
 
-Make sure you're connected to the internet and try again. If you see an error message, copy it and email me.
+You're missing one of the R packages we use—most likely because you weren't in class
+the day we installed it. Open RStudio and run:
+
+```r
+install.packages("name_of_the_package")
+```
+
+using whatever name the error message gave you, then try your code again.
+
+### "I don't see a Git tab in RStudio"
+
+RStudio only looks for Git when it starts, so quit RStudio completely and reopen it.
+If the tab still isn't there, see the Troubleshooting section of the
+[Installation Guide](https://www.raymondcaraher.com/ec325/ec325_installation_guide.html).
 
 ### "I accidentally deleted something"
 
