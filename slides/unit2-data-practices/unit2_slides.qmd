@@ -7,7 +7,7 @@ date: "today"
 embed-resources: true
 format:
   revealjs:
-    theme: simple
+    theme: colby-theme.scss
     slide-number: true
     incremental: true
     footer: "EC325 | Unit 2 | Good Data Practices"
@@ -34,15 +34,7 @@ library(tidyverse)
 
 ## When Good Economists Use Bad Data
 
-- In 2010, economists Reinhart and Rogoff published influential research on government debt and economic growth.
-
-- **Key finding:** When a country's debt exceeds 90% of GDP, economic growth drops *dramatically* and becomes negative.
-
-## When Good Economists Use Bad Data
-
-- This strongly influenced policy debates worldwide during the Great Recession.
-- It suggested a policy of *austerity*--cutting government expenditures during an economic crisis--was the correct policy
-- Went against more established, *Keynesian* policies
+- In 2010, economists Reinhart and Rogoff presented influential research on government debt and economic growth.
 
 ```{r}
 #| echo: false
@@ -74,6 +66,16 @@ p1 <- ggplot(rr_data, aes(x = debt_ratio, y = growth)) +
 print(p1)
 
 ```
+
+
+
+## When Good Economists Use Bad Data
+
+- **Key finding:** When a country's debt exceeds 90% of GDP, economic growth drops *dramatically* and becomes negative.
+
+- This strongly influenced policy debates worldwide during the Great Recession.
+- Results suggested a policy of *austerity*--cutting government expenditures during an economic crisis--was the correct policy at the time
+- Went against more established, *Keynesian* policies
 
 
 ## When Good Economists Use Bad Data
@@ -133,7 +135,7 @@ Good data practices are fundamental to credible research. No sophisticated techn
 
 . . .
 
-Some questions to ask:
+Examples of some questions to ask to get to know your data:
 
 - How many observations? What is missing?
 - What is the distribution like? Does it make sense?
@@ -201,13 +203,25 @@ knitr::kable(problem_data, align = "lcccc")
 
 . . .
 
+What **red flags** do you notice about these data?
+
+. . .
+
 **Red Flags:**
 
 - Education = -5 years is **impossible**
 - Wage = $850/hr seems **suspiciously high**
 - Age = 200 is clearly a **data entry error**
 
+## Never Underestimate the Value of Staring at Your Data {.smaller}
+
+- If you don't have a good understanding of *who* is in your data or *what* it looks like, any econometric/statistical technique (no matter how fancy!) will yield *meaningless results*
+- Simple descriptive statistics are your best tool for exploring and understanding your data, and should **always be your first step**
+
+
 # Getting to Know R
+
+We will introduce ourselves to R by learning how to do some of this basic (but essential!) descriptive work
 
 ## Starting to work with RStudio
 
@@ -244,12 +258,28 @@ Type along in your console as we go
 
 ## Basic R Operations {.smaller}
 
+
+- R can work as a calculator!
+
+. . .
+
+R uses the standard arithmetic operators:
+
+| Operator | Meaning | Example | Result |
+|----------|---------|---------|--------|
+| `+` | Addition | `4 + 2` | `6` |
+| `-` | Subtraction | `4 - 2` | `2` |
+| `*` | Multiplication | `4 * 2` | `8` |
+| `/` | Division | `4 / 2` | `2` |
+| `^` | Exponentiation | `4 ^ 2` | `16` |
+
+## Basic R Operations {.smaller}
+
 ::: {.callout-note icon=false}
 ## 🖥️ Try it yourself!
 :::
 
-- R can work as a calculator!
-- Type each expression below in your console:
+- Type each expression below in your console and let me know what you get:
 
 . . .
 
@@ -257,7 +287,7 @@ Type along in your console as we go
 #| echo: true
 #| output-location: fragment
 
-4 + 2
+118 + 32
 
 ```
 
@@ -267,7 +297,7 @@ Type along in your console as we go
 #| echo: true
 #| output-location: fragment
 
-4.65 * 9.3
+4.65 * 9.37
 
 ```
 
@@ -277,14 +307,14 @@ Type along in your console as we go
 #| echo: true
 #| output-location: fragment
 
-(8 + 2.9) * (654 / 98)
+(8 + 2.94) * (654.1 / 98)
 
 ```
 
 ## Objects and Assignment
 
 - As an **Object-Orientated Language,** the logic of R is built around interacting with **objects**
-- An object is a generic name for anything that is "saved" in R
+- An object is a generic name for anything that is "saved" in R's memory, which you can then interact with
 - This includes numbers, vectors, functions, or essentially anything else we will interact with or have to reference
 
 ## Objects and Assignment {.smaller}
@@ -293,7 +323,7 @@ Type along in your console as we go
 ## 🖥️ Try it yourself!
 :::
 
-- Store things as an object using the assignment operator `<-`
+- Store things as an object using the assignment operator `<-` (less-than symbol `<` followed a dash `-` )
 - Try typing these in your console:
 
 . . .
@@ -328,110 +358,11 @@ x + y
 
 ```
 
-## Vectors {.smaller}
-
-::: {.callout-note icon=false}
-## 🖥️ Try it yourself!
-:::
-
-- A vector is a sequence of values of the same type
-- Use the `c()` function to **combine** values into a vector
-- Operations apply to each element:
-
-. . .
-
-```{r}
-#| echo: true
-#| output-location: fragment
-
-ages <- c(19, 20, 21, 22, 20, 19)
-ages
-
-```
-
-. . .
-
-```{r}
-#| echo: true
-#| output-location: fragment
-ages + 10
-
-```
-
-. . .
-
-```{r}
-#| echo: true
-#| output-location: fragment
-primes <- c(1, 3, 5, 7, 9, 11)
-
-ages + primes
-
-```
-
-## Functions {.smaller}
-
-::: {.callout-note icon=false}
-## 🖥️ Try it yourself!
-:::
-
-- Functions are pre-packaged sets of instructions that perform specific tasks
-- Every function requires an *argument* to produce output
-- Try the `seq()` function, which generates a sequence of numbers:
-
-. . .
-
-```{r}
-#| echo: true
-#| output-location: fragment
-
-bb <- seq(from = 1, to = 30, by = 3)
-bb
-
-```
-
-. . .
-
-- `from`, `to`, and `by` are the arguments of the function
-- We set `from = 1` to start at 1, `to = 30` to end at 30, and `by = 3` to increment by 3
-- Every functions has a different set of arguments
-- We can look up documentation on how to use a function using the `?` function
-
-
-## Data Frames {.smaller}
-
-- A data frame is the main way datasets are stored as objects
-- Basically resembles a spreadsheet: rows = observations, columns = variables
-- The `head()` function prints only the first `n` rows:
-
-. . .
-
-```{r}
-#| echo: true
-#| output-location: fragment
-
-head(mtcars, 4)
-```
-
-. . .
-
-- We can pull a specific column with `$` (useful for many functions)
-
-. . .
-
-```{r}
-#| echo: true
-#| output-location: fragment
-
-head(mtcars$mpg, 10)
-
-```
-
 ## Data Types {.smaller}
 
 - Every piece of data in R has a type that determines how it can be used
-- The main types are numeric (numbers), character (text), logical (true/false), and factor(categories)
-- Depending on the datatype, functions will operate differently or not at all
+- The main types are **numeric (numbers)**, **character (text)**, **logical (true/false)**, and **factor (categories)**
+- Depending on the datatype, functions will *work differently or *not at all*
 
 ## Data Types {.smaller}
 
@@ -455,15 +386,15 @@ price * 1.08
 
 ```{r}
 #| echo: true
+#| error: true
 #| output-location: fragment
 
 # Character: text strings (always in quotes)
 name <- "Boston"
 greeting <- 'Hello World'
 
-# But can combine them
-paste("Hello", name)  # "Hello Boston"
-
+# Can't do math on text!
+name + greeting
 ```
 
 . . .
@@ -474,6 +405,154 @@ paste("Hello", name)  # "Hello Boston"
 
 # Can't do math on characters!
 greeting + "3"  # Error!
+
+```
+
+## Vectors {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Try it yourself!
+:::
+
+- A vector is a sequence of values
+- Use `c()` to **combine** values into a vector
+
+. . .
+
+```{r}
+#| echo: true
+#| output-location: fragment
+
+ages <- c(19, 20, 21, 22, 20, 19)
+ages
+
+```
+
+. . .
+
+- You can do operations on a vector. Operations apply to each element of a vector:
+
+. . .
+
+```{r}
+#| echo: true
+#| output-location: fragment
+ages + 10
+
+```
+
+. . .
+
+- You can also do operations on multiple vectors:
+
+. . .
+
+```{r}
+#| echo: true
+#| output-location: fragment
+primes <- c(1, 3, 5, 7, 9, 11)
+
+ages + primes
+
+```
+
+## Character Vectors {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Try it yourself!
+:::
+
+- Vectors can hold text too — just put each value in quotes
+
+. . .
+
+```{r}
+#| echo: true
+#| output-location: fragment
+students <- c("Ana", "Ben", "Cara", "Dev", "Eli", "Fay")
+students
+
+```
+
+. . .
+
+- Operations still apply to each element, one at a time:
+
+. . .
+
+```{r}
+#| echo: true
+#| output-location: fragment
+paste(students, "is", ages, "years old")
+
+```
+
+
+## Functions {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Try it yourself!
+:::
+
+- Functions are pre-packaged sets of instructions that perform specific tasks
+- Every function requires an *argument* (or inputs) to produce output
+- Try the `seq()` function, which generates a sequence of numbers:
+
+. . .
+
+```{r}
+#| echo: true
+#| output-location: fragment
+
+bb <- seq(from = 1, to = 30, by = 3)
+bb
+
+```
+
+. . .
+
+- `from`, `to`, and `by` are the *arguments* of the function
+- We set `from = 1` to start at 1, `to = 30` to end at 30, and `by = 3` to increment by 3
+- Every functions has a different set of arguments
+- We can look up documentation on how to use a function using the `?` function
+
+
+## Dataframes {.smaller}
+
+- A dataframe is the main way datasets are stored as objects
+- Basically a spreadsheet: rows = observations, columns = variables
+
+. . .
+
+```{r}
+#| echo: true
+#| output-location: fragment
+
+mtcars
+```
+
+- The `head()` function prints only the first `n` rows:
+
+. . .
+
+```{r}
+#| echo: true
+#| output-location: fragment
+
+head(mtcars, 4)
+```
+
+. . .
+
+- We can pull a specific column with `$` (useful for many functions)
+
+. . .
+
+```{r}
+#| echo: true
+#| output-location: fragment
+
+head(mtcars$mpg, 10)
 
 ```
 

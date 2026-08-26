@@ -1,0 +1,228 @@
+/*-- scss:defaults --*/
+
+// ── Colby College Brand Colors ──────────────────────────────────
+$colby-blue:    #002169;
+$colby-gray:    #9EA9B0;
+$blue-black:    #1A2D38;
+$bright-blue:   #5D8EE5;
+$deep-yellow:   #EEB808;
+
+// ── Fonts ───────────────────────────────────────────────────────
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+
+$font-family-sans-serif: "Inter", "Helvetica Neue", Arial, sans-serif;
+$font-family-monospace:  "Fira Code", monospace;
+$presentation-heading-font: "Inter", "Helvetica Neue", Arial, sans-serif;
+
+// ── Colors ──────────────────────────────────────────────────────
+$body-bg:    #ffffff;
+$body-color: $blue-black;
+$link-color: $bright-blue;
+$presentation-heading-color: $colby-blue;
+$code-color: $colby-blue;
+$code-block-bg: #f4f6f8;
+
+// ── Font Sizes ──────────────────────────────────────────────────
+$presentation-font-size-root: 34px;
+$presentation-heading-font-weight: 700;
+$presentation-h1-font-size: 1.7em;
+$presentation-h2-font-size: 1.3em;
+$presentation-h3-font-size: 1.05em;
+
+// ── Slide layout ────────────────────────────────────────────────
+$presentation-slide-text-align: left;
+
+
+/*-- scss:rules --*/
+
+// ── Title Slide ─────────────────────────────────────────────────
+.reveal .title-slide {
+  text-align: left;
+  padding-left: 5%;
+
+  h1.title {
+    color: $colby-blue;
+    font-size: 1.8em;
+    font-weight: 700;
+    border-bottom: 4px solid $deep-yellow;
+    padding-bottom: 0.2em;
+    margin-bottom: 0.3em;
+  }
+
+  .subtitle {
+    color: $bright-blue;
+    font-size: 0.85em;
+    font-weight: 400;
+    margin-top: 0;
+  }
+
+  .author, .date, .institute {
+    color: lighten($blue-black, 20%);
+    font-size: 0.7em;
+  }
+}
+
+// ── Slide Headers ───────────────────────────────────────────────
+.reveal h2 {
+  border-bottom: 3px solid $deep-yellow;
+  padding-bottom: 0.15em;
+  margin-bottom: 0.5em;
+}
+
+.reveal h3 {
+  color: darken($bright-blue, 10%);
+}
+
+// ── Code ────────────────────────────────────────────────────────
+
+// Turn off Fira Code ligatures so `<-` renders as two characters,
+// not a single arrow glyph (same for `%>%`, `!=`, `>=`, etc.)
+.reveal code,
+.reveal pre,
+.reveal pre code,
+.reveal .sourceCode {
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "clig" 0, "calt" 0;
+}
+
+.reveal pre {
+  font-size: 0.65em;
+  // border-left: 4px solid $colby-blue;
+   border-radius: 0.25em;
+  // overflow: visible;
+  // max-height: none;
+  // box-shadow: none;
+  // overflow: auto;
+}
+
+// .reveal pre code {
+//   overflow: visible;
+//   max-height: none;
+//   box-shadow: none;
+//   overflow: auto;
+// }
+
+// .reveal code {
+//   font-size: 0.9em;
+// }
+
+.reveal p code,
+.reveal li code {
+  background-color: $code-block-bg;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 0.85em;
+}
+
+// ── Tables ──────────────────────────────────────────────────────
+.reveal table {
+  font-size: 0.75em;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.reveal table thead th {
+  background-color: $colby-blue;
+  color: #ffffff;
+  font-weight: 600;
+  padding: 8px 12px;
+  border: none;
+}
+
+.reveal table tbody td {
+  padding: 6px 12px;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.reveal table tbody tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+// ── Lists ───────────────────────────────────────────────────────
+.reveal ul,
+.reveal ol {
+  margin-bottom: 0.5em;
+}
+
+.reveal li {
+  margin-bottom: 0.3em;
+  line-height: 1.4;
+}
+
+// ── Blockquotes (nice for definitions, key results) ─────────────
+.reveal blockquote {
+  border-left: 4px solid $deep-yellow;
+  background-color: #fdf8e8;
+  padding: 0.8em 1.2em;
+  font-style: normal;
+  font-size: 0.9em;
+  margin: 0.8em 0;
+  box-shadow: none;
+}
+
+// ── Callout boxes (Quarto's .callout classes) ───────────────────
+.reveal .callout {
+  font-size: 0.8em;
+  margin: 0.6em 0;
+}
+
+.reveal .callout .callout-icon-container {
+  transform: scale(0.7);
+}
+
+.reveal .callout .callout-title-container .callout-title {
+  font-size: 1.15em;
+  font-weight: 600;
+}
+
+// ── Slide number ────────────────────────────────────────────────
+.reveal .slide-number {
+  font-size: 0.55em;
+  color: $colby-gray;
+}
+
+// ── Footer ──────────────────────────────────────────────────────
+.reveal .footer {
+  font-size: 0.45em;
+  color: $colby-gray;
+}
+
+// ── Custom utility classes ──────────────────────────────────────
+
+// Smaller text for dense slides (tables, long output)
+.smaller {
+  font-size: 0.75em;
+}
+
+.smallest {
+  font-size: 0.6em;
+}
+
+// Emphasize key terms in Colby Blue
+.term {
+  color: $colby-blue;
+  font-weight: 600;
+}
+
+// Highlight box for key equations or takeaways
+.highlight-box {
+  background-color: lighten($colby-blue, 68%);
+  border: 2px solid $colby-blue;
+  border-radius: 6px;
+  padding: 0.8em 1.2em;
+  margin: 0.6em 0;
+}
+
+// Yellow accent box for warnings, caveats
+.caution-box {
+  background-color: #fdf8e8;
+  border: 2px solid $deep-yellow;
+  border-radius: 6px;
+  padding: 0.8em 1.2em;
+  margin: 0.6em 0;
+}
+
+// Two-column helper (use with Quarto's ::: {.columns})
+.reveal .columns {
+  gap: 2em;
+}
