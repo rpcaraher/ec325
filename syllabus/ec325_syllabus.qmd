@@ -4,12 +4,18 @@ subtitle: "Colby College | Fall 2026"
 author: "Prof. Ray Caraher"
 author-title: "Instructor"
 date: last-modified
+date-format: long
 published-title: "Last Updated"
 bibliography: references.bib
 format:
   html:
     embed-resources: true
     toc: true
+    format-links: false
+    other-links:
+      - text: PDF
+        href: ec325_syllabus.pdf
+        icon: file-pdf
   pdf:
     toc: false
     geometry: margin=1in
@@ -37,7 +43,7 @@ library(yaml)
 - Office Hours:
     - Tuesdays: 1:30pm - 3:30pm
     - Thursdays: 1:30pm - 3:30pm
-    - Fri: 10:00am - 12:00pm
+    - Fridays: 10:00am - 12:00pm
     - Or by [appointment](https://calendar.app.google/x2kBXD8Ma9XwABVh9)
 :::
 
@@ -47,7 +53,7 @@ library(yaml)
 - Class Times:
     - Section C: 9:30am - 10:45am
     - Section D: 11:00am - 12:15pm
-- Classroom: TBD
+- Classroom: 342 Diamond Building
 
 :::
 
@@ -64,10 +70,11 @@ With a focus on *causality* as our guiding theme,
 we begin by establishing a framework for causal inference based on the gold standard of randomized trials---a 
 foundation that will inform our approach throughout the course. 
 We then introduce the workhorse of econometric analysis: the linear regression model. 
-You'll learn about its statistical properties and limitations, and how to interpret and communicate econometric results effectively.
+You'll learn about its statistical properties and limitations, 
+and how to interpret and communicate econometric results effectively.
 Building on this foundation, 
 we explore how to apply these tools to real-life scenarios, covering categorical variables, non-linear relationships, binary outcomes, and other specialized models. 
-The course concludes with advanced econometric techniques for analyzing two particularly powerful types of data: panel data and time series data.
+The course concludes with a suite of quasi-experimental research designs for recovering causal effects from observational data---panel data and difference-in-differences, instrumental variables, and regression discontinuity---before closing with an introduction to time-series methods.
 Econometrics demands a diverse skill set encompassing mathematics, statistics, economic theory, programming, and written and verbal communication.
 Perhaps most importantly, it requires developing strong intuition.
 This course will equip you with the analytical tools and empirical methods essential for modern economic research and policy analysis.
@@ -75,18 +82,21 @@ This course will equip you with the analytical tools and empirical methods essen
 ## Learning Objectives
 
 1. **Understand Core Econometric Techniques**
-    - Develop a solid understanding of major econometric concepts and their applications in analyzing social science data
+    - Develop a solid understanding of the core concepts, assumptions, and interpretation of major econometric methods
 
 2. **Distinguish Correlation from Causation**
     - Explore techniques to identify and evaluate causal relationships in data, differentiating them from mere correlations, with applications in policy evaluation
 
-3. **Gain Proficiency in Statistical Software**
+3. **Adjudicate Among Econometric Methods**
+    - Weigh the assumptions and tradeoffs of competing econometric methods and justify which approach is best suited to a given research question, data structure, and institutional context
+
+4. **Gain Proficiency in Statistical Software**
     - Build hands-on experience with modern tools for data analysis, visualization, and maintaining reproducible research workflows.
 
-4. **Apply Econometric Techniques to Real Questions**
+5. **Apply Econometric Techniques to Real Questions**
     - Utilize econometric methods to analyze real-world datasets, including in your own project, drawing meaningful conclusions and policy implications
 
-5. **Communicate Analytical Results Clearly**
+6. **Communicate Analytical Results Clearly**
     - Learn to effectively present, interpret, and document econometric findings
 
 ## Contacting Me
@@ -95,8 +105,8 @@ Please reach out if you have questions or need assistance!
 The best way to contact me is via email.
 I will do my best to respond within 24 hours on weekdays.
 
-Especially for an econometrics course, it can be difficult to answer questions solely over email.
-I strongly recommend you come to my office hours or schedule an appointment if you have a question that requires more than a few sentences to answer.
+In an econometrics course, it can be difficult to answer questions solely over email.
+I strongly recommend you come to my office hours if you have a question that requires more than a few sentences to answer.
 If the office hours listed above do not work for you, please schedule an appointment with the link above.
 
 ## Course Materials
@@ -105,13 +115,13 @@ This class will pull from three primary texts.
 I recommend you obtain all three, but *none are required*.
 
 1. [Introductory Econometrics: A Modern Approach](https://www.google.com/books/edition/Introductory_Econometrics_A_Modern_Appro/0p9_tQEACAAJ?hl=en&kptab=overview) by Jeffrey M. Wooldridge (2019)
-    - The 7th edition is the most recent, but any edition 5 or above will work. We will primarily use this text for part of the course more reliant on statistical theory.
+    - The 7th edition is the most recent, but any edition 5 or above will work. We will primarily use material from this text for the part of the course more reliant on statistical theory.
 
 2. [Real Econometrics](https://www.google.com/books/edition/Real_Econometrics/sbMEvgEACAAJ?hl=en) by Michael Bailey (2020)
-    - This is a good, more "applied" version of the Wooldridge textbook.
+    - This book covers many of the same concepts as the Wooldridge text, but the focus is generally more on applications rather than theory.
 
 3. [Mastering 'Metrics](https://books.google.com/books/about/Mastering_Metrics.html?id=dEh-BAAAQBAJ) by Joshua D. Angrist and Jörn-Steffen Pischke (2015)
-    - This text is an excellent companion to the other texts, but is not like a traditional textbook.
+    - This text is an excellent companion to the other texts, but is not like a traditional textbook. It is much more readable, but it can have gaps in what it covers, or assume too much background knowledge.
 
 You will also need reliable access to a computer (such as your personal laptop) to use the following software:
 
@@ -131,7 +141,7 @@ All course materials excluding assignments you turn in---including lecture notes
 You will clone this repository to your computer during the first week of class.
 When I update the materials throughout the semester,
 you will "pull" the latest version to keep your local copy up to date.
-Instructions for setting up and using the repository are included in the `README` file and in the [EC325 Installation Guide](https://www.raymondcaraher.com/ec325/ec325_installation_guide.html).
+Instructions for setting up and using the repository are included in the in the [EC325 Installation Guide](https://www.raymondcaraher.com/ec325/ec325_installation_guide.html).
 Your own work can be saved in the `student-work/` folder,
 which is not tracked by Git and will not be overwritten when you pull updates.
 
@@ -164,7 +174,7 @@ However, your lowest 2 grades will be dropped at the end of the semester.
 Be sure to use these wisely!
 
 These concept checks must be completed individually,
-and there can be no collaboration with your classmates or AI tools.
+and there can be no collaboration with your classmates.
 However, you are allowed to ask me questions via email or come to office hours.
 There is no time limit to complete each concept check,
 but they will be designed to take about 30-60 minutes per week.
@@ -268,7 +278,7 @@ Any unexcused absences (i.e., absences not due to extracurricular events and ill
 ### Assignment Submission
 
 Please submit all your assignments as either Microsoft Word files (.doc/.docx) or PDF files. 
-All files must be submitted via Moodle (do not email them to me),
+All files must be submitted via Moodle (do not email them to me),s
 generally at 11:59pm on the date they are due.
 You must confirm that your files can be opened and are not corrupt before you turn them in.
 
@@ -294,7 +304,7 @@ but I also want to mitigate the risk of over-reliance on them.
 Therefore, the course policy regarding the use of AI tools is as follows:
 
 1. You are **allowed to use AI tools** on your **problem sets and in your final project** to **troubleshoot specific, code-related questions only**.
-**No AI** tools are allowed **on the Concept Checks**.
+**No AI tools are allowed on the Concept Checks**.
 If you find yourself tempted rely on AI for the Concept Checks, 
 it is a sign that there is a serious gap in your understanding of the course material and
 you should get in touch with me about the issues you are having. 
@@ -311,6 +321,8 @@ students should cite the creator of the AI tool (e.g., cite OpenAI when directly
 3. You must **understand** the AI-assisted code you submit, 
 and you must be prepared to explain it in your own words if prompted.
 Exams in this course will require you to explain what blocks of code are doing, line-by-line.
+If you turn in AI-assisted code that you have not made the effort to understand, 
+you will only hurt your performance on the midterm and final exam.
 
 If you are unsure if a use case of an AI tool is allowed, 
 you should ask the instructor for clarification.
@@ -442,7 +454,7 @@ Usage of the notes or in-class recordings in this way without instructor permiss
 ### Inclement Weather
 
 This course follows the College's official decisions regarding class cancellations due to inclement weather. 
-IFf the College cancels classes, our class will not meet.
+If the College cancels classes, our class will not meet.
 However, I reserve the right to hold class online via Zoom in cases of extenuating circumstances, 
 such as when weather conditions make travel to campus for myself difficult but do not warrant a full College closure. 
 In such cases, I will notify you via email as early as possible with a Zoom link and any adjusted plans for the session.
