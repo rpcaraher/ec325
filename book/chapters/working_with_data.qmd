@@ -1,4 +1,4 @@
-# Importing and Working with Data {#sec-working-with-data}
+# Files, Folders, and Working with Data {#sec-working-with-data}
 
 ```{r}
 #| echo: false
@@ -97,6 +97,7 @@ function checkAnswer(selectElement, correctValue) {
 
 ::: {.callout-tip collapse="true"}
 ## **Key Questions**
+- Where do files live on my computer, and how do I point R to them?
 - How do I import data files into R?
 - What are README files and codebooks, and why do they matter?
 - What are the first things I should do after loading a dataset?
@@ -119,8 +120,73 @@ or data you collected yourself,
 you need to know how to import it,
 understand its structure,
 and get it into the right shape for your analysis.
-This appendix walks you through the entire process,
+This appendix starts with the basics of how your computer organizes
+files and folders---since R can't work with a dataset it can't find---
+and then walks you through the entire process,
 from reading in a data file to reshaping and exporting your results.
+
+
+## Files, Folders, and Paths
+
+Before R can analyze a dataset, it has to be able to *find* it on your computer.
+This is where a lot of early frustration comes from,
+so its worth a quick review of how files are organized on computers,
+since R interacts with this setup to figure out where files on your PC are located.
+
+**Files and extensions.**
+A file is a single saved thing---a script, a dataset, a document, an image, a video, etc.
+Its **extension** (the part after the dot) says what kind it is.
+For example, a file ending with the extension `.R` is an R script, 
+`.csv` a plain-text data file, and`.xlsx` an Excel file.
+
+If your computer hides extensions by default, you should turn them on
+(**Finder \(\rightarrow\) Settings \(\rightarrow\) Advanced** on Mac;
+the **View** menu in File Explorer on Windows).
+It makes files much easier to tell apart.
+
+**Folders and paths.**
+A **folder** (or **directory**---same thing) holds files and other folders.
+A **path** is a file's full address, written as the folders you would click
+through to reach it:
+
+- Mac: `/Users/yourname/GitHub/ec325/data/wages.csv`
+- Windows: `C:\Users\yourname\GitHub\ec325\data\wages.csv`
+
+Mac separates folders with `/` and Windows with `\`,
+but **inside R you always use forward slashes** (`"C:/Users/..."`),
+even on Windows.
+The tilde `~` is a shortcut for your home folder,
+so `~/GitHub/ec325` and `/Users/yourname/GitHub/ec325` mean the same thing.
+
+**The working directory.**
+When R is running, it is always "standing" in one folder---the
+**working directory**.
+If you ask it to read `"wages.csv"` with no path, it looks *only* there.
+This is the reason behind the most common beginner error:
+
+```
+Error: cannot open file 'wages.csv': No such file or directory
+```
+
+Nine times out of ten the file exists,
+it is just not in the folder R is standing in.
+Run `getwd()` to see where that is.
+There is more on this elsewhere in these lecture note.
+
+::: {.callout-tip}
+## Use RStudio Projects to Avoid Path Headaches
+Open your work through an **RStudio Project** (the `.Rproj` file).
+RStudio then sets the working directory to the project folder automatically,
+so you can refer to data by its location *within* the project---like
+`"data/wages.csv"`---and it works on any computer, with no full paths needed.
+:::
+
+Two habits save a lot of trouble:
+**name files with no spaces** (`midterm_data.csv`, not `midterm data.csv`---use
+`_` or `-` instead), and **keep coding projects out of cloud-synced folders**
+like iCloud, OneDrive, Dropbox, or Google Drive, which sync in the background
+and interfere with R and Git.
+(On most Macs, the Desktop and Documents folders sync to iCloud by default.)
 
 
 ## README Files and Codebooks

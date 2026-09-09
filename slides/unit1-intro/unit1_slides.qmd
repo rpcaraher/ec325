@@ -4,6 +4,7 @@ subtitle: "EC 325: Econometrics"
 author: "Prof. Caraher"
 institute: "Colby College"
 date: "Spring 2026"
+date-format: "[Spring] YYYY"
 embed-resources: true
 format:
   revealjs:
@@ -23,15 +24,19 @@ execute:
 library(tidyverse)
 ```
 
-## About Me: Prof. Ray Caraher
+## About Prof. Caraher
 
 I am a recent PhD from UMass Amherst. My research focuses on the relationship between public/economic policy and maternal, infant, and child health and racial/ethnic health disparities.
 
+. . .
+
 This is my second year at Colby!
 
-- Email: [rcaraher@colby.edu](mailto:rcaraher@colby.edu). I will do my best to respond within 24 hours on weekdays.
+. . .
+
+- Email: [rcaraher@colby.edu](mailto:rcaraher@colby.edu). I will do my best to respond within *24 hours on weekdays*.
 - Office: 365 Diamond Bldg.
-- Office Hours: Tuesdays, 2pm - 4pm, Thursdays, 1pm - 3pm, Fridays, 10:30am - 12:30pm. Or by appointment.
+- Office Hours: Tuesdays and Thursdays, 1:30pm - 3:30pm, Fridays, 10:00am - 12:00pm. Or by [appointment](https://calendar.app.google/x2kBXD8Ma9XwABVh9).
 
 # What is Econometrics?
 
@@ -55,6 +60,10 @@ In my opinion:
 
 Modern econometrics has really focused on developing techniques to identify the **causal effects** of social phenomena/policy as opposed to **correlations**
 
+. . .
+
+What do we mean by **causal effects**? Let's think through an example...
+
 
 ## The US is Unhealthy Relative to Peer Countries
 
@@ -72,7 +81,7 @@ Modern econometrics has really focused on developing techniques to identify the 
 
 Discuss with a classmate
 
-## Does having health insurance make you healthier?
+. . .
 
 ::: {.incremental}
 - Health insurance coverage is **correlated** with better health outcomes
@@ -83,21 +92,23 @@ Discuss with a classmate
 
 **Econometrics** can help us answer this question!
 
-## Other examples of causal inference questions
+## Other examples of causal inference questions we will discuss
 
 ::: {.incremental}
-- Does a college degree increase your earnings?
+- Does a getting a college degree cause someone to have a higher wage?
 - Is immigration bad for native workers wages?
 - Do police reduce crime?
 :::
 
-## What Is the Broad Process for Econometric Analysis?
+# How Do We Do Econometrics?
+
+## What Is the Process for an Econometric Analysis?
 
 Let's say we want to know what the effect of on-the-job training has on your wage.
 
 What **steps** would we need to take to answer this question?
 
-## What Is the Broad Process for Econometric Analysis?
+## What Is the Process for an Econometric Analysis?
 
 Step 1: Write an *econometric model*
 
@@ -106,13 +117,13 @@ Step 1: Write an *econometric model*
 - Always based on some **intuition** which **mathematically relates** some *variable(s)* to some other *variables(s)*
 :::
 
-## What Is the Broad Process for Econometric Analysis?
+## What Is the Process for an Econometric Analysis?
 
 One example of an econometric model would be (we will learn what this equation means later!):
 
 $$ wage = \beta_{0} + \beta_{1} educ + \beta_{2} exper + \beta_{3} training + \epsilon $$
 
-## What Is the Broad Process for Econometric Analysis?
+## What Is the Process for an Econometric Analysis?
 
 Step 2: *Find and explore* the data (easier said then done!)
 
@@ -121,14 +132,14 @@ Step 2: *Find and explore* the data (easier said then done!)
 Many different types of data:
 
 ::: {.incremental}
-- cross-sectional (most common): a sample of individuals, households, firms, countries, or any other unit observed at a given point in time
-- Data for econometric is organized (or needs to be organized) as a **matrix** or **dataframe** (very similar to a spreadsheet!)
+- cross-sectional (most common, our focus for most of the semester): a sample of individuals, households, firms, countries, or any other unit observed at a single, given point in time
+- Data for econometric is organized (or *needs to be organized*) as a **matrix** or **dataframe** (very similar to a spreadsheet!)
 :::
 
 ```{r}
 #| label: create-test-data
 
-test_data <- tibble("person" = c(1, 2, 3, 4),
+test_data <- tibble("pid" = c(1, 2, 3, 4),
                     "wage" = c(17.25, 11.90, 23.20, 18.45),
                     "educ" = c(12, 16, 16, 10),
                     "exper" = c(10, 1, 2, 15),
@@ -150,8 +161,8 @@ test_data_2 <- tibble("educ" = rnorm(50, mean = 10, sd = 2),
 test_data |>
   knitr::kable(
     format = "html",
-    col.names = c("Person", "Wage ($/hr)", "Education (yrs)",
-                  "Experience (yrs)", "Training (weeks)"),
+    col.names = c("Person ID", "Wage", "Education",
+                  "Experience", "Training"),
     align = "ccccc",
     digits = 2
   )
@@ -160,12 +171,16 @@ test_data |>
 
 ::: {.column width="28%"}
 ::: {.smaller}
-Each **row** is an *observation* (a person)
+Each **row** is an *observation*
 
 Each **column** is a *variable*
 :::
 :::
 ::::
+
+. . .
+
+Important questions to ask: what does each row represent? What about each column?
 
 ## What Is the Broad Process for Econometric Analysis?
 
@@ -275,13 +290,14 @@ Why use Git/GitHub?
 
 - Industry standard for collaborative coding and version control
 - You can see exactly what changed between versions
-- Useful skill for research and industry jobs
+- Essential skill for research and industry jobs
+- You can easily grab the most-updated versions of the course materials 
 
 ## Lecture Notes
 
 - You are required the read the lecture notes for this course *before we cover the unit in class*
 
-- The notes are available either in the Github Repo or at: [https://www.raymondcaraher.com/ec325/](https://www.raymondcaraher.com/ec325/)
+- The notes are available at: [https://www.raymondcaraher.com/ec325/](https://www.raymondcaraher.com/ec325/) or in your Git directory on your computer
 
 - Lecture notes include optional multiple choice review questions
 
@@ -300,13 +316,7 @@ This is a good, more “applied” version of the Wooldridge textbook.
 This text is an excellent companion to the other texts, but is not like a traditional
 textbook.
 
-
-## Pre-Reqs
-
-- Intermediate Micro
-- Research Methods and Statistics
-
-If you don't have either one of these, let me know!
+# Assessments and Grades
 
 ## Assignments
 
@@ -330,6 +340,8 @@ Your grade will be determined by:
 - Graded on a 3-point scale (0 = no attempt, 3 = excellent)
 - Lowest 2 grades dropped at end of semester
 
+. . .
+
 **No collaboration allowed** on concept checks. Come to office hours/email if you have questions!
 
 ## Problem Sets
@@ -339,32 +351,17 @@ Your grade will be determined by:
 - A considerable portion of your grade — treat each as a mini-project
 - No late problem sets allowed
 
-You can (*and are encouraged!*) to work in groups on problem sets.
-
-## AI Policy
-
-- AI tools can be useful for coding questions, but over-reliance can become a crutch. 
-- [Stromberg et al. (2026)](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6977138): Students who use AI have higher homework scores and complete homework quicker,
-but have lower exam scores and higher learning loss in the short and long run,
-*with social science students experiencing the largest decreases*
-
 . . .
 
-The AI policy for this course is:
+You can work in groups on problem sets, but please turn in an individual copy of your work.
 
-- You are allowed to use AI tools on your **problem sets and final project** for **specific, coding-related questions only**
-- **No AI tools allowed on Concept Checks**
-- Any use of an AI tool must be **attributed** in your submission
-- You **must understand** the code you submit
-
-If you choose to use AI, Colby recommends **Google Gemini** with your Colby account.
 
 ## Exams
 
-- Midterm exam (in-class, Thursday, March 12)
-- Final exam (per registrar schedule)
-- Both are in-person; one double-sided note sheet allowed
-- Focus on concepts and interpretation — no software, but you will analyze output
+- In-class Midterm exam (tentative date: Thursday, Oct. 15)
+- Final exam (per Registrar schedule)
+- One double-sided, hand-written reference sheet is allowed
+- No calculators necessary
 
 ## Engaged Learning
 
@@ -448,9 +445,26 @@ Why R?
 
 **R** is the engine; **RStudio** is the driver's seat
 
-## R and R Studio
 
-There are instructions on how to install this software in the appendix of the Lecture Notes. Review them and install R and R Studio as soon as you can!
+## AI Policy {.smaller}
+
+- AI tools can be useful for coding questions, but over-reliance can become a crutch. 
+- [Stromberg et al. (2026)](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6977138): Students who use AI have higher homework scores and complete homework quicker,
+but have lower exam scores and higher learning loss in the short and long run,
+*with social science students experiencing the largest decreases*
+
+. . .
+
+The AI policy for this course is:
+
+- You are allowed to use AI tools on your **problem sets and final project** for **specific, coding-related questions only**
+- **No AI tools allowed on Concept Checks**
+- Any use of an AI tool must be **attributed** in your submission
+- You **must understand** the code you submit (you will have to read and interpret code on the exams!)
+
+. . .
+
+If you choose to use AI, Colby recommends **Google Gemini** with your Colby account.
 
 
 ## About you!
@@ -461,9 +475,8 @@ There are instructions on how to install this software in the appendix of the Le
 
 ## For Next Time
 
-- Read **unit 1 and unit 2** of the lecture notes (will help with Concept Check 1!)
+- Read **Unit 1: Introduction, Unit 2: Good Data Practices, and Appendix B: Statistics and Probability Review** of the lecture notes (will help with Concept Check 1!)
 - Follow the [EC325 Installation Guide](https://www.raymondcaraher.com/ec325/ec325_installation_guide.html) to get set up with R, RStudio, and Git!
-- Concept Check 1 (review of Key Concepts from Statistics - due this Sunday!)
-- Fill out the survey so I can assign groups!
-- Make a Github account
+- Concept Check 1 (review of Key Concepts from statistics - due this Sunday (the 13th) at 11:59pm)
+- Fill out the [First Day Survey](https://forms.gle/cW1LadxiySCFWAtD9) so I can create final project groups
 

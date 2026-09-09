@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Appendix C — Importing and Working with Data – EC325 Lecture Notes</title>
+<title>Appendix C — Files, Folders, and Working with Data – EC325 Lecture Notes</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -135,7 +135,7 @@ div.csl-indent {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/installingR.html">Appendices</a></li><li class="breadcrumb-item"><a href="../chapters/working_with_data.html"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Importing and Working with Data</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/installingR.html">Appendices</a></li><li class="breadcrumb-item"><a href="../chapters/working_with_data.html"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Files, Folders, and Working with Data</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -311,7 +311,7 @@ div.csl-indent {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/working_with_data.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Importing and Working with Data</span></span></a>
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Files, Folders, and Working with Data</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -332,70 +332,71 @@ div.csl-indent {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#readme-files-and-codebooks" id="toc-readme-files-and-codebooks" class="nav-link active" data-scroll-target="#readme-files-and-codebooks"><span class="header-section-number">C.1</span> README Files and Codebooks</a>
+  <li><a href="#files-folders-and-paths" id="toc-files-folders-and-paths" class="nav-link active" data-scroll-target="#files-folders-and-paths"><span class="header-section-number">C.1</span> Files, Folders, and Paths</a></li>
+  <li><a href="#readme-files-and-codebooks" id="toc-readme-files-and-codebooks" class="nav-link" data-scroll-target="#readme-files-and-codebooks"><span class="header-section-number">C.2</span> README Files and Codebooks</a>
   <ul class="collapse">
-  <li><a href="#readme-files" id="toc-readme-files" class="nav-link" data-scroll-target="#readme-files"><span class="header-section-number">C.1.1</span> README Files</a></li>
-  <li><a href="#codebooks" id="toc-codebooks" class="nav-link" data-scroll-target="#codebooks"><span class="header-section-number">C.1.2</span> Codebooks</a></li>
+  <li><a href="#readme-files" id="toc-readme-files" class="nav-link" data-scroll-target="#readme-files"><span class="header-section-number">C.2.1</span> README Files</a></li>
+  <li><a href="#codebooks" id="toc-codebooks" class="nav-link" data-scroll-target="#codebooks"><span class="header-section-number">C.2.2</span> Codebooks</a></li>
   </ul></li>
-  <li><a href="#importing-data" id="toc-importing-data" class="nav-link" data-scroll-target="#importing-data"><span class="header-section-number">C.2</span> Importing Data</a>
+  <li><a href="#importing-data" id="toc-importing-data" class="nav-link" data-scroll-target="#importing-data"><span class="header-section-number">C.3</span> Importing Data</a>
   <ul class="collapse">
-  <li><a href="#csv-files" id="toc-csv-files" class="nav-link" data-scroll-target="#csv-files"><span class="header-section-number">C.2.1</span> CSV Files</a></li>
-  <li><a href="#other-delimited-files" id="toc-other-delimited-files" class="nav-link" data-scroll-target="#other-delimited-files"><span class="header-section-number">C.2.2</span> Other Delimited Files</a></li>
-  <li><a href="#excel-files" id="toc-excel-files" class="nav-link" data-scroll-target="#excel-files"><span class="header-section-number">C.2.3</span> Excel Files</a></li>
-  <li><a href="#stata-and-other-statistical-software-files" id="toc-stata-and-other-statistical-software-files" class="nav-link" data-scroll-target="#stata-and-other-statistical-software-files"><span class="header-section-number">C.2.4</span> Stata and Other Statistical Software Files</a></li>
-  <li><a href="#r-data-files" id="toc-r-data-files" class="nav-link" data-scroll-target="#r-data-files"><span class="header-section-number">C.2.5</span> R Data Files</a></li>
+  <li><a href="#csv-files" id="toc-csv-files" class="nav-link" data-scroll-target="#csv-files"><span class="header-section-number">C.3.1</span> CSV Files</a></li>
+  <li><a href="#other-delimited-files" id="toc-other-delimited-files" class="nav-link" data-scroll-target="#other-delimited-files"><span class="header-section-number">C.3.2</span> Other Delimited Files</a></li>
+  <li><a href="#excel-files" id="toc-excel-files" class="nav-link" data-scroll-target="#excel-files"><span class="header-section-number">C.3.3</span> Excel Files</a></li>
+  <li><a href="#stata-and-other-statistical-software-files" id="toc-stata-and-other-statistical-software-files" class="nav-link" data-scroll-target="#stata-and-other-statistical-software-files"><span class="header-section-number">C.3.4</span> Stata and Other Statistical Software Files</a></li>
+  <li><a href="#r-data-files" id="toc-r-data-files" class="nav-link" data-scroll-target="#r-data-files"><span class="header-section-number">C.3.5</span> R Data Files</a></li>
   </ul></li>
-  <li><a href="#first-things-to-do-with-your-data" id="toc-first-things-to-do-with-your-data" class="nav-link" data-scroll-target="#first-things-to-do-with-your-data"><span class="header-section-number">C.3</span> First Things to Do with Your Data</a>
+  <li><a href="#first-things-to-do-with-your-data" id="toc-first-things-to-do-with-your-data" class="nav-link" data-scroll-target="#first-things-to-do-with-your-data"><span class="header-section-number">C.4</span> First Things to Do with Your Data</a>
   <ul class="collapse">
-  <li><a href="#head-look-at-the-first-few-rows" id="toc-head-look-at-the-first-few-rows" class="nav-link" data-scroll-target="#head-look-at-the-first-few-rows"><span class="header-section-number">C.3.1</span> <code>head()</code>: Look at the First Few Rows</a></li>
-  <li><a href="#glimpse-get-a-compact-overview" id="toc-glimpse-get-a-compact-overview" class="nav-link" data-scroll-target="#glimpse-get-a-compact-overview"><span class="header-section-number">C.3.2</span> <code>glimpse()</code>: Get a Compact Overview</a></li>
-  <li><a href="#summary-check-key-statistics" id="toc-summary-check-key-statistics" class="nav-link" data-scroll-target="#summary-check-key-statistics"><span class="header-section-number">C.3.3</span> <code>summary()</code>: Check Key Statistics</a></li>
+  <li><a href="#head-look-at-the-first-few-rows" id="toc-head-look-at-the-first-few-rows" class="nav-link" data-scroll-target="#head-look-at-the-first-few-rows"><span class="header-section-number">C.4.1</span> <code>head()</code>: Look at the First Few Rows</a></li>
+  <li><a href="#glimpse-get-a-compact-overview" id="toc-glimpse-get-a-compact-overview" class="nav-link" data-scroll-target="#glimpse-get-a-compact-overview"><span class="header-section-number">C.4.2</span> <code>glimpse()</code>: Get a Compact Overview</a></li>
+  <li><a href="#summary-check-key-statistics" id="toc-summary-check-key-statistics" class="nav-link" data-scroll-target="#summary-check-key-statistics"><span class="header-section-number">C.4.3</span> <code>summary()</code>: Check Key Statistics</a></li>
   </ul></li>
-  <li><a href="#data-structure-wide-vs.-long" id="toc-data-structure-wide-vs.-long" class="nav-link" data-scroll-target="#data-structure-wide-vs.-long"><span class="header-section-number">C.4</span> Data Structure: Wide vs.&nbsp;Long</a>
+  <li><a href="#data-structure-wide-vs.-long" id="toc-data-structure-wide-vs.-long" class="nav-link" data-scroll-target="#data-structure-wide-vs.-long"><span class="header-section-number">C.5</span> Data Structure: Wide vs.&nbsp;Long</a>
   <ul class="collapse">
-  <li><a href="#wide-data" id="toc-wide-data" class="nav-link" data-scroll-target="#wide-data"><span class="header-section-number">C.4.1</span> Wide Data</a></li>
-  <li><a href="#long-data" id="toc-long-data" class="nav-link" data-scroll-target="#long-data"><span class="header-section-number">C.4.2</span> Long Data</a></li>
-  <li><a href="#when-to-use-which-format" id="toc-when-to-use-which-format" class="nav-link" data-scroll-target="#when-to-use-which-format"><span class="header-section-number">C.4.3</span> When to Use Which Format</a></li>
+  <li><a href="#wide-data" id="toc-wide-data" class="nav-link" data-scroll-target="#wide-data"><span class="header-section-number">C.5.1</span> Wide Data</a></li>
+  <li><a href="#long-data" id="toc-long-data" class="nav-link" data-scroll-target="#long-data"><span class="header-section-number">C.5.2</span> Long Data</a></li>
+  <li><a href="#when-to-use-which-format" id="toc-when-to-use-which-format" class="nav-link" data-scroll-target="#when-to-use-which-format"><span class="header-section-number">C.5.3</span> When to Use Which Format</a></li>
   </ul></li>
-  <li><a href="#reshaping-data-with-pivot_longer-and-pivot_wider" id="toc-reshaping-data-with-pivot_longer-and-pivot_wider" class="nav-link" data-scroll-target="#reshaping-data-with-pivot_longer-and-pivot_wider"><span class="header-section-number">C.5</span> Reshaping Data with <code>pivot_longer()</code> and <code>pivot_wider()</code></a>
+  <li><a href="#reshaping-data-with-pivot_longer-and-pivot_wider" id="toc-reshaping-data-with-pivot_longer-and-pivot_wider" class="nav-link" data-scroll-target="#reshaping-data-with-pivot_longer-and-pivot_wider"><span class="header-section-number">C.6</span> Reshaping Data with <code>pivot_longer()</code> and <code>pivot_wider()</code></a>
   <ul class="collapse">
-  <li><a href="#wide-to-long-with-pivot_longer" id="toc-wide-to-long-with-pivot_longer" class="nav-link" data-scroll-target="#wide-to-long-with-pivot_longer"><span class="header-section-number">C.5.1</span> Wide to Long with <code>pivot_longer()</code></a></li>
-  <li><a href="#a-more-detailed-example" id="toc-a-more-detailed-example" class="nav-link" data-scroll-target="#a-more-detailed-example"><span class="header-section-number">C.5.2</span> A More Detailed Example</a></li>
-  <li><a href="#long-to-wide-with-pivot_wider" id="toc-long-to-wide-with-pivot_wider" class="nav-link" data-scroll-target="#long-to-wide-with-pivot_wider"><span class="header-section-number">C.5.3</span> Long to Wide with <code>pivot_wider()</code></a></li>
-  <li><a href="#another-pivot_wider-example" id="toc-another-pivot_wider-example" class="nav-link" data-scroll-target="#another-pivot_wider-example"><span class="header-section-number">C.5.4</span> Another <code>pivot_wider()</code> Example</a></li>
+  <li><a href="#wide-to-long-with-pivot_longer" id="toc-wide-to-long-with-pivot_longer" class="nav-link" data-scroll-target="#wide-to-long-with-pivot_longer"><span class="header-section-number">C.6.1</span> Wide to Long with <code>pivot_longer()</code></a></li>
+  <li><a href="#a-more-detailed-example" id="toc-a-more-detailed-example" class="nav-link" data-scroll-target="#a-more-detailed-example"><span class="header-section-number">C.6.2</span> A More Detailed Example</a></li>
+  <li><a href="#long-to-wide-with-pivot_wider" id="toc-long-to-wide-with-pivot_wider" class="nav-link" data-scroll-target="#long-to-wide-with-pivot_wider"><span class="header-section-number">C.6.3</span> Long to Wide with <code>pivot_wider()</code></a></li>
+  <li><a href="#another-pivot_wider-example" id="toc-another-pivot_wider-example" class="nav-link" data-scroll-target="#another-pivot_wider-example"><span class="header-section-number">C.6.4</span> Another <code>pivot_wider()</code> Example</a></li>
   </ul></li>
-  <li><a href="#merging-data-with-joins" id="toc-merging-data-with-joins" class="nav-link" data-scroll-target="#merging-data-with-joins"><span class="header-section-number">C.6</span> Merging Data with Joins</a>
+  <li><a href="#merging-data-with-joins" id="toc-merging-data-with-joins" class="nav-link" data-scroll-target="#merging-data-with-joins"><span class="header-section-number">C.7</span> Merging Data with Joins</a>
   <ul class="collapse">
-  <li><a href="#a-simple-example" id="toc-a-simple-example" class="nav-link" data-scroll-target="#a-simple-example"><span class="header-section-number">C.6.1</span> A Simple Example</a></li>
-  <li><a href="#left_join" id="toc-left_join" class="nav-link" data-scroll-target="#left_join"><span class="header-section-number">C.6.2</span> <code>left_join()</code></a></li>
-  <li><a href="#right_join" id="toc-right_join" class="nav-link" data-scroll-target="#right_join"><span class="header-section-number">C.6.3</span> <code>right_join()</code></a></li>
-  <li><a href="#inner_join" id="toc-inner_join" class="nav-link" data-scroll-target="#inner_join"><span class="header-section-number">C.6.4</span> <code>inner_join()</code></a></li>
-  <li><a href="#full_join" id="toc-full_join" class="nav-link" data-scroll-target="#full_join"><span class="header-section-number">C.6.5</span> <code>full_join()</code></a></li>
-  <li><a href="#joining-on-multiple-key-variables" id="toc-joining-on-multiple-key-variables" class="nav-link" data-scroll-target="#joining-on-multiple-key-variables"><span class="header-section-number">C.6.6</span> Joining on Multiple Key Variables</a></li>
-  <li><a href="#joining-when-key-variables-have-different-names" id="toc-joining-when-key-variables-have-different-names" class="nav-link" data-scroll-target="#joining-when-key-variables-have-different-names"><span class="header-section-number">C.6.7</span> Joining When Key Variables Have Different Names</a></li>
-  <li><a href="#diagnosing-join-problems" id="toc-diagnosing-join-problems" class="nav-link" data-scroll-target="#diagnosing-join-problems"><span class="header-section-number">C.6.8</span> Diagnosing Join Problems</a></li>
+  <li><a href="#a-simple-example" id="toc-a-simple-example" class="nav-link" data-scroll-target="#a-simple-example"><span class="header-section-number">C.7.1</span> A Simple Example</a></li>
+  <li><a href="#left_join" id="toc-left_join" class="nav-link" data-scroll-target="#left_join"><span class="header-section-number">C.7.2</span> <code>left_join()</code></a></li>
+  <li><a href="#right_join" id="toc-right_join" class="nav-link" data-scroll-target="#right_join"><span class="header-section-number">C.7.3</span> <code>right_join()</code></a></li>
+  <li><a href="#inner_join" id="toc-inner_join" class="nav-link" data-scroll-target="#inner_join"><span class="header-section-number">C.7.4</span> <code>inner_join()</code></a></li>
+  <li><a href="#full_join" id="toc-full_join" class="nav-link" data-scroll-target="#full_join"><span class="header-section-number">C.7.5</span> <code>full_join()</code></a></li>
+  <li><a href="#joining-on-multiple-key-variables" id="toc-joining-on-multiple-key-variables" class="nav-link" data-scroll-target="#joining-on-multiple-key-variables"><span class="header-section-number">C.7.6</span> Joining on Multiple Key Variables</a></li>
+  <li><a href="#joining-when-key-variables-have-different-names" id="toc-joining-when-key-variables-have-different-names" class="nav-link" data-scroll-target="#joining-when-key-variables-have-different-names"><span class="header-section-number">C.7.7</span> Joining When Key Variables Have Different Names</a></li>
+  <li><a href="#diagnosing-join-problems" id="toc-diagnosing-join-problems" class="nav-link" data-scroll-target="#diagnosing-join-problems"><span class="header-section-number">C.7.8</span> Diagnosing Join Problems</a></li>
   </ul></li>
-  <li><a href="#exporting-data" id="toc-exporting-data" class="nav-link" data-scroll-target="#exporting-data"><span class="header-section-number">C.7</span> Exporting Data</a>
+  <li><a href="#exporting-data" id="toc-exporting-data" class="nav-link" data-scroll-target="#exporting-data"><span class="header-section-number">C.8</span> Exporting Data</a>
   <ul class="collapse">
-  <li><a href="#writing-csv-files" id="toc-writing-csv-files" class="nav-link" data-scroll-target="#writing-csv-files"><span class="header-section-number">C.7.1</span> Writing CSV Files</a></li>
-  <li><a href="#writing-r-data-files" id="toc-writing-r-data-files" class="nav-link" data-scroll-target="#writing-r-data-files"><span class="header-section-number">C.7.2</span> Writing R Data Files</a></li>
-  <li><a href="#writing-stata-files" id="toc-writing-stata-files" class="nav-link" data-scroll-target="#writing-stata-files"><span class="header-section-number">C.7.3</span> Writing Stata Files</a></li>
-  <li><a href="#writing-excel-files" id="toc-writing-excel-files" class="nav-link" data-scroll-target="#writing-excel-files"><span class="header-section-number">C.7.4</span> Writing Excel Files</a></li>
+  <li><a href="#writing-csv-files" id="toc-writing-csv-files" class="nav-link" data-scroll-target="#writing-csv-files"><span class="header-section-number">C.8.1</span> Writing CSV Files</a></li>
+  <li><a href="#writing-r-data-files" id="toc-writing-r-data-files" class="nav-link" data-scroll-target="#writing-r-data-files"><span class="header-section-number">C.8.2</span> Writing R Data Files</a></li>
+  <li><a href="#writing-stata-files" id="toc-writing-stata-files" class="nav-link" data-scroll-target="#writing-stata-files"><span class="header-section-number">C.8.3</span> Writing Stata Files</a></li>
+  <li><a href="#writing-excel-files" id="toc-writing-excel-files" class="nav-link" data-scroll-target="#writing-excel-files"><span class="header-section-number">C.8.4</span> Writing Excel Files</a></li>
   </ul></li>
-  <li><a href="#summary-and-conclusion" id="toc-summary-and-conclusion" class="nav-link" data-scroll-target="#summary-and-conclusion"><span class="header-section-number">C.8</span> Summary and Conclusion</a>
+  <li><a href="#summary-and-conclusion" id="toc-summary-and-conclusion" class="nav-link" data-scroll-target="#summary-and-conclusion"><span class="header-section-number">C.9</span> Summary and Conclusion</a>
   <ul class="collapse">
-  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">C.8.1</span> Key Takeaways</a></li>
+  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways"><span class="header-section-number">C.9.1</span> Key Takeaways</a></li>
   </ul></li>
-  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">C.9</span> Check Your Understanding</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">C.10</span> Check Your Understanding</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/installingR.html">Appendices</a></li><li class="breadcrumb-item"><a href="../chapters/working_with_data.html"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Importing and Working with Data</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/installingR.html">Appendices</a></li><li class="breadcrumb-item"><a href="../chapters/working_with_data.html"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Files, Folders, and Working with Data</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title"><span id="sec-working-with-data" class="quarto-section-identifier">Appendix C — Importing and Working with Data</span></h1>
+<h1 class="title"><span id="sec-working-with-data" class="quarto-section-identifier">Appendix C — Files, Folders, and Working with Data</span></h1>
 </div>
 
 
@@ -506,6 +507,7 @@ function checkAnswer(selectElement, correctValue) {
 <div id="callout-1" class="callout-1-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ul>
+<li>Where do files live on my computer, and how do I point R to them?</li>
 <li>How do I import data files into R?</li>
 <li>What are README files and codebooks, and why do they matter?</li>
 <li>What are the first things I should do after loading a dataset?</li>
@@ -534,12 +536,41 @@ function checkAnswer(selectElement, correctValue) {
 </div>
 </div>
 </div>
-<p>Every empirical analysis starts with the same step: getting data into R. Whether you’re working with a dataset from a published paper, government statistics, or data you collected yourself, you need to know how to import it, understand its structure, and get it into the right shape for your analysis. This appendix walks you through the entire process, from reading in a data file to reshaping and exporting your results.</p>
-<section id="readme-files-and-codebooks" class="level2" data-number="C.1">
-<h2 data-number="C.1" class="anchored" data-anchor-id="readme-files-and-codebooks"><span class="header-section-number">C.1</span> README Files and Codebooks</h2>
+<p>Every empirical analysis starts with the same step: getting data into R. Whether you’re working with a dataset from a published paper, government statistics, or data you collected yourself, you need to know how to import it, understand its structure, and get it into the right shape for your analysis. This appendix starts with the basics of how your computer organizes files and folders—since R can’t work with a dataset it can’t find— and then walks you through the entire process, from reading in a data file to reshaping and exporting your results.</p>
+<section id="files-folders-and-paths" class="level2" data-number="C.1">
+<h2 data-number="C.1" class="anchored" data-anchor-id="files-folders-and-paths"><span class="header-section-number">C.1</span> Files, Folders, and Paths</h2>
+<p>Before R can analyze a dataset, it has to be able to <em>find</em> it on your computer. This is where a lot of early frustration comes from, so its worth a quick review of how files are organized on computers, since R interacts with this setup to figure out where files on your PC are located.</p>
+<p><strong>Files and extensions.</strong> A file is a single saved thing—a script, a dataset, a document, an image, a video, etc. Its <strong>extension</strong> (the part after the dot) says what kind it is. For example, a file ending with the extension <code>.R</code> is an R script, <code>.csv</code> a plain-text data file, and<code>.xlsx</code> an Excel file.</p>
+<p>If your computer hides extensions by default, you should turn them on (<strong>Finder () Settings () Advanced</strong> on Mac; the <strong>View</strong> menu in File Explorer on Windows). It makes files much easier to tell apart.</p>
+<p><strong>Folders and paths.</strong> A <strong>folder</strong> (or <strong>directory</strong>—same thing) holds files and other folders. A <strong>path</strong> is a file’s full address, written as the folders you would click through to reach it:</p>
+<ul>
+<li>Mac: <code>/Users/yourname/GitHub/ec325/data/wages.csv</code></li>
+<li>Windows: <code>C:\Users\yourname\GitHub\ec325\data\wages.csv</code></li>
+</ul>
+<p>Mac separates folders with <code>/</code> and Windows with <code>\</code>, but <strong>inside R you always use forward slashes</strong> (<code>"C:/Users/..."</code>), even on Windows. The tilde <code>~</code> is a shortcut for your home folder, so <code>~/GitHub/ec325</code> and <code>/Users/yourname/GitHub/ec325</code> mean the same thing.</p>
+<p><strong>The working directory.</strong> When R is running, it is always “standing” in one folder—the <strong>working directory</strong>. If you ask it to read <code>"wages.csv"</code> with no path, it looks <em>only</em> there. This is the reason behind the most common beginner error:</p>
+<pre><code>Error: cannot open file 'wages.csv': No such file or directory</code></pre>
+<p>Nine times out of ten the file exists, it is just not in the folder R is standing in. Run <code>getwd()</code> to see where that is. There is more on this elsewhere in these lecture note.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Use RStudio Projects to Avoid Path Headaches
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Open your work through an <strong>RStudio Project</strong> (the <code>.Rproj</code> file). RStudio then sets the working directory to the project folder automatically, so you can refer to data by its location <em>within</em> the project—like <code>"data/wages.csv"</code>—and it works on any computer, with no full paths needed.</p>
+</div>
+</div>
+<p>Two habits save a lot of trouble: <strong>name files with no spaces</strong> (<code>midterm_data.csv</code>, not <code>midterm data.csv</code>—use <code>_</code> or <code>-</code> instead), and <strong>keep coding projects out of cloud-synced folders</strong> like iCloud, OneDrive, Dropbox, or Google Drive, which sync in the background and interfere with R and Git. (On most Macs, the Desktop and Documents folders sync to iCloud by default.)</p>
+</section>
+<section id="readme-files-and-codebooks" class="level2" data-number="C.2">
+<h2 data-number="C.2" class="anchored" data-anchor-id="readme-files-and-codebooks"><span class="header-section-number">C.2</span> README Files and Codebooks</h2>
 <p>Before you ever open a dataset in R, you should look for its <strong>documentation</strong>. Two types of documentation are especially important: the README file and the codebook.</p>
-<section id="readme-files" class="level3" data-number="C.1.1">
-<h3 data-number="C.1.1" class="anchored" data-anchor-id="readme-files"><span class="header-section-number">C.1.1</span> README Files</h3>
+<section id="readme-files" class="level3" data-number="C.2.1">
+<h3 data-number="C.2.1" class="anchored" data-anchor-id="readme-files"><span class="header-section-number">C.2.1</span> README Files</h3>
 <p>A README file provides a high-level overview of a dataset or project. It typically contains information about where the data came from, when it was collected, who collected it, and any important notes about how the data should be used or cited. README files are usually plain text (<code>.txt</code>) or Markdown (<code>.md</code>) files.</p>
 <p>A good README for a research dataset might look something like this:</p>
 <pre><code>================================================================
@@ -574,8 +605,8 @@ Citation:
 ================================================================</code></pre>
 <p>Even if a dataset doesn’t come with a README, you should create one for your own projects. When you come back to an analysis six months later, you will thank yourself for writing down where the data came from and what the key variables mean.</p>
 </section>
-<section id="codebooks" class="level3" data-number="C.1.2">
-<h3 data-number="C.1.2" class="anchored" data-anchor-id="codebooks"><span class="header-section-number">C.1.2</span> Codebooks</h3>
+<section id="codebooks" class="level3" data-number="C.2.2">
+<h3 data-number="C.2.2" class="anchored" data-anchor-id="codebooks"><span class="header-section-number">C.2.2</span> Codebooks</h3>
 <p>A <strong>codebook</strong> (sometimes called a data dictionary) is more detailed than a README. It describes every variable in the dataset: what it measures, what values it can take, how missing values are coded, and any important notes about interpretation.</p>
 <p>Here’s an example of what a codebook might look like for the birth outcomes dataset described above:</p>
 <pre><code>================================================================
@@ -618,23 +649,23 @@ Always Look for Documentation First
 </div>
 </section>
 </section>
-<section id="importing-data" class="level2" data-number="C.2">
-<h2 data-number="C.2" class="anchored" data-anchor-id="importing-data"><span class="header-section-number">C.2</span> Importing Data</h2>
+<section id="importing-data" class="level2" data-number="C.3">
+<h2 data-number="C.3" class="anchored" data-anchor-id="importing-data"><span class="header-section-number">C.3</span> Importing Data</h2>
 <p>The <code>tidyverse</code> includes a package called <code>readr</code> that provides fast, consistent functions for reading data files into R. When you load the <code>tidyverse</code> with <code>library(tidyverse)</code>, <code>readr</code> is automatically loaded for you.</p>
-<section id="csv-files" class="level3" data-number="C.2.1">
-<h3 data-number="C.2.1" class="anchored" data-anchor-id="csv-files"><span class="header-section-number">C.2.1</span> CSV Files</h3>
+<section id="csv-files" class="level3" data-number="C.3.1">
+<h3 data-number="C.3.1" class="anchored" data-anchor-id="csv-files"><span class="header-section-number">C.3.1</span> CSV Files</h3>
 <p>The most common data format you’ll encounter is the <strong>CSV</strong> (comma-separated values) file. A CSV file is essentially a plain text file where each row is an observation and each value is separated by commas. To read a CSV file, use <code>read_csv()</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read a CSV file from your working directory</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>birth_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"birth_outcomes.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read a CSV file from your working directory</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>birth_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"birth_outcomes.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>When you run <code>read_csv()</code>, it will print a message showing you what type it assigned to each column. This is helpful for catching issues—for example, if a column you expected to be numeric shows up as character, that might indicate there are non-numeric entries (like “N/A” or “-”) in the data that need to be addressed.</p>
 <p>You can also read CSV files directly from a URL, which is convenient for datasets hosted online:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read a CSV file from a URL</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>storms_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://vincentarelbundock.github.io/Rdatasets/csv/dplyr/storms.csv"</span>)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(storms_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read a CSV file from a URL</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>storms_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://vincentarelbundock.github.io/Rdatasets/csv/dplyr/storms.csv"</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(storms_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 6 × 14
   rownames name   year month   day  hour   lat  long status       category  wind
@@ -650,59 +681,59 @@ Always Look for Documentation First
 </div>
 </div>
 </section>
-<section id="other-delimited-files" class="level3" data-number="C.2.2">
-<h3 data-number="C.2.2" class="anchored" data-anchor-id="other-delimited-files"><span class="header-section-number">C.2.2</span> Other Delimited Files</h3>
+<section id="other-delimited-files" class="level3" data-number="C.3.2">
+<h3 data-number="C.3.2" class="anchored" data-anchor-id="other-delimited-files"><span class="header-section-number">C.3.2</span> Other Delimited Files</h3>
 <p>Not all text-based data files use commas as separators. Some use tabs, semicolons, or other characters. The <code>readr</code> package (included when loading the <code>tidyverse</code>) has functions for common variants:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tab-separated files</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>my_data <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"data_file.tsv"</span>)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Semicolon-separated files (common in some European data)</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>my_data <span class="ot">&lt;-</span> <span class="fu">read_delim</span>(<span class="st">"data_file.csv"</span>, <span class="at">delim =</span> <span class="st">";"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tab-separated files</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>my_data <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"data_file.tsv"</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Semicolon-separated files (common in some European data)</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>my_data <span class="ot">&lt;-</span> <span class="fu">read_delim</span>(<span class="st">"data_file.csv"</span>, <span class="at">delim =</span> <span class="st">";"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="excel-files" class="level3" data-number="C.2.3">
-<h3 data-number="C.2.3" class="anchored" data-anchor-id="excel-files"><span class="header-section-number">C.2.3</span> Excel Files</h3>
+<section id="excel-files" class="level3" data-number="C.3.3">
+<h3 data-number="C.3.3" class="anchored" data-anchor-id="excel-files"><span class="header-section-number">C.3.3</span> Excel Files</h3>
 <p>Many datasets, especially those from government agencies or organizations, come in Excel format (<code>.xlsx</code> or <code>.xls</code>). To read Excel files, you need the <code>readxl</code> package, which is installed as part of the <code>tidyverse</code> but not loaded automatically:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Read the first sheet of an Excel file</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>my_data <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data_file.xlsx"</span>)</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Read a specific sheet</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>my_data <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data_file.xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Sheet2"</span>)</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Read a specific sheet by number</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>my_data <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data_file.xlsx"</span>, <span class="at">sheet =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Read the first sheet of an Excel file</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>my_data <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data_file.xlsx"</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Read a specific sheet</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>my_data <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data_file.xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Sheet2"</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Read a specific sheet by number</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>my_data <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data_file.xlsx"</span>, <span class="at">sheet =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="stata-and-other-statistical-software-files" class="level3" data-number="C.2.4">
-<h3 data-number="C.2.4" class="anchored" data-anchor-id="stata-and-other-statistical-software-files"><span class="header-section-number">C.2.4</span> Stata and Other Statistical Software Files</h3>
+<section id="stata-and-other-statistical-software-files" class="level3" data-number="C.3.4">
+<h3 data-number="C.3.4" class="anchored" data-anchor-id="stata-and-other-statistical-software-files"><span class="header-section-number">C.3.4</span> Stata and Other Statistical Software Files</h3>
 <p>If you’re working with data from other statistical software, the <code>haven</code> package (also installed with <code>tidyverse</code> but not loaded automatically) can read files from Stata (<code>.dta</code>), SPSS (<code>.sav</code>), and SAS (<code>.sas7bdat</code>):</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(haven)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Read a Stata file</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>stata_data <span class="ot">&lt;-</span> <span class="fu">read_dta</span>(<span class="st">"data_file.dta"</span>)</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Read an SPSS file</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>spss_data <span class="ot">&lt;-</span> <span class="fu">read_sav</span>(<span class="st">"data_file.sav"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(haven)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Read a Stata file</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>stata_data <span class="ot">&lt;-</span> <span class="fu">read_dta</span>(<span class="st">"data_file.dta"</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Read an SPSS file</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>spss_data <span class="ot">&lt;-</span> <span class="fu">read_sav</span>(<span class="st">"data_file.sav"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Stata files are particularly common in economics research, so <code>read_dta()</code> is a function you will use often.</p>
 </section>
-<section id="r-data-files" class="level3" data-number="C.2.5">
-<h3 data-number="C.2.5" class="anchored" data-anchor-id="r-data-files"><span class="header-section-number">C.2.5</span> R Data Files</h3>
+<section id="r-data-files" class="level3" data-number="C.3.5">
+<h3 data-number="C.3.5" class="anchored" data-anchor-id="r-data-files"><span class="header-section-number">C.3.5</span> R Data Files</h3>
 <p>R has its own file formats for saving data. The most common is <code>.rds</code>, which stores a single R object:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read an RDS file</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>my_data <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"data_file.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read an RDS file</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>my_data <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"data_file.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>You may also encounter <code>.RData</code> or <code>.rda</code> files, which can store multiple objects at once. These are loaded using <code>load()</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load an RData file (objects are loaded into your environment</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># with whatever names they were saved with)</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">"data_file.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load an RData file (objects are loaded into your environment</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># with whatever names they were saved with)</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">"data_file.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -774,19 +805,19 @@ Table&nbsp;C.1: Import functions by file type
 </div>
 </section>
 </section>
-<section id="first-things-to-do-with-your-data" class="level2" data-number="C.3">
-<h2 data-number="C.3" class="anchored" data-anchor-id="first-things-to-do-with-your-data"><span class="header-section-number">C.3</span> First Things to Do with Your Data</h2>
+<section id="first-things-to-do-with-your-data" class="level2" data-number="C.4">
+<h2 data-number="C.4" class="anchored" data-anchor-id="first-things-to-do-with-your-data"><span class="header-section-number">C.4</span> First Things to Do with Your Data</h2>
 <p>You’ve imported your data—now what? Before jumping into any analysis, you should take a few minutes to explore the dataset and make sure everything looks right. For a deeper discussion of why this matters—and how descriptive statistics and visualization can help you catch errors—see <a href="data_practices.html" class="quarto-xref"><span>Chapter 2</span></a>. Here we’ll focus on the three functions you should run every time you load a new dataset.</p>
 <p>Let’s demonstrate using the <code>penguins</code> dataset from the <code>palmerpenguins</code> package:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(palmerpenguins)</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(penguins)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(palmerpenguins)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(penguins)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="head-look-at-the-first-few-rows" class="level3" data-number="C.3.1">
-<h3 data-number="C.3.1" class="anchored" data-anchor-id="head-look-at-the-first-few-rows"><span class="header-section-number">C.3.1</span> <code>head()</code>: Look at the First Few Rows</h3>
+<section id="head-look-at-the-first-few-rows" class="level3" data-number="C.4.1">
+<h3 data-number="C.4.1" class="anchored" data-anchor-id="head-look-at-the-first-few-rows"><span class="header-section-number">C.4.1</span> <code>head()</code>: Look at the First Few Rows</h3>
 <p>The <code>head()</code> function shows you the first few rows of your data, giving you an immediate sense of what variables are present and what the values look like:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(penguins)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(penguins)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 6 × 8
   species island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g
@@ -802,11 +833,11 @@ Table&nbsp;C.1: Import functions by file type
 </div>
 <p>By default, <code>head()</code> shows 6 rows. You can change this with the <code>n</code> argument (e.g., <code>head(penguins, n = 10)</code>).</p>
 </section>
-<section id="glimpse-get-a-compact-overview" class="level3" data-number="C.3.2">
-<h3 data-number="C.3.2" class="anchored" data-anchor-id="glimpse-get-a-compact-overview"><span class="header-section-number">C.3.2</span> <code>glimpse()</code>: Get a Compact Overview</h3>
+<section id="glimpse-get-a-compact-overview" class="level3" data-number="C.4.2">
+<h3 data-number="C.4.2" class="anchored" data-anchor-id="glimpse-get-a-compact-overview"><span class="header-section-number">C.4.2</span> <code>glimpse()</code>: Get a Compact Overview</h3>
 <p>The <code>glimpse()</code> function shows every column’s name, data type, and first several values. This is one of the most efficient ways to quickly understand a dataset’s structure:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(penguins)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(penguins)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 344
 Columns: 8
@@ -822,11 +853,11 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 </div>
 <p>From this output, we can immediately see that the dataset has 344 rows and 8 columns, and we can verify that each variable has the type we’d expect (e.g., <code>species</code> is a factor, <code>bill_length_mm</code> is a double).</p>
 </section>
-<section id="summary-check-key-statistics" class="level3" data-number="C.3.3">
-<h3 data-number="C.3.3" class="anchored" data-anchor-id="summary-check-key-statistics"><span class="header-section-number">C.3.3</span> <code>summary()</code>: Check Key Statistics</h3>
+<section id="summary-check-key-statistics" class="level3" data-number="C.4.3">
+<h3 data-number="C.4.3" class="anchored" data-anchor-id="summary-check-key-statistics"><span class="header-section-number">C.4.3</span> <code>summary()</code>: Check Key Statistics</h3>
 <p>The <code>summary()</code> function provides basic descriptive statistics for every variable—minimums, maximums, means, medians, and counts of missing values:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(penguins)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(penguins)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>      species          island    bill_length_mm  bill_depth_mm  
  Adelie   :152   Biscoe   :168   Min.   :32.10   Min.   :13.10  
@@ -849,22 +880,22 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 <p>This lets you quickly verify that variable ranges make sense and spot any missing data. For example, we can see that <code>sex</code> has 11 <code>NA's</code>—something to keep in mind for our analysis.</p>
 </section>
 </section>
-<section id="data-structure-wide-vs.-long" class="level2" data-number="C.4">
-<h2 data-number="C.4" class="anchored" data-anchor-id="data-structure-wide-vs.-long"><span class="header-section-number">C.4</span> Data Structure: Wide vs.&nbsp;Long</h2>
+<section id="data-structure-wide-vs.-long" class="level2" data-number="C.5">
+<h2 data-number="C.5" class="anchored" data-anchor-id="data-structure-wide-vs.-long"><span class="header-section-number">C.5</span> Data Structure: Wide vs.&nbsp;Long</h2>
 <p>One of the most important concepts in data management is the distinction between <strong>wide</strong> and <strong>long</strong> data formats. The same information can be arranged in fundamentally different ways, and the format you need depends on what you’re trying to do with the data. Understanding this distinction—and knowing how to switch between formats—is a crucial skill for applied econometrics.</p>
-<section id="wide-data" class="level3" data-number="C.4.1">
-<h3 data-number="C.4.1" class="anchored" data-anchor-id="wide-data"><span class="header-section-number">C.4.1</span> Wide Data</h3>
+<section id="wide-data" class="level3" data-number="C.5.1">
+<h3 data-number="C.5.1" class="anchored" data-anchor-id="wide-data"><span class="header-section-number">C.5.1</span> Wide Data</h3>
 <p>In <strong>wide format</strong>, each row represents a single observational unit (like a country, state, or person), and each time period or category gets its own column. This is how data often appears in spreadsheets and published tables.</p>
 <p>Here’s an example of wide-format data showing GDP per capita for several countries across three years:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>gdp_wide <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">country =</span> <span class="fu">c</span>(<span class="st">"United States"</span>, <span class="st">"United Kingdom"</span>, <span class="st">"Germany"</span>, <span class="st">"Japan"</span>),</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">gdp_2018 =</span> <span class="fu">c</span>(<span class="dv">62887</span>, <span class="dv">42943</span>, <span class="dv">47603</span>, <span class="dv">39287</span>),</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">gdp_2019 =</span> <span class="fu">c</span>(<span class="dv">65298</span>, <span class="dv">42330</span>, <span class="dv">46468</span>, <span class="dv">40247</span>),</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">gdp_2020 =</span> <span class="fu">c</span>(<span class="dv">63544</span>, <span class="dv">40285</span>, <span class="dv">45724</span>, <span class="dv">39539</span>)</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>gdp_wide</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>gdp_wide <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">country =</span> <span class="fu">c</span>(<span class="st">"United States"</span>, <span class="st">"United Kingdom"</span>, <span class="st">"Germany"</span>, <span class="st">"Japan"</span>),</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">gdp_2018 =</span> <span class="fu">c</span>(<span class="dv">62887</span>, <span class="dv">42943</span>, <span class="dv">47603</span>, <span class="dv">39287</span>),</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">gdp_2019 =</span> <span class="fu">c</span>(<span class="dv">65298</span>, <span class="dv">42330</span>, <span class="dv">46468</span>, <span class="dv">40247</span>),</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">gdp_2020 =</span> <span class="fu">c</span>(<span class="dv">63544</span>, <span class="dv">40285</span>, <span class="dv">45724</span>, <span class="dv">39539</span>)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>gdp_wide</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 4 × 4
   country        gdp_2018 gdp_2019 gdp_2020
@@ -877,21 +908,21 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 </div>
 <p>Wide data is easy to read as a table. You can quickly compare across years for a given country by scanning across a row, or compare across countries for a given year by scanning down a column.</p>
 </section>
-<section id="long-data" class="level3" data-number="C.4.2">
-<h3 data-number="C.4.2" class="anchored" data-anchor-id="long-data"><span class="header-section-number">C.4.2</span> Long Data</h3>
+<section id="long-data" class="level3" data-number="C.5.2">
+<h3 data-number="C.5.2" class="anchored" data-anchor-id="long-data"><span class="header-section-number">C.5.2</span> Long Data</h3>
 <p>In <strong>long format</strong>, each row represents a single observation for a single unit at a single point in time. Instead of having separate columns for each year, there is one column that identifies the time period and another column that holds the value.</p>
 <p>Here is the same GDP data in long format:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>gdp_long <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">country =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"United States"</span>, <span class="st">"United Kingdom"</span>, <span class="st">"Germany"</span>, <span class="st">"Japan"</span>), <span class="at">each =</span> <span class="dv">3</span>),</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">year =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="dv">2018</span>, <span class="dv">2019</span>, <span class="dv">2020</span>), <span class="at">times =</span> <span class="dv">4</span>),</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">gdp_per_capita =</span> <span class="fu">c</span>(<span class="dv">62887</span>, <span class="dv">65298</span>, <span class="dv">63544</span>,</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>                     <span class="dv">42943</span>, <span class="dv">42330</span>, <span class="dv">40285</span>,</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>                     <span class="dv">47603</span>, <span class="dv">46468</span>, <span class="dv">45724</span>,</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>                     <span class="dv">39287</span>, <span class="dv">40247</span>, <span class="dv">39539</span>)</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>gdp_long</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>gdp_long <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">country =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"United States"</span>, <span class="st">"United Kingdom"</span>, <span class="st">"Germany"</span>, <span class="st">"Japan"</span>), <span class="at">each =</span> <span class="dv">3</span>),</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">year =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="dv">2018</span>, <span class="dv">2019</span>, <span class="dv">2020</span>), <span class="at">times =</span> <span class="dv">4</span>),</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">gdp_per_capita =</span> <span class="fu">c</span>(<span class="dv">62887</span>, <span class="dv">65298</span>, <span class="dv">63544</span>,</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>                     <span class="dv">42943</span>, <span class="dv">42330</span>, <span class="dv">40285</span>,</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>                     <span class="dv">47603</span>, <span class="dv">46468</span>, <span class="dv">45724</span>,</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>                     <span class="dv">39287</span>, <span class="dv">40247</span>, <span class="dv">39539</span>)</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>gdp_long</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 12 × 3
    country         year gdp_per_capita
@@ -912,28 +943,28 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 </div>
 <p>Long data has more rows but fewer columns. Each row is a single country-year observation. This format might seem less intuitive at first, but it is often the format that R functions—especially <code>ggplot2</code> for visualization and regression functions—expect.</p>
 </section>
-<section id="when-to-use-which-format" class="level3" data-number="C.4.3">
-<h3 data-number="C.4.3" class="anchored" data-anchor-id="when-to-use-which-format"><span class="header-section-number">C.4.3</span> When to Use Which Format</h3>
+<section id="when-to-use-which-format" class="level3" data-number="C.5.3">
+<h3 data-number="C.5.3" class="anchored" data-anchor-id="when-to-use-which-format"><span class="header-section-number">C.5.3</span> When to Use Which Format</h3>
 <p>Wide format is natural for presenting data in tables, reading data quickly by eye, and working with data where you want to compare values across time periods within a row.</p>
 <p>Long format is necessary for most data analysis in R. Specifically, <code>ggplot2</code> works best with long data because you can map variables like <code>year</code> to aesthetics (like color or facets). Regression functions like <code>lm()</code> and <code>feols()</code> require long data when you want to include time as a variable. The <code>dplyr</code> verbs like <code>group_by()</code> and <code>summarize()</code> are designed for long data.</p>
 <p>As a general rule: if your data has column names that contain variable values (like <code>gdp_2018</code>, <code>gdp_2019</code>, <code>gdp_2020</code>), it is probably in wide format and may need to be converted to long format for analysis.</p>
 </section>
 </section>
-<section id="reshaping-data-with-pivot_longer-and-pivot_wider" class="level2" data-number="C.5">
-<h2 data-number="C.5" class="anchored" data-anchor-id="reshaping-data-with-pivot_longer-and-pivot_wider"><span class="header-section-number">C.5</span> Reshaping Data with <code>pivot_longer()</code> and <code>pivot_wider()</code></h2>
+<section id="reshaping-data-with-pivot_longer-and-pivot_wider" class="level2" data-number="C.6">
+<h2 data-number="C.6" class="anchored" data-anchor-id="reshaping-data-with-pivot_longer-and-pivot_wider"><span class="header-section-number">C.6</span> Reshaping Data with <code>pivot_longer()</code> and <code>pivot_wider()</code></h2>
 <p>The <code>tidyr</code> package (part of the <code>tidyverse</code>) provides two functions for reshaping data: <code>pivot_longer()</code> converts wide data to long, and <code>pivot_wider()</code> converts long data to wide.</p>
-<section id="wide-to-long-with-pivot_longer" class="level3" data-number="C.5.1">
-<h3 data-number="C.5.1" class="anchored" data-anchor-id="wide-to-long-with-pivot_longer"><span class="header-section-number">C.5.1</span> Wide to Long with <code>pivot_longer()</code></h3>
+<section id="wide-to-long-with-pivot_longer" class="level3" data-number="C.6.1">
+<h3 data-number="C.6.1" class="anchored" data-anchor-id="wide-to-long-with-pivot_longer"><span class="header-section-number">C.6.1</span> Wide to Long with <code>pivot_longer()</code></h3>
 <p>Let’s convert our wide GDP data to long format:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>gdp_long <span class="ot">&lt;-</span> gdp_wide <span class="sc">|&gt;</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">starts_with</span>(<span class="st">"gdp_"</span>),</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"year"</span>,</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"gdp_per_capita"</span></span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>gdp_long</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>gdp_long <span class="ot">&lt;-</span> gdp_wide <span class="sc">|&gt;</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">starts_with</span>(<span class="st">"gdp_"</span>),</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"year"</span>,</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"gdp_per_capita"</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>gdp_long</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 12 × 3
    country        year     gdp_per_capita
@@ -960,15 +991,15 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 </ul>
 <p>Notice that the <code>year</code> column still has the <code>gdp_</code> prefix attached. We can clean that up by adding <code>names_prefix</code> to strip the prefix:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>gdp_long <span class="ot">&lt;-</span> gdp_wide <span class="sc">|&gt;</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">starts_with</span>(<span class="st">"gdp_"</span>),</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"year"</span>,</span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_prefix =</span> <span class="st">"gdp_"</span>,</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"gdp_per_capita"</span></span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>gdp_long</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>gdp_long <span class="ot">&lt;-</span> gdp_wide <span class="sc">|&gt;</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">starts_with</span>(<span class="st">"gdp_"</span>),</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"year"</span>,</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_prefix =</span> <span class="st">"gdp_"</span>,</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"gdp_per_capita"</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>gdp_long</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 12 × 3
    country        year  gdp_per_capita
@@ -989,16 +1020,16 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 </div>
 <p>Now the <code>year</code> column contains just the year numbers. However, notice that <code>year</code> is still a character type (because it was extracted from column names). We can convert it to numeric by adding <code>names_transform</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>gdp_long <span class="ot">&lt;-</span> gdp_wide <span class="sc">|&gt;</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">starts_with</span>(<span class="st">"gdp_"</span>),</span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"year"</span>,</span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_prefix =</span> <span class="st">"gdp_"</span>,</span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_transform =</span> <span class="fu">list</span>(<span class="at">year =</span> as.integer),</span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"gdp_per_capita"</span></span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>gdp_long</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>gdp_long <span class="ot">&lt;-</span> gdp_wide <span class="sc">|&gt;</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">starts_with</span>(<span class="st">"gdp_"</span>),</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"year"</span>,</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_prefix =</span> <span class="st">"gdp_"</span>,</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_transform =</span> <span class="fu">list</span>(<span class="at">year =</span> as.integer),</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"gdp_per_capita"</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>gdp_long</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 12 × 3
    country         year gdp_per_capita
@@ -1019,21 +1050,21 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 </div>
 <p>Now <code>year</code> is a proper integer column, ready for use in regressions or plots.</p>
 </section>
-<section id="a-more-detailed-example" class="level3" data-number="C.5.2">
-<h3 data-number="C.5.2" class="anchored" data-anchor-id="a-more-detailed-example"><span class="header-section-number">C.5.2</span> A More Detailed Example</h3>
+<section id="a-more-detailed-example" class="level3" data-number="C.6.2">
+<h3 data-number="C.6.2" class="anchored" data-anchor-id="a-more-detailed-example"><span class="header-section-number">C.6.2</span> A More Detailed Example</h3>
 <p>Let’s work through a slightly more complex example. Suppose you have state-level data on unemployment rates and poverty rates across several years:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>state_wide <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">state =</span> <span class="fu">c</span>(<span class="st">"Maine"</span>, <span class="st">"Vermont"</span>, <span class="st">"New Hampshire"</span>),</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">unemp_2018 =</span> <span class="fu">c</span>(<span class="fl">3.4</span>, <span class="fl">2.7</span>, <span class="fl">2.5</span>),</span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">unemp_2019 =</span> <span class="fu">c</span>(<span class="fl">3.0</span>, <span class="fl">2.4</span>, <span class="fl">2.6</span>),</span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">unemp_2020 =</span> <span class="fu">c</span>(<span class="fl">5.4</span>, <span class="fl">5.0</span>, <span class="fl">6.2</span>),</span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">poverty_2018 =</span> <span class="fu">c</span>(<span class="fl">12.9</span>, <span class="fl">11.3</span>, <span class="fl">7.6</span>),</span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">poverty_2019 =</span> <span class="fu">c</span>(<span class="fl">11.6</span>, <span class="fl">10.2</span>, <span class="fl">7.3</span>),</span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">poverty_2020 =</span> <span class="fu">c</span>(<span class="fl">11.4</span>, <span class="fl">10.8</span>, <span class="fl">7.1</span>)</span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>state_wide</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>state_wide <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">state =</span> <span class="fu">c</span>(<span class="st">"Maine"</span>, <span class="st">"Vermont"</span>, <span class="st">"New Hampshire"</span>),</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">unemp_2018 =</span> <span class="fu">c</span>(<span class="fl">3.4</span>, <span class="fl">2.7</span>, <span class="fl">2.5</span>),</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">unemp_2019 =</span> <span class="fu">c</span>(<span class="fl">3.0</span>, <span class="fl">2.4</span>, <span class="fl">2.6</span>),</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">unemp_2020 =</span> <span class="fu">c</span>(<span class="fl">5.4</span>, <span class="fl">5.0</span>, <span class="fl">6.2</span>),</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">poverty_2018 =</span> <span class="fu">c</span>(<span class="fl">12.9</span>, <span class="fl">11.3</span>, <span class="fl">7.6</span>),</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">poverty_2019 =</span> <span class="fu">c</span>(<span class="fl">11.6</span>, <span class="fl">10.2</span>, <span class="fl">7.3</span>),</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">poverty_2020 =</span> <span class="fu">c</span>(<span class="fl">11.4</span>, <span class="fl">10.8</span>, <span class="fl">7.1</span>)</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>state_wide</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 7
   state  unemp_2018 unemp_2019 unemp_2020 poverty_2018 poverty_2019 poverty_2020
@@ -1045,15 +1076,15 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 </div>
 <p>This dataset has two variables (unemployment and poverty) each measured across three years. To pivot this to long format, we need to handle the fact that column names encode <em>two</em> pieces of information: the variable name and the year. We use <code>names_sep</code> to tell <code>pivot_longer()</code> how to split the column names:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>state_long <span class="ot">&lt;-</span> state_wide <span class="sc">|&gt;</span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="sc">-</span>state,</span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="fu">c</span>(<span class="st">"variable"</span>, <span class="st">"year"</span>),</span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_sep =</span> <span class="st">"_"</span>,</span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"value"</span></span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>state_long</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>state_long <span class="ot">&lt;-</span> state_wide <span class="sc">|&gt;</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="sc">-</span>state,</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="fu">c</span>(<span class="st">"variable"</span>, <span class="st">"year"</span>),</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_sep =</span> <span class="st">"_"</span>,</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"value"</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>state_long</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 18 × 4
    state         variable year  value
@@ -1081,13 +1112,13 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 <p>Here we used <code>cols = -state</code> to pivot all columns <em>except</em> <code>state</code>. The <code>names_sep = "_"</code> tells R to split each column name at the underscore, putting the first part into a column called <code>variable</code> and the second part into a column called <code>year</code>.</p>
 <p>If you’d prefer each variable to have its own column (which is usually more useful for analysis), you can add one more step using <code>pivot_wider()</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>state_tidy <span class="ot">&lt;-</span> state_long <span class="sc">|&gt;</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(</span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_from =</span> variable,</span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_from =</span> value</span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>state_tidy</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>state_tidy <span class="ot">&lt;-</span> state_long <span class="sc">|&gt;</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_from =</span> variable,</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_from =</span> value</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>state_tidy</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 9 × 4
   state         year  unemp poverty
@@ -1105,19 +1136,19 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 </div>
 <p>Now each row is a state-year observation with separate columns for unemployment and poverty—exactly the format you’d want for a regression or a plot.</p>
 </section>
-<section id="long-to-wide-with-pivot_wider" class="level3" data-number="C.5.3">
-<h3 data-number="C.5.3" class="anchored" data-anchor-id="long-to-wide-with-pivot_wider"><span class="header-section-number">C.5.3</span> Long to Wide with <code>pivot_wider()</code></h3>
+<section id="long-to-wide-with-pivot_wider" class="level3" data-number="C.6.3">
+<h3 data-number="C.6.3" class="anchored" data-anchor-id="long-to-wide-with-pivot_wider"><span class="header-section-number">C.6.3</span> Long to Wide with <code>pivot_wider()</code></h3>
 <p>Sometimes you need to go in the other direction—converting long data to wide. This is common when creating summary tables or when a dataset arrived in long format but you need it wide for a specific purpose.</p>
 <p><code>pivot_wider()</code> is essentially the reverse of <code>pivot_longer()</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>gdp_wide_again <span class="ot">&lt;-</span> gdp_long <span class="sc">|&gt;</span></span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_from =</span> year,</span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_from =</span> gdp_per_capita,</span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_prefix =</span> <span class="st">"gdp_"</span></span>
-<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>gdp_wide_again</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>gdp_wide_again <span class="ot">&lt;-</span> gdp_long <span class="sc">|&gt;</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_from =</span> year,</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_from =</span> gdp_per_capita,</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_prefix =</span> <span class="st">"gdp_"</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>gdp_wide_again</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 4 × 4
   country        gdp_2018 gdp_2019 gdp_2020
@@ -1135,19 +1166,19 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 <li><code>names_prefix</code> (optional) adds a prefix to the new column names. Without it, the columns would just be named <code>2018</code>, <code>2019</code>, <code>2020</code>—which are valid R column names but harder to work with because they start with numbers.</li>
 </ul>
 </section>
-<section id="another-pivot_wider-example" class="level3" data-number="C.5.4">
-<h3 data-number="C.5.4" class="anchored" data-anchor-id="another-pivot_wider-example"><span class="header-section-number">C.5.4</span> Another <code>pivot_wider()</code> Example</h3>
+<section id="another-pivot_wider-example" class="level3" data-number="C.6.4">
+<h3 data-number="C.6.4" class="anchored" data-anchor-id="another-pivot_wider-example"><span class="header-section-number">C.6.4</span> Another <code>pivot_wider()</code> Example</h3>
 <p>Suppose you have panel data on birth outcomes and want to create a table comparing states:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>birth_long <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">state =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"Maine"</span>, <span class="st">"Vermont"</span>, <span class="st">"New Hampshire"</span>), <span class="at">each =</span> <span class="dv">3</span>),</span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">year =</span> <span class="fu">rep</span>(<span class="dv">2018</span><span class="sc">:</span><span class="dv">2020</span>, <span class="at">times =</span> <span class="dv">3</span>),</span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">lbw_rate =</span> <span class="fu">c</span>(<span class="fl">7.1</span>, <span class="fl">7.3</span>, <span class="fl">7.0</span>,</span>
-<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>               <span class="fl">6.8</span>, <span class="fl">6.5</span>, <span class="fl">6.9</span>,</span>
-<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>               <span class="fl">6.2</span>, <span class="fl">6.4</span>, <span class="fl">6.1</span>)</span>
-<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>birth_long</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>birth_long <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">state =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"Maine"</span>, <span class="st">"Vermont"</span>, <span class="st">"New Hampshire"</span>), <span class="at">each =</span> <span class="dv">3</span>),</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">year =</span> <span class="fu">rep</span>(<span class="dv">2018</span><span class="sc">:</span><span class="dv">2020</span>, <span class="at">times =</span> <span class="dv">3</span>),</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">lbw_rate =</span> <span class="fu">c</span>(<span class="fl">7.1</span>, <span class="fl">7.3</span>, <span class="fl">7.0</span>,</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>               <span class="fl">6.8</span>, <span class="fl">6.5</span>, <span class="fl">6.9</span>,</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>               <span class="fl">6.2</span>, <span class="fl">6.4</span>, <span class="fl">6.1</span>)</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>birth_long</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 9 × 3
   state          year lbw_rate
@@ -1165,13 +1196,13 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 </div>
 <p>To create a wide table comparing states across years:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>birth_wide <span class="ot">&lt;-</span> birth_long <span class="sc">|&gt;</span></span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(</span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_from =</span> year,</span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_from =</span> lbw_rate</span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>birth_wide</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>birth_wide <span class="ot">&lt;-</span> birth_long <span class="sc">|&gt;</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_from =</span> year,</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_from =</span> lbw_rate</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>birth_wide</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 4
   state         `2018` `2019` `2020`
@@ -1197,29 +1228,29 @@ Remembering the Difference
 </div>
 </section>
 </section>
-<section id="merging-data-with-joins" class="level2" data-number="C.6">
-<h2 data-number="C.6" class="anchored" data-anchor-id="merging-data-with-joins"><span class="header-section-number">C.6</span> Merging Data with Joins</h2>
+<section id="merging-data-with-joins" class="level2" data-number="C.7">
+<h2 data-number="C.7" class="anchored" data-anchor-id="merging-data-with-joins"><span class="header-section-number">C.7</span> Merging Data with Joins</h2>
 <p>In applied economics, the data you need for an analysis rarely comes in a single file. You might have county-level health outcomes in one dataset and county-level demographic characteristics in another, or state policy variables in one file and state economic indicators in a second. To bring these together for regression analysis, you need to <strong>merge</strong> (or <strong>join</strong>) the datasets.</p>
 <p>The <code>tidyverse</code> provides a family of <code>_join()</code> functions that merge two data frames based on one or more shared key variables. The key variable is simply a column that appears in both datasets and identifies which rows should be matched—a county FIPS code, a state abbreviation, a year, or some combination of these.</p>
-<section id="a-simple-example" class="level3" data-number="C.6.1">
-<h3 data-number="C.6.1" class="anchored" data-anchor-id="a-simple-example"><span class="header-section-number">C.6.1</span> A Simple Example</h3>
+<section id="a-simple-example" class="level3" data-number="C.7.1">
+<h3 data-number="C.7.1" class="anchored" data-anchor-id="a-simple-example"><span class="header-section-number">C.7.1</span> A Simple Example</h3>
 <p>Suppose you have two small datasets about states. One contains population data and the other contains policy information:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Population data</span></span>
-<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>pop_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">state =</span> <span class="fu">c</span>(<span class="st">"NC"</span>, <span class="st">"VA"</span>, <span class="st">"SC"</span>, <span class="st">"GA"</span>),</span>
-<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">population =</span> <span class="fu">c</span>(<span class="fl">10.7</span>, <span class="fl">8.6</span>, <span class="fl">5.2</span>, <span class="fl">10.9</span>)</span>
-<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Policy data</span></span>
-<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>policy_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">state =</span> <span class="fu">c</span>(<span class="st">"NC"</span>, <span class="st">"VA"</span>, <span class="st">"SC"</span>, <span class="st">"TN"</span>),</span>
-<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">medicaid_expanded =</span> <span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>, <span class="cn">TRUE</span>)</span>
-<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a>pop_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Population data</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>pop_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">state =</span> <span class="fu">c</span>(<span class="st">"NC"</span>, <span class="st">"VA"</span>, <span class="st">"SC"</span>, <span class="st">"GA"</span>),</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">population =</span> <span class="fu">c</span>(<span class="fl">10.7</span>, <span class="fl">8.6</span>, <span class="fl">5.2</span>, <span class="fl">10.9</span>)</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Policy data</span></span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>policy_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">state =</span> <span class="fu">c</span>(<span class="st">"NC"</span>, <span class="st">"VA"</span>, <span class="st">"SC"</span>, <span class="st">"TN"</span>),</span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">medicaid_expanded =</span> <span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>, <span class="cn">TRUE</span>)</span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a>pop_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 4 × 2
   state population
@@ -1229,7 +1260,7 @@ Remembering the Difference
 3 SC           5.2
 4 GA          10.9</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>policy_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>policy_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 4 × 2
   state medicaid_expanded
@@ -1242,11 +1273,11 @@ Remembering the Difference
 </div>
 <p>Notice that the two datasets overlap but are not identical: both contain NC, VA, and SC, but <code>pop_data</code> has GA while <code>policy_data</code> has TN. How the join handles these non-overlapping rows is what distinguishes the different join types.</p>
 </section>
-<section id="left_join" class="level3" data-number="C.6.2">
-<h3 data-number="C.6.2" class="anchored" data-anchor-id="left_join"><span class="header-section-number">C.6.2</span> <code>left_join()</code></h3>
+<section id="left_join" class="level3" data-number="C.7.2">
+<h3 data-number="C.7.2" class="anchored" data-anchor-id="left_join"><span class="header-section-number">C.7.2</span> <code>left_join()</code></h3>
 <p>A <strong>left join</strong> keeps all rows from the first (left) dataset and adds matching columns from the second (right) dataset. Rows in the left dataset that have no match in the right dataset get <code>NA</code> for the new columns:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">left_join</span>(pop_data, policy_data, <span class="at">by =</span> <span class="st">"state"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">left_join</span>(pop_data, policy_data, <span class="at">by =</span> <span class="st">"state"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 4 × 3
   state population medicaid_expanded
@@ -1260,11 +1291,11 @@ Remembering the Difference
 <p>All four states from <code>pop_data</code> are retained. GA has no match in <code>policy_data</code>, so its <code>medicaid_expanded</code> value is <code>NA</code>. TN, which appears only in <code>policy_data</code>, is dropped because it is not in the left dataset.</p>
 <p>This is the most commonly used join in applied work. When you have a “main” analysis dataset and want to add variables from a supplementary source, <code>left_join()</code> ensures you don’t lose any of your primary observations.</p>
 </section>
-<section id="right_join" class="level3" data-number="C.6.3">
-<h3 data-number="C.6.3" class="anchored" data-anchor-id="right_join"><span class="header-section-number">C.6.3</span> <code>right_join()</code></h3>
+<section id="right_join" class="level3" data-number="C.7.3">
+<h3 data-number="C.7.3" class="anchored" data-anchor-id="right_join"><span class="header-section-number">C.7.3</span> <code>right_join()</code></h3>
 <p>A <strong>right join</strong> is the mirror image: it keeps all rows from the second (right) dataset and fills in <code>NA</code> where the left dataset has no match:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">right_join</span>(pop_data, policy_data, <span class="at">by =</span> <span class="st">"state"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">right_join</span>(pop_data, policy_data, <span class="at">by =</span> <span class="st">"state"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 4 × 3
   state population medicaid_expanded
@@ -1277,11 +1308,11 @@ Remembering the Difference
 </div>
 <p>Now TN is retained (with <code>NA</code> for <code>population</code>) and GA is dropped. In practice, <code>right_join()</code> is less common because you can always achieve the same result by switching the order of the datasets in a <code>left_join()</code>.</p>
 </section>
-<section id="inner_join" class="level3" data-number="C.6.4">
-<h3 data-number="C.6.4" class="anchored" data-anchor-id="inner_join"><span class="header-section-number">C.6.4</span> <code>inner_join()</code></h3>
+<section id="inner_join" class="level3" data-number="C.7.4">
+<h3 data-number="C.7.4" class="anchored" data-anchor-id="inner_join"><span class="header-section-number">C.7.4</span> <code>inner_join()</code></h3>
 <p>An <strong>inner join</strong> keeps only rows that have a match in <em>both</em> datasets:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">inner_join</span>(pop_data, policy_data, <span class="at">by =</span> <span class="st">"state"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">inner_join</span>(pop_data, policy_data, <span class="at">by =</span> <span class="st">"state"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 3
   state population medicaid_expanded
@@ -1294,11 +1325,11 @@ Remembering the Difference
 <p>Only NC, VA, and SC appear—they are the states present in both datasets. GA and TN are both dropped.</p>
 <p>Use <code>inner_join()</code> when you only want observations for which you have complete data from both sources. The downside is that you may silently lose observations, so always check how many rows you started with and how many the join returns.</p>
 </section>
-<section id="full_join" class="level3" data-number="C.6.5">
-<h3 data-number="C.6.5" class="anchored" data-anchor-id="full_join"><span class="header-section-number">C.6.5</span> <code>full_join()</code></h3>
+<section id="full_join" class="level3" data-number="C.7.5">
+<h3 data-number="C.7.5" class="anchored" data-anchor-id="full_join"><span class="header-section-number">C.7.5</span> <code>full_join()</code></h3>
 <p>A <strong>full join</strong> keeps all rows from both datasets, filling in <code>NA</code> wherever a match is missing:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">full_join</span>(pop_data, policy_data, <span class="at">by =</span> <span class="st">"state"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">full_join</span>(pop_data, policy_data, <span class="at">by =</span> <span class="st">"state"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 3
   state population medicaid_expanded
@@ -1312,25 +1343,25 @@ Remembering the Difference
 </div>
 <p>All five states appear. GA has <code>NA</code> for <code>medicaid_expanded</code> and TN has <code>NA</code> for <code>population</code>. This is useful when you want to see the complete universe of observations across both sources and deal with missing values later.</p>
 </section>
-<section id="joining-on-multiple-key-variables" class="level3" data-number="C.6.6">
-<h3 data-number="C.6.6" class="anchored" data-anchor-id="joining-on-multiple-key-variables"><span class="header-section-number">C.6.6</span> Joining on Multiple Key Variables</h3>
+<section id="joining-on-multiple-key-variables" class="level3" data-number="C.7.6">
+<h3 data-number="C.7.6" class="anchored" data-anchor-id="joining-on-multiple-key-variables"><span class="header-section-number">C.7.6</span> Joining on Multiple Key Variables</h3>
 <p>Many economics datasets require matching on more than one variable. Panel data, for instance, typically needs to be joined on both a unit identifier and a time variable. You can pass a vector of column names to the <code>by</code> argument:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># State-year economic data</span></span>
-<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>econ_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">state =</span> <span class="fu">c</span>(<span class="st">"NC"</span>, <span class="st">"NC"</span>, <span class="st">"VA"</span>, <span class="st">"VA"</span>),</span>
-<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">year  =</span> <span class="fu">c</span>(<span class="dv">2020</span>, <span class="dv">2021</span>, <span class="dv">2020</span>, <span class="dv">2021</span>),</span>
-<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">unem_rate =</span> <span class="fu">c</span>(<span class="fl">6.8</span>, <span class="fl">4.1</span>, <span class="fl">6.2</span>, <span class="fl">3.8</span>)</span>
-<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a><span class="co"># State-year health data</span></span>
-<span id="cb52-9"><a href="#cb52-9" aria-hidden="true" tabindex="-1"></a>health_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb52-10"><a href="#cb52-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">state =</span> <span class="fu">c</span>(<span class="st">"NC"</span>, <span class="st">"NC"</span>, <span class="st">"VA"</span>, <span class="st">"VA"</span>),</span>
-<span id="cb52-11"><a href="#cb52-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">year  =</span> <span class="fu">c</span>(<span class="dv">2020</span>, <span class="dv">2021</span>, <span class="dv">2020</span>, <span class="dv">2021</span>),</span>
-<span id="cb52-12"><a href="#cb52-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">infant_mort =</span> <span class="fu">c</span>(<span class="fl">7.1</span>, <span class="fl">6.9</span>, <span class="fl">5.8</span>, <span class="fl">5.6</span>)</span>
-<span id="cb52-13"><a href="#cb52-13" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb52-14"><a href="#cb52-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb52-15"><a href="#cb52-15" aria-hidden="true" tabindex="-1"></a><span class="fu">left_join</span>(econ_data, health_data, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"state"</span>, <span class="st">"year"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="co"># State-year economic data</span></span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>econ_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">state =</span> <span class="fu">c</span>(<span class="st">"NC"</span>, <span class="st">"NC"</span>, <span class="st">"VA"</span>, <span class="st">"VA"</span>),</span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">year  =</span> <span class="fu">c</span>(<span class="dv">2020</span>, <span class="dv">2021</span>, <span class="dv">2020</span>, <span class="dv">2021</span>),</span>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">unem_rate =</span> <span class="fu">c</span>(<span class="fl">6.8</span>, <span class="fl">4.1</span>, <span class="fl">6.2</span>, <span class="fl">3.8</span>)</span>
+<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb53-7"><a href="#cb53-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-8"><a href="#cb53-8" aria-hidden="true" tabindex="-1"></a><span class="co"># State-year health data</span></span>
+<span id="cb53-9"><a href="#cb53-9" aria-hidden="true" tabindex="-1"></a>health_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb53-10"><a href="#cb53-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">state =</span> <span class="fu">c</span>(<span class="st">"NC"</span>, <span class="st">"NC"</span>, <span class="st">"VA"</span>, <span class="st">"VA"</span>),</span>
+<span id="cb53-11"><a href="#cb53-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">year  =</span> <span class="fu">c</span>(<span class="dv">2020</span>, <span class="dv">2021</span>, <span class="dv">2020</span>, <span class="dv">2021</span>),</span>
+<span id="cb53-12"><a href="#cb53-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">infant_mort =</span> <span class="fu">c</span>(<span class="fl">7.1</span>, <span class="fl">6.9</span>, <span class="fl">5.8</span>, <span class="fl">5.6</span>)</span>
+<span id="cb53-13"><a href="#cb53-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb53-14"><a href="#cb53-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-15"><a href="#cb53-15" aria-hidden="true" tabindex="-1"></a><span class="fu">left_join</span>(econ_data, health_data, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"state"</span>, <span class="st">"year"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 4 × 4
   state  year unem_rate infant_mort
@@ -1343,17 +1374,17 @@ Remembering the Difference
 </div>
 <p>Each row is matched on the combination of <code>state</code> <em>and</em> <code>year</code>, so North Carolina in 2020 gets paired with the correct infant mortality rate for that state and year. If you only joined on <code>state</code>, each NC row would match both NC-2020 and NC-2021 from the other dataset, creating duplicate rows—a common mistake that inflates your sample size and produces incorrect results.</p>
 </section>
-<section id="joining-when-key-variables-have-different-names" class="level3" data-number="C.6.7">
-<h3 data-number="C.6.7" class="anchored" data-anchor-id="joining-when-key-variables-have-different-names"><span class="header-section-number">C.6.7</span> Joining When Key Variables Have Different Names</h3>
+<section id="joining-when-key-variables-have-different-names" class="level3" data-number="C.7.7">
+<h3 data-number="C.7.7" class="anchored" data-anchor-id="joining-when-key-variables-have-different-names"><span class="header-section-number">C.7.7</span> Joining When Key Variables Have Different Names</h3>
 <p>Sometimes the key variable is named differently in the two datasets. Rather than renaming a column before the merge, you can specify the mapping directly:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This dataset uses "st" instead of "state"</span></span>
-<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>policy_data_alt <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">st =</span> <span class="fu">c</span>(<span class="st">"NC"</span>, <span class="st">"VA"</span>, <span class="st">"SC"</span>, <span class="st">"TN"</span>),</span>
-<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">medicaid_expanded =</span> <span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>, <span class="cn">TRUE</span>)</span>
-<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a><span class="fu">left_join</span>(pop_data, policy_data_alt, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"state"</span> <span class="ot">=</span> <span class="st">"st"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This dataset uses "st" instead of "state"</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>policy_data_alt <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">st =</span> <span class="fu">c</span>(<span class="st">"NC"</span>, <span class="st">"VA"</span>, <span class="st">"SC"</span>, <span class="st">"TN"</span>),</span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">medicaid_expanded =</span> <span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>, <span class="cn">TRUE</span>)</span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a><span class="fu">left_join</span>(pop_data, policy_data_alt, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"state"</span> <span class="ot">=</span> <span class="st">"st"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 4 × 3
   state population medicaid_expanded
@@ -1366,20 +1397,20 @@ Remembering the Difference
 </div>
 <p>The <code>by = c("state" = "st")</code> syntax tells R to match <code>state</code> in the left dataset to <code>st</code> in the right dataset. The output keeps the column name from the left dataset.</p>
 </section>
-<section id="diagnosing-join-problems" class="level3" data-number="C.6.8">
-<h3 data-number="C.6.8" class="anchored" data-anchor-id="diagnosing-join-problems"><span class="header-section-number">C.6.8</span> Diagnosing Join Problems</h3>
+<section id="diagnosing-join-problems" class="level3" data-number="C.7.8">
+<h3 data-number="C.7.8" class="anchored" data-anchor-id="diagnosing-join-problems"><span class="header-section-number">C.7.8</span> Diagnosing Join Problems</h3>
 <p>Merges can go wrong in ways that are easy to miss if you don’t check. Here are two things to watch for after every join:</p>
 <p><strong>Check the row count.</strong> If your merged dataset has more rows than your original dataset, you likely have duplicate keys in the right-hand dataset—meaning one row in your main data matched multiple rows in the supplementary data. This is the most common join mistake in applied work:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Accidental duplicates in the lookup table</span></span>
-<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>bad_lookup <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">state =</span> <span class="fu">c</span>(<span class="st">"NC"</span>, <span class="st">"NC"</span>, <span class="st">"VA"</span>, <span class="st">"SC"</span>),</span>
-<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">region =</span> <span class="fu">c</span>(<span class="st">"South"</span>, <span class="st">"Southeast"</span>, <span class="st">"South"</span>, <span class="st">"South"</span>)</span>
-<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a><span class="co"># This produces MORE rows than we started with</span></span>
-<span id="cb56-8"><a href="#cb56-8" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">left_join</span>(pop_data, bad_lookup, <span class="at">by =</span> <span class="st">"state"</span>)</span>
-<span id="cb56-9"><a href="#cb56-9" aria-hidden="true" tabindex="-1"></a>result</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Accidental duplicates in the lookup table</span></span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>bad_lookup <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">state =</span> <span class="fu">c</span>(<span class="st">"NC"</span>, <span class="st">"NC"</span>, <span class="st">"VA"</span>, <span class="st">"SC"</span>),</span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">region =</span> <span class="fu">c</span>(<span class="st">"South"</span>, <span class="st">"Southeast"</span>, <span class="st">"South"</span>, <span class="st">"South"</span>)</span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a><span class="co"># This produces MORE rows than we started with</span></span>
+<span id="cb57-8"><a href="#cb57-8" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">left_join</span>(pop_data, bad_lookup, <span class="at">by =</span> <span class="st">"state"</span>)</span>
+<span id="cb57-9"><a href="#cb57-9" aria-hidden="true" tabindex="-1"></a>result</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 3
   state population region   
@@ -1390,11 +1421,11 @@ Remembering the Difference
 4 SC           5.2 South    
 5 GA          10.9 &lt;NA&gt;     </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(pop_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(pop_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 4</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 5</code></pre>
 </div>
@@ -1450,46 +1481,46 @@ Table&nbsp;C.2: Join functions and what they retain
 </div>
 </section>
 </section>
-<section id="exporting-data" class="level2" data-number="C.7">
-<h2 data-number="C.7" class="anchored" data-anchor-id="exporting-data"><span class="header-section-number">C.7</span> Exporting Data</h2>
+<section id="exporting-data" class="level2" data-number="C.8">
+<h2 data-number="C.8" class="anchored" data-anchor-id="exporting-data"><span class="header-section-number">C.8</span> Exporting Data</h2>
 <p>After cleaning, reshaping, or creating a new dataset, you’ll often want to save it for future use or to share with others. The <code>tidyverse</code> provides straightforward functions for exporting data.</p>
-<section id="writing-csv-files" class="level3" data-number="C.7.1">
-<h3 data-number="C.7.1" class="anchored" data-anchor-id="writing-csv-files"><span class="header-section-number">C.7.1</span> Writing CSV Files</h3>
+<section id="writing-csv-files" class="level3" data-number="C.8.1">
+<h3 data-number="C.8.1" class="anchored" data-anchor-id="writing-csv-files"><span class="header-section-number">C.8.1</span> Writing CSV Files</h3>
 <p>The most common export format is CSV, because it can be opened by virtually any software:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Write a data frame to a CSV file</span></span>
-<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(gdp_long, <span class="st">"gdp_data_clean.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Write a data frame to a CSV file</span></span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(gdp_long, <span class="st">"gdp_data_clean.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>This creates a file called <code>gdp_data_clean.csv</code> in your working directory. The file will contain the data in plain text with commas separating the values—no special formatting, no formulas, just clean data.</p>
 </section>
-<section id="writing-r-data-files" class="level3" data-number="C.7.2">
-<h3 data-number="C.7.2" class="anchored" data-anchor-id="writing-r-data-files"><span class="header-section-number">C.7.2</span> Writing R Data Files</h3>
+<section id="writing-r-data-files" class="level3" data-number="C.8.2">
+<h3 data-number="C.8.2" class="anchored" data-anchor-id="writing-r-data-files"><span class="header-section-number">C.8.2</span> Writing R Data Files</h3>
 <p>If you’re saving data that will only be used in R, the <code>.rds</code> format is preferable because it preserves all of R’s data types (factors, dates, etc.) and is more compact than CSV:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Save as an RDS file</span></span>
-<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(gdp_long, <span class="st">"gdp_data_clean.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Save as an RDS file</span></span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(gdp_long, <span class="st">"gdp_data_clean.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>To read it back in later:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>gdp_long <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"gdp_data_clean.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>gdp_long <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"gdp_data_clean.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="writing-stata-files" class="level3" data-number="C.7.3">
-<h3 data-number="C.7.3" class="anchored" data-anchor-id="writing-stata-files"><span class="header-section-number">C.7.3</span> Writing Stata Files</h3>
+<section id="writing-stata-files" class="level3" data-number="C.8.3">
+<h3 data-number="C.8.3" class="anchored" data-anchor-id="writing-stata-files"><span class="header-section-number">C.8.3</span> Writing Stata Files</h3>
 <p>If you need to share data with someone using Stata, the <code>haven</code> package can write <code>.dta</code> files:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(haven)</span>
-<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a><span class="fu">write_dta</span>(gdp_long, <span class="st">"gdp_data_clean.dta"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(haven)</span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a><span class="fu">write_dta</span>(gdp_long, <span class="st">"gdp_data_clean.dta"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="writing-excel-files" class="level3" data-number="C.7.4">
-<h3 data-number="C.7.4" class="anchored" data-anchor-id="writing-excel-files"><span class="header-section-number">C.7.4</span> Writing Excel Files</h3>
+<section id="writing-excel-files" class="level3" data-number="C.8.4">
+<h3 data-number="C.8.4" class="anchored" data-anchor-id="writing-excel-files"><span class="header-section-number">C.8.4</span> Writing Excel Files</h3>
 <p>To export to Excel format, you can use the <code>writexl</code> package:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(writexl)</span>
-<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a><span class="fu">write_xlsx</span>(gdp_long, <span class="st">"gdp_data_clean.xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(writexl)</span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a><span class="fu">write_xlsx</span>(gdp_long, <span class="st">"gdp_data_clean.xlsx"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -1550,11 +1581,11 @@ Table&nbsp;C.3: Export functions by file type
 </div>
 </section>
 </section>
-<section id="summary-and-conclusion" class="level2" data-number="C.8">
-<h2 data-number="C.8" class="anchored" data-anchor-id="summary-and-conclusion"><span class="header-section-number">C.8</span> Summary and Conclusion</h2>
+<section id="summary-and-conclusion" class="level2" data-number="C.9">
+<h2 data-number="C.9" class="anchored" data-anchor-id="summary-and-conclusion"><span class="header-section-number">C.9</span> Summary and Conclusion</h2>
 <p>This appendix covered the essential workflow for getting data into and out of R and understanding its structure along the way.</p>
-<section id="key-takeaways" class="level3" data-number="C.8.1">
-<h3 data-number="C.8.1" class="anchored" data-anchor-id="key-takeaways"><span class="header-section-number">C.8.1</span> Key Takeaways</h3>
+<section id="key-takeaways" class="level3" data-number="C.9.1">
+<h3 data-number="C.9.1" class="anchored" data-anchor-id="key-takeaways"><span class="header-section-number">C.9.1</span> Key Takeaways</h3>
 <ul>
 <li><p><strong>Documentation first:</strong> Always look for README files and codebooks before analyzing a dataset. Understanding what your variables measure and how they’re coded prevents errors downstream.</p></li>
 <li><p><strong>Import with the right function:</strong> Use <code>read_csv()</code> for CSV files, <code>read_excel()</code> for Excel files, <code>read_dta()</code> for Stata files, and <code>read_rds()</code> for R data files. The <code>tidyverse</code> and its companion packages cover virtually every common file format.</p></li>
@@ -1566,8 +1597,8 @@ Table&nbsp;C.3: Export functions by file type
 </ul>
 </section>
 </section>
-<section id="check-your-understanding" class="level2" data-number="C.9">
-<h2 data-number="C.9" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">C.9</span> Check Your Understanding</h2>
+<section id="check-your-understanding" class="level2" data-number="C.10">
+<h2 data-number="C.10" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">C.10</span> Check Your Understanding</h2>
 <p>For each question below, select the best answer from the dropdown menu. The dropdown will turn green if correct and red if incorrect. Click the “Show Explanation” toggle to see a full explanation of the answer after attempting each question.</p>
 <div class="question">
 <div class="answer-row">
@@ -1649,7 +1680,7 @@ Table&nbsp;C.3: Export functions by file type
 </div>
 
 <div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1658,7 +1689,7 @@ Show Explanation
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ol type="i">
 <li><p>The tidyverse function for reading CSV files is <code>read_csv()</code> (with an underscore), from the <code>readr</code> package. Note that base R has a similar function called <code>read.csv()</code> (with a period), but <code>read_csv()</code> is faster, handles column types more intelligently, and produces tibbles rather than basic data frames.</p></li>
