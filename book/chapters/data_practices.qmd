@@ -158,7 +158,7 @@ and will be useful throughout your career as an econometrician.
 
 ## Know Your Data
 
-The first rule of data analysis is simple:
+The first rule of any type of data analysis, including econometrics is simple:
 **know your data**.
 This means examining it carefully before conducting any formal analysis.
 We want to understand what we're working with,
@@ -252,6 +252,12 @@ These obvious errors suggest we need to investigate our data more carefully.
 While summary tables like those above are useful for reports,
 you often need to calculate specific statistics yourself.
 R provides simple functions for all the common descriptive statistics.
+
+::: {.callout-note collapse="false"}
+The remainder of this section assumes you are familiar with the material from @sec-installingR.
+If you haven't read that yet, it may be a good idea to do so before continuing!
+:::
+
 
 #### Basic Summary Functions
 
@@ -445,15 +451,10 @@ Let's look at its distribution:
 # Create frequency table
 wage_data |>
   count(college) |>
-  mutate(percent = n / sum(n) * 100) |>
-  knitr::kable(
-    col.names = c("College Degree", "Count", "Percent"),
-    digits = 1,
-    caption = "Distribution of College Degree"
-  )
+  mutate(percent = n / sum(n) * 100)
 ```
 
-This tells us that 29% of our sample has a college degree.
+This tells us that 33% of our sample has a college degree.
 But imagine our frequency table looked like this:
 
 ```{r}
@@ -466,12 +467,7 @@ tibble(
   college = c(0, 1, 100),
   n = c(30, 20, 1),
   percent = c(58.8, 39.2, 2.0)
-) |>
-  knitr::kable(
-    col.names = c("College Degree", "Count", "Percent"),
-    digits = 1,
-    caption = "A Problematic Distribution"
-  )
+)
 ```
 
 We have a value of 100 for the college degree variable.
@@ -819,8 +815,6 @@ Here's an example of well-documented code:
 # Load required packages
 library(tidyverse)
 
-# Set seed for reproducibility
-set.seed(42)
 
 # -----------------------------------------------------------------------------
 # 1. LOAD AND CLEAN DATA
@@ -896,9 +890,9 @@ datasummary_skim(state_data |> select(-state),
 ```
 
 The descriptive statistics look reasonable.
-Crime rates range from about 150 to 750 per 100,000 people.
+Crime rates range from about 150 to 725 per 100,000 people.
 The urbanization variable is measured on a 0-100 scale,
-while poverty is measured as a percentage (8% to 22%).
+while poverty is measured as a percentage (8% to 20%).
 Understanding these scales is important for interpreting results.
 
 Now let's visualize the relationship between urbanization and crime:
@@ -922,13 +916,16 @@ ggplot(state_data, aes(x = percent_urban, y = violent_crime)) +
   theme_minimal()
 ```
 
-The scatterplot suggests a positive relationship:
-more urbanized states tend to have higher violent crime rates.
-But this is just correlation,
-not causation.
-Many factors differ between urban and rural states beyond just population density,
-and any of these could be driving the relationship we observe.
-This is precisely the kind of endogeneity problem that motivates the econometric methods we'll study in later chapters.
+There appears to be a slight negative relationship, though it is not strong.
+That does not mean that there isn't a *causal* relationship happening under the hood, however!
+There could be other factors that are counteracting the correlations here.
+For example, more urbanized states also tend to be wealthier,
+and our data show that wealthier states have lower poverty rates.
+If urbanization pushes crime rates up while the lower poverty that comes with it pushes them back down,
+the two forces partially cancel out,
+and what we see in the scatterplot is only the net result.
+A plot of two variables shows us the *total* correlation between them;
+it cannot separate out the individual channels that produced it.
 
 
 ## Summary
