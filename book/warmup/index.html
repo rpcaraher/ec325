@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EC325 Warm-Up</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Colby palette — matches colby-theme.scss used by the unit slides */
+  --colby-blue:#002169;
+  --bright-blue:#5D8EE5;
+  --deep-yellow:#EEB808;
+  --blue-black:#1A2D38;
+  --colby-gray:#9EA9B0;
+
+  --bg:#f4f6f8; --panel:#ffffff; --ink:var(--blue-black); --muted:#5a6b77;
+  --line:#dee2e6; --accent:var(--colby-blue); --accent-soft:#e7ecf5;
+  --link:#2f5fb8;
+  --yellow:var(--deep-yellow); --yellow-soft:#fdf8e8;
+  --ok:#1a7f4b; --ok-soft:#e6f4ec; --warn:#9a3412; --warn-soft:#fdf0e7;
+
+  --mono:"Fira Code",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:"Inter","Helvetica Neue",Arial,sans-serif;
+  --radius:8px;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0f1a24; --panel:#16242f; --ink:#e8eef3; --muted:#9EA9B0;
+    --line:#263644; --accent:#5D8EE5; --accent-soft:#132738;
+    --link:#7aa7ff;
+    --yellow-soft:#2a2412;
+    --ok:#4ade80; --ok-soft:#13291d; --warn:#fdba74; --warn-soft:#2b1d12;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+     font-size:16px;line-height:1.55;-webkit-text-size-adjust:100%}
+.wrap{max-width:980px;margin:0 auto;padding:20px 16px 64px}
+a{color:var(--link)}
+
+/* ---------- header ---------- */
+header.top{margin-bottom:18px}
+.brand{font-weight:700;font-size:1.35rem;color:var(--accent);letter-spacing:-.01em;
+  display:inline-block;border-bottom:4px solid var(--yellow);padding-bottom:.15em}
+.brand span{font-weight:400;color:var(--muted)}
+
+/* ---------- how-to strip ---------- */
+.howto{background:var(--yellow-soft);border:1px solid var(--yellow);
+  border-left-width:4px;border-radius:var(--radius);padding:12px 16px;margin:18px 0 16px}
+.howto h2{margin:0 0 6px;font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--ink);font-weight:700}
+.howto ol{margin:0;padding-left:1.15em;font-size:.9rem}
+.howto li{margin:2px 0}
+.howto code{font-family:var(--mono);font-size:.88em;background:rgba(0,33,105,.08);
+  padding:1px 5px;border-radius:3px}
+@media (prefers-color-scheme:dark){.howto code{background:rgba(255,255,255,.09)}}
+
+/* ---------- cards ---------- */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:18px;margin-bottom:16px}
+.qlabel{font-size:.72rem;text-transform:uppercase;letter-spacing:.09em;
+  color:var(--accent);font-weight:700;margin-bottom:8px}
+#question{font-size:1.2rem;line-height:1.5;white-space:pre-wrap;margin:0}
+#qmeta{margin-top:12px;font-size:.85rem;color:var(--muted);display:none}
+#qmeta code{font-family:var(--mono);background:var(--accent-soft);color:var(--accent);
+  padding:1px 5px;border-radius:3px;font-size:.9em}
+@media (prefers-color-scheme:dark){#qmeta code{color:var(--bright-blue)}}
+
+h2.sec{font-size:.78rem;text-transform:uppercase;letter-spacing:.09em;color:var(--accent);
+  margin:0 0 10px;font-weight:700;display:flex;align-items:center;gap:8px;
+  border-bottom:3px solid var(--yellow);padding-bottom:.3em}
+@media (prefers-color-scheme:dark){h2.sec{color:var(--ink)}}
+.pill{font-size:.68rem;padding:1px 8px;border-radius:999px;border:1px solid var(--line);
+  background:var(--bg);color:var(--muted);text-transform:none;letter-spacing:0;font-weight:500;
+  font-family:var(--sans)}
+.pill.ready{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.pill.busy{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+
+textarea{width:100%;font-family:var(--mono);font-size:13.5px;line-height:1.6;
+  background:var(--bg);color:var(--ink);border:1px solid var(--line);
+  border-radius:6px;padding:11px 12px;resize:vertical;tab-size:2}
+textarea:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:transparent}
+#code{min-height:190px}
+#answer{min-height:66px;font-family:var(--sans);font-size:15px}
+
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
+button{font:inherit;font-family:var(--sans);font-weight:600;border-radius:6px;
+  padding:9px 16px;cursor:pointer;border:1px solid var(--line);
+  background:var(--panel);color:var(--ink);transition:.12s}
+button:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+button:disabled{opacity:.5;cursor:not-allowed}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+button.primary:hover:not(:disabled){filter:brightness(1.25);color:#fff}
+@media (prefers-color-scheme:dark){button.primary{color:#0f1a24}}
+.hint{font-size:.8rem;color:var(--muted)}
+
+pre#console{font-family:var(--mono);font-size:13px;line-height:1.55;background:var(--bg);
+  border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:6px;
+  padding:11px 12px;margin:10px 0 0;min-height:56px;max-height:300px;overflow:auto;
+  white-space:pre-wrap;word-break:break-word}
+pre#console .err{color:var(--warn);font-weight:500}
+#plots{display:none;margin-top:10px}
+#plots canvas{max-width:100%;height:auto;display:block;background:#fff;
+  border:1px solid var(--line);border-radius:6px;margin-top:10px}
+pre#console .dim{color:var(--muted)}
+
+.field{margin-bottom:12px}
+.field label{display:block;font-size:.72rem;font-weight:700;margin-bottom:5px;
+  color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+input[type=text]{width:100%;font:inherit;font-family:var(--sans);padding:9px 11px;
+  border-radius:6px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+input[type=text]:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:transparent}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:640px){.two{grid-template-columns:1fr}}
+
+#status{margin-top:12px;font-size:.9rem;min-height:1.2em}
+#status.ok{color:var(--ok);font-weight:600}
+#status.bad{color:var(--warn);font-weight:600}
+
+#done{display:none;text-align:center;padding:34px 18px}
+#done .check{font-size:2.4rem;line-height:1;color:var(--yellow)}
+#done h2{margin:10px 0 6px;font-size:1.35rem;color:var(--accent)}
+@media (prefers-color-scheme:dark){#done h2{color:var(--ink)}}
+#done p{color:var(--muted);margin:0 0 16px}
+
+#closed{display:none;text-align:center;padding:34px 18px;color:var(--muted)}
+#loading{text-align:center;padding:40px 18px;color:var(--muted)}
+.count{font-size:.8rem;color:var(--muted);margin-left:auto;font-weight:500;
+  text-transform:none;letter-spacing:0}
+footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--line);
+  text-align:center;font-size:.78rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">EC325 <span>Warm-Up</span></div>
+  </header>
+
+  <div id="loading">Loading today's warm-up&hellip;</div>
+
+  <div id="closed" class="card">
+    <strong>No warm-up is open right now.</strong>
+    <div style="margin-top:6px">Check back at the start of class.</div>
+  </div>
+
+  <main id="main" style="display:none">
+
+    <section class="howto">
+      <h2>How this works</h2>
+      <ol>
+        <li>Read the question below.</li>
+        <li>Write your R in the code box and press <strong>Run code</strong> to test it —
+            R runs right here, so you don't need RStudio open.</li>
+        <li>Put your result in <strong>Your answer</strong>, add your name, and hit Submit.</li>
+      </ol>
+    </section>
+
+    <section class="card">
+      <div class="qlabel" id="qlabel">Today's question</div>
+      <p id="question"></p>
+      <div id="qmeta"></div>
+    </section>
+
+    <section class="card">
+      <h2 class="sec">Your R code <span class="pill" id="rstatus">starting R (~10s)&hellip;</span></h2>
+      <textarea id="code" spellcheck="false" autocapitalize="off" autocorrect="off"
+        placeholder="# Write your R code here"></textarea>
+      <div class="row">
+        <button id="run" disabled>Run code</button>
+        <button id="clear" type="button">Clear output</button>
+        <span class="hint" id="runhint">&#8984;/Ctrl + Enter to run</span>
+      </div>
+      <pre id="console"><span class="dim">Output will appear here.</span></pre>
+      <div id="plots"></div>
+    </section>
+
+    <section class="card">
+      <h2 class="sec">Submit <span class="count" id="count"></span></h2>
+      <div class="two">
+        <div class="field">
+          <label for="name">Your name</label>
+          <input type="text" id="name" autocomplete="name" placeholder="First and last">
+        </div>
+        <div class="field">
+          <label for="answer">Your answer</label>
+          <textarea id="answer" placeholder="The number, or a sentence."></textarea>
+        </div>
+      </div>
+      <div class="row">
+        <button class="primary" id="submit">Submit my answer</button>
+        <span class="hint">Your code above is sent along with your answer.</span>
+      </div>
+      <div id="status"></div>
+    </section>
+
+  </main>
+
+  <div id="done" class="card">
+    <div class="check">&#10003;</div>
+    <h2>Submitted</h2>
+    <p id="donesub">Nice work &mdash; we'll go over these in a minute.</p>
+    <button id="again" type="button">Edit and resubmit</button>
+  </div>
+
+  <footer>EC325 | Colby College | Prof. Caraher</footer>
+</div>
+
+<script type="module">
+/* ============================================================
+   CONFIG — paste your Apps Script Web App URL between the quotes.
+   It looks like: https://script.google.com/macros/s/AKfy..../exec
+   ============================================================ */
+const API = "https://script.google.com/macros/s/AKfycby_BJMOBY15Cf9fdOxJZDhxf64OvBJt6j8nuJQYh8oQVOoQVwTsfD2huajzw79Y-dHR/exec";
+
+const WEBR_BASE = "https://webr.r-wasm.org/latest/";
+
+const $ = id => document.getElementById(id);
+const el = {
+  loading:$("loading"), closed:$("closed"), main:$("main"), done:$("done"),
+  question:$("question"), qlabel:$("qlabel"), qmeta:$("qmeta"),
+  code:$("code"), run:$("run"), clear:$("clear"), console:$("console"),
+  rstatus:$("rstatus"), name:$("name"), answer:$("answer"), plots:$("plots"),
+  submit:$("submit"), status:$("status"),
+  count:$("count"), again:$("again"), donesub:$("donesub")
+};
+
+let cfg = null;
+let webR = null, shelter = null, rReady = false;
+
+const esc = s => String(s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+function say(node, html, cls){ node.innerHTML = html; node.className = cls || ""; }
+function writeConsole(html){
+  el.console.innerHTML = html;
+  el.console.scrollTop = el.console.scrollHeight;
+}
+
+/* ---------- load the round ---------- */
+async function loadConfig(){
+  if (API.startsWith("PASTE_")) {
+    el.loading.innerHTML = "<strong>Not configured yet.</strong><br>" +
+      "The Apps Script URL still needs to be pasted into this page.";
+    return;
+  }
+  let data;
+  try {
+    const r = await fetch(API + "?action=config", {redirect:"follow"});
+    data = await r.json();
+  } catch (e) {
+    el.loading.innerHTML = "<strong>Couldn't reach the server.</strong><br>" +
+      "Check your wifi and reload the page.";
+    return;
+  }
+  el.loading.style.display = "none";
+
+  if (!data || !data.open) { el.closed.style.display = "block"; return; }
+
+  cfg = data;
+  el.main.style.display = "block";
+  if (cfg.label) el.qlabel.textContent = cfg.label;
+  el.question.textContent = cfg.question || "(no question set)";
+
+  const pkgList = (cfg.packages || "").split(/[,\s]+/).map(x => x.trim()).filter(Boolean);
+  const bits = [];
+  if (cfg.data_var && cfg.data_url)
+    bits.push("The dataset is preloaded as <code>" + esc(cfg.data_var) + "</code>");
+  if (pkgList.length){
+    const tags = pkgList.map(x => "<code>" + esc(x) + "</code>");
+    const list = tags.length === 1 ? tags[0]
+               : tags.slice(0, -1).join(", ") + " and " + tags[tags.length - 1];
+    bits.push(list + (tags.length > 1 ? " are loaded" : " is loaded"));
+  }
+  if (bits.length) {
+    el.qmeta.style.display = "block";
+    el.qmeta.innerHTML = bits.join(", ") + " &mdash; you don't need to set that up.";
+  }
+  if (cfg.starter_code) el.code.value = cfg.starter_code;
+
+  const saved = localStorage.getItem("ec325_name");
+  if (saved) el.name.value = saved;
+
+  refreshCount();
+  // 45s with jitter: 24 browsers polling in lockstep every 20s is a lot of
+  // script executions for a number that only needs to be roughly right.
+  setInterval(refreshCount, 45000 + Math.random() * 10000);
+  bootWebR();   // never blocks submitting
+}
+
+/* ---------- live submission count ---------- */
+async function refreshCount(){
+  if (!cfg) return;
+  try{
+    const r = await fetch(API + "?action=count&round=" + encodeURIComponent(cfg.round_id));
+    const d = await r.json();
+    if (typeof d.count === "number" && d.count > 0){
+      el.count.textContent = d.count + (d.count === 1 ? " submission" : " submissions") + " so far";
+    }
+  }catch(e){ /* a missing count is not worth bothering anyone about */ }
+}
+
+/* ---------- webR: a bonus, never a dependency ---------- */
+async function bootWebR(){
+  try {
+    const mod = await import(WEBR_BASE + "webr.mjs");
+    // GitHub Pages can't send the COOP/COEP headers the SharedArrayBuffer
+    // channel needs, so ask for PostMessage explicitly.
+    webR = new mod.WebR({
+      baseUrl: WEBR_BASE,
+      channelType: mod.ChannelType ? mod.ChannelType.PostMessage : 3
+    });
+    // Cap the wait: a wasm download that stalls must not leave the badge
+    // spinning while a student wonders whether the page is broken.
+    await Promise.race([
+      webR.init(),
+      new Promise((_, rej) =>
+        setTimeout(() => rej(new Error("timed out starting R")), 75000))
+    ]);
+    shelter = await new webR.Shelter();
+
+    // Packages named in the Config sheet, installed before the console opens so
+    // nobody meets a half-ready R. Each is attached, so students don't library().
+    const pkgs = (cfg.packages || "")
+      .split(/[,\s]+/).map(x => x.trim()).filter(Boolean);
+    if (pkgs.length){
+      el.rstatus.textContent = "installing " + pkgs.join(", ") + "…";
+      try {
+        await webR.installPackages(pkgs);
+        for (const pk of pkgs){
+          await webR.evalRVoid('suppressPackageStartupMessages(library(' + pk + '))');
+        }
+      } catch(e){
+        writeConsole('<span class="dim">(Could not install: ' + esc(pkgs.join(", ")) +
+          '. You can still use base R.)</span>');
+      }
+    }
+
+    if (cfg.data_url && cfg.data_var){
+      el.rstatus.textContent = "loading data…";
+      try {
+        const resp = await fetch(cfg.data_url);
+        if (!resp.ok) throw new Error("HTTP " + resp.status);
+        const buf = new Uint8Array(await resp.arrayBuffer());
+        await webR.FS.writeFile("/home/web_user/data.csv", buf);
+        await webR.evalRVoid(
+          cfg.data_var + ' <- utils::read.csv("/home/web_user/data.csv", stringsAsFactors = FALSE)'
+        );
+      } catch(e){
+        writeConsole('<span class="dim">(Could not preload the dataset: ' +
+          esc(e.message) + ')</span>');
+      }
+    }
+
+    rReady = true;
+    el.run.disabled = false;
+    el.rstatus.textContent = "R ready";
+    el.rstatus.className = "pill ready";
+    writeConsole('<span class="dim">R is ready. Write code above and press Run.</span>');
+  } catch (e){
+    el.rstatus.textContent = "console unavailable";
+    el.rstatus.className = "pill";
+    el.run.disabled = true;
+    $("runhint").textContent = "Run your code in RStudio instead";
+    writeConsole('<span class="dim">The in-page R console couldn’t start on this ' +
+      'browser. That’s fine — run your code in RStudio and paste it above. ' +
+      'You can still submit.</span>');
+  }
+}
+
+async function runCode(){
+  if (!rReady || el.run.disabled) return;
+  const code = el.code.value;
+  if (!code.trim()) return;
+  el.run.disabled = true;
+  el.rstatus.textContent = "running…";
+  el.rstatus.className = "pill busy";
+  writeConsole('<span class="dim">Running…</span>');
+  el.plots.innerHTML = "";
+  el.plots.style.display = "none";
+  try {
+    let res;
+    try {
+      res = await shelter.captureR(code, {
+        withAutoprint: true, captureStreams: true, captureConditions: false,
+        captureGraphics: true
+      });
+    } catch (inner) {
+      // Older webR builds reject the graphics option; text still works.
+      if (/captureGraphics|unused argument|unknown option/i.test(String(inner.message||inner))) {
+        res = await shelter.captureR(code, {
+          withAutoprint: true, captureStreams: true, captureConditions: false
+        });
+      } else throw inner;
+    }
+
+    const out = res.output.map(o => o.data).join("\n");
+    const imgs = res.images || [];
+    for (const img of imgs){
+      const c = document.createElement("canvas");
+      c.width = img.width; c.height = img.height;
+      c.getContext("2d").drawImage(img, 0, 0);
+      el.plots.appendChild(c);
+    }
+    if (imgs.length) el.plots.style.display = "block";
+
+    writeConsole(out.trim()
+      ? esc(out)
+      : (imgs.length
+          ? '<span class="dim">(plot below)</span>'
+          : '<span class="dim">(ran with no printed output)</span>'));
+  } catch (e){
+    writeConsole('<span class="err">' + esc(e.message || String(e)) + "</span>");
+  } finally {
+    try { shelter.purge(); } catch(_){}
+    el.run.disabled = false;
+    el.rstatus.textContent = "R ready";
+    el.rstatus.className = "pill ready";
+  }
+}
+
+/* ---------- submit ---------- */
+async function submit(){
+  const name = el.name.value.trim();
+  const answer = el.answer.value.trim();
+  if (!name){ say(el.status, "Please add your name so I know whose this is.", "bad"); el.name.focus(); return; }
+  if (!answer && !el.code.value.trim()){
+    say(el.status, "Add an answer or some code before submitting.", "bad"); el.answer.focus(); return;
+  }
+  localStorage.setItem("ec325_name", name);
+  el.submit.disabled = true;
+  say(el.status, "Sending…", "");
+
+  const payload = JSON.stringify({
+    action: "submit",
+    round_id: cfg.round_id,
+    name: name,
+    answer: answer,
+    code: el.code.value
+  });
+
+  // A whole class hits Submit inside a few seconds and the server serialises
+  // the writes, so a "busy" is an ordinary queue, not a failure. Retry quietly
+  // with jittered backoff rather than showing the student an error.
+  async function attempt(){
+    const r = await fetch(API, {
+      method: "POST",
+      headers: {"Content-Type": "text/plain;charset=utf-8"}, // simple request: no CORS preflight
+      body: payload
+    });
+    return await r.json();
+  }
+
+  const TRIES = 4;
+  try {
+    let d = null;
+    for (let i = 0; i < TRIES; i++){
+      try {
+        d = await attempt();
+        if (d && d.ok) break;
+        if (!d || d.error !== "busy") throw new Error((d && d.error) || "rejected");
+      } catch (err){
+        if (i === TRIES - 1) throw err;       // out of patience: report it
+        d = null;
+      }
+      if (i < TRIES - 1){
+        const wait = 1200 * Math.pow(2, i) + Math.random() * 900;
+        say(el.status, "Lots of submissions at once — still sending…", "");
+        await new Promise(res => setTimeout(res, wait));
+      }
+    }
+    if (!d || !d.ok) throw new Error("rejected");
+    el.main.style.display = "none";
+    el.done.style.display = "block";
+    el.donesub.textContent = d.resubmitted
+      ? "Your earlier answer was replaced with this one."
+      : "Nice work — we'll go over these in a minute.";
+    refreshCount();
+  } catch (e){
+    el.submit.disabled = false;
+    say(el.status, "Couldn’t send that — check your wifi and try again.", "bad");
+  }
+}
+
+/* ---------- wiring ---------- */
+el.run.addEventListener("click", runCode);
+el.clear.addEventListener("click", () => {
+  writeConsole('<span class="dim">Output will appear here.</span>');
+  el.plots.innerHTML = ""; el.plots.style.display = "none";
+});
+el.submit.addEventListener("click", submit);
+el.again.addEventListener("click", () => {
+  el.done.style.display = "none";
+  el.main.style.display = "block";
+  el.submit.disabled = false;
+  say(el.status, "", "");
+});
+
+el.code.addEventListener("keydown", e => {
+  if (e.key === "Tab"){                       // Tab indents, it doesn't leave the box
+    e.preventDefault();
+    const s = el.code.selectionStart, t = el.code.selectionEnd;
+    el.code.value = el.code.value.slice(0,s) + "  " + el.code.value.slice(t);
+    el.code.selectionStart = el.code.selectionEnd = s + 2;
+  }
+  if ((e.metaKey || e.ctrlKey) && e.key === "Enter"){ e.preventDefault(); runCode(); }
+});
+
+loadConfig();
+</script>
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>EC325 Warm-Up — Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f1a24; --panel:#16242f; --panel2:#1e2f3d; --ink:#e9edf3; --muted:#9EA9B0;
+  --line:#263644; --accent:#5D8EE5; --accent-soft:#132738;
+  --gold:#EEB808; --gold-soft:#2a2412; --ok:#4ade80;
+  --mono:"Fira Code",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:"Inter","Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+
+function step(d){
+  if (!subs.length) return;
+  cursor = (cursor + d + subs.length) % subs.length;   // wrap at both ends
+  presenting = true;
+  $("mode").classList.add("on");
+  $("mode").textContent = "List";
+  render();
+}
+
+/* ---------- gate ---------- */
+#gate{display:flex;min-height:100vh;align-items:center;justify-content:center;padding:20px}
+#gate .box{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  padding:28px;max-width:420px;width:100%}
+#gate h1{margin:0 0 6px;font-size:1.2rem}
+#gate p{color:var(--muted);font-size:.88rem;margin:0 0 16px}
+input{width:100%;font:inherit;padding:10px 12px;border-radius:8px;border:1px solid var(--line);
+  background:var(--bg);color:var(--ink);font-family:var(--mono)}
+input:focus{outline:2px solid var(--accent);outline-offset:-1px}
+
+/* ---------- app shell ---------- */
+#app{display:none;min-height:100vh;flex-direction:column}
+header{display:flex;align-items:center;gap:12px;padding:10px 16px;
+  border-bottom:3px solid var(--gold);background:var(--panel);flex-wrap:wrap}
+.title{font-weight:700}
+.title span{color:var(--accent)}
+.meta{color:var(--muted);font-size:.85rem}
+.spacer{flex:1}
+button{font:inherit;font-weight:600;border-radius:8px;padding:7px 13px;cursor:pointer;
+  border:1px solid var(--line);background:var(--panel2);color:var(--ink);transition:.12s}
+button:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button.on{background:var(--accent);border-color:var(--accent);color:#0f1a24}
+button.gold{background:var(--gold);border-color:var(--gold);color:#241c07}
+.tally{font-family:var(--mono);font-size:1.05rem;font-weight:700;color:var(--ok)}
+
+main{flex:1;padding:16px;overflow:auto}
+.qbar{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:8px;padding:12px 14px;margin-bottom:16px;white-space:pre-wrap}
+
+/* ---------- list mode ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px}
+.sub{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;
+  cursor:pointer;transition:.12s}
+.sub:hover{border-color:var(--accent)}
+.sub.win{border-color:var(--gold);background:var(--gold-soft)}
+.sub .who{display:flex;align-items:baseline;gap:8px;margin-bottom:6px}
+.sub .nm{font-weight:700}
+.sub .tm{color:var(--muted);font-size:.75rem;margin-left:auto;font-family:var(--mono)}
+.sub .ans{background:var(--accent-soft);border-radius:6px;padding:6px 9px;margin-bottom:8px;
+  font-size:.95rem;white-space:pre-wrap;word-break:break-word}
+.sub pre{margin:0;font-family:var(--mono);font-size:11.5px;line-height:1.45;color:var(--muted);
+  max-height:110px;overflow:hidden;white-space:pre-wrap;word-break:break-word}
+
+/* ---------- present mode ---------- */
+#present{display:none}
+#present .who{display:flex;align-items:baseline;gap:14px;margin-bottom:14px}
+#present .nm{font-size:2rem;font-weight:800}
+#present .ix{color:var(--muted);font-family:var(--mono);margin-left:auto}
+#present .ans{font-size:1.5rem;background:var(--accent-soft);border-radius:10px;
+  padding:14px 18px;margin-bottom:16px;white-space:pre-wrap;word-break:break-word}
+#present pre{font-family:var(--mono);font-size:1.05rem;line-height:1.6;background:var(--panel);
+  border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:0;
+  white-space:pre-wrap;word-break:break-word;overflow:auto}
+
+/* R syntax colors */
+.k{color:#EEB808;font-weight:600} .s{color:#a5e8a5} .c{color:#6f7d8f;font-style:italic}
+.n{color:#ffd28a} .f{color:#5D8EE5} .o{color:#cbd5e1}
+
+/* ---------- winner reveal ---------- */
+#reveal{display:none;position:fixed;inset:0;background:var(--bg);z-index:50;
+  flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
+#reveal .crown{font-size:4rem;line-height:1}
+#reveal .lab{text-transform:uppercase;letter-spacing:.2em;color:var(--gold);
+  font-size:.9rem;font-weight:700;margin-top:10px}
+#reveal .nm{font-size:clamp(2.4rem,9vw,5.5rem);font-weight:800;margin:4px 0 14px;line-height:1.05}
+#reveal .ans{font-size:clamp(1.1rem,3.2vw,2rem);background:var(--accent-soft);
+  border-radius:12px;padding:14px 24px;max-width:1000px;white-space:pre-wrap}
+#reveal pre{font-family:var(--mono);font-size:clamp(.85rem,1.5vw,1.15rem);text-align:left;
+  background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 22px;
+  margin:18px 0 0;max-width:1000px;max-height:44vh;overflow:auto;white-space:pre-wrap}
+#reveal .esc{margin-top:20px;color:var(--muted);font-size:.82rem}
+.empty{text-align:center;color:var(--muted);padding:60px 20px}
+kbd{font-family:var(--mono);font-size:.78em;background:var(--panel2);border:1px solid var(--line);
+  border-bottom-width:2px;border-radius:4px;padding:1px 5px}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="box">
+    <h1>Warm-up review</h1>
+    <p>Enter the review key. It's stored in this browser only, so you'll only do this once on the podium machine.</p>
+    <input id="key" type="password" placeholder="review key" autocomplete="off">
+    <div style="margin-top:12px"><button id="unlock" class="on">Unlock</button>
+      <span id="gerr" style="color:#EEB808;font-size:.85rem;margin-left:8px"></span></div>
+  </div>
+</div>
+
+<div id="app">
+  <header>
+    <div>
+      <div class="title">EC325 <span>Warm-Up</span> &middot; review</div>
+      <div class="meta" id="roundmeta">&mdash;</div>
+    </div>
+    <div class="spacer"></div>
+    <span class="tally" id="tally">0</span>
+    <button id="mode">Present</button>
+    <button id="crown" class="gold" disabled title="Open a submission in Present mode first">Pick winner</button>
+    <button id="refresh">Refresh</button>
+  </header>
+
+  <main>
+    <div class="qbar" id="qbar"></div>
+    <div id="list" class="grid"></div>
+    <div id="present"></div>
+    <div class="empty" id="empty">No submissions yet. This updates on its own every 10 seconds.</div>
+  </main>
+</div>
+
+<div id="reveal">
+  <div class="crown">&#127942;</div>
+  <div class="lab">Winner</div>
+  <div class="nm" id="rvname"></div>
+  <div class="ans" id="rvans"></div>
+  <pre id="rvcode"></pre>
+  <div class="esc">Press <kbd>Esc</kbd> to go back</div>
+</div>
+
+<script>
+/* ============================================================
+   CONFIG — same Apps Script Web App URL as the student page.
+   ============================================================ */
+const API = "https://script.google.com/macros/s/AKfycby_BJMOBY15Cf9fdOxJZDhxf64OvBJt6j8nuJQYh8oQVOoQVwTsfD2huajzw79Y-dHR/exec";
+
+const $ = id => document.getElementById(id);
+let KEY = localStorage.getItem("ec325_review_key") || "";
+let subs = [], round = null, cursor = 0, presenting = false, winnerId = null;
+
+const esc = s => String(s == null ? "" : s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+
+/* ---------- a small R highlighter (no dependencies) ----------
+   One pass over the RAW source, escaping each token as it is emitted, so
+   student code can never inject markup onto the projector. Alternation
+   order matters: comments and strings beat everything, keywords beat the
+   call-name rule, multi-char operators beat their single-char parts. */
+const RE_R = /(#[^\n]*)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|(\b\d+\.?\d*(?:[eE][-+]?\d+)?\b)|(\b(?:if|else|for|while|repeat|function|return|break|next|in|TRUE|FALSE|NA|NULL|Inf|NaN)\b)|([A-Za-z._][A-Za-z0-9._]*)(?=\s*\()|(<-|->|<=|>=|==|!=|&&|\|\||%[^%\s]*%|[+\-*\/=~!&|^$<>])/g;
+
+function highlight(code){
+  let out = "", last = 0, m;
+  RE_R.lastIndex = 0;
+  while ((m = RE_R.exec(code)) !== null){
+    out += esc(code.slice(last, m.index));
+    const t = m[0];
+    if (m[1])      out += '<span class="c">' + esc(t) + '</span>';
+    else if (m[2]) out += '<span class="s">' + esc(t) + '</span>';
+    else if (m[3]) out += '<span class="n">' + esc(t) + '</span>';
+    else if (m[4]) out += '<span class="k">' + esc(t) + '</span>';
+    else if (m[5]) out += '<span class="f">' + esc(t) + '</span>';
+    else           out += '<span class="o">' + esc(t) + '</span>';
+    last = m.index + t.length;
+    if (RE_R.lastIndex === m.index) RE_R.lastIndex++;   // zero-length guard
+  }
+  return out + esc(code.slice(last));
+}
+
+const hhmm = iso => {
+  const d = new Date(iso);
+  return isNaN(d) ? "" : d.toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
+};
+
+/* ---------- data ---------- */
+async function load(){
+  if (API.startsWith("PASTE_")) { $("empty").textContent = "The Apps Script URL still needs to be pasted into this page."; return; }
+  try {
+    const r = await fetch(API + "?action=submissions&key=" + encodeURIComponent(KEY));
+    const d = await r.json();
+    if (d.error === "bad_key"){ lock("That key didn't work."); return; }
+    round = d.round || null;
+    subs = d.submissions || [];
+    render();
+  } catch(e){ /* transient: the next poll will pick it up */ }
+}
+
+function render(){
+  $("tally").textContent = subs.length;
+  $("roundmeta").textContent = round
+    ? (round.round_id || "") + (round.open ? " · open" : " · closed")
+    : "no round open";
+  $("qbar").textContent = round && round.question ? round.question : "(no question set)";
+  $("empty").style.display = subs.length ? "none" : "block";
+  $("crown").disabled = !subs.length || !presenting;
+  if (presenting) renderPresent(); else renderList();
+}
+
+function renderList(){
+  $("present").style.display = "none";
+  const list = $("list");
+  list.style.display = "grid";
+  list.innerHTML = subs.map((s, i) => `
+    <div class="sub ${s.id === winnerId ? "win" : ""}" data-i="${i}">
+      <div class="who"><span class="nm">${esc(s.name)}</span>
+        <span class="tm">${hhmm(s.timestamp)}</span></div>
+      ${s.answer ? `<div class="ans">${esc(s.answer)}</div>` : ""}
+      <pre>${highlight(s.code || "")}</pre>
+    </div>`).join("");
+  list.querySelectorAll(".sub").forEach(n => n.addEventListener("click", () => {
+    cursor = +n.dataset.i; presenting = true; $("mode").classList.add("on");
+    $("mode").textContent = "List"; render();
+  }));
+}
+
+function renderPresent(){
+  $("list").style.display = "none";
+  const p = $("present");
+  p.style.display = "block";
+  if (!subs.length){ p.innerHTML = ""; return; }
+  if (cursor >= subs.length) cursor = subs.length - 1;
+  if (cursor < 0) cursor = 0;
+  const s = subs[cursor];
+  p.innerHTML = `
+    <div class="who"><span class="nm">${esc(s.name)}</span>
+      <span class="ix">${cursor + 1} / ${subs.length} &nbsp; ${hhmm(s.timestamp)}</span></div>
+    ${s.answer ? `<div class="ans">${esc(s.answer)}</div>` : ""}
+    <pre>${highlight(s.code || "")}</pre>`;
+}
+
+/* ---------- winner ---------- */
+function crownCurrent(){
+  if (!subs.length || !presenting) return;   // only ever crown what is on screen
+  const s = subs[cursor];
+  if (!s) return;
+  winnerId = s.id;
+  $("rvname").textContent = s.name;
+  $("rvans").textContent = s.answer || "";
+  $("rvans").style.display = s.answer ? "block" : "none";
+  $("rvcode").innerHTML = highlight(s.code || "");
+  $("rvcode").style.display = s.code ? "block" : "none";
+  $("reveal").style.display = "flex";
+  // record it so the participation sheet keeps the result
+  fetch(API, {
+    method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body: JSON.stringify({action:"winner", key:KEY, id:s.id, round_id: round && round.round_id})
+  }).catch(()=>{});
+}
+
+function step(d){
+  if (!subs.length) return;
+  cursor = (cursor + d + subs.length) % subs.length;   // wrap at both ends
+  presenting = true;
+  $("mode").classList.add("on");
+  $("mode").textContent = "List";
+  render();
+}
+
+/* ---------- gate ---------- */
+function lock(msg){
+  $("app").style.display = "none";
+  $("gate").style.display = "flex";
+  $("gerr").textContent = msg || "";
+  localStorage.removeItem("ec325_review_key");
+}
+function unlock(){
+  KEY = $("key").value.trim();
+  if (!KEY) return;
+  localStorage.setItem("ec325_review_key", KEY);
+  $("gate").style.display = "none";
+  $("app").style.display = "flex";
+  load();
+}
+$("unlock").addEventListener("click", unlock);
+$("key").addEventListener("keydown", e => { if (e.key === "Enter") unlock(); });
+
+/* ---------- controls ---------- */
+$("mode").addEventListener("click", () => {
+  presenting = !presenting;
+  $("mode").classList.toggle("on", presenting);
+  $("mode").textContent = presenting ? "List" : "Present";
+  render();
+});
+$("crown").addEventListener("click", crownCurrent);
+$("refresh").addEventListener("click", load);
+
+document.addEventListener("keydown", e => {
+  if ($("app").style.display === "none") return;
+  if (e.key === "Escape"){ $("reveal").style.display = "none"; return; }
+  if ($("reveal").style.display === "flex") return;
+  if (e.key === "ArrowRight" || e.key === " "){ e.preventDefault(); step(1); }
+  if (e.key === "ArrowLeft"){ e.preventDefault(); step(-1); }
+  if ((e.key === "w" || e.key === "W") && presenting) crownCurrent();
+});
+
+if (KEY){ $("gate").style.display = "none"; $("app").style.display = "flex"; load(); }
+setInterval(() => { if ($("app").style.display !== "none" && $("reveal").style.display !== "flex") load(); }, 10000);
+</script>
+</body>
+</html>
