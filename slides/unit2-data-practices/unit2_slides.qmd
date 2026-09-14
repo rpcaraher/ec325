@@ -3,14 +3,15 @@ title: "Good Data Practices with R and RStudio"
 subtitle: "EC 325: Econometrics"
 author: "Prof. Caraher"
 institute: "Colby College"
-date: "today"
+date: last-modified
+date-format: "[Last updated:] MM-DD-YYYY"
 embed-resources: true
 format:
   revealjs:
     theme: colby-theme.scss
     slide-number: true
     incremental: true
-    footer: "EC325 | Unit 2 | Good Data Practices"
+    footer: "EC325 | Fall 2026 | Unit 2: Good Data Practices"
 execute:
   echo: true
   warning: false
@@ -27,7 +28,34 @@ library(tidyverse)
 
 # Good Data Practices
 
+## Goals for Unit 2 {.smaller}
+
+**Main idea:** No econometric technique — however sophisticated — can rescue an
+analysis built on data you never bothered to understand.
+
+. . .
+
+**Skills.** By the end of this unit, you should be able to:
+
+- **Find your way around R** — objects, functions, and packages
+- **Interrogate** a new dataset: how many observations, what's missing, which values are impossible
+- **Manipulate** data with `filter()`, `select()`, `mutate()`, and the pipe `|>`
+- **Summarize** it overall and by group using `summarize()` and `group_by()`
+- **Visualize** it with `ggplot2` — scatterplots, histograms, lines of best fit
+- **Write a script** someone else could run to reproduce your results
+
+. . .
+
+::: {.callout-note icon=false}
+## 🖥️ You'll be typing today
+Have RStudio open. We start in the console and move into scripts later on.
+:::
+
 ## When Good Economists Use Bad Data
+
+Let's look at an example of what can go wrong...
+
+. . .
 
 - What is the role of the government in times of economic crisis?
 - Question received renewed interest in 2008-2009 financial crisis
@@ -40,7 +68,7 @@ library(tidyverse)
 #| echo: false
 
 cats <- c("0-30%", "30-60%", "60-90%", "> 90%")
-rr_calcs <- c(4.1, 2.9, 3.4, -0.1)
+rr_calcs  <- c(4.1, 2.8, 2.8, -0.1)
 hap_calcs <- c(4.2, 3.1, 3.2, 2.2)
 
 rr_data <- tibble(debt_ratio = factor(cats, levels = cats), growth = rr_calcs)
@@ -82,7 +110,7 @@ print(p1)
 
 - However, there was a problem...
 
-- In 2014, graduate student Thomas Herndon tried to replicate the results for a homework assignment.
+- In 2013, graduate student Thomas Herndon tried to replicate the results for a homework assignment.
 
 . . .
 
@@ -311,11 +339,30 @@ R uses the standard arithmetic operators:
 
 ```
 
+. . .
+
+- Anything preceded by a `#` is a note to humans - it will not be read by R
+
+. . .
+
+```{r}
+#| echo: true
+#| output-location: fragment
+
+5 * 3.4
+
+# Solution: 17
+
+```
+
+
 ## Objects and Assignment
 
-- As an **Object-Orientated Language,** the logic of R is built around interacting with **objects**
-- An object is a generic name for anything that is "saved" in R's memory, which you can then interact with
-- This includes numbers, vectors, functions, or essentially anything else we will interact with or have to reference
+- In R, everything you create is stored as an **object** — a number, a vector,
+  a dataset, a regression, even a function
+- You can hold as many as you want at once, each with its own name
+- This is why you can keep your raw data, your cleaned data, and three
+  different models side by side and compare them
 
 ## Objects and Assignment {.smaller}
 
@@ -362,7 +409,7 @@ x + y
 
 - Every piece of data in R has a type that determines how it can be used
 - The main types are **numeric (numbers)**, **character (text)**, **logical (true/false)**, and **factor (categories)**
-- Depending on the datatype, functions will *work differently or *not at all*
+- Depending on the datatype, operations in R will *work differently or not at all*
 
 ## Data Types {.smaller}
 
@@ -450,7 +497,7 @@ ages + 10
 ```{r}
 #| echo: true
 #| output-location: fragment
-primes <- c(1, 3, 5, 7, 9, 11)
+primes <- c(2, 3, 5, 7, 11, 13)
 
 ages + primes
 
@@ -477,7 +524,7 @@ students
 . . .
 
 - Operations still apply to each element, one at a time:
-
+- Use `paste()` to glue text vectors together
 . . .
 
 ```{r}
@@ -495,7 +542,7 @@ paste(students, "is", ages, "years old")
 :::
 
 - Functions are pre-packaged sets of instructions that perform specific tasks
-- Every function requires an *argument* (or inputs) to produce output
+- Most function require an *argument* (or inputs) to produce output
 - Try the `seq()` function, which generates a sequence of numbers:
 
 . . .
@@ -530,6 +577,8 @@ bb
 
 mtcars
 ```
+
+## Dataframes {.smaller}
 
 - The `head()` function prints only the first `n` rows:
 
@@ -609,13 +658,6 @@ We will work with all of these engines.
 
 - Let's learn about `tidyverse` functions using the `mtcars` data
 
-. . .
-
-```{r}
-#| output-location: fragment
-
-mtcars
-```
 
 ## The Pipe `|>` {.smaller}
 
@@ -631,6 +673,37 @@ mtcars
 mtcars |>
   filter(mpg > 25)
 ```
+
+## Comparing Values {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Try it yourself!
+:::
+
+- To pick out rows, we first ask R a *yes/no question* about every row
+- The answer is always `TRUE` or `FALSE` — R's **logical** type
+
+| Operator | Question it asks | Example |
+|----------|------------------|---------|
+| `>` `<`    | greater / less than | `mpg > 25` |
+| `>=` `<=`  | greater / less than or equal | `cyl >= 6` |
+| `==`       | **is exactly equal to** | `cyl == 4` |
+| `!=`       | is not equal to | `cyl != 4` |
+
+. . .
+
+```{r}
+#| output-location: fragment
+head(mtcars$mpg > 25, 10)
+```
+
+. . .
+
+::: {.callout-warning}
+## One `=` is not two `==`
+One `=` **assigns** a value. Two `==` **compares** two values.
+This will be the most common error you make all semester.
+:::
 
 ## Key Functions for Data Manipulation
 
@@ -650,6 +723,39 @@ mtcars |>
 mtcars |>
   filter(mpg > 25)
 ```
+
+## `filter()`: More Than One Condition {.smaller}
+
+- A **comma** means *and* --- keep only the rows where **every** condition is `TRUE`
+
+```{r}
+#| output-location: fragment
+
+mtcars |>
+  filter(cyl == 4, mpg > 25)
+```
+
+
+## `filter()`: Saying *Or* with `|` {.smaller}
+
+- Use the vertical bar `|` to keep rows where **at least one** condition is `TRUE`
+
+```{r}
+#| output-location: fragment
+
+mtcars |>
+  filter(cyl == 4 | cyl == 8) |>
+  head(4)
+```
+
+. . .
+
+::: {.callout-warning}
+## A mistake that gives you no error
+`filter(cyl == 4, cyl == 8)` runs fine and returns **zero rows** --- no car has
+4 cylinders *and* 8 cylinders. If a filter returns nothing, check whether you
+meant `|`.
+:::
 
 ## `select()`: Choose Columns {.smaller}
 
@@ -754,7 +860,6 @@ Let's learn the tools to answer these questions!
 | `sd()` | Standard deviation |
 | `median()` | Median (middle value) |
 | `min()` / `max()` | Minimum / Maximum |
-| `n()` | Number of observations |
 
 ## Descriptive Statistics Functions {.smaller}
 
@@ -1030,7 +1135,7 @@ mtcars |>
 
 ## Practice 2 {.smaller}
 
-**What is the average MPG for cars by the number of gears it has?
+**What is the average MPG for cars by the number of gears it has?**
 
 - *Hint:* First `group_by()` then `summarize()` and `mean()`
 
@@ -1062,26 +1167,6 @@ mtcars |>
 ```
 
 ## Practice 4 {.smaller}
-
-**Create a summary table showing the number of cars, mean weight (`wt`), and mean MPG for each number of cylinders (`cyl`).**
-
-- *Hint:* `group_by()` + `summarize()` with `n()`, `mean(wt)`, and `mean(mpg)`
-
-. . .
-
-```{r}
-#| output-location: fragment
-
-mtcars |>
-  group_by(cyl) |>
-  summarize(
-    n_cars = n(),
-    mean_wt = mean(wt),
-    mean_mpg = mean(mpg)
-  )
-```
-
-## Practice 5 {.smaller}
 
 **Among cars that weigh less than 3,000 lbs (`wt < 3`), what is the mean and standard deviation of their quarter-mile time (`qsec`)?**
 
@@ -1227,7 +1312,7 @@ A well-organized script has clear sections:
 # =============================================================
 # Project: Unit 2 Analysis
 # Author: Your Name
-# Date: February 2026
+# Date: Whatever today is
 # =============================================================
 
 # Load packages -------------------------------------------
@@ -1569,23 +1654,25 @@ ggplot(penguins) +
   theme_minimal()
 ```
 
-## Visualization Practice 4 {.smaller}
+# Wrapping Up
 
-**Add a line of best fit to the scatterplot of flipper length vs. body mass, and add proper axis labels and a title.**
+## Unit 2: Main Takeaways {.smaller}
 
-- *Hint:* Combine `geom_point()`, `geom_smooth(method = "lm")`, and `labs()`
+1. **Descriptive statistics are the first step, not the warm-up.** How many
+   observations, what's missing, what's impossible — before any model gets estimated
+2. **Missing data is never neutral.** `na.rm = TRUE` is fine when data are missing
+   at random. When missingness relates to your outcome, it biases everything downstream
+3. **Plot it.** A histogram catches what a table of means hides — visualization is a
+   diagnostic tool first, a communication tool second
+4. **Keep your work in scripts, commented and organized.** Your future self is the
+   person most likely to need it
+5. **Get in the habit of sharing data and the code.** Herndon found the error only because Reinhart and
+   Rogoff handed over their spreadsheet when he asked
 
 . . .
 
-```{r}
-#| output-location: fragment
-#| fig-height: 2.5
-
-ggplot(penguins) +
-  geom_point(aes(x = flipper_length_mm, y = body_mass_g), alpha = 0.6) +
-  geom_smooth(aes(x = flipper_length_mm, y = body_mass_g), method = "lm") +
-  labs(title = "Penguin Body Mass vs. Flipper Length",
-       x = "Flipper Length (mm)", y = "Body Mass (g)") +
-  theme_minimal()
-```
-
+::: {.callout-important}
+## Back to where we started
+No technique — however sophisticated — rescues an analysis built on data you never
+understood. Everything in the rest of this course assumes you've done this part first.
+:::
