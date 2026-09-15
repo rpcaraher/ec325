@@ -971,7 +971,10 @@ When might data be missing in a non-random way?
 
 ## `summarize()`: Compute Summary Statistics {.smaller}
 
-- **Purpose:** Collapse a data frame into a single summary row
+- **Purpose:** Collapse a data frame into a row with calculated values, based on descriptive statistics functions
+- Each argument is `new_name = function(variable)` --- the name on the left becomes the **column name** in the output
+- You can compute as many statistics as you want in one call, separated by commas
+- `n()` is a special helper that counts the **number of rows**
 
 . . .
 
@@ -985,6 +988,11 @@ mtcars |>
     n = n()
   )
 ```
+
+. . .
+
+- No matter how big the data frame, `summarize()` returns a **single row** (unless you group --- more on that next)
+- If your variable has missing values, remember `na.rm = TRUE`: `mean(mpg, na.rm = TRUE)`
 
 ## `group_by()` + `summarize()`: Grouped Summaries {.smaller}
 
