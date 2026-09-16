@@ -675,33 +675,30 @@ mtcars |> filter(mpg > 25)
 
 ## Comparing Values {.smaller}
 
-::: {.callout-note icon=false}
-## 🖥️ Try it yourself!
-:::
 
-- To pick out rows, we first ask R a *yes/no question* about every row
-- The answer is always `TRUE` or `FALSE` — R's **logical** type
+- `mpg > 25` on the last slide is a **comparison**: it asks a yes/no question about every row
+- The answer for each row is `TRUE` or `FALSE`
+- `filter()` keeps only the rows where the answer is `TRUE`
+- Other functions use `TRUE`/`FALSE` differently: `sum(mtcars$mpg > 25)` counts the `TRUE`s (6 cars)
+
+. . .
+
+**Comparison operators**
 
 | Operator | Question it asks | Example |
 |----------|------------------|---------|
 | `>` `<`    | greater / less than | `mpg > 25` |
-| `>=` `<=`  | greater / less than or equal | `cyl >= 6` |
+| `>=` `<=`  | greater / less than or equal to | `cyl >= 6` |
 | `==`       | **is exactly equal to** | `cyl == 4` |
 | `!=`       | is not equal to | `cyl != 4` |
 
 . . .
 
-```{r}
-#| output-location: fragment
-head(mtcars$mpg > 25, 10)
-```
-
-. . .
-
 ::: {.callout-warning}
 ## One `=` is not two `==`
-One `=` **assigns** a value. Two `==` **compares** two values.
-This will be the most common error you make all semester.
+One `=` sets an argument, like `by = 3`. Two `==` asks whether two values are equal.
+`filter(cyl = 4)` gives an error; `filter(cyl == 4)` works.
+This will be among the most common errors you make all semester.
 :::
 
 ## Key Functions for Data Manipulation
@@ -727,6 +724,8 @@ mtcars |>
 
 - A **comma** means *and* --- keep only the rows where **every** condition is `TRUE`
 
+. . .
+
 ```{r}
 #| output-location: fragment
 
@@ -739,12 +738,13 @@ mtcars |>
 
 - Use the vertical bar `|` to keep rows where **at least one** condition is `TRUE`
 
+. . .
+
 ```{r}
 #| output-location: fragment
 
 mtcars |>
-  filter(cyl == 4 | cyl == 8) |>
-  head(4)
+  filter(cyl == 4 | cyl == 8)
 ```
 
 . . .
@@ -787,6 +787,8 @@ mtcars |>
 
 - The real power of the pipe: **chain multiple operations** in sequence
 - Read it like a sentence: "Take the data, *then* filter, *then* mutate, *then* select..."
+- Let's say we want to compute kilometers for litre only for cars with 4 cylinders,
+and only keep the MPG, KPML, and WT variables. How do we do this in once statement of code?
 
 . . .
 
@@ -801,8 +803,8 @@ mtcars |>
 
 ## Saving Your Work as a New Object {.smaller}
 
-- So far, we've just been **printing** results to the console
-- To keep the manipulated data, **save it as a new object** using `<-`
+- When cleaning data for your analysis using `filter()`, `mutate()`, and other functions,
+it is useful to create a "new" version of the data by assigning it to a new object
 
 . . .
 
@@ -989,14 +991,17 @@ mtcars |>
 ```
 
 . . .
-
-- No matter how big the data frame, `summarize()` returns a **single row** (unless you group --- more on that next)
+- Returns, as a single row, the specified descriptive statistics
+- When computing descriptive statistics with `summarize()`, you don't need to use `$`!
 - If your variable has missing values, remember `na.rm = TRUE`: `mean(mpg, na.rm = TRUE)`
 
 ## `group_by()` + `summarize()`: Grouped Summaries {.smaller}
 
 - **Purpose:** Split data into groups and summarize each group separately
 - Pair `group_by()` with `summarize()` to get statistics *by group*
+- A **group** is all the rows that share the same value of the variable in `group_by()`
+- `group_by(cyl)` makes 3 groups: cars with 4, 6, or 8 cylinders
+- `summarize()` then returns **one row per group**
 
 . . .
 
@@ -1012,9 +1017,6 @@ mtcars |>
   )
 ```
 
-. . .
-
-- When computing descriptive statistics with `summarize()`, you don't need to use `$`!
 
 ## Storing Summary Statistics as Objects {.smaller}
 
@@ -1142,7 +1144,7 @@ mtcars |>
 
 ## Practice 2 {.smaller}
 
-**What is the average MPG for cars by the number of gears it has?**
+**What is the average MPG (`mpg`) for cars by for ach number of gears (`gear`)?
 
 - *Hint:* First `group_by()` then `summarize()` and `mean()`
 
@@ -1260,6 +1262,8 @@ Research meets the **replication standard** when an independent researcher can e
 
 - Check your current working directory:
 
+. . .
+
 ```{r}
 #| eval: false
 #| echo: true
@@ -1322,6 +1326,9 @@ A well-organized script has clear sections:
 # Date: Whatever today is
 # =============================================================
 
+# Clear environment ---------------------------------------
+rm(list = ls())
+
 # Load packages -------------------------------------------
 library(tidyverse)
 
@@ -1335,6 +1342,51 @@ my_data <- read_csv("data/my_dataset.csv")
 # ... analysis code here ...
 ```
 
+## Start With a Clean Environment {.smaller}
+
+- Your **environment** is everything R is holding in memory right now — every object you've created since R started
+- After an hour of work it's full of objects you made in the console, renamed, or abandoned
+
+. . .
+
+- The danger: your script runs perfectly *for you* because it quietly relies on an object that sits in your environment but is **created nowhere in the script**
+- Hand that script to a class and it breaks immediately — or worse, it runs on *their* leftover object and returns a different answer
+- Add `rm(list = ls())` at the top of your script to clear out your environment (i.e., delete all objects)
+
+
+## Don't Let R Save Your Workspace {.smaller}
+
+- By default, RStudio offers to save your environment to an `.RData` file and reload it the next time you open R
+- That quietly brings your old objects back — exactly what we're trying to avoid
+
+. . .
+
+**Turn it off once:** Tools → Global Options → General
+
+- Uncheck **"Restore .RData into workspace at startup"**
+- Set **"Save workspace to .RData on exit"** to **Never**
+
+## Running Your Whole Script {.smaller}
+
+- Click **Source** (top-right of the script editor) or press `Ctrl/Cmd + Shift + S` to run your whole script, top to bottom
+- If R hits an error, it stops and the rest of the script doesn't run
+- Running **line-by-line** (`Ctrl/Cmd + Enter`) is great for testing code as you write, but it's easy to skip a line or run lines out of order. **Source** shows whether the whole script works in order.
+
+. . .
+
+::: {.callout-warning}
+## Where did my output go?
+**Source** runs your code but doesn't automatically print results like summary tables or `ggplot` graphs.
+To see them, click the arrow next to **Source** and choose **Source with Echo** (`Ctrl/Cmd + Shift + Enter`).
+:::
+
+. . .
+
+::: {.callout-tip}
+## The replication test
+**Restart R, then Source your script.** If it runs top to bottom without errors, your results are reproducible. If it errors, you just found a hidden dependency on something in your old environment — better you find it than your reviewer.
+:::
+
 ## The Bottom Line
 
 - **Always work in scripts**, not the console
@@ -1347,7 +1399,6 @@ my_data <- read_csv("data/my_dataset.csv")
 ## Remember
 If you can't replicate your own results, neither can anyone else!
 :::
-
 
 
 #  Visualizations in R

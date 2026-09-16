@@ -1070,7 +1070,7 @@ Prof. Caraher
     </div>
 </div>
 
-  <p class="date">Last updated: 09-15-2026</p>
+  <p class="date">Last updated: 09-16-2026</p>
 </section>
 <section>
 <section id="good-data-practices" class="title-slide slide level1 center">
@@ -1230,33 +1230,33 @@ Prof. Caraher
 <tbody>
 <tr class="odd">
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">12</td>
-<td style="text-align: right;">150</td>
-<td style="text-align: right;">40</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;">19</td>
 </tr>
 <tr class="even">
 <td style="text-align: right;">2</td>
-<td style="text-align: right;">13</td>
-<td style="text-align: right;">180</td>
-<td style="text-align: right;">57</td>
+<td style="text-align: right;">17</td>
+<td style="text-align: right;">80</td>
+<td style="text-align: right;">34</td>
 </tr>
 <tr class="odd">
 <td style="text-align: right;">3</td>
-<td style="text-align: right;">12</td>
-<td style="text-align: right;">166</td>
-<td style="text-align: right;">28</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">39</td>
+<td style="text-align: right;">20</td>
 </tr>
 <tr class="even">
 <td style="text-align: right;">4</td>
-<td style="text-align: right;">17</td>
-<td style="text-align: right;">27</td>
-<td style="text-align: right;">50</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">174</td>
+<td style="text-align: right;">39</td>
 </tr>
 <tr class="odd">
 <td style="text-align: right;">5</td>
-<td style="text-align: right;">14</td>
-<td style="text-align: right;">78</td>
-<td style="text-align: right;">43</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">55</td>
 </tr>
 </tbody>
 </table>
@@ -1920,20 +1920,14 @@ Lotus Europa   30.4   4  95.1 113 3.77 1.513 16.90  1  1    5    2</code></pre>
 </section>
 <section id="comparing-values" class="slide level2 smaller">
 <h2>Comparing Values</h2>
-<div class="callout callout-note no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>🖥️ Try it yourself!</strong></p>
-</div>
-<div class="callout-content">
-
-</div>
-</div>
-</div>
 <ul>
-<li class="fragment">To pick out rows, we first ask R a <em>yes/no question</em> about every row</li>
-<li class="fragment">The answer is always <code>TRUE</code> or <code>FALSE</code> — R’s <strong>logical</strong> type</li>
+<li class="fragment"><code>mpg &gt; 25</code> on the last slide is a <strong>comparison</strong>: it asks a yes/no question about every row</li>
+<li class="fragment">The answer for each row is <code>TRUE</code> or <code>FALSE</code></li>
+<li class="fragment"><code>filter()</code> keeps only the rows where the answer is <code>TRUE</code></li>
+<li class="fragment">Other functions use <code>TRUE</code>/<code>FALSE</code> differently: <code>sum(mtcars$mpg &gt; 25)</code> counts the <code>TRUE</code>s (6 cars)</li>
 </ul>
+<div class="fragment">
+<p><strong>Comparison operators</strong></p>
 <table class="caption-top">
 <thead>
 <tr class="header">
@@ -1950,7 +1944,7 @@ Lotus Europa   30.4   4  95.1 113 3.77 1.513 16.90  1  1    5    2</code></pre>
 </tr>
 <tr class="even">
 <td><code>&gt;=</code> <code>&lt;=</code></td>
-<td>greater / less than or equal</td>
+<td>greater / less than or equal to</td>
 <td><code>cyl &gt;= 6</code></td>
 </tr>
 <tr class="odd">
@@ -1965,15 +1959,6 @@ Lotus Europa   30.4   4  95.1 113 3.77 1.513 16.90  1  1    5    2</code></pre>
 </tr>
 </tbody>
 </table>
-<div class="fragment">
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href aria-label="1"></a><span class="fu">head</span>(mtcars<span class="sc">$</span>mpg <span class="sc">&gt;</span> <span class="dv">25</span>, <span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div class="cell fragment">
-<div class="cell-output cell-output-stdout">
-<pre><code> [1] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</code></pre>
-</div>
-</div>
 </div>
 <div class="fragment">
 <div class="callout callout-warning callout-titled callout-style-default">
@@ -1985,7 +1970,7 @@ Lotus Europa   30.4   4  95.1 113 3.77 1.513 16.90  1  1    5    2</code></pre>
 <p><strong>One <code>=</code> is not two <code>==</code></strong></p>
 </div>
 <div class="callout-content">
-<p>One <code>=</code> <strong>assigns</strong> a value. Two <code>==</code> <strong>compares</strong> two values. This will be the most common error you make all semester.</p>
+<p>One <code>=</code> sets an argument, like <code>by = 3</code>. Two <code>==</code> asks whether two values are equal. <code>filter(cyl = 4)</code> gives an error; <code>filter(cyl == 4)</code> works. This will be among the most common errors you make all semester.</p>
 </div>
 </div>
 </div>
@@ -2006,8 +1991,8 @@ Lotus Europa   30.4   4  95.1 113 3.77 1.513 16.90  1  1    5    2</code></pre>
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href aria-label="1"></a>mtcars <span class="sc">|&gt;</span></span>
-<span id="cb46-2"><a href aria-label="2"></a>  <span class="fu">filter</span>(mpg <span class="sc">&gt;</span> <span class="dv">25</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href aria-label="1"></a>mtcars <span class="sc">|&gt;</span></span>
+<span id="cb44-2"><a href aria-label="2"></a>  <span class="fu">filter</span>(mpg <span class="sc">&gt;</span> <span class="dv">25</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -2027,9 +2012,10 @@ Lotus Europa   30.4   4  95.1 113 3.77 1.513 16.90  1  1    5    2</code></pre>
 <ul>
 <li class="fragment">A <strong>comma</strong> means <em>and</em> — keep only the rows where <strong>every</strong> condition is <code>TRUE</code></li>
 </ul>
+<div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href aria-label="1"></a>mtcars <span class="sc">|&gt;</span></span>
-<span id="cb48-2"><a href aria-label="2"></a>  <span class="fu">filter</span>(cyl <span class="sc">==</span> <span class="dv">4</span>, mpg <span class="sc">&gt;</span> <span class="dv">25</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href aria-label="1"></a>mtcars <span class="sc">|&gt;</span></span>
+<span id="cb46-2"><a href aria-label="2"></a>  <span class="fu">filter</span>(cyl <span class="sc">==</span> <span class="dv">4</span>, mpg <span class="sc">&gt;</span> <span class="dv">25</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -2042,24 +2028,47 @@ Porsche 914-2  26.0   4 120.3  91 4.43 2.140 16.70  0  1    5    2
 Lotus Europa   30.4   4  95.1 113 3.77 1.513 16.90  1  1    5    2</code></pre>
 </div>
 </div>
+</div>
 </section>
 <section id="filter-saying-or-with" class="slide level2 smaller">
 <h2><code>filter()</code>: Saying <em>Or</em> with <code>|</code></h2>
 <ul>
 <li class="fragment">Use the vertical bar <code>|</code> to keep rows where <strong>at least one</strong> condition is <code>TRUE</code></li>
 </ul>
+<div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href aria-label="1"></a>mtcars <span class="sc">|&gt;</span></span>
-<span id="cb50-2"><a href aria-label="2"></a>  <span class="fu">filter</span>(cyl <span class="sc">==</span> <span class="dv">4</span> <span class="sc">|</span> cyl <span class="sc">==</span> <span class="dv">8</span>) <span class="sc">|&gt;</span></span>
-<span id="cb50-3"><a href aria-label="3"></a>  <span class="fu">head</span>(<span class="dv">4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href aria-label="1"></a>mtcars <span class="sc">|&gt;</span></span>
+<span id="cb48-2"><a href aria-label="2"></a>  <span class="fu">filter</span>(cyl <span class="sc">==</span> <span class="dv">4</span> <span class="sc">|</span> cyl <span class="sc">==</span> <span class="dv">8</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
-<pre><code>                   mpg cyl  disp  hp drat   wt  qsec vs am gear carb
-Datsun 710        22.8   4 108.0  93 3.85 2.32 18.61  1  1    4    1
-Hornet Sportabout 18.7   8 360.0 175 3.15 3.44 17.02  0  0    3    2
-Duster 360        14.3   8 360.0 245 3.21 3.57 15.84  0  0    3    4
-Merc 240D         24.4   4 146.7  62 3.69 3.19 20.00  1  0    4    2</code></pre>
+<pre><code>                     mpg cyl  disp  hp drat    wt  qsec vs am gear carb
+Datsun 710          22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1
+Hornet Sportabout   18.7   8 360.0 175 3.15 3.440 17.02  0  0    3    2
+Duster 360          14.3   8 360.0 245 3.21 3.570 15.84  0  0    3    4
+Merc 240D           24.4   4 146.7  62 3.69 3.190 20.00  1  0    4    2
+Merc 230            22.8   4 140.8  95 3.92 3.150 22.90  1  0    4    2
+Merc 450SE          16.4   8 275.8 180 3.07 4.070 17.40  0  0    3    3
+Merc 450SL          17.3   8 275.8 180 3.07 3.730 17.60  0  0    3    3
+Merc 450SLC         15.2   8 275.8 180 3.07 3.780 18.00  0  0    3    3
+Cadillac Fleetwood  10.4   8 472.0 205 2.93 5.250 17.98  0  0    3    4
+Lincoln Continental 10.4   8 460.0 215 3.00 5.424 17.82  0  0    3    4
+Chrysler Imperial   14.7   8 440.0 230 3.23 5.345 17.42  0  0    3    4
+Fiat 128            32.4   4  78.7  66 4.08 2.200 19.47  1  1    4    1
+Honda Civic         30.4   4  75.7  52 4.93 1.615 18.52  1  1    4    2
+Toyota Corolla      33.9   4  71.1  65 4.22 1.835 19.90  1  1    4    1
+Toyota Corona       21.5   4 120.1  97 3.70 2.465 20.01  1  0    3    1
+Dodge Challenger    15.5   8 318.0 150 2.76 3.520 16.87  0  0    3    2
+AMC Javelin         15.2   8 304.0 150 3.15 3.435 17.30  0  0    3    2
+Camaro Z28          13.3   8 350.0 245 3.73 3.840 15.41  0  0    3    4
+Pontiac Firebird    19.2   8 400.0 175 3.08 3.845 17.05  0  0    3    2
+Fiat X1-9           27.3   4  79.0  66 4.08 1.935 18.90  1  1    4    1
+Porsche 914-2       26.0   4 120.3  91 4.43 2.140 16.70  0  1    5    2
+Lotus Europa        30.4   4  95.1 113 3.77 1.513 16.90  1  1    5    2
+Ford Pantera L      15.8   8 351.0 264 4.22 3.170 14.50  0  1    5    4
+Maserati Bora       15.0   8 301.0 335 3.54 3.570 14.60  0  1    5    8
+Volvo 142E          21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2</code></pre>
+</div>
 </div>
 </div>
 <div class="fragment">
@@ -2085,8 +2094,8 @@ Merc 240D         24.4   4 146.7  62 3.69 3.19 20.00  1  0    4    2</code></pre
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href aria-label="1"></a>mtcars <span class="sc">|&gt;</span></span>
-<span id="cb52-2"><a href aria-label="2"></a>  <span class="fu">select</span>(mpg, cyl, wt)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href aria-label="1"></a>mtcars <span class="sc">|&gt;</span></span>
+<span id="cb50-2"><a href aria-label="2"></a>  <span class="fu">select</span>(mpg, cyl, wt)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -2134,8 +2143,8 @@ Volvo 142E          21.4   4 2.780</code></pre>
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href aria-label="1"></a>mtcars <span class="sc">|&gt;</span></span>
-<span id="cb54-2"><a href aria-label="2"></a>  <span class="fu">mutate</span>(<span class="at">kmpl =</span> mpg <span class="sc">*</span> <span class="fl">0.425</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href aria-label="1"></a>mtcars <span class="sc">|&gt;</span></span>
+<span id="cb52-2"><a href aria-label="2"></a>  <span class="fu">mutate</span>(<span class="at">kmpl =</span> mpg <span class="sc">*</span> <span class="fl">0.425</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -2181,13 +2190,14 @@ Volvo 142E          21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2  9.0950<
 <ul>
 <li class="fragment">The real power of the pipe: <strong>chain multiple operations</strong> in sequence</li>
 <li class="fragment">Read it like a sentence: “Take the data, <em>then</em> filter, <em>then</em> mutate, <em>then</em> select…”</li>
+<li class="fragment">Let’s say we want to compute kilometers for litre only for cars with 4 cylinders, and only keep the MPG, KPML, and WT variables. How do we do this in once statement of code?</li>
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href aria-label="1"></a>mtcars <span class="sc">|&gt;</span></span>
-<span id="cb56-2"><a href aria-label="2"></a>  <span class="fu">filter</span>(cyl <span class="sc">==</span> <span class="dv">4</span>) <span class="sc">|&gt;</span></span>
-<span id="cb56-3"><a href aria-label="3"></a>  <span class="fu">mutate</span>(<span class="at">kmpl =</span> mpg <span class="sc">*</span> <span class="fl">0.425</span>) <span class="sc">|&gt;</span></span>
-<span id="cb56-4"><a href aria-label="4"></a>  <span class="fu">select</span>(mpg, kmpl, wt)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href aria-label="1"></a>mtcars <span class="sc">|&gt;</span></span>
+<span id="cb54-2"><a href aria-label="2"></a>  <span class="fu">filter</span>(cyl <span class="sc">==</span> <span class="dv">4</span>) <span class="sc">|&gt;</span></span>
+<span id="cb54-3"><a href aria-label="3"></a>  <span class="fu">mutate</span>(<span class="at">kmpl =</span> mpg <span class="sc">*</span> <span class="fl">0.425</span>) <span class="sc">|&gt;</span></span>
+<span id="cb54-4"><a href aria-label="4"></a>  <span class="fu">select</span>(mpg, kmpl, wt)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -2210,17 +2220,16 @@ Volvo 142E     21.4  9.0950 2.780</code></pre>
 <section id="saving-your-work-as-a-new-object" class="slide level2 smaller">
 <h2>Saving Your Work as a New Object</h2>
 <ul>
-<li class="fragment">So far, we’ve just been <strong>printing</strong> results to the console</li>
-<li class="fragment">To keep the manipulated data, <strong>save it as a new object</strong> using <code>&lt;-</code></li>
+<li class="fragment">When cleaning data for your analysis using <code>filter()</code>, <code>mutate()</code>, and other functions, it is useful to create a “new” version of the data by assigning it to a new object</li>
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb58"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href aria-label="1"></a><span class="co"># Create a new dataset with only efficient 4-cylinder cars</span></span>
-<span id="cb58-2"><a href aria-label="2"></a>efficient_cars <span class="ot">&lt;-</span> mtcars <span class="sc">|&gt;</span></span>
-<span id="cb58-3"><a href aria-label="3"></a>  <span class="fu">filter</span>(cyl <span class="sc">==</span> <span class="dv">4</span>, mpg <span class="sc">&gt;</span> <span class="dv">25</span>) <span class="sc">|&gt;</span></span>
-<span id="cb58-4"><a href aria-label="4"></a>  <span class="fu">select</span>(mpg, hp, wt)</span>
-<span id="cb58-5"><a href aria-label="5"></a></span>
-<span id="cb58-6"><a href aria-label="6"></a>efficient_cars</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href aria-label="1"></a><span class="co"># Create a new dataset with only efficient 4-cylinder cars</span></span>
+<span id="cb56-2"><a href aria-label="2"></a>efficient_cars <span class="ot">&lt;-</span> mtcars <span class="sc">|&gt;</span></span>
+<span id="cb56-3"><a href aria-label="3"></a>  <span class="fu">filter</span>(cyl <span class="sc">==</span> <span class="dv">4</span>, mpg <span class="sc">&gt;</span> <span class="dv">25</span>) <span class="sc">|&gt;</span></span>
+<span id="cb56-4"><a href aria-label="4"></a>  <span class="fu">select</span>(mpg, hp, wt)</span>
+<span id="cb56-5"><a href aria-label="5"></a></span>
+<span id="cb56-6"><a href aria-label="6"></a>efficient_cars</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -2314,7 +2323,7 @@ Lotus Europa   30.4 113 1.513</code></pre>
 <section id="descriptive-statistics-functions-1" class="slide level2 smaller">
 <h2>Descriptive Statistics Functions</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb60"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href aria-label="1"></a><span class="fu">mean</span>(mtcars<span class="sc">$</span>mpg)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb58"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href aria-label="1"></a><span class="fu">mean</span>(mtcars<span class="sc">$</span>mpg)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -2323,7 +2332,7 @@ Lotus Europa   30.4 113 1.513</code></pre>
 </div>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href aria-label="1"></a><span class="fu">sd</span>(mtcars<span class="sc">$</span>mpg)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb60"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href aria-label="1"></a><span class="fu">sd</span>(mtcars<span class="sc">$</span>mpg)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -2333,7 +2342,7 @@ Lotus Europa   30.4 113 1.513</code></pre>
 </div>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb64"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href aria-label="1"></a><span class="fu">min</span>(mtcars<span class="sc">$</span>mpg)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href aria-label="1"></a><span class="fu">min</span>(mtcars<span class="sc">$</span>mpg)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -2359,7 +2368,7 @@ Lotus Europa   30.4 113 1.513</code></pre>
 </div>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb66"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href aria-label="1"></a><span class="fu">sum</span>(<span class="fu">is.na</span>(airquality<span class="sc">$</span>Ozone))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb64"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href aria-label="1"></a><span class="fu">sum</span>(<span class="fu">is.na</span>(airquality<span class="sc">$</span>Ozone))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -2375,7 +2384,7 @@ Lotus Europa   30.4 113 1.513</code></pre>
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb68"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href aria-label="1"></a><span class="fu">mean</span>(airquality<span class="sc">$</span>Ozone)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb66"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href aria-label="1"></a><span class="fu">mean</span>(airquality<span class="sc">$</span>Ozone)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -2390,7 +2399,7 @@ Lotus Europa   30.4 113 1.513</code></pre>
 </div>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb70"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href aria-label="1"></a><span class="fu">mean</span>(airquality<span class="sc">$</span>Ozone, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb68"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href aria-label="1"></a><span class="fu">mean</span>(airquality<span class="sc">$</span>Ozone, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -2463,12 +2472,12 @@ Lotus Europa   30.4 113 1.513</code></pre>
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb72"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href aria-label="1"></a>mtcars <span class="sc">|&gt;</span></span>
-<span id="cb72-2"><a href aria-label="2"></a>  <span class="fu">summarize</span>(</span>
-<span id="cb72-3"><a href aria-label="3"></a>    <span class="at">mean_mpg =</span> <span class="fu">mean</span>(mpg),</span>
-<span id="cb72-4"><a href aria-label="4"></a>    <span class="at">sd_mpg =</span> <span class="fu">sd</span>(mpg),</span>
-<span id="cb72-5"><a href aria-label="5"></a>    <span class="at">n =</span> <span class="fu">n</span>()</span>
-<span id="cb72-6"><a href aria-label="6"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb70"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href aria-label="1"></a>mtcars <span class="sc">|&gt;</span></span>
+<span id="cb70-2"><a href aria-label="2"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb70-3"><a href aria-label="3"></a>    <span class="at">mean_mpg =</span> <span class="fu">mean</span>(mpg),</span>
+<span id="cb70-4"><a href aria-label="4"></a>    <span class="at">sd_mpg =</span> <span class="fu">sd</span>(mpg),</span>
+<span id="cb70-5"><a href aria-label="5"></a>    <span class="at">n =</span> <span class="fu">n</span>()</span>
+<span id="cb70-6"><a href aria-label="6"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -2476,12 +2485,7 @@ Lotus Europa   30.4 113 1.513</code></pre>
 1 20.09062 6.026948 32</code></pre>
 </div>
 </div>
-</div>
-<div class="fragment">
-<ul>
-<li class="fragment">No matter how big the data frame, <code>summarize()</code> returns a <strong>single row</strong> (unless you group — more on that next)</li>
-<li class="fragment">If your variable has missing values, remember <code>na.rm = TRUE</code>: <code>mean(mpg, na.rm = TRUE)</code></li>
-</ul>
+<p>. . . - Returns, as a single row, the specified descriptive statistics - When computing descriptive statistics with <code>summarize()</code>, you don’t need to use <code>$</code>! - If your variable has missing values, remember <code>na.rm = TRUE</code>: <code>mean(mpg, na.rm = TRUE)</code></p>
 </div>
 </section>
 <section id="group_by-summarize-grouped-summaries" class="slide level2 smaller">
@@ -2489,16 +2493,19 @@ Lotus Europa   30.4 113 1.513</code></pre>
 <ul>
 <li class="fragment"><strong>Purpose:</strong> Split data into groups and summarize each group separately</li>
 <li class="fragment">Pair <code>group_by()</code> with <code>summarize()</code> to get statistics <em>by group</em></li>
+<li class="fragment">A <strong>group</strong> is all the rows that share the same value of the variable in <code>group_by()</code></li>
+<li class="fragment"><code>group_by(cyl)</code> makes 3 groups: cars with 4, 6, or 8 cylinders</li>
+<li class="fragment"><code>summarize()</code> then returns <strong>one row per group</strong></li>
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb74"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href aria-label="1"></a>mtcars <span class="sc">|&gt;</span></span>
-<span id="cb74-2"><a href aria-label="2"></a>  <span class="fu">group_by</span>(cyl) <span class="sc">|&gt;</span></span>
-<span id="cb74-3"><a href aria-label="3"></a>  <span class="fu">summarize</span>(</span>
-<span id="cb74-4"><a href aria-label="4"></a>    <span class="at">mean_mpg =</span> <span class="fu">mean</span>(mpg),</span>
-<span id="cb74-5"><a href aria-label="5"></a>    <span class="at">mean_hp =</span> <span class="fu">mean</span>(hp),</span>
-<span id="cb74-6"><a href aria-label="6"></a>    <span class="at">n =</span> <span class="fu">n</span>()</span>
-<span id="cb74-7"><a href aria-label="7"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb72"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href aria-label="1"></a>mtcars <span class="sc">|&gt;</span></span>
+<span id="cb72-2"><a href aria-label="2"></a>  <span class="fu">group_by</span>(cyl) <span class="sc">|&gt;</span></span>
+<span id="cb72-3"><a href aria-label="3"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb72-4"><a href aria-label="4"></a>    <span class="at">mean_mpg =</span> <span class="fu">mean</span>(mpg),</span>
+<span id="cb72-5"><a href aria-label="5"></a>    <span class="at">mean_hp =</span> <span class="fu">mean</span>(hp),</span>
+<span id="cb72-6"><a href aria-label="6"></a>    <span class="at">n =</span> <span class="fu">n</span>()</span>
+<span id="cb72-7"><a href aria-label="7"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -2511,11 +2518,6 @@ Lotus Europa   30.4 113 1.513</code></pre>
 </div>
 </div>
 </div>
-<div class="fragment">
-<ul>
-<li class="fragment">When computing descriptive statistics with <code>summarize()</code>, you don’t need to use <code>$</code>!</li>
-</ul>
-</div>
 </section>
 <section id="storing-summary-statistics-as-objects" class="slide level2 smaller">
 <h2>Storing Summary Statistics as Objects</h2>
@@ -2525,14 +2527,14 @@ Lotus Europa   30.4 113 1.513</code></pre>
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb76"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href aria-label="1"></a>mpg_by_cyl <span class="ot">&lt;-</span> mtcars <span class="sc">|&gt;</span></span>
-<span id="cb76-2"><a href aria-label="2"></a>  <span class="fu">group_by</span>(cyl) <span class="sc">|&gt;</span></span>
-<span id="cb76-3"><a href aria-label="3"></a>  <span class="fu">summarize</span>(</span>
-<span id="cb76-4"><a href aria-label="4"></a>    <span class="at">mean_mpg =</span> <span class="fu">mean</span>(mpg),</span>
-<span id="cb76-5"><a href aria-label="5"></a>    <span class="at">sd_mpg =</span> <span class="fu">sd</span>(mpg)</span>
-<span id="cb76-6"><a href aria-label="6"></a>  )</span>
-<span id="cb76-7"><a href aria-label="7"></a></span>
-<span id="cb76-8"><a href aria-label="8"></a>mpg_by_cyl</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb74"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href aria-label="1"></a>mpg_by_cyl <span class="ot">&lt;-</span> mtcars <span class="sc">|&gt;</span></span>
+<span id="cb74-2"><a href aria-label="2"></a>  <span class="fu">group_by</span>(cyl) <span class="sc">|&gt;</span></span>
+<span id="cb74-3"><a href aria-label="3"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb74-4"><a href aria-label="4"></a>    <span class="at">mean_mpg =</span> <span class="fu">mean</span>(mpg),</span>
+<span id="cb74-5"><a href aria-label="5"></a>    <span class="at">sd_mpg =</span> <span class="fu">sd</span>(mpg)</span>
+<span id="cb74-6"><a href aria-label="6"></a>  )</span>
+<span id="cb74-7"><a href aria-label="7"></a></span>
+<span id="cb74-8"><a href aria-label="8"></a>mpg_by_cyl</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -2560,8 +2562,8 @@ Lotus Europa   30.4 113 1.513</code></pre>
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb78"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href aria-label="1"></a>mtcars <span class="sc">|&gt;</span></span>
-<span id="cb78-2"><a href aria-label="2"></a>  <span class="fu">count</span>(cyl)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb76"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href aria-label="1"></a>mtcars <span class="sc">|&gt;</span></span>
+<span id="cb76-2"><a href aria-label="2"></a>  <span class="fu">count</span>(cyl)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -2579,8 +2581,8 @@ Lotus Europa   30.4 113 1.513</code></pre>
 </div>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb80"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href aria-label="1"></a>mtcars <span class="sc">|&gt;</span></span>
-<span id="cb80-2"><a href aria-label="2"></a>  <span class="fu">count</span>(cyl, am)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb78"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href aria-label="1"></a>mtcars <span class="sc">|&gt;</span></span>
+<span id="cb78-2"><a href aria-label="2"></a>  <span class="fu">count</span>(cyl, am)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -2606,9 +2608,9 @@ Lotus Europa   30.4 113 1.513</code></pre>
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb82"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href aria-label="1"></a>mtcars <span class="sc">|&gt;</span></span>
-<span id="cb82-2"><a href aria-label="2"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(mpg)) <span class="sc">|&gt;</span></span>
-<span id="cb82-3"><a href aria-label="3"></a>  <span class="fu">select</span>(mpg, cyl, hp)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb80"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href aria-label="1"></a>mtcars <span class="sc">|&gt;</span></span>
+<span id="cb80-2"><a href aria-label="2"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(mpg)) <span class="sc">|&gt;</span></span>
+<span id="cb80-3"><a href aria-label="3"></a>  <span class="fu">select</span>(mpg, cyl, hp)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -2660,7 +2662,7 @@ Lincoln Continental 10.4   8 215</code></pre>
 </div>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb84"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href aria-label="1"></a><span class="fu">summary</span>(mtcars)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb82"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href aria-label="1"></a><span class="fu">summary</span>(mtcars)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -2693,7 +2695,7 @@ Lincoln Continental 10.4   8 215</code></pre>
 <h2>Quick Summary Tools</h2>
 <p><strong><code>glimpse()</code></strong> — shows the structure of your data (variable names, types, and first few values):</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb86"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href aria-label="1"></a><span class="fu">glimpse</span>(mtcars)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb84"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href aria-label="1"></a><span class="fu">glimpse</span>(mtcars)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -2741,8 +2743,8 @@ $ carb &lt;dbl&gt; 4, 4, 1, 1, 2, 1, 4, 2, 2, 4, 4, 3, 3, 3, 4, 4, 4, 1, 2, 1, 1
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb88"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href aria-label="1"></a>mtcars <span class="sc">|&gt;</span></span>
-<span id="cb88-2"><a href aria-label="2"></a>  <span class="fu">summarize</span>(<span class="at">mean_hp =</span> <span class="fu">mean</span>(hp))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb86"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href aria-label="1"></a>mtcars <span class="sc">|&gt;</span></span>
+<span id="cb86-2"><a href aria-label="2"></a>  <span class="fu">summarize</span>(<span class="at">mean_hp =</span> <span class="fu">mean</span>(hp))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -2754,15 +2756,15 @@ $ carb &lt;dbl&gt; 4, 4, 1, 1, 2, 1, 4, 2, 2, 4, 4, 3, 3, 3, 4, 4, 4, 1, 2, 1, 1
 </section>
 <section id="practice-2" class="slide level2 smaller">
 <h2>Practice 2</h2>
-<p><strong>What is the average MPG for cars by the number of gears it has?</strong></p>
+<p>**What is the average MPG (<code>mpg</code>) for cars by for ach number of gears (<code>gear</code>)?</p>
 <ul>
 <li class="fragment"><em>Hint:</em> First <code>group_by()</code> then <code>summarize()</code> and <code>mean()</code></li>
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb90"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href aria-label="1"></a>mtcars <span class="sc">|&gt;</span></span>
-<span id="cb90-2"><a href aria-label="2"></a>  <span class="fu">group_by</span>(gear) <span class="sc">|&gt;</span></span>
-<span id="cb90-3"><a href aria-label="3"></a>  <span class="fu">summarize</span>(<span class="at">mean_mpg =</span> <span class="fu">mean</span>(mpg))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb88"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href aria-label="1"></a>mtcars <span class="sc">|&gt;</span></span>
+<span id="cb88-2"><a href aria-label="2"></a>  <span class="fu">group_by</span>(gear) <span class="sc">|&gt;</span></span>
+<span id="cb88-3"><a href aria-label="3"></a>  <span class="fu">summarize</span>(<span class="at">mean_mpg =</span> <span class="fu">mean</span>(mpg))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -2784,10 +2786,10 @@ $ carb &lt;dbl&gt; 4, 4, 1, 1, 2, 1, 4, 2, 2, 4, 4, 3, 3, 3, 4, 4, 4, 1, 2, 1, 1
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb92"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href aria-label="1"></a>mtcars <span class="sc">|&gt;</span></span>
-<span id="cb92-2"><a href aria-label="2"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(hp)) <span class="sc">|&gt;</span></span>
-<span id="cb92-3"><a href aria-label="3"></a>  <span class="fu">select</span>(mpg, hp, wt) <span class="sc">|&gt;</span></span>
-<span id="cb92-4"><a href aria-label="4"></a>  <span class="fu">head</span>(<span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb90"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href aria-label="1"></a>mtcars <span class="sc">|&gt;</span></span>
+<span id="cb90-2"><a href aria-label="2"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(hp)) <span class="sc">|&gt;</span></span>
+<span id="cb90-3"><a href aria-label="3"></a>  <span class="fu">select</span>(mpg, hp, wt) <span class="sc">|&gt;</span></span>
+<span id="cb90-4"><a href aria-label="4"></a>  <span class="fu">head</span>(<span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -2805,13 +2807,13 @@ Maserati Bora  15 335 3.57</code></pre>
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb94"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href aria-label="1"></a>mtcars <span class="sc">|&gt;</span></span>
-<span id="cb94-2"><a href aria-label="2"></a>  <span class="fu">filter</span>(wt <span class="sc">&lt;</span> <span class="dv">3</span>) <span class="sc">|&gt;</span></span>
-<span id="cb94-3"><a href aria-label="3"></a>  <span class="fu">summarize</span>(</span>
-<span id="cb94-4"><a href aria-label="4"></a>    <span class="at">mean_qsec =</span> <span class="fu">mean</span>(qsec),</span>
-<span id="cb94-5"><a href aria-label="5"></a>    <span class="at">sd_qsec =</span> <span class="fu">sd</span>(qsec),</span>
-<span id="cb94-6"><a href aria-label="6"></a>    <span class="at">n =</span> <span class="fu">n</span>()</span>
-<span id="cb94-7"><a href aria-label="7"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb92"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href aria-label="1"></a>mtcars <span class="sc">|&gt;</span></span>
+<span id="cb92-2"><a href aria-label="2"></a>  <span class="fu">filter</span>(wt <span class="sc">&lt;</span> <span class="dv">3</span>) <span class="sc">|&gt;</span></span>
+<span id="cb92-3"><a href aria-label="3"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb92-4"><a href aria-label="4"></a>    <span class="at">mean_qsec =</span> <span class="fu">mean</span>(qsec),</span>
+<span id="cb92-5"><a href aria-label="5"></a>    <span class="at">sd_qsec =</span> <span class="fu">sd</span>(qsec),</span>
+<span id="cb92-6"><a href aria-label="6"></a>    <span class="at">n =</span> <span class="fu">n</span>()</span>
+<span id="cb92-7"><a href aria-label="7"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -2920,8 +2922,10 @@ Maserati Bora  15 335 3.57</code></pre>
 <ul>
 <li class="fragment">Check your current working directory:</li>
 </ul>
+</div>
+<div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb96"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href aria-label="1"></a><span class="fu">getwd</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb94"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href aria-label="1"></a><span class="fu">getwd</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 <div class="fragment">
@@ -2960,11 +2964,11 @@ Maserati Bora  15 335 3.57</code></pre>
 <h2>Good Coding Practices</h2>
 <p><strong>Use comments extensively</strong> — explain what your code does and <em>why</em></p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb97"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href aria-label="1"></a><span class="co"># Calculate average MPG by number of cylinders</span></span>
-<span id="cb97-2"><a href aria-label="2"></a><span class="co"># We group by cylinders because engine size affects fuel efficiency</span></span>
-<span id="cb97-3"><a href aria-label="3"></a>mtcars <span class="sc">|&gt;</span></span>
-<span id="cb97-4"><a href aria-label="4"></a>  <span class="fu">group_by</span>(cyl) <span class="sc">|&gt;</span></span>
-<span id="cb97-5"><a href aria-label="5"></a>  <span class="fu">summarize</span>(<span class="at">mean_mpg =</span> <span class="fu">mean</span>(mpg))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb95"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb95-1"><a href aria-label="1"></a><span class="co"># Calculate average MPG by number of cylinders</span></span>
+<span id="cb95-2"><a href aria-label="2"></a><span class="co"># We group by cylinders because engine size affects fuel efficiency</span></span>
+<span id="cb95-3"><a href aria-label="3"></a>mtcars <span class="sc">|&gt;</span></span>
+<span id="cb95-4"><a href aria-label="4"></a>  <span class="fu">group_by</span>(cyl) <span class="sc">|&gt;</span></span>
+<span id="cb95-5"><a href aria-label="5"></a>  <span class="fu">summarize</span>(<span class="at">mean_mpg =</span> <span class="fu">mean</span>(mpg))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="fragment">
 <p><strong>Use descriptive variable names</strong></p>
@@ -2978,23 +2982,92 @@ Maserati Bora  15 335 3.57</code></pre>
 <h2>Organizing Your Script</h2>
 <p>A well-organized script has clear sections:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb98"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href aria-label="1"></a><span class="co"># =============================================================</span></span>
-<span id="cb98-2"><a href aria-label="2"></a><span class="co"># Project: Unit 2 Analysis</span></span>
-<span id="cb98-3"><a href aria-label="3"></a><span class="co"># Author: Your Name</span></span>
-<span id="cb98-4"><a href aria-label="4"></a><span class="co"># Date: Whatever today is</span></span>
-<span id="cb98-5"><a href aria-label="5"></a><span class="co"># =============================================================</span></span>
-<span id="cb98-6"><a href aria-label="6"></a></span>
-<span id="cb98-7"><a href aria-label="7"></a><span class="co"># Load packages -------------------------------------------</span></span>
-<span id="cb98-8"><a href aria-label="8"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb98-9"><a href aria-label="9"></a></span>
-<span id="cb98-10"><a href aria-label="10"></a><span class="co"># Load data -----------------------------------------------</span></span>
-<span id="cb98-11"><a href aria-label="11"></a>my_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/my_dataset.csv&quot;</span>)</span>
-<span id="cb98-12"><a href aria-label="12"></a></span>
-<span id="cb98-13"><a href aria-label="13"></a><span class="co"># Clean data ----------------------------------------------</span></span>
-<span id="cb98-14"><a href aria-label="14"></a><span class="co"># ... cleaning code here ...</span></span>
-<span id="cb98-15"><a href aria-label="15"></a></span>
-<span id="cb98-16"><a href aria-label="16"></a><span class="co"># Analysis ------------------------------------------------</span></span>
-<span id="cb98-17"><a href aria-label="17"></a><span class="co"># ... analysis code here ...</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb96"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href aria-label="1"></a><span class="co"># =============================================================</span></span>
+<span id="cb96-2"><a href aria-label="2"></a><span class="co"># Project: Unit 2 Analysis</span></span>
+<span id="cb96-3"><a href aria-label="3"></a><span class="co"># Author: Your Name</span></span>
+<span id="cb96-4"><a href aria-label="4"></a><span class="co"># Date: Whatever today is</span></span>
+<span id="cb96-5"><a href aria-label="5"></a><span class="co"># =============================================================</span></span>
+<span id="cb96-6"><a href aria-label="6"></a></span>
+<span id="cb96-7"><a href aria-label="7"></a><span class="co"># Clear environment ---------------------------------------</span></span>
+<span id="cb96-8"><a href aria-label="8"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>())</span>
+<span id="cb96-9"><a href aria-label="9"></a></span>
+<span id="cb96-10"><a href aria-label="10"></a><span class="co"># Load packages -------------------------------------------</span></span>
+<span id="cb96-11"><a href aria-label="11"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb96-12"><a href aria-label="12"></a></span>
+<span id="cb96-13"><a href aria-label="13"></a><span class="co"># Load data -----------------------------------------------</span></span>
+<span id="cb96-14"><a href aria-label="14"></a>my_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/my_dataset.csv&quot;</span>)</span>
+<span id="cb96-15"><a href aria-label="15"></a></span>
+<span id="cb96-16"><a href aria-label="16"></a><span class="co"># Clean data ----------------------------------------------</span></span>
+<span id="cb96-17"><a href aria-label="17"></a><span class="co"># ... cleaning code here ...</span></span>
+<span id="cb96-18"><a href aria-label="18"></a></span>
+<span id="cb96-19"><a href aria-label="19"></a><span class="co"># Analysis ------------------------------------------------</span></span>
+<span id="cb96-20"><a href aria-label="20"></a><span class="co"># ... analysis code here ...</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="start-with-a-clean-environment" class="slide level2 smaller">
+<h2>Start With a Clean Environment</h2>
+<ul>
+<li class="fragment">Your <strong>environment</strong> is everything R is holding in memory right now — every object you’ve created since R started</li>
+<li class="fragment">After an hour of work it’s full of objects you made in the console, renamed, or abandoned</li>
+</ul>
+<div class="fragment">
+<ul>
+<li class="fragment">The danger: your script runs perfectly <em>for you</em> because it quietly relies on an object that sits in your environment but is <strong>created nowhere in the script</strong></li>
+<li class="fragment">Hand that script to a class and it breaks immediately — or worse, it runs on <em>their</em> leftover object and returns a different answer</li>
+<li class="fragment">Add <code>rm(list = ls())</code> at the top of your script to clear out your environment (i.e., delete all objects)</li>
+</ul>
+</div>
+</section>
+<section id="dont-let-r-save-your-workspace" class="slide level2 smaller">
+<h2>Don’t Let R Save Your Workspace</h2>
+<ul>
+<li class="fragment">By default, RStudio offers to save your environment to an <code>.RData</code> file and reload it the next time you open R</li>
+<li class="fragment">That quietly brings your old objects back — exactly what we’re trying to avoid</li>
+</ul>
+<div class="fragment">
+<p><strong>Turn it off once:</strong> Tools → Global Options → General</p>
+<ul>
+<li class="fragment">Uncheck <strong>“Restore .RData into workspace at startup”</strong></li>
+<li class="fragment">Set <strong>“Save workspace to .RData on exit”</strong> to <strong>Never</strong></li>
+</ul>
+</div>
+</section>
+<section id="running-your-whole-script" class="slide level2 smaller">
+<h2>Running Your Whole Script</h2>
+<ul>
+<li class="fragment">Click <strong>Source</strong> (top-right of the script editor) or press <code>Ctrl/Cmd + Shift + S</code> to run your whole script, top to bottom</li>
+<li class="fragment">If R hits an error, it stops and the rest of the script doesn’t run</li>
+<li class="fragment">Running <strong>line-by-line</strong> (<code>Ctrl/Cmd + Enter</code>) is great for testing code as you write, but it’s easy to skip a line or run lines out of order. <strong>Source</strong> shows whether the whole script works in order.</li>
+</ul>
+<div class="fragment">
+<div class="callout callout-warning callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Where did my output go?</strong></p>
+</div>
+<div class="callout-content">
+<p><strong>Source</strong> runs your code but doesn’t automatically print results like summary tables or <code>ggplot</code> graphs. To see them, click the arrow next to <strong>Source</strong> and choose <strong>Source with Echo</strong> (<code>Ctrl/Cmd + Shift + Enter</code>).</p>
+</div>
+</div>
+</div>
+</div>
+<div class="fragment">
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>The replication test</strong></p>
+</div>
+<div class="callout-content">
+<p><strong>Restart R, then Source your script.</strong> If it runs top to bottom without errors, your results are reproducible. If it errors, you just found a hidden dependency on something in your old environment — better you find it than your reviewer.</p>
+</div>
+</div>
+</div>
 </div>
 </section>
 <section id="the-bottom-line" class="slide level2">
@@ -3083,11 +3156,11 @@ Maserati Bora  15 335 3.57</code></pre>
 <li class="fragment">First, install and load the package:</li>
 </ul>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb99"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb99-1"><a href aria-label="1"></a><span class="co"># Install the package (only need to do this once!)</span></span>
-<span id="cb99-2"><a href aria-label="2"></a><span class="fu">install.packages</span>(<span class="st">&quot;palmerpenguins&quot;</span>)</span>
-<span id="cb99-3"><a href aria-label="3"></a></span>
-<span id="cb99-4"><a href aria-label="4"></a><span class="co"># Load it</span></span>
-<span id="cb99-5"><a href aria-label="5"></a><span class="fu">library</span>(palmerpenguins)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb97"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href aria-label="1"></a><span class="co"># Install the package (only need to do this once!)</span></span>
+<span id="cb97-2"><a href aria-label="2"></a><span class="fu">install.packages</span>(<span class="st">&quot;palmerpenguins&quot;</span>)</span>
+<span id="cb97-3"><a href aria-label="3"></a></span>
+<span id="cb97-4"><a href aria-label="4"></a><span class="co"># Load it</span></span>
+<span id="cb97-5"><a href aria-label="5"></a><span class="fu">library</span>(palmerpenguins)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="the-palmer-penguins-data" class="slide level2 smaller">
@@ -3098,7 +3171,7 @@ Maserati Bora  15 335 3.57</code></pre>
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb100"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href aria-label="1"></a><span class="fu">glimpse</span>(penguins)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb98"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href aria-label="1"></a><span class="fu">glimpse</span>(penguins)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -3123,7 +3196,7 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb102"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href aria-label="1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> penguins)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb100"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href aria-label="1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> penguins)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output-display">
@@ -3147,8 +3220,8 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb103"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb103-1"><a href aria-label="1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> penguins) <span class="sc">+</span></span>
-<span id="cb103-2"><a href aria-label="2"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb101"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb101-1"><a href aria-label="1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> penguins) <span class="sc">+</span></span>
+<span id="cb101-2"><a href aria-label="2"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output-display">
@@ -3176,8 +3249,8 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 <section id="adding-color-by-species" class="slide level2 smaller">
 <h2>Adding Color by Species</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb104"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href aria-label="1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> penguins) <span class="sc">+</span></span>
-<span id="cb104-2"><a href aria-label="2"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g, <span class="at">color =</span> species))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb102"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href aria-label="1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> penguins) <span class="sc">+</span></span>
+<span id="cb102-2"><a href aria-label="2"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g, <span class="at">color =</span> species))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output-display">
@@ -3222,9 +3295,9 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb105"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href aria-label="1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> penguins) <span class="sc">+</span></span>
-<span id="cb105-2"><a href aria-label="2"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g, <span class="at">color =</span> species)) <span class="sc">+</span></span>
-<span id="cb105-3"><a href aria-label="3"></a>  <span class="fu">geom_smooth</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g), <span class="at">method =</span> <span class="st">&quot;lm&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb103"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb103-1"><a href aria-label="1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> penguins) <span class="sc">+</span></span>
+<span id="cb103-2"><a href aria-label="2"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g, <span class="at">color =</span> species)) <span class="sc">+</span></span>
+<span id="cb103-3"><a href aria-label="3"></a>  <span class="fu">geom_smooth</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g), <span class="at">method =</span> <span class="st">&quot;lm&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output-display">
@@ -3245,16 +3318,16 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb106"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb106-1"><a href aria-label="1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> penguins) <span class="sc">+</span></span>
-<span id="cb106-2"><a href aria-label="2"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g, <span class="at">color =</span> species)) <span class="sc">+</span></span>
-<span id="cb106-3"><a href aria-label="3"></a>  <span class="fu">geom_smooth</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g), <span class="at">method =</span> <span class="st">&quot;lm&quot;</span>) <span class="sc">+</span></span>
-<span id="cb106-4"><a href aria-label="4"></a>  <span class="fu">labs</span>(</span>
-<span id="cb106-5"><a href aria-label="5"></a>    <span class="at">title =</span> <span class="st">&quot;Body Mass and Flipper Length&quot;</span>,</span>
-<span id="cb106-6"><a href aria-label="6"></a>    <span class="at">x =</span> <span class="st">&quot;Flipper Length (mm)&quot;</span>,</span>
-<span id="cb106-7"><a href aria-label="7"></a>    <span class="at">y =</span> <span class="st">&quot;Body Mass (g)&quot;</span>,</span>
-<span id="cb106-8"><a href aria-label="8"></a>    <span class="at">color =</span> <span class="st">&quot;Species&quot;</span></span>
-<span id="cb106-9"><a href aria-label="9"></a>  ) <span class="sc">+</span></span>
-<span id="cb106-10"><a href aria-label="10"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb104"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href aria-label="1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> penguins) <span class="sc">+</span></span>
+<span id="cb104-2"><a href aria-label="2"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g, <span class="at">color =</span> species)) <span class="sc">+</span></span>
+<span id="cb104-3"><a href aria-label="3"></a>  <span class="fu">geom_smooth</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm, <span class="at">y =</span> body_mass_g), <span class="at">method =</span> <span class="st">&quot;lm&quot;</span>) <span class="sc">+</span></span>
+<span id="cb104-4"><a href aria-label="4"></a>  <span class="fu">labs</span>(</span>
+<span id="cb104-5"><a href aria-label="5"></a>    <span class="at">title =</span> <span class="st">&quot;Body Mass and Flipper Length&quot;</span>,</span>
+<span id="cb104-6"><a href aria-label="6"></a>    <span class="at">x =</span> <span class="st">&quot;Flipper Length (mm)&quot;</span>,</span>
+<span id="cb104-7"><a href aria-label="7"></a>    <span class="at">y =</span> <span class="st">&quot;Body Mass (g)&quot;</span>,</span>
+<span id="cb104-8"><a href aria-label="8"></a>    <span class="at">color =</span> <span class="st">&quot;Species&quot;</span></span>
+<span id="cb104-9"><a href aria-label="9"></a>  ) <span class="sc">+</span></span>
+<span id="cb104-10"><a href aria-label="10"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output-display">
@@ -3275,12 +3348,12 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb107"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href aria-label="1"></a><span class="fu">ggplot</span>(penguins) <span class="sc">+</span></span>
-<span id="cb107-2"><a href aria-label="2"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">x =</span> body_mass_g), <span class="at">binwidth =</span> <span class="dv">200</span>,</span>
-<span id="cb107-3"><a href aria-label="3"></a>                 <span class="at">fill =</span> <span class="st">&quot;steelblue&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
-<span id="cb107-4"><a href aria-label="4"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Distribution of Penguin Body Mass&quot;</span>,</span>
-<span id="cb107-5"><a href aria-label="5"></a>       <span class="at">x =</span> <span class="st">&quot;Body Mass (g)&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Count&quot;</span>) <span class="sc">+</span></span>
-<span id="cb107-6"><a href aria-label="6"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb105"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href aria-label="1"></a><span class="fu">ggplot</span>(penguins) <span class="sc">+</span></span>
+<span id="cb105-2"><a href aria-label="2"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">x =</span> body_mass_g), <span class="at">binwidth =</span> <span class="dv">200</span>,</span>
+<span id="cb105-3"><a href aria-label="3"></a>                 <span class="at">fill =</span> <span class="st">&quot;steelblue&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb105-4"><a href aria-label="4"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Distribution of Penguin Body Mass&quot;</span>,</span>
+<span id="cb105-5"><a href aria-label="5"></a>       <span class="at">x =</span> <span class="st">&quot;Body Mass (g)&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Count&quot;</span>) <span class="sc">+</span></span>
+<span id="cb105-6"><a href aria-label="6"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output-display">
@@ -3394,11 +3467,11 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb108"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb108-1"><a href aria-label="1"></a><span class="fu">ggplot</span>(penguins) <span class="sc">+</span></span>
-<span id="cb108-2"><a href aria-label="2"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm), <span class="at">binwidth =</span> <span class="dv">5</span>,</span>
-<span id="cb108-3"><a href aria-label="3"></a>                 <span class="at">fill =</span> <span class="st">&quot;steelblue&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
-<span id="cb108-4"><a href aria-label="4"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Flipper Length (mm)&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Count&quot;</span>) <span class="sc">+</span></span>
-<span id="cb108-5"><a href aria-label="5"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb106"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb106-1"><a href aria-label="1"></a><span class="fu">ggplot</span>(penguins) <span class="sc">+</span></span>
+<span id="cb106-2"><a href aria-label="2"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">x =</span> flipper_length_mm), <span class="at">binwidth =</span> <span class="dv">5</span>,</span>
+<span id="cb106-3"><a href aria-label="3"></a>                 <span class="at">fill =</span> <span class="st">&quot;steelblue&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb106-4"><a href aria-label="4"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Flipper Length (mm)&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Count&quot;</span>) <span class="sc">+</span></span>
+<span id="cb106-5"><a href aria-label="5"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output-display">
@@ -3419,10 +3492,10 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb109"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb109-1"><a href aria-label="1"></a><span class="fu">ggplot</span>(penguins) <span class="sc">+</span></span>
-<span id="cb109-2"><a href aria-label="2"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> bill_length_mm, <span class="at">y =</span> bill_depth_mm)) <span class="sc">+</span></span>
-<span id="cb109-3"><a href aria-label="3"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Bill Length (mm)&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Bill Depth (mm)&quot;</span>) <span class="sc">+</span></span>
-<span id="cb109-4"><a href aria-label="4"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb107"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href aria-label="1"></a><span class="fu">ggplot</span>(penguins) <span class="sc">+</span></span>
+<span id="cb107-2"><a href aria-label="2"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> bill_length_mm, <span class="at">y =</span> bill_depth_mm)) <span class="sc">+</span></span>
+<span id="cb107-3"><a href aria-label="3"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Bill Length (mm)&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Bill Depth (mm)&quot;</span>) <span class="sc">+</span></span>
+<span id="cb107-4"><a href aria-label="4"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output-display">
@@ -3443,10 +3516,10 @@ $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb110"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb110-1"><a href aria-label="1"></a><span class="fu">ggplot</span>(penguins) <span class="sc">+</span></span>
-<span id="cb110-2"><a href aria-label="2"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> bill_length_mm, <span class="at">y =</span> bill_depth_mm, <span class="at">color =</span> species)) <span class="sc">+</span></span>
-<span id="cb110-3"><a href aria-label="3"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Bill Length (mm)&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Bill Depth (mm)&quot;</span>, <span class="at">color =</span> <span class="st">&quot;Species&quot;</span>) <span class="sc">+</span></span>
-<span id="cb110-4"><a href aria-label="4"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb108"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb108-1"><a href aria-label="1"></a><span class="fu">ggplot</span>(penguins) <span class="sc">+</span></span>
+<span id="cb108-2"><a href aria-label="2"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> bill_length_mm, <span class="at">y =</span> bill_depth_mm, <span class="at">color =</span> species)) <span class="sc">+</span></span>
+<span id="cb108-3"><a href aria-label="3"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Bill Length (mm)&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Bill Depth (mm)&quot;</span>, <span class="at">color =</span> <span class="st">&quot;Species&quot;</span>) <span class="sc">+</span></span>
+<span id="cb108-4"><a href aria-label="4"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output-display">
