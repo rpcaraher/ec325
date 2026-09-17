@@ -32,40 +32,62 @@ library(tidyverse)
 
 - In Unit 1, we discussed how econometrics focuses on identifying **causal effects** rather than mere correlations
 
-- People with health insurance tend to be healthier than people without it
-
-. . .
-
-- This correlation is undeniable
-
 
 ## The Problem with Simple Comparisons {.smaller}
 
-- Suppose you conduct a survey and ask people if they believe they are in "good health"
-- For those with insurance, 70% report having good health
-- For those without insurance, only 40% report having good health
+- Let's say you want to study the effect of health insurance on health outcomes
+- You decide to conduct a survey and ask people to rate their health on a scale of 1 (bad) to 5 (excellent) and ask if they have health insurance
+- After you tabulate your survey, you get the following results:
 
 . . .
 
-- But can we interpret this as evidence that insurance *causes* better health?
+| Insurance status | Average self-reported health |
+|:-----------------|:----------------------------:|
+| Insured          | 4.2                          |
+| Uninsured        | 3.5                          |
+
+- A natural way to compare the two groups is to take the **difference** in their average health:
+
+. . .
+
+
+| Insurance status | Average self-reported health |
+|:-----------------|:----------------------------:|
+| Insured          | 4.2                          |
+| Uninsured        | 3.5                          |
+| **Difference**   | **0.7**                      |
+
+## The Problem with Simple Comparisons {.smaller}
+
+- This comparison suggests that health insurance increases health outcomes by 0.7
+- But can we interpret this "effect" as evidence that insurance *causes* better health?
 - People who have health insurance differ from those who don't in many ways **beyond** just their insurance status
-  - May also be **wealthier**, **educated**, and have **stable employment**
+  - May also be **wealthier**, **more educated**, and have **stable employment**
+  - We call these **confounding variables**
+  - These factors **independently affect health outcomes and insurance status**
 
-. . .
-
-- All of these factors independently affect health outcomes
-
-## Apples to Oranges
+## Apples to Oranges {.smaller}
 
 - When we compare two groups of people, insured vs. uninsured, we're not just comparing the effect of insurance
 
 - We're comparing people who differ along **many dimensions**
+
+- This is an example of what we call **Selection Bias**
 
 . . .
 
 ::: {.callout-note}
 ## Selection Bias
 **Selection bias** occurs when we compare groups that differ systematically in ways beyond just the treatment we're studying. In other words, we are comparing **apples to oranges**.
+:::
+
+. . .
+
+::: {.callout-note}
+## Confounding
+**Confounding** is a specific type of selection bias. A **confounding variable** is one that independently affects *both* who ends up in the treatment group *and* the outcome we measure.
+
+Income is a confounder here: it affects both who can afford insurance **and** how healthy someone is.
 :::
 
 ## What We Really Want
@@ -78,22 +100,44 @@ library(tidyverse)
 
 - This is the essence of *ceteris paribus*: **all else being equal**
 
+- If we *can somehow* compare apples-to-apples groups, then the average difference in our outcome between the two groups *can be interpreted* as a causal effect
+
 - The difference between treated and untreated units reveals the causal effect of treatment
 
-## Discussion: Can You Think of Other Examples? {.smaller}
+## Class Activity: Spot the Selection Bias {.smaller .nonincremental}
 
-::: {.callout-tip}
-## Discussion Question
-Think of another example where a simple comparison between two groups might be misleading. What factors might differ between the groups beyond the treatment?
+::: {.callout-note icon=false}
+## 🤔 Think-Pair-Share
 :::
+
+**Think (2 min):** Come up with your own comparison in two pieces:
+
+| | Your example |
+|:---|:---|
+| **Treatment** -- the thing that differs between groups you care about | *having health insurance* |
+| **Outcome** -- what you would measure | *self-reported health, 1-5* |
 
 . . .
 
-Some examples:
+**Pair (3 min):** Trade examples with a neighbor. Together, think through possible **confounding variables** (i.e., factors that independently affect *both* who ends up in each group *and* the outcome you are measuring)
 
-- College graduates vs. non-graduates (wages) -- differ in motivation, family background, innate ability
-- People who exercise vs. those who don't (health) -- differ in income, education, baseline health
-- Schools with small class sizes vs. large (test scores) -- differ in funding, location, student demographics
+. . .
+
+**Share:** We will put a few on the board.
+
+## Class Activity: Some Examples {.smaller}
+
+| Comparison | Outcome | The groups also differ in... |
+|:---|:---|:---|
+| College grads vs. non-grads | Wages | Motivation, family background, prior ability |
+| Exercisers vs. non-exercisers | Health | Income, education, baseline health |
+| Small vs. large class sizes | Test scores | School funding, location, student demographics |
+
+. . .
+
+- In all three, the treated group was **already better off** before treatment
+- So the simple difference **overstates** the causal effect
+
 
 ## The Core Challenge
 
@@ -224,13 +268,13 @@ Drug companies conduct a **Randomized Control Trial** (RCT):
 
 . . .
 
-- The difference in average outcomes can this be interpreted as the **causal effect** of the treatment
+- In this experimental setting, *now* the simple difference in average outcomes can be interpreted as the **causal effect** of the treatment
 
-## The Key Insight
+## Why Randomization Works
 
 ::: {.callout-important}
 ## Why Randomization Works
-Random assignment ensures that, on average, the treatment and control groups have **identical characteristics** -- both observed and unobserved. Any difference in outcomes can therefore be attributed to the treatment itself.
+Random assignment ensures that, **on average**, the treatment and control groups have **identical characteristics** -- both observed and unobserved. Any difference in outcomes can therefore be attributed to the treatment itself.
 :::
 
 . . .
@@ -243,8 +287,8 @@ Random assignment ensures that, on average, the treatment and control groups hav
 
 . . .
 
-- **Bad approach:** Compare students who signed up for tutoring vs. those who didn't
-  - Problem: students who sign up may be more motivated or struggling more
+- **Bad approach:** Compare average test scores for students who signed up for tutoring vs. those who didn't
+  - Problem: students who sign up may be more motivated, or may be struggling more
 
 . . .
 
@@ -282,7 +326,7 @@ Random assignment ensures that, on average, the treatment and control groups hav
 
 . . .
 
-- Formally, if $Y_1, Y_2, ..., Y_n$ are i.i.d. random variables with mean $\mu$:
+- Formally, if $Y_1, Y_2, ..., Y_n$ are i.i.d. random numbers with mean $\mu$:
 
 . . .
 
@@ -303,7 +347,7 @@ $$\mu = \frac{1 + 2 + 3 + 4 + 5 + 6}{6} = 3.5$$
 
 . . .
 
-- If we roll once or twice, we might be far from 3.5
+- If we roll once or twice, our average might be far from 3.5
 
 - But what if we roll many, many times?
 
@@ -525,14 +569,15 @@ dat <- tibble(
 dat |>
   group_by(attended_oh) |>
   summarize(
-    avg_study = mean(study_hours),
-    avg_score = mean(test_score)
+    avg_score = mean(test_score),
+    avg_study = mean(study_hours)
   )
 ```
 
 . . .
 
-- Students who attended office hours study more **and** score higher
+- Difference in means between the 2 groups suggests an "effect" on test scores of about 15
+- But students who attended office hours also studied more!
 - Even though office hours have **zero** causal effect!
 - This is **selection bias**: studious students selected into office hours
 
@@ -571,10 +616,6 @@ last(example$value)
 
 ## Random Assignment: N = 20 {.smaller}
 
-::: {.callout-note icon=false}
-## 🖥️ Try it yourself!
-:::
-
 ```{r}
 #| echo: true
 
@@ -595,7 +636,7 @@ group_means <- sample_data |>
 group_means
 ```
 
-## Difference in Means: N = 20 {.smaller}
+. . .
 
 ```{r}
 #| echo: true
@@ -603,14 +644,15 @@ group_means
 # Difference: Treated (last row) minus Control (first row)
 group_means |>
   summarize(
-    diff_study = last(avg_study) - first(avg_study),
-    diff_score = last(avg_score) - first(avg_score)
+    diff_score = last(avg_score) - first(avg_score),
+    diff_study = last(avg_study) - first(avg_study)
   )
 ```
 
 . . .
 
 - With only 20 people, the difference in test scores is **far from zero**
+- Also see differences remain in confounding variable
 - A small sample can give a misleading result!
 
 ## Random Assignment: N = 2000 {.smaller}
@@ -702,7 +744,7 @@ $$\kappa_i = Y_{1i} - Y_{0i}$$
 
 ## Connecting to the Multiverse
 
-- This framework captures the "multiverse" intuition:
+- This framework captures the "multiverse" intuition, where Morty is person $i$:
 
 . . .
 
@@ -736,11 +778,11 @@ We can never observe both potential outcomes for the same individual. The counte
 
 . . .
 
-$$D_i = \begin{cases} 1 & \text{if individual } i \text{ is treated} \\ 0 & \text{otherwise} \end{cases}$$
+$$D_i = \begin{cases} 1 & \text{if individual } i \text{ is in the treatment group} \\ 0 & \text{otherwise} \end{cases}$$
 
 . . .
 
-- What we actually observe:
+- Call what we actually observe $Y_i$ (drop the first subscript):
 
 . . .
 
@@ -748,11 +790,11 @@ $$Y_i = D_i \cdot Y_{1i} + (1 - D_i) \cdot Y_{0i}$$
 
 . . .
 
-- We observe the treated outcome for treated individuals and the untreated outcome for untreated individuals -- but **never both**
+- We observe the treated outcome for treated individuals ($Y_i = Y_{1i}$ and the untreated outcome for untreated individuals ($Y_i = Y_{0i}$)
 
 ## The Simple Difference in Means {.smaller}
 
-- Suppose we compare average outcomes between treated and untreated:
+- Suppose we compare average outcomes between treated and untreated groups:
 
 . . .
 
@@ -770,13 +812,75 @@ $$E[Y_{1i} | D_i = 1] - E[Y_{0i} | D_i = 0]$$
 
 - Is this the causal effect? **Not necessarily!**
 
-## The Selection Bias Decomposition {.smaller}
+## Reading the Terms We Have {.smaller}
 
-- Add and subtract the counterfactual term $E[Y_{0i} | D_i = 1]$:
+- Before doing any algebra, let's make sure we can say each term **out loud**
 
 . . .
 
-$$E[Y_{1i} | D_i = 1] - E[Y_{0i} | D_i = 0]$$
+1. $E[Y_{1i} | D_i = 1]$: the average **treated** outcome, among people who **were in treatment group**
+
+    - Average health of the **insured** group ($D_i = 1$), *with* their insurance: **4.2**
+    - We **observe** this
+
+. . .
+
+2. $E[Y_{0i} | D_i = 0]$: the average **untreated** outcome, among people who **were not treatment group**
+
+    - Average health of the **uninsured** group ($D_i = 0$), *without* insurance: **3.5**
+    - We **observe** this too
+
+
+## A Term We *Cannot* Observe {.smaller}
+
+- Now add a new term: $E[Y_{0i} | D_i = 1]$
+
+. . .
+
+- Read it carefully -- the two subscripts do **different jobs**:
+  - $D_i = 1$ tells us **which people**: the insured group/treatment group
+  - $Y_{0i}$ tells us **which world**: the outcome where they have no insurance/untreated outcome
+
+. . .
+
+- In plain English: *how healthy would the insured group of people be if they had never gotten insurance?*
+
+. . .
+
+::: {.callout-warning}
+## This number does not exist in our data
+Insured people **have** insurance. We never see them in the untreated world, so $E[Y_{0i} | D_i = 1]$ is the **missing counterfactual** -- the Fundamental Problem again.
+:::
+
+## Which Averages Do We Actually See? {.smaller}
+
+- Two groups $\times$ two potential outcomes = four averages, but we only ever see **two**:
+
+. . .
+
+|                              | **Health *with* insurance** $(Y_{1i})$ | **Health *without* insurance** $(Y_{0i})$ |
+|:-----------------------------|:--------------------------------------:|:-----------------------------------------:|
+| **Insured Group** $(D_i = 1)$      | $E[Y_{1i} \mid D_i = 1] = 4.2$         | $E[Y_{0i} \mid D_i = 1] = \; ?$           |
+| **Uninsured Group** $(D_i = 0)$    | $E[Y_{1i} \mid D_i = 0] = \; ?$        | $E[Y_{0i} \mid D_i = 0] = 3.5$            |
+
+. . .
+
+- The **diagonal** is what our survey measured; the **off-diagonal** cells are counterfactual
+
+
+## The Selection Bias Decomposition {.smaller}
+
+- Take the difference we *can* compute, $E[Y_{1i} | D_i = 1] - E[Y_{0i} | D_i = 0]$, and **add and subtract** the counterfactual $E[Y_{0i} | D_i = 1]$
+
+- This changes **nothing** -- the two new terms cancel:
+
+. . .
+
+$$E[Y_{1i} | D_i = 1] \underbrace{- E[Y_{0i} | D_i = 1] + E[Y_{0i} | D_i = 1]}_{\text{cancels to } 0} - E[Y_{0i} | D_i = 0]$$
+
+. . .
+
+- But now **regroup** the four terms into two pairs:
 
 . . .
 
@@ -789,6 +893,10 @@ $$= \underbrace{E[Y_{1i} | D_i = 1] - E[Y_{0i} | D_i = 1]}_{\text{Causal effect 
 
 $$\underbrace{E[Y_i | D_i = 1] - E[Y_i | D_i = 0]}_{\text{Observed difference}} = \underbrace{\kappa}_{\text{Causal effect}} + \underbrace{E[Y_{0i} | D_i = 1] - E[Y_{0i} | D_i = 0]}_{\text{Selection bias}}$$
 :::
+
+. . .
+
+- Same result as the last slide, now written with $Y_i$ (what we **observe**) and $\kappa$ (the causal effect for the treatment group)
 
 . . .
 
@@ -815,7 +923,11 @@ $$\underbrace{E[Y_i | D_i = 1] - E[Y_i | D_i = 0]}_{\text{Observed difference}} 
 
 . . .
 
-- By the LLN, their average potential outcomes converge:
+- Assignment is a **coin flip**, so which group you land in tells us **nothing** about your potential outcomes
+
+. . .
+
+- So, by the LLN, their average potential outcomes converge (assume $N$ is large enough):
 
 . . .
 
@@ -836,7 +948,7 @@ $$\begin{aligned}
 
 . . .
 
-- **With random assignment, the simple difference in means equals the causal effect!**
+- **We have formally shown how the simple difference in means equals the causal effect with random assignment!**
 
 ## Summary of the Framework
 
@@ -887,15 +999,8 @@ $$\begin{aligned}
 
 . . .
 
-- The comparison between winners and losers provides a **valid causal estimate** of the effect of health insurance
+- This means the comparison between winners and losers provides a **valid causal estimate** of the effect of health insurance, *free from the selection bias that plagues observational studies*
 
-. . .
-
-- Free from the selection bias that plagues observational studies
-
-. . .
-
-- This is exactly the logic of an RCT -- applied to a major policy question!
 
 ## Using the OHIE Data
 
@@ -952,7 +1057,7 @@ person_id,treatment,female,race
 
 - Knowing that `treatment` is binary (1 = lottery winner, 0 = not selected) and that missing values are coded as `NA` saves you a lot of confusion later
 
-## Working Directories: A Quick Note {.smaller}
+## Working Directories: A Quick Reminder {.smaller}
 
 - When R reads a file, it looks for it **relative to the working directory**
 
@@ -965,11 +1070,10 @@ person_id,treatment,female,race
 If you cloned the course repository with Git and opened the `.Rproj` file, your working directory is **automatically** set to the project root. You can verify this with `getwd()`.
 :::
 
-. . .
-
-- This means you can use **relative paths** like `"data/ohie/ohie_sample.csv"` instead of long absolute paths
 
 - If your working directory is wrong, `read_csv()` won't find the file!
+
+- It also means you automatically already have the data!
 
 ## Introducing `read_csv()` {.smaller}
 
@@ -1018,23 +1122,10 @@ ohie <- read_csv("data/ohie/ohie_sample.csv")
 - `read_csv()` prints a **column specification** telling you what type each variable was read as
   - `col_double()` = numeric, `col_character()` = text
 
-## First Look: `head()` and `glimpse()` {.smaller}
-
-::: {.callout-note icon=false}
-## 🖥️ Try it yourself!
-:::
-
-- `head()` shows the first few rows:
-
-```{r}
-#| echo: true
-
-head(ohie)
-```
 
 ## First Look: `glimpse()` {.smaller}
 
-- `glimpse()` gives a compact overview of every column:
+- Remember `glimpse()` gives a compact overview of every column:
 
 ```{r}
 #| echo: true
