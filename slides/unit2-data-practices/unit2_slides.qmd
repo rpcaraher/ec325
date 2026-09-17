@@ -730,7 +730,7 @@ mtcars |>
 #| output-location: fragment
 
 mtcars |>
-  filter(cyl == 4, mpg > 25)
+  filter(gear == 5, mpg > 25)
 ```
 
 
@@ -960,15 +960,10 @@ When might data be missing in a non-random way?
 - **Student evaluations**: Students who dropped the course don't fill them out
   - Evaluations only reflect students who stayed
 
-## Systematically Missing Data {.smaller}
+. . .
 
 - **Takeaway**: Always ask *why* data might be missing
 - If missingness is related to the outcome you're studying, simple fixes like `na.rm = TRUE` can give misleading results
-
-. . .
-
-- Advanced methods exist to handle this (multiple imputation, selection models)
-- For now, just be aware of the issue!
 
 ## `summarize()`: Compute Summary Statistics {.smaller}
 
@@ -991,6 +986,7 @@ mtcars |>
 ```
 
 . . .
+
 - Returns, as a single row, the specified descriptive statistics
 - When computing descriptive statistics with `summarize()`, you don't need to use `$`!
 - If your variable has missing values, remember `na.rm = TRUE`: `mean(mpg, na.rm = TRUE)`
