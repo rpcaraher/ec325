@@ -59,11 +59,10 @@ library(tidyverse)
 
 ## The Problem with Simple Comparisons {.smaller}
 
-- This comparison suggests that health insurance increases health outcomes by 0.7
+- This comparison suggests that health insurance increases self-reported health by 0.7 points
 - But can we interpret this "effect" as evidence that insurance *causes* better health?
 - People who have health insurance differ from those who don't in many ways **beyond** just their insurance status
   - May also be **wealthier**, **more educated**, and have **stable employment**
-  - We call these **confounding variables**
   - These factors **independently affect health outcomes and insurance status**
 
 ## Apples to Oranges {.smaller}
@@ -193,39 +192,43 @@ Income is a confounder here: it affects both who can afford insurance **and** ho
 
 ## The Fundamental Problem
 
-- Of course, the fundamental problem is that **we don't have a portal gun**
+- The catch: **we don't have a portal gun**
 
 . . .
 
-- We only observe **one** version of reality, not parallel universes
+- We only ever see **one** version of each person: Morty *with* college, or Morty *without* -- never both
 
 . . .
 
-- We can never observe both what happened AND what *would have* happened
+- So the *ceteris paribus* comparison we want can never be observed
 
 ## The Counterfactual
 
+- In other words, we can never observe the perfect **counterfactual** for our treated individual
+
+. . .
+
 ::: {.callout-important}
 ## Definition
-The **counterfactual** is the unobserved "what if" scenario -- what would have happened to an individual under the alternative treatment status.
+What *would have happened* to the **same person/unit** under the alternative treatment status.
 :::
 
 . . .
 
-- For a college graduate: what would their wage have been if they had NOT gone to college?
-- For a non-graduate: what would their wage have been if they HAD gone to college?
+- We observe a college graduate's actual wage
+- Their counterfactual: what they *would have* earned had they **not** gone to college
 
 . . .
 
-- We can **never** directly observe counterfactuals
+- Every causal question needs a counterfactual to compare outcomes -- but the ideal version is always **missing** in reality
 
 ## So What Do We Do?
 
-- We need another way to make valid causal comparisons **without** a portal gun
+- We need another way to make valid comparisons that can be considered causal **without** a portal gun
 
 . . .
 
-- The solution that comes closest to achieving *ceteris paribus* conditions in the real world:
+- The solution that comes closest to achieving *ceteris paribus/apples-to-apples* conditions in the real world:
 
 . . .
 
@@ -281,26 +284,6 @@ Random assignment ensures that, **on average**, the treatment and control groups
 
 - Random assignment **eliminates selection bias**
 
-## A Simple Example {.smaller}
-
-- Suppose we want to know: does a tutoring program improve test scores?
-
-. . .
-
-- **Bad approach:** Compare average test scores for students who signed up for tutoring vs. those who didn't
-  - Problem: students who sign up may be more motivated, or may be struggling more
-
-. . .
-
-- **RCT approach:**
-  1. Sample 200 students
-  2. Randomly assign 100 to tutoring, 100 to no tutoring
-  3. Compare average test scores by finding the difference in average test scores 
-
-. . .
-
-- Because assignment was random, the groups are comparable on average!
-
 ## But Why "On Average"?
 
 - We said randomization makes groups identical **"on average"**
@@ -322,11 +305,11 @@ Random assignment ensures that, **on average**, the treatment and control groups
 
 ## The Law of Large Numbers (LLN)
 
-- The **Law of Large Numbers** states that as the sample size increases, the sample average converges to the population average
+- The **Law of Large Numbers** states that as the sample size increases, the sample average converges to the true, underlying population average
 
 . . .
 
-- Formally, if $Y_1, Y_2, ..., Y_n$ are i.i.d. random numbers with mean $\mu$:
+- Formally, if $Y_1, Y_2, ..., Y_n$ are i.i.d. random variables with population mean $\mu$:
 
 . . .
 
@@ -368,7 +351,7 @@ sample(x, size, replace = TRUE)
 
 - `x` = the values to choose from (e.g., `c(1, 2, 3, 4, 5, 6)`)
 - `size` = how many values to pick
-- `replace = TRUE` means the same value can be picked again
+- `replace = TRUE` means the same value can be picked again after it is chosen once. We usually want this argument to be `TRUE`.
 
 ## Simulating Dice Rolls in R {.smaller}
 
@@ -387,8 +370,11 @@ sample(x, size, replace = TRUE)
 ```{r}
 #| output-location: fragment
 
+# Create a vector which contains the possible outcomes of a dice roll
 dice <- c(1, 2, 3, 4, 5, 6)
+# "Roll" to dice once by randomly selecting 1 number from our dice vector
 roll_1 <- sample(dice, size = 1, replace = TRUE)
+# Print the outcome of our roll
 roll_1
 ```
 
@@ -404,8 +390,9 @@ roll_1
 
 ```{r}
 #| output-location: fragment
-
+# "Roll" to dice 5 times by randomly selecting 1 number from our dice vector 5 times
 roll_5 <- sample(dice, size = 5, replace = TRUE)
+# sample() will store those 5 rolls in a vector
 roll_5
 ```
 
@@ -413,13 +400,13 @@ roll_5
 
 ```{r}
 #| output-location: fragment
-
+# Find the mean of our sample of rolls -- is it close to the population mean?
 mean(roll_5)
 ```
 
 . . .
 
-- With 5 rolls, our average is a little closer to the expected value
+- With 5 rolls, our average is maybe a  little closer to the expected value
 
 ## Rolling More Times {.smaller}
 
@@ -483,7 +470,14 @@ The LLN is why randomization eliminates selection bias: with large enough sample
 
 . . .
 
-- Let's see this directly with a simulation...
+- Let's see this directly with a **simulation**...
+
+. . .
+
+::: {.callout-note}
+## What is a Simulation?
+A **simulation** is an experiment run on the computer, where we generate artificial data according to rules *we* choose. Because we built the data ourselves, we know the **true** causal effect -- so we can check whether a method actually recovers it.
+:::
 
 
 # Seeing Randomization Work
@@ -495,14 +489,15 @@ Imagine we want to know: **do extra office hours improve test scores?**
 - 5,000 students with different **weekly study hours** (1 to 10)
 - **Test score** depends on study habits: more studying → higher score
 - Students who study more also **attend office hours** more (NOT random!)
-
-. . .
-
 - The **true causal effect** of office hours = **zero**
 
 . . .
 
-- But because studious students self-select into office hours, a naive comparison will be **misleading**
+- Will a comparison of average test scores between students who went to office hours and those that did not yield a valid causal estimate?
+
+- **No!** There is **selection bias** since students who study more are more likely to go to office hours
+
+- Because studious students self-select into office hours, a naive comparison will be **misleading**
 
 ## New Function: `ifelse()` {.smaller}
 
@@ -530,11 +525,9 @@ ifelse(x > 5, "high", "low")
 
 ## Creating the Population {.smaller}
 
-::: {.callout-note icon=false}
-## 🖥️ Try it yourself!
-:::
+Let's take a look at this simulation code
 
-Copy-paste this into a new R script!
+. . .
 
 ```{r}
 #| echo: true
@@ -657,11 +650,10 @@ group_means |>
 
 ## Random Assignment: N = 2000 {.smaller}
 
-::: {.callout-note icon=false}
-## 🖥️ Try it yourself!
-:::
 
-Just change `n_sample` and re-run:
+Change `n_sample` and re-run:
+
+. . .
 
 ```{r}
 #| echo: true
@@ -681,6 +673,10 @@ group_means <- sample_data |>
   )
 group_means
 ```
+
+. . .
+
+- `set.seed()` makes sure we get the same "random" result every time we run this code!
 
 ## Random Assignment: N = 2000 {.smaller}
 
@@ -1199,31 +1195,24 @@ Let's put everything together with some practice exercises. Give each one a try 
 
 ## Practice 2 {.smaller}
 
-**For each scenario, identify the likely direction of selection bias (positive, negative, or ambiguous):**
+**Random assignment makes the treatment and control groups comparable *on average* -- but in any one sample, the two groups can still differ by chance. What problem does the Law of Large Numbers solve?**
 
 . . .
 
-a. Effect of private school on test scores (parents who choose private school are wealthier and more involved)
+::: {.nonincremental}
+a. It fixes selection bias in *any* comparison -- random or not -- as long as the sample is large enough
+b. It lets us observe both potential outcomes for the same individual
+c. It guarantees that randomly assigned groups have the **same average characteristics**, as long as the sample is large enough
+d. It guarantees that the causal effect is the same size for every individual
+:::
 
 . . .
 
-- *Positive* -- overstates the causal effect
+*Answer:* **c.** Random assignment makes any difference between the groups *random* rather than systematic, and the LLN says those random differences shrink as $N$ grows -- so $E[Y_{0i} | D_i = 1] = E[Y_{0i} | D_i = 0]$ and selection bias goes to zero.
 
 . . .
 
-b. Effect of a job training program on employment (those who sign up may be more desperate for work)
-
-. . .
-
-- *Negative* -- understates the causal effect
-
-. . .
-
-c. Effect of exercise on mental health (motivated people may exercise more, but people with mental health struggles may also use exercise as treatment)
-
-. . .
-
-- *Ambiguous* -- could go either direction
+*Watch out for (a):* a bigger sample does **not** fix selection bias. If people self-select into treatment, the bias stays no matter how large $N$ gets -- only **random assignment** removes it.
 
 
 # Summary and Key Takeaways
@@ -1241,17 +1230,3 @@ c. Effect of exercise on mental health (motivated people may exercise more, but 
 5. The **potential outcomes framework** formalizes: $\kappa = Y_{1i} - Y_{0i}$
 
 6. Simple differences in means = Causal effect + Selection bias. Randomization sets bias to zero.
-
-## The Key Equation
-
-$$\underbrace{E[Y_i | D_i = 1] - E[Y_i | D_i = 0]}_{\text{Observed difference}} = \underbrace{\kappa}_{\text{Causal effect}} + \underbrace{E[Y_{0i} | D_i = 1] - E[Y_{0i} | D_i = 0]}_{\text{Selection bias}}$$
-
-. . .
-
-- With randomization: Selection bias = 0
-
-. . .
-
-- Without randomization: We need other tools (the rest of this course!)
-
-- Next up: **Ordinary Least Squares (OLS)**
