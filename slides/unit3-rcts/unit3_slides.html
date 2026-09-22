@@ -1568,7 +1568,7 @@ Prof. Caraher
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 4</code></pre>
+<pre><code>[1] 3</code></pre>
 </div>
 </div>
 </div>
@@ -1597,7 +1597,7 @@ Prof. Caraher
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 4 1 2 6 5</code></pre>
+<pre><code>[1] 6 6 1 5 2</code></pre>
 </div>
 </div>
 </div>
@@ -1608,7 +1608,7 @@ Prof. Caraher
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 3.6</code></pre>
+<pre><code>[1] 4</code></pre>
 </div>
 </div>
 </div>
@@ -1640,7 +1640,7 @@ Prof. Caraher
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 3.72</code></pre>
+<pre><code>[1] 3.48</code></pre>
 </div>
 </div>
 </div>
@@ -1651,7 +1651,7 @@ Prof. Caraher
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 3.9</code></pre>
+<pre><code>[1] 3.32</code></pre>
 </div>
 </div>
 </div>
@@ -1662,7 +1662,7 @@ Prof. Caraher
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 3.35</code></pre>
+<pre><code>[1] 3.4</code></pre>
 </div>
 </div>
 </div>
@@ -2043,18 +2043,19 @@ Prof. Caraher
 <section id="connecting-to-the-multiverse" class="slide level2">
 <h2>Connecting to the Multiverse</h2>
 <ul>
-<li class="fragment">This framework captures the “multiverse” intuition, where Morty is person <span class="math inline">\(i\)</span>:</li>
+<li class="fragment"><p>This framework captures the “multiverse” intuition, where Morty is person <span class="math inline">\(i\)</span></p></li>
+<li class="fragment"><p>Suppose we want the causal effect of going to college on wages, <span class="math inline">\(\kappa_{i}\)</span>:</p></li>
 </ul>
 <div class="fragment">
 <ul>
 <li class="fragment"><span class="math inline">\(Y_{1i}\)</span> = <strong>College Morty’s</strong> wage</li>
 <li class="fragment"><span class="math inline">\(Y_{0i}\)</span> = <strong>Morty C-137’s</strong> wage</li>
-<li class="fragment"><span class="math inline">\(\kappa_i\)</span> = The causal effect of college for Morty</li>
+<li class="fragment"><span class="math inline">\(\kappa_i = Y_{1i} - Y_{0i}\)</span> = Morty’s causal effect on wages of going to college</li>
 </ul>
 </div>
 <div class="fragment">
 <ul>
-<li class="fragment">But remember: we only observe <strong>one</strong> of these outcomes for each person</li>
+<li class="fragment">But remember: we only observe <strong>one</strong> of these outcomes for each person; we don’t have a portal gun!</li>
 </ul>
 </div>
 </section>
@@ -2069,21 +2070,6 @@ Prof. Caraher
 <li class="fragment">If person <span class="math inline">\(i\)</span> does NOT attend: observe <span class="math inline">\(Y_{0i}\)</span>, never see <span class="math inline">\(Y_{1i}\)</span></li>
 </ul>
 </div>
-<div class="fragment">
-<div class="callout callout-important callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>The Fundamental Problem</strong></p>
-</div>
-<div class="callout-content">
-<p>We can never observe both potential outcomes for the same individual. The counterfactual is always missing.</p>
-</div>
-</div>
-</div>
-</div>
 </section>
 <section id="the-treatment-indicator" class="slide level2 smaller">
 <h2>The Treatment Indicator</h2>
@@ -2095,7 +2081,9 @@ Prof. Caraher
 </div>
 <div class="fragment">
 <ul>
-<li class="fragment">Call what we actually observe <span class="math inline">\(Y_i\)</span> (drop the first subscript):</li>
+<li class="fragment"><p>This is different from the treated outcome <span class="math inline">\(Y_{0i}\)</span> and <span class="math inline">\(Y_{1i}\)</span>!</p></li>
+<li class="fragment"><p><span class="math inline">\(D_i\)</span> records what group person <span class="math inline">\(i\)</span> is part of (treated/untreated) in our reality, while <span class="math inline">\(Y_{0i}\)</span> and <span class="math inline">\(Y_{1i}\)</span> are <strong>hypotheticals</strong> that both exist for every person, no matter which group they land in</p></li>
+<li class="fragment"><p>Call what the outcome we observe <span class="math inline">\(Y_i\)</span>, (i.e., drop the first subscript), defined as:</p></li>
 </ul>
 </div>
 <div class="fragment">
@@ -2103,21 +2091,68 @@ Prof. Caraher
 </div>
 <div class="fragment">
 <ul>
-<li class="fragment">We observe the treated outcome for treated individuals (<span class="math inline">\(Y_i = Y_{1i}\)</span> and the untreated outcome for untreated individuals (<span class="math inline">\(Y_i = Y_{0i}\)</span>)</li>
+<li class="fragment">So we observe the treated outcome for treated individuals (<span class="math inline">\(Y_i = Y_{1i}\)</span>), and the untreated outcome for untreated individuals (<span class="math inline">\(Y_i = Y_{0i}\)</span>)</li>
+</ul>
+</div>
+</section>
+<section id="from-one-person-to-averages" class="slide level2 smaller">
+<h2>From One Person to Averages</h2>
+<ul>
+<li class="fragment"><p>The Fundamental Problem says we can <strong>never</strong> compute <span class="math inline">\(\kappa_i\)</span> for any single person</p></li>
+<li class="fragment"><p>So we lower our ambition: instead of the effect for Morty (or any individual <span class="math inline">\(i\)</span>), we ask about the <strong>average</strong> effect across all <span class="math inline">\(i\)</span></p></li>
+</ul>
+<div class="fragment">
+<ul>
+<li class="fragment"><span class="math inline">\(E[Y_{1i}]\)</span>: the average outcome if <strong>everyone</strong> were treated</li>
+<li class="fragment"><span class="math inline">\(E[Y_{0i}]\)</span>: the average outcome if <strong>no one</strong> were treated</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li class="fragment">The average of a difference is the difference of the averages, so the <strong>average causal effect</strong> is:</li>
+</ul>
+<p><span class="math display">\[E[\kappa_i] = E[Y_{1i} - Y_{0i}] = E[Y_{1i}] - E[Y_{0i}]\]</span></p>
+</div>
+</section>
+<section id="averages-for-which-people" class="slide level2 smaller">
+<h2>Averages for <em>Which</em> People?</h2>
+<ul>
+<li class="fragment">We still never see <span class="math inline">\(E[Y_{1i}]\)</span> or <span class="math inline">\(E[Y_{0i}]\)</span> for <em>everyone</em> – each group is only observed in the world it actually lived in</li>
+</ul>
+<div class="fragment">
+<ul>
+<li class="fragment">A <strong>conditional expectation</strong> narrows the average to a subgroup: read the bar <span class="math inline">\(|\)</span> as <strong>“among the people for whom…”</strong></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li class="fragment"><span class="math inline">\(E[Y_i | D_i = 1]\)</span>: average observed health <strong>among the insured</strong></li>
+<li class="fragment"><span class="math inline">\(E[Y_i | D_i = 0]\)</span>: average observed health <strong>among the uninsured</strong></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li class="fragment">Because <span class="math inline">\(Y_i = Y_{1i}\)</span> whenever <span class="math inline">\(D_i = 1\)</span>, these observed averages are also averages of <strong>potential outcomes</strong>:</li>
+</ul>
+<p><span class="math display">\[E[Y_i | D_i = 1] = E[Y_{1i} | D_i = 1], \qquad E[Y_i | D_i = 0] = E[Y_{0i} | D_i = 0]\]</span></p>
+</div>
+<div class="fragment">
+<ul>
+<li class="fragment">Conditioning works on causal effects too: <span class="math display">\[E[\kappa_i | D_i = 1]\]</span> is the average treatment effect <strong>for the treated group</strong></li>
 </ul>
 </div>
 </section>
 <section id="the-simple-difference-in-means" class="slide level2 smaller">
 <h2>The Simple Difference in Means</h2>
 <ul>
-<li class="fragment">Suppose we compare average outcomes between treated and untreated groups:</li>
+<li class="fragment">The comparison we can actually compute: average observed outcome in the treated group minus the untreated group</li>
 </ul>
 <div class="fragment">
 <p><span class="math display">\[E[Y_i | D_i = 1] - E[Y_i | D_i = 0]\]</span></p>
 </div>
 <div class="fragment">
 <ul>
-<li class="fragment">Since we only observe <span class="math inline">\(Y_{1i}\)</span> for treated and <span class="math inline">\(Y_{0i}\)</span> for untreated:</li>
+<li class="fragment">Using the equalities from the last slide, write each term in terms of potential outcomes:</li>
 </ul>
 </div>
 <div class="fragment">
@@ -2125,7 +2160,8 @@ Prof. Caraher
 </div>
 <div class="fragment">
 <ul>
-<li class="fragment">Is this the causal effect? <strong>Not necessarily!</strong></li>
+<li class="fragment"><p>This is the same simple comparison as finding the average health outcome between those with and without insurance</p></li>
+<li class="fragment"><p>Is this the causal effect? <strong>Not necessarily!</strong></p></li>
 </ul>
 </div>
 </section>
@@ -2138,7 +2174,7 @@ Prof. Caraher
 <ol type="1">
 <li class="fragment"><p><span class="math inline">\(E[Y_{1i} | D_i = 1]\)</span>: the average <strong>treated</strong> outcome, among people who <strong>were in treatment group</strong></p>
 <ul>
-<li class="fragment">Average health of the <strong>insured</strong> group (<span class="math inline">\(D_i = 1\)</span>), <em>with</em> their insurance: <strong>4.2</strong></li>
+<li class="fragment">Average health of the <strong>insured</strong> group (<span class="math inline">\(D_i = 1\)</span>), <em>with</em> their insurance</li>
 <li class="fragment">We <strong>observe</strong> this</li>
 </ul></li>
 </ol>
@@ -2147,7 +2183,7 @@ Prof. Caraher
 <ol start="2" type="1">
 <li class="fragment"><p><span class="math inline">\(E[Y_{0i} | D_i = 0]\)</span>: the average <strong>untreated</strong> outcome, among people who <strong>were not treatment group</strong></p>
 <ul>
-<li class="fragment">Average health of the <strong>uninsured</strong> group (<span class="math inline">\(D_i = 0\)</span>), <em>without</em> insurance: <strong>3.5</strong></li>
+<li class="fragment">Average health of the <strong>uninsured</strong> group (<span class="math inline">\(D_i = 0\)</span>), <em>without</em> insurance</li>
 <li class="fragment">We <strong>observe</strong> this too</li>
 </ul></li>
 </ol>
@@ -2169,70 +2205,25 @@ Prof. Caraher
 </div>
 <div class="fragment">
 <ul>
-<li class="fragment">In plain English: <em>how healthy would the insured group of people be if they had never gotten insurance?</em></li>
-</ul>
-</div>
-<div class="fragment">
-<div class="callout callout-warning callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>This number does not exist in our data</strong></p>
-</div>
-<div class="callout-content">
-<p>Insured people <strong>have</strong> insurance. We never see them in the untreated world, so <span class="math inline">\(E[Y_{0i} | D_i = 1]\)</span> is the <strong>missing counterfactual</strong> – the Fundamental Problem again.</p>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="which-averages-do-we-actually-see" class="slide level2 smaller">
-<h2>Which Averages Do We Actually See?</h2>
-<ul>
-<li class="fragment">Two groups <span class="math inline">\(\times\)</span> two potential outcomes = four averages, but we only ever see <strong>two</strong>:</li>
-</ul>
-<div class="fragment">
-<table class="caption-top">
-<colgroup>
-<col style="width: 26%">
-<col style="width: 35%">
-<col style="width: 38%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;"></th>
-<th style="text-align: center;"><strong>Health <em>with</em> insurance</strong> <span class="math inline">\((Y_{1i})\)</span></th>
-<th style="text-align: center;"><strong>Health <em>without</em> insurance</strong> <span class="math inline">\((Y_{0i})\)</span></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;"><strong>Insured Group</strong> <span class="math inline">\((D_i = 1)\)</span></td>
-<td style="text-align: center;"><span class="math inline">\(E[Y_{1i} \mid D_i = 1] = 4.2\)</span></td>
-<td style="text-align: center;"><span class="math inline">\(E[Y_{0i} \mid D_i = 1] = \; ?\)</span></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><strong>Uninsured Group</strong> <span class="math inline">\((D_i = 0)\)</span></td>
-<td style="text-align: center;"><span class="math inline">\(E[Y_{1i} \mid D_i = 0] = \; ?\)</span></td>
-<td style="text-align: center;"><span class="math inline">\(E[Y_{0i} \mid D_i = 0] = 3.5\)</span></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="fragment">
-<ul>
-<li class="fragment">The <strong>diagonal</strong> is what our survey measured; the <strong>off-diagonal</strong> cells are counterfactual</li>
+<li class="fragment">In plain English: <em>how healthy would the insured group of people (<span class="math inline">\(D_i = 1\)</span>) be if they had never gotten insurance (<span class="math inline">\(Y_{0i}\)</span>)?</em></li>
 </ul>
 </div>
 </section>
 <section id="the-selection-bias-decomposition" class="slide level2 smaller">
 <h2>The Selection Bias Decomposition</h2>
 <ul>
-<li class="fragment"><p>Take the difference we <em>can</em> compute, <span class="math inline">\(E[Y_{1i} | D_i = 1] - E[Y_{0i} | D_i = 0]\)</span>, and <strong>add and subtract</strong> the counterfactual <span class="math inline">\(E[Y_{0i} | D_i = 1]\)</span></p></li>
+<li class="fragment"><p>Now that we have defined all the terms, we can decompose our comparison</p></li>
+<li class="fragment"><p>Take the difference we <em>can</em> compute, the difference in average outcomes between the treatment and control group:</p></li>
+</ul>
+<div class="fragment">
+<p><span class="math display">\[E[Y_{1i} | D_i = 1] - E[Y_{0i} | D_i = 0]\]</span></p>
+</div>
+<div class="fragment">
+<ul>
+<li class="fragment"><p>Then <strong>add and subtract</strong> the counterfactual <span class="math inline">\(E[Y_{0i} | D_i = 1]\)</span></p></li>
 <li class="fragment"><p>This changes <strong>nothing</strong> – the two new terms cancel:</p></li>
 </ul>
+</div>
 <div class="fragment">
 <p><span class="math display">\[E[Y_{1i} | D_i = 1] \underbrace{- E[Y_{0i} | D_i = 1] + E[Y_{0i} | D_i = 1]}_{\text{cancels to } 0} - E[Y_{0i} | D_i = 0]\]</span></p>
 </div>
@@ -2240,6 +2231,9 @@ Prof. Caraher
 <ul>
 <li class="fragment">But now <strong>regroup</strong> the four terms into two pairs:</li>
 </ul>
+</div>
+<div class="fragment">
+<p><span class="math display">\[= E[Y_{1i} | D_i = 1] - E[Y_{0i} | D_i = 1] + E[Y_{0i} | D_i = 1] - E[Y_{0i} | D_i = 0]\]</span></p>
 </div>
 <div class="fragment">
 <p><span class="math display">\[= \underbrace{E[Y_{1i} | D_i = 1] - E[Y_{0i} | D_i = 1]}_{\text{Causal effect for the treatment group}} + \underbrace{E[Y_{0i} | D_i = 1] - E[Y_{0i} | D_i = 0]}_{\text{Selection bias}}\]</span></p>
@@ -2267,7 +2261,7 @@ Prof. Caraher
 </div>
 <div class="fragment">
 <ul>
-<li class="fragment">A simple difference in group means = <strong>Causal effect + Selection bias</strong></li>
+<li class="fragment">A simple difference in means between the treated and untreated group outcomes = <strong>Causal effect + Selection bias</strong></li>
 </ul>
 </div>
 </section>
@@ -2650,7 +2644,7 @@ $ good_health &lt;dbl&gt; 1, 1, 1, 1, NA, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1,
 <li class="fragment"><p><strong>Ceteris paribus</strong> comparisons isolate the causal effect by holding everything constant except treatment</p></li>
 <li class="fragment"><p><strong>RCTs</strong> eliminate selection bias by ensuring groups are drawn from the same population</p></li>
 <li class="fragment"><p>The <strong>Law of Large Numbers</strong> guarantees that with large samples, randomly assigned groups have identical average characteristics</p></li>
-<li class="fragment"><p>The <strong>potential outcomes framework</strong> formalizes: <span class="math inline">\(\kappa = Y_{1i} - Y_{0i}\)</span></p></li>
+<li class="fragment"><p>The <strong>potential outcomes framework</strong> formalizes: <span class="math inline">\(\kappa_i = Y_{1i} - Y_{0i}\)</span>, and we target its average, <span class="math inline">\(E[\kappa_i]\)</span></p></li>
 <li class="fragment"><p>Simple differences in means = Causal effect + Selection bias. Randomization sets bias to zero.</p></li>
 </ol>
 
