@@ -438,7 +438,7 @@ mean(rolls_100)
 
 ::: {.callout-important}
 ## Why This Matters
-The LLN is why randomization eliminates selection bias: with large enough samples, treatment and control groups become **statistically identical** in all characteristics -- both observed and unobserved.
+Randomization removes **systematic** differences; the LLN shrinks the **random** ones, so large groups become **statistically identical** -- even in unobserved traits.
 :::
 
 . . .
@@ -694,290 +694,260 @@ With random assignment, the difference in group means equals the **true causal e
 
 # The Potential Outcomes Framework
 
-## From Intuition to Math
+## Roadmap
 
-- Now that we intuitively understand WHY simple comparisons can mislead and HOW randomization helps...
+The **potential outcomes framework** turns this unit's intuition into math, in four steps:
 
-. . .
+::: {.nonincremental}
+1. **Define** the causal effect for one person -- and see why we can never observe it
+2. **Average** it over the treated group: our target, the **ATT**
+3. **Decompose** the simple difference in means into **ATT + selection bias**
+4. **Randomize**: selection bias drops to zero, so the difference in means = the ATT
+:::
 
-- Let's formalize these ideas mathematically using the **Potential Outcomes Framework**
-
-. . .
-
-- This framework gives us precise language for discussing causal effects
-
-## Defining Potential Outcomes {.smaller}
+## Potential Outcomes {.smaller}
 
 - For any individual $i$, define two **potential outcomes**:
-
-. . .
-
-- $Y_{1i}$: The outcome individual $i$ would experience **if treated**
-- $Y_{0i}$: The outcome individual $i$ would experience **if not treated**
-
-. . .
-
+  - $Y_{1i}$: the outcome $i$ would have **if treated**
+  - $Y_{0i}$: the outcome $i$ would have **if not treated**
 - The **causal effect** for individual $i$:
 
 . . .
 
 $$\kappa_i = Y_{1i} - Y_{0i}$$
 
-## Connecting to the Multiverse
+- In the multiverse, with Morty as person $i$: $Y_{1i}$ = College Morty's wage, $Y_{0i}$ = Morty C-137's wage
+- From here on, back to **health insurance**: $Y_{1i}$ = $i$'s health *with* insurance, $Y_{0i}$ = $i$'s health *without* it
 
-- This framework captures the "multiverse" intuition, where Morty is person $i$
-
-- Suppose we want the causal effect of going to college on wages, $\kappa_{i}$:
-
-. . .
-
-- $Y_{1i}$ = **College Morty's** wage
-- $Y_{0i}$ = **Morty C-137's** wage
-- $\kappa_i = Y_{1i} - Y_{0i}$ = Morty's causal effect on wages of going to college
-
-. . .
-
-- But remember: we only observe **one** of these outcomes for each person; we don't have a portal gun!
-
-## The Fundamental Problem of Causal Inference
-
-- We only observe **one** potential outcome for each individual
-
-. . .
-
-- If person $i$ attends college: observe $Y_{1i}$, never see $Y_{0i}$
-- If person $i$ does NOT attend: observe $Y_{0i}$, never see $Y_{1i}$
-
-
-## The Treatment Indicator {.smaller}
+## What We Actually Observe {.smaller}
 
 - Let $D_i$ be a **treatment indicator**:
 
 . . .
 
-$$D_i = \begin{cases} 1 & \text{if individual } i \text{ is in the treatment group} \\ 0 & \text{otherwise} \end{cases}$$
+$$D_i = \begin{cases} 1 & \text{if individual } i \text{ is treated (has insurance)} \\ 0 & \text{otherwise} \end{cases}$$
 
-. . .
-
-- This is different from the treated outcome $Y_{0i}$ and $Y_{1i}$!
-
-- $D_i$ records what group person $i$ is part of (treated/untreated) in our reality, 
-while $Y_{0i}$ and $Y_{1i}$ are **hypotheticals** that both exist for every person, no matter which group they land in
-
-- Call what the outcome we observe $Y_i$, (i.e., drop the first subscript), defined as:
+- $D_i$ records which group $i$ is **actually** in: the **group with insurance** ($D_i = 1$) or the **group without insurance** ($D_i = 0$)
+- $Y_{1i}$ and $Y_{0i}$ are **hypotheticals** that exist for everyone, whichever group they land in
+- The outcome we **observe** is $Y_i$ (no 0/1 subscript):
 
 . . .
 
 $$Y_i = D_i \cdot Y_{1i} + (1 - D_i) \cdot Y_{0i}$$
 
-. . .
-
-- So we observe the treated outcome for treated individuals ($Y_i = Y_{1i}$), and the untreated outcome for untreated individuals ($Y_i = Y_{0i}$)
+- For the group with insurance, $Y_i = Y_{1i}$; for the group without insurance, $Y_i = Y_{0i}$
+- The other potential outcome is **never observed** -- the Fundamental Problem, in one equation
 
 ## From One Person to Averages {.smaller}
 
-- The Fundamental Problem says we can **never** compute $\kappa_i$ for any single person
-
-- So we lower our ambition: instead of the effect for Morty (or any individual $i$), we ask about the **average** effect across all $i$
-
-. . .
-
-- $E[Y_{1i}]$: the average outcome if **everyone** were treated
-- $E[Y_{0i}]$: the average outcome if **no one** were treated
+- We never observe $\kappa_i$, so we aim for an **average** effect instead
+- A **conditional expectation** averages over a subgroup: read the bar $|$ as **"among the people for whom..."**
+  - $E[Y_i | D_i = 1]$: average observed health **among the group with insurance**
+  - $E[Y_i | D_i = 0]$: average observed health **among the group without insurance**
+- Our target: the **average treatment effect on the treated (ATT)**, the average of $\kappa_i$ among the group with insurance
 
 . . .
 
-- The average of a difference is the difference of the averages, so the **average causal effect** is:
+$$\text{ATT} = E[\kappa_i | D_i = 1] = E[Y_{1i} | D_i = 1] - E[Y_{0i} | D_i = 1]$$
 
-$$E[\kappa_i] = E[Y_{1i} - Y_{0i}] = E[Y_{1i}] - E[Y_{0i}]$$
+- In words: on average, how much does insurance change health **for the group with insurance**?
 
-## Averages for *Which* People? {.smaller}
+## Four Averages, Two We Can See {.smaller}
 
-- We still never see $E[Y_{1i}]$ or $E[Y_{0i}]$ for *everyone* -- each group is only observed in the world it actually lived in
 
-. . .
-
-- A **conditional expectation** narrows the average to a subgroup: read the bar $|$ as **"among the people for whom..."**
+- In our potential outcomes framework, we have 4 total combinations of $D_i$ and $Y_{i}$:
 
 . . .
 
-- $E[Y_i | D_i = 1]$: average observed health **among the insured**
-- $E[Y_i | D_i = 0]$: average observed health **among the uninsured**
+|                           | World **with** insurance ($Y_{1i}$) | World **without** insurance ($Y_{0i}$) |
+|:----|:------:|:------:|
+| **Group with insurance**<br>($D_i = 1$) | $E[Y_{1i} \vert D_i = 1]$<br>observed | $E[Y_{0i} \vert D_i = 1]$<br>**never observed** |
+| **Group without insurance**<br>($D_i = 0$) | $E[Y_{1i} \vert D_i = 0]$<br>never observed | $E[Y_{0i} \vert D_i = 0]$<br>observed |
 
-. . .
-
-- Because $Y_i = Y_{1i}$ whenever $D_i = 1$, these observed averages are also averages of **potential outcomes**:
-
-$$E[Y_i | D_i = 1] = E[Y_{1i} | D_i = 1], \qquad E[Y_i | D_i = 0] = E[Y_{0i} | D_i = 0]$$
-
-. . .
-
-- Conditioning works on causal effects too:
-$$E[\kappa_i | D_i = 1]$$ is the average treatment effect **for the treated group**
-
-## The Simple Difference in Means {.smaller}
-
-- The comparison we can actually compute: average observed outcome in the treated group minus the untreated group
-
-. . .
-
-$$E[Y_i | D_i = 1] - E[Y_i | D_i = 0]$$
-
-. . .
-
-- Using the equalities from the last slide, write each term in terms of potential outcomes:
-
-. . .
-
-$$E[Y_{1i} | D_i = 1] - E[Y_{0i} | D_i = 0]$$
-
-. . .
-
-- This is the same simple comparison as finding the average health outcome between those with and without insurance
-
-
-- Is this the causal effect? **Not necessarily!**
-
-## Reading the Terms We Have {.smaller}
-
-- Before doing any algebra, let's make sure we can say each term **out loud**
-
-. . .
-
-1. $E[Y_{1i} | D_i = 1]$: the average **treated** outcome, among people who **were in treatment group**
-
-    - Average health of the **insured** group ($D_i = 1$), *with* their insurance
-    - We **observe** this
-
-. . .
-
-2. $E[Y_{0i} | D_i = 0]$: the average **untreated** outcome, among people who **were not treatment group**
-
-    - Average health of the **uninsured** group ($D_i = 0$), *without* insurance
-    - We **observe** this too
-
-
-## A Term We *Cannot* Observe {.smaller}
-
-- Now add a new term: $E[Y_{0i} | D_i = 1]$
-
-. . .
-
-- Read it carefully -- the two subscripts do **different jobs**:
-  - $D_i = 1$ tells us **which people**: the insured group/treatment group
-  - $Y_{0i}$ tells us **which world**: the outcome where they have no insurance/untreated outcome
-
-. . .
-
-- In plain English: *how healthy would the insured group of people ($D_i = 1$) 
-be if they had never gotten insurance ($Y_{0i}$)?*
-
+- Row = **which group** ($D_i$); column = **which world** ($Y_{1i}$ or $Y_{0i}$)
+- The simple comparison uses the two **observed** cells: *different* groups in *different* worlds
+- The ATT compares across the **top row**: the *same* group in *different* worlds
+- The missing piece is $E[Y_{0i} | D_i = 1]$: *how healthy would the group with insurance be without insurance?*
 
 ## The Selection Bias Decomposition {.smaller}
 
-- Now that we have defined all the terms, we can decompose our comparison
-
-- Take the difference we *can* compute, the difference in average outcomes between the treatment and control group:
+- Start with the difference we **can** compute. Since $Y_i = Y_{1i}$ for the group with insurance and $Y_i = Y_{0i}$ for the group without insurance:
 
 . . .
 
-$$E[Y_{1i} | D_i = 1] - E[Y_{0i} | D_i = 0]$$
+$$E[Y_i | D_i = 1] - E[Y_i | D_i = 0] = E[Y_{1i} | D_i = 1] - E[Y_{0i} | D_i = 0]$$
 
 . . .
 
-- Then **add and subtract** the counterfactual $E[Y_{0i} | D_i = 1]$
+- This is our simple comparison: i.e., comparing average health outcomes for those with insurance to those without insurance
 
-- This changes **nothing** -- the two new terms cancel:
-
-. . .
-
-
-
-$$E[Y_{1i} | D_i = 1] \underbrace{- E[Y_{0i} | D_i = 1] + E[Y_{0i} | D_i = 1]}_{\text{cancels to } 0} - E[Y_{0i} | D_i = 0]$$
+- **Add and subtract** the missing piece, $E[Y_{0i} | D_i = 1]$ -- this adds zero:
 
 . . .
 
-- But now **regroup** the four terms into two pairs:
+$$= E[Y_{1i} | D_i = 1] \underbrace{- E[Y_{0i} | D_i = 1] + E[Y_{0i} | D_i = 1]}_{= \, 0} - E[Y_{0i} | D_i = 0]$$
+
+- Now re-arrange the terms differently:
 
 . . .
 
-$$= E[Y_{1i} | D_i = 1] - E[Y_{0i} | D_i = 1] + E[Y_{0i} | D_i = 1] - E[Y_{0i} | D_i = 0]$$
+$$= \underbrace{E[Y_{1i} | D_i = 1] - E[Y_{0i} | D_i = 1]}_{\text{ATT (top row)}} + \underbrace{E[Y_{0i} | D_i = 1] - E[Y_{0i} | D_i = 0]}_{\text{Selection bias (right column)}}$$
 
-. . .
-
-$$= \underbrace{E[Y_{1i} | D_i = 1] - E[Y_{0i} | D_i = 1]}_{\text{Causal effect for the treatment group}} + \underbrace{E[Y_{0i} | D_i = 1] - E[Y_{0i} | D_i = 0]}_{\text{Selection bias}}$$
-
-## The Key Equation
+## What Is the Selection Bias Term? {.smaller}
 
 ::: {.callout-important}
 ## The Selection Bias Decomposition
 
-$$\underbrace{E[Y_i | D_i = 1] - E[Y_i | D_i = 0]}_{\text{Observed difference}} = \underbrace{\kappa}_{\text{Causal effect}} + \underbrace{E[Y_{0i} | D_i = 1] - E[Y_{0i} | D_i = 0]}_{\text{Selection bias}}$$
+$$\underbrace{E[Y_i | D_i = 1] - E[Y_i | D_i = 0]}_{\text{Observed difference}} = \text{ATT} + \underbrace{E[Y_{0i} | D_i = 1] - E[Y_{0i} | D_i = 0]}_{\text{Selection bias}}$$
 :::
 
-. . .
-
-- Same result as the last slide, now written with $Y_i$ (what we **observe**) and $\kappa$ (the causal effect for the treatment group)
-
-. . .
-
-- A simple difference in means between the treated and untreated group outcomes = **Causal effect + Selection bias**
-
-## What Is the Selection Bias Term? {.smaller}
-
-- Selection bias: $E[Y_{0i} | D_i = 1] - E[Y_{0i} | D_i = 0]$
-
-. . .
-
-- This compares the **untreated potential outcomes** of the two groups
-
-. . .
-
+- We see that a simple comparison of average outcomes between groups $D_i$ is comprised of both the **average causal effect (the ATT)** and a **selection bias term**
+- Selection bias compares the **untreated** outcomes of two **different groups** of people -- *apples to oranges*, in math
 - In the health insurance example:
-  - People who *choose* to get insurance would be healthier **even without insurance** (wealthier, more health-conscious)
+  - The group with insurance would be healthier **even without it** (e.g., higher income, our confounder)
   - So $E[Y_{0i} | D_i = 1] > E[Y_{0i} | D_i = 0]$
-  - Selection bias is **positive**: simple comparisons **overstate** the causal effect
+  - Selection bias is **positive**: the simple comparison **overstates** the ATT
 
 ## How Randomization Eliminates Selection Bias {.smaller}
 
-- With random assignment, treatment and control groups are drawn from the **same population**
-
-. . .
-
-- Assignment is a **coin flip**, so which group you land in tells us **nothing** about your potential outcomes
-
-. . .
-
-- So, by the LLN, their average potential outcomes converge (assume $N$ is large enough):
+- With random assignment, $D_i$ is a **coin flip**: which group you land in tells us **nothing** about your potential outcomes
+- So, **on average**, both groups have the same untreated outcome:
 
 . . .
 
 $$E[Y_{0i} | D_i = 1] = E[Y_{0i} | D_i = 0]$$
 
-. . .
-
-- Plugging into our decomposition:
+- Selection bias is zero, so the decomposition becomes:
 
 . . .
 
-$$\begin{aligned}
-&E[Y_i | D_i = 1] - E[Y_i | D_i = 0] \\
-&= E[Y_{1i} | D_i = 1] - E[Y_{0i} | D_i = 1] + E[Y_{0i} | D_i = 1] - E[Y_{0i} | D_i = 0] \\
-&= \kappa + 0 \\
-&= \kappa
-\end{aligned}$$
+$$E[Y_i | D_i = 1] - E[Y_i | D_i = 0] = \text{ATT} + 0 = \text{ATT}$$
 
-. . .
+- Because the group with insurance is a random subset of everyone, the ATT also equals the **average treatment effect (ATE)**, $E[\kappa_i]$: the average effect for **everyone** (without random assignment, the two can differ; more in Unit 12)
+- The **LLN** handles the rest: with large $N$, the averages in our sample land close to these expected values
 
-- **We have formally shown how the simple difference in means equals the causal effect with random assignment!**
+## Worked Example: The Data We Have {.smaller}
+
+Made-up data on 8 people: insurance status ($D_i$) and health on a 1-5 scale
+
+| Person | $D_i$ | $Y_{0i}$ | $Y_{1i}$ |
+|:------:|:-----:|:--------:|:--------:|
+| Ana | 1 | ? | 5 |
+| Ben | 1 | ? | 4 |
+| Cal | 1 | ? | 4 |
+| Ivy | 1 | ? | 3 |
+| Eli | 0 | 2 | ? |
+| Fay | 0 | 2 | ? |
+| Gus | 0 | 1 | ? |
+| Hal | 0 | 1 | ? |
+
+- Each person shows only **one** potential outcome; the other is a **?**
+- This is the Fundamental Problem: real data always looks like this
+
+## Suppose We Get a Portal Gun... {.smaller}
+
+Now we can visit the other world and fill in every **?** ([blue]{style="color:#3170DE;font-weight:700"} = only visible with a portal gun) (i.e., $Y_{0i} for those with $D_i = 1$ and $Y_{0i} for those with $D_i = 0$)
+
+| Person | $D_i$ | $Y_{0i}$ | $Y_{1i}$ | $\kappa_i$ |
+|:------:|:-----:|:--------:|:--------:|:----------:|
+| Ana | 1 | [4]{style="color:#3170DE;font-weight:700"} | 5 | 1 |
+| Ben | 1 | [4]{style="color:#3170DE;font-weight:700"} | 4 | 0 |
+| Cal | 1 | [3]{style="color:#3170DE;font-weight:700"} | 4 | 1 |
+| Ivy | 1 | [3]{style="color:#3170DE;font-weight:700"} | 3 | 0 |
+| Eli | 0 | 2 | [3]{style="color:#3170DE;font-weight:700"} | 1 |
+| Fay | 0 | 2 | [2]{style="color:#3170DE;font-weight:700"} | 0 |
+| Gus | 0 | 1 | [2]{style="color:#3170DE;font-weight:700"} | 1 |
+| Hal | 0 | 1 | [1]{style="color:#3170DE;font-weight:700"} | 0 |
+
+- Now we can compute each person's causal effect, $\kappa_i = Y_{1i} - Y_{0i}$
+- Insurance raises health by 1 point for some people and does nothing for others
+
+## Worked Example: The Averages We Can See {.smaller}
+
+Back to reality: average what we observe within each group
+
+:::: {.columns}
+::: {.column width="50%"}
+**Group with insurance** ($D_i = 1$)
+
+| Person | $Y_{0i}$ | $Y_{1i}$ |
+|:------:|:--------:|:--------:|
+| Ana | ? | 5 |
+| Ben | ? | 4 |
+| Cal | ? | 4 |
+| Ivy | ? | 3 |
+| **Mean** | ? | **4.0** |
+:::
+::: {.column width="50%"}
+**Group without insurance** ($D_i = 0$)
+
+| Person | $Y_{0i}$ | $Y_{1i}$ |
+|:------:|:--------:|:--------:|
+| Eli | 2 | ? |
+| Fay | 2 | ? |
+| Gus | 1 | ? |
+| Hal | 1 | ? |
+| **Mean** | **1.5** | ? |
+:::
+::::
+
+- Simple difference in means: $E[Y_i | D_i = 1] - E[Y_i | D_i = 0] = 4.0 - 1.5 = 2.5$
+- Does insurance really raise health by 2.5 points?
+
+## Worked Example: Portal Gun Averages {.smaller}
+
+With the portal gun, we can average **every** column
+
+:::: {.columns}
+::: {.column width="50%"}
+**Group with insurance** ($D_i = 1$)
+
+| Person | $Y_{0i}$ | $Y_{1i}$ | $\kappa_i$ |
+|:------:|:--------:|:--------:|:----------:|
+| Ana | [4]{style="color:#3170DE;font-weight:700"} | 5 | 1 |
+| Ben | [4]{style="color:#3170DE;font-weight:700"} | 4 | 0 |
+| Cal | [3]{style="color:#3170DE;font-weight:700"} | 4 | 1 |
+| Ivy | [3]{style="color:#3170DE;font-weight:700"} | 3 | 0 |
+| **Mean** | [3.5]{style="color:#3170DE;font-weight:700"} | **4.0** | **0.5** |
+:::
+::: {.column width="50%"}
+**Group without insurance** ($D_i = 0$)
+
+| Person | $Y_{0i}$ | $Y_{1i}$ | $\kappa_i$ |
+|:------:|:--------:|:--------:|:----------:|
+| Eli | 2 | [3]{style="color:#3170DE;font-weight:700"} | 1 |
+| Fay | 2 | [2]{style="color:#3170DE;font-weight:700"} | 0 |
+| Gus | 1 | [2]{style="color:#3170DE;font-weight:700"} | 1 |
+| Hal | 1 | [1]{style="color:#3170DE;font-weight:700"} | 0 |
+| **Mean** | **1.5** | [2.0]{style="color:#3170DE;font-weight:700"} | **0.5** |
+:::
+::::
+
+- ATT: the mean of $\kappa_i$ in the group with insurance $= 0.5$ (equivalently, $4.0 - 3.5$)
+- The simple comparison said **2.5**, five times the ATT. Where does the extra **2.0** come from?
+
+## Worked Example: The Decomposition {.smaller}
+
+Put the four group means in our table from earlier:
+
+|                           | World **with** insurance ($Y_{1i}$) | World **without** insurance ($Y_{0i}$) |
+|:----|:------:|:------:|
+| **Group with insurance**<br>($D_i = 1$) | 4.0<br>observed | [3.5]{style="color:#3170DE;font-weight:700"}<br>**never observed** |
+| **Group without insurance**<br>($D_i = 0$) | [2.0]{style="color:#3170DE;font-weight:700"}<br>never observed | 1.5<br>observed |
+
+- Simple difference (the two observed cells): $4.0 - 1.5 = 2.5$
+- ATT (top row): $4.0 - 3.5 = 0.5$
+- Selection bias (right column): $3.5 - 1.5 = 2.0$
+- So $2.5 = 0.5 + 2.0$: the group with insurance would be healthier **even without it**
+- If a **coin flip** had assigned insurance, the right-column gap would be zero on average, and the simple difference would center on the true 0.5
 
 ## Summary of the Framework
 
 ::: {.callout-tip}
 ## The Potential Outcomes Framework in Three Sentences
 1. Each individual has two potential outcomes ($Y_{1i}$ and $Y_{0i}$), but we only observe one.
-2. Simple comparisons confound the causal effect with selection bias.
-3. Randomization sets selection bias to zero, so the difference in means = the causal effect.
+2. A simple difference in means = ATT + selection bias.
+3. Randomization sets selection bias to zero, so the difference in means = the ATT.
 :::
 
 
@@ -1211,7 +1181,7 @@ d. It guarantees that the causal effect is the same size for every individual
 
 . . .
 
-*Answer:* **c.** Random assignment makes any difference between the groups *random* rather than systematic, and the LLN says those random differences shrink as $N$ grows -- so $E[Y_{0i} | D_i = 1] = E[Y_{0i} | D_i = 0]$ and selection bias goes to zero.
+*Answer:* **c.** Random assignment makes any difference between the groups *random* rather than systematic, which sets selection bias to zero: $E[Y_{0i} | D_i = 1] = E[Y_{0i} | D_i = 0]$. The LLN says those random differences shrink as $N$ grows, so in a large sample the groups really do look alike.
 
 . . .
 
@@ -1230,6 +1200,6 @@ d. It guarantees that the causal effect is the same size for every individual
 
 4. The **Law of Large Numbers** guarantees that with large samples, randomly assigned groups have identical average characteristics
 
-5. The **potential outcomes framework** formalizes: $\kappa_i = Y_{1i} - Y_{0i}$, and we target its average, $E[\kappa_i]$
+5. The **potential outcomes framework** defines the individual effect $\kappa_i = Y_{1i} - Y_{0i}$; since we never observe it, we target an average, the **ATT** $= E[\kappa_i | D_i = 1]$
 
-6. Simple differences in means = Causal effect + Selection bias. Randomization sets bias to zero.
+6. Simple differences in means = ATT + Selection bias. Randomization sets bias to zero.
