@@ -1,17 +1,17 @@
 ---
 title: "Bivariate Regression and OLS"
-subtitle: "EC 325: Econometrics"
+subtitle: "EC325: Econometrics"
 author: "Prof. Caraher"
 institute: "Colby College"
-date: "today"
-date-format: "medium"
+date: last-modified
+date-format: "[Last updated:] MM-DD-YYYY"
 embed-resources: true
 format:
   revealjs:
     theme: colby-theme.scss
     slide-number: true
     incremental: true
-    footer: "EC325 | Unit 4 | Bivariate Regression and OLS"
+    footer: "EC325 | Fall 2026 | Unit 4: Bivariate Regression and OLS"
 execute:
   echo: true
   warning: false
@@ -34,46 +34,40 @@ library(tidyverse)
 
 - Random assignment eliminates selection bias: the simple difference in means equals the causal effect
 
-. . .
+## Where We're Going {.smaller}
 
 - But most economic questions **cannot** be answered with experiments
 
-- We typically work with **observational data** where treatment is not randomly assigned
+- Why?
+  - We typically work with **observational data** where treatment is not randomly assigned
+  - There may be ethical issues involved (i.e., is it ethical to withhold insurance from the control group?)
+  - Some research questions we are interested in rule out this possibility (e.g., economic history)
+  - Social science experiments are expensive!
 
-## Where We're Going
+- Instead, we need to develop tools which **may** recover similar causal estimates without an RCT
+- The workhorse behind all these methods: **Ordinary Least Squares (OLS)**
+- This unit will focus on **bivariate OLS regression**
 
-- Today: **Ordinary Least Squares (OLS)** regression -- the workhorse tool of econometrics
-
-. . .
-
-- We focus on the **bivariate** case (one independent variable) to build intuition
-
-. . .
-
-::: {.callout-important}
-## The Big Question
-When can we interpret a regression coefficient as a **causal effect** vs. a mere **correlation**?
-:::
 
 # Modeling Relationships Between Variables
 
 ## What Do We Mean by "Relationship"?
 
+- Before we move onto regression, let's take a set back
+
 - Suppose we have two variables, $y$ and $x$
 
 - We want to study "how $x$ is related to $y$"
 
-. . .
+- What does this really mean?
 
 - We need a precise, mathematical way to do this
-
-. . .
 
 - The most natural approach: what is the **average** value of $y$ for each different value of $x$?
 
 ## Conditional Expectations
 
-- This idea is called the **conditional expectation**
+- This idea is operationalize as the **conditional expectation**
 
 . . .
 
@@ -83,7 +77,7 @@ $$E[Y | X = x]$$
 
 - "If we knew that $X$ took on some specific value $x$, what would we expect $Y$ to be, **on average**?"
 
-. . .
+- (Recall some of the notation from the Potential Outcomes framework, e.g. $E[Y_{1i} | D_i = 1]$)
 
 - The conditional expectation is the central quantity we want to model and estimate
 
@@ -94,7 +88,7 @@ $$E[Y | X = x]$$
 
 . . .
 
-- For each education level, compute the average wage among people in that group
+- For each education level, compute the average wage $E[wage | educ = \{HS deg, Coll deg, Pof deg\}]$ among people in a given education group
 
 . . .
 
@@ -132,13 +126,11 @@ ggplot(ed_data, aes(x = education, y = wage)) +
 
 ## What Do We See?
 
+- Each blue dot is an individual education level plotted against their wage
+
 - The **red diamonds** show the conditional expectations: $E[Y|X=\text{HS}]$, $E[Y|X=\text{College}]$, $E[Y|X=\text{Prof}]$
 
-. . .
-
-- These averages tell us how wages **change** as education increases
-
-. . .
+- Together, these group-specific averages tell us how wages **change** as education increases
 
 - This is precisely what we want to estimate!
 
@@ -184,40 +176,85 @@ The Unit 2 lecture notes cover `ggplot2` in much more detail, including histogra
 
 ## Building a Scatter Plot {.smaller}
 
-::: {.callout-note icon=false}
-## 🖥️ Try it yourself!
-:::
+- Let's build a scatter plot step by step!
 
-- Let's build a scatter plot step by step. Start with data and add points using `geom_point()`:
+- Start by "initializing" our plot by specifying our data with the `ggplot()` function
+
+- We will use the `mtcars` data. Say we want to see the relationship between horsepower (`hp`) and miles per gallon (`mpg`)
+
+- Need the `tidyverse` to use `ggplot()`!
 
 . . .
 
 ```{r}
-#| output-location: fragment
+#| output-location: slide
 #| fig-height: 3.5
 
 library(tidyverse)
+
+ggplot(data = mtcars)
+```
+
+## Building a Scatter Plot {.smaller}
+
+- We just have an empty square!
+
+- Why? We did not yet tell R:
+  - i) which geometry we want to use, and 
+  - ii) how we want to map variables in our data to the aesthetics of that geometry
+
+- In this case, we want **scatterplot** geometry (`geom_point()`) and we want to map horsepower `hp` to the x-axis and `mpg` to the y-axis
+
+- We can do so by adding (`+`) to our initial plot the `geom_point()` function, and within that the `aes()` function
+
+. . .
+
+```{r}
+#| output-location: slide
+#| fig-height: 3.5
 
 ggplot(data = mtcars) +
   geom_point(aes(x = hp, y = mpg))
 ```
 
+## Adding Other Geometries {.smaller}
+
+- `ggplot()` allows us to add additional geometries and aesthetics with the plus sign `+`
+
+- Let's say we want to add a line of best fit to the data (i.e., a trend line)
+
+- We can do so by adding the `geom_smooth()` geometry, with the same aseptic mapping to the x and y inputs
+
+- But in addition to the aesthetic mapping from variables in the data to elements of the geometry, we also need to sometimes supply additional arguments to the geometry functions
+
+- In the case of `geom_smooth()`, we need to tell it the shape of the line (`lm`) and to omit uncertainty estimates
+
+. . . 
+
+```{r}
+#| output-location: slide
+#| fig-height: 3.5
+
+ggplot(data = mtcars) +
+  geom_point(aes(x = hp, y = mpg)) +
+  geom_smooth(aes(x = hp, y = mpg), method = "lm", se = FALSE)
+```
+
 ## Making Publication-Quality Plots {.smaller}
 
-::: {.callout-note icon=false}
-## 🖥️ Try it yourself!
-:::
-
-Always add proper labels and a clean theme:
+- Always add proper labels and titles using the `labs()` function after another `+`
+- Each aesthetic can get its own label (e.g., x, y, title, subtitle, etc.)
+- We cab also get rid of the grey-square background and get nicer-looking figure by adding `theme_minimal()` (there are other pre-packaged themes out there too)
 
 . . .
 
 ```{r}
-#| output-location: fragment
-#| fig-height: 3
+#| output-location: slide
+#| fig-height: 3.5
 
 ggplot(data = mtcars) +
   geom_point(aes(x = hp, y = mpg)) +
+  geom_smooth(aes(x = hp, y = mpg), method = "lm", se = FALSE) +
   labs(
     title = "Fuel Efficiency vs. Engine Power",
     x = "Horsepower",
@@ -226,61 +263,15 @@ ggplot(data = mtcars) +
   theme_minimal()
 ```
 
-## Adding a Line of Best Fit {.smaller}
-
-::: {.callout-note icon=false}
-## 🖥️ Try it yourself!
-:::
-
-- `geom_smooth(method = "lm")` adds a straight line that "best fits" the data
-
-. . .
-
-```{r}
-#| output-location: fragment
-#| fig-height: 3
-
-ggplot(data = mtcars) +
-  geom_point(aes(x = hp, y = mpg)) +
-  geom_smooth(aes(x = hp, y = mpg), method = "lm", se = FALSE) +
-  labs(x = "Horsepower", y = "Miles per Gallon",
-       title = "MPG vs. Horsepower with Line of Best Fit") +
-  theme_minimal()
-```
-
-## Try It: Scatter Plot Practice {.smaller}
-
-::: {.callout-note icon=false}
-## 🖥️ Your turn!
-:::
-
-**Create a scatter plot of `wt` (weight) vs. `mpg` (fuel efficiency). Add proper labels.**
-
-- *Hint:* Use `geom_point()` + `labs()`
-
-. . .
-
-```{r}
-#| output-location: fragment
-#| fig-height: 2.5
-
-ggplot(mtcars) +
-  geom_point(aes(x = wt, y = mpg)) +
-  labs(x = "Weight (1000 lbs)", y = "Miles per Gallon",
-       title = "Heavier Cars Get Worse Fuel Efficiency") +
-  theme_minimal()
-```
-
-
 # The Population Regression Model
 
 ## Writing Down the Population Model {.smaller}
 
-- We start by describing the **true relationship** in the population -- even though we can't observe it directly
+- We start by assuming that there exists a **true relationship** between $x$ and $y$ in the population -- even though we can't observe it directly
 
-. . .
+- **Population** = everyone we want to learn about (e.g., all U.S. workers). Our data are usually a **sample** drawn from it.
 
-- The simplest regression model relates $y$ to a single variable $x$:
+- The **bivariate, linear regression model** is written as follows:
 
 . . .
 
@@ -293,7 +284,7 @@ where:
 - $y$ is the **dependent variable** (outcome)
 - $x$ is the **independent variable** (explanatory)
 - $\mu$ is the **error term** (everything else that affects $y$)
-- $\beta_0$ and $\beta_1$ are **population parameters** (unknown)
+- $\beta_0$ and $\beta_1$ are **true population parameters which relate $x$ to $y$** (unknown)
 
 ## The Error Term
 
@@ -306,36 +297,69 @@ where:
 . . .
 
 - $\mu$ might include:
-  - Ability and motivation
+  - Innate ability
+  - Motivation
   - Family connections
   - Luck
   - Work experience
 
-## Example: Education and Wages {.smaller}
+## Back to Conditional Expectations {.smaller}
 
-- With some assumptions, the regression line traces out the **conditional expectation**: $E[y|x] = \beta_0 + \beta_1 x$
+- How does the regression model link back to our study of the "relationship between two variables"?
 
-. . .
+- Recall our mathematical definition: $E[Y | X = x]$ as $x$ varies
 
-- We can interpret the coefficients like we would any linear equation:
+- Average the model $y = \beta_0 + \beta_1 x + \mu$ among people with the same $educ$ (i..e, expectation of $y$ conditional on $x$)
+- Only $\mu$ varies within that group, so all other terms will be pulled out of the expectations operator (see expectations properties)
 
-- $\beta_0$ is the value of $y$ when $x=0$
-
-- $\beta_1$ is the **marginal effect**: a one-unit increase in $x$ changes $y$ by $\beta_1$ units, on average
-
-. . .
-
-- Let's make this concrete:
-
-$$wage = \beta_0 + \beta_1 \cdot educ + \mu$$
-
-- $wage$ = dollars per hour
-- $educ$ = years of education
+$$
+\begin{aligned}
+wage &= \beta_0 + \beta_1 \cdot educ + \mu \\[4pt]
+E[wage \mid educ] &= \beta_0 + \beta_1 \cdot educ + E[\mu \mid educ] \\[4pt]
+&= \beta_0 + \beta_1 \cdot educ \qquad \text{if } E[\mu \mid educ] = 0
+\end{aligned}
+$$
 
 . . .
 
-- If $\beta_1 = 2.50$: each additional year of education is associated with **$2.50 higher hourly wages**, on average
+- So, the regression line *is* the way to describe how a variable $y$, on average, changes in response to another variable $x$!
 
+## Interpreting $\beta_1$: The Slope {.smaller}
+
+- Since the regression line is in the form $y = mx + b$, then $\beta_1$ describes the **slope** of the regression line
+- In our context, it tells us how much $y$ will change **on average** when $x$ increases by 1
+- Since our regression line is **linear**, the slope will be constant no matter the value of $x$
+- How can we see this more clearly? Pick **any** education level $e$ and compare group averages one year apart:
+
+. . .
+
+$$
+\begin{aligned}
+E[wage \mid educ = e+1] - E[wage \mid educ = e]
+&= [\beta_0 + \beta_1 (e+1)] - [\beta_0 + \beta_1 e] \\[2pt]
+&= \beta_0 + \beta_1 e + \beta_1 - \beta_0 - \beta_1 e \\[2pt]
+&= \beta_1
+\end{aligned}
+$$
+
+
+## Interpreting $\beta_0$: The Intercept {.smaller}
+
+- In $y = mx + b$ form, $\beta_0$ is the **intercept**: the height of the line when $x = 0$
+
+- In our context, plug in $educ = 0$:
+
+. . .
+
+$$E[wage \mid educ = 0] = \beta_0 + \beta_1 \cdot 0 = \beta_0$$
+
+- So $\beta_0$ is the **average wage for people with zero years of education**
+
+. . .
+
+- Rarely meaningful on its own: almost no one has 0 years of school, so the line is **extrapolating** beyond the data. E.g., if $E[wage \mid educ] = -10 + 2.50 \cdot educ$, then $\beta_0 = -\$10$, a negative wage!
+
+- Its main job is to set the **height** of the line
 
 # From Population to Sample
 
@@ -368,15 +392,19 @@ $$\hat{y} = \hat{\beta}_0 + \hat{\beta}_1 x$$
 
 - For any value of $x$, this gives us $\hat{y}$, the **predicted value** of $y$
 
-- This is exactly what `geom_smooth(method = "lm")` draws!
 
-## Residuals: The Prediction Errors {.smaller}
+## Residuals: The Prediction Errors
 
 - Our predictions won't be perfect. The **residual** for observation $i$ is:
 
 . . .
 
-$$\hat{\mu}_i = y_i - \hat{y}_i = y_i - (\hat{\beta}_0 + \hat{\beta}_1 x_i)$$
+$$
+\underbrace{\hat{\mu}_i}_{\text{residual}}
+= \underbrace{y_i}_{\text{actual value}}
+- \underbrace{\hat{y}_i}_{\text{predicted value}}
+= y_i - \underbrace{(\hat{\beta}_0 + \hat{\beta}_1 x_i)}_{\text{point at fitted line at } x_i}
+$$
 
 . . .
 
@@ -418,7 +446,7 @@ ggplot(mtcars_aug, aes(x = hp, y = mpg)) +
 
 . . .
 
-- Can't just minimize $\sum \hat{\mu}_i$ -- positive and negative residuals would cancel out!
+- Can't just minimize $\sum \hat{\mu}_i$ since positive and negative residuals would cancel out!
 
 . . .
 
@@ -467,9 +495,12 @@ $$\hat{\beta}_1 = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{\sum_{i=1}
 
 . . .
 
+::: {.callout-important}
 **The OLS Intercept:**
 
 $$\hat{\beta}_0 = \bar{y} - \hat{\beta}_1 \bar{x}$$
+
+:::
 
 . . .
 
@@ -483,21 +514,19 @@ $$\hat{\beta}_0 = \bar{y} - \hat{\beta}_1 \bar{x}$$
 
 $$\hat{\beta}_1 = \rho_{xy} \frac{\sigma_y}{\sigma_x}$$
 
-. . .
+
+where $r_{xy}$ is the **correlation** between $x$ and $y$ and $\sigma_y$, $\sigma_x$ are the **standard deviations** of $x$ and $y$
+
 
 - Bivariate OLS is essentially a **scaled version of the correlation** between $x$ and $y$
 
-. . .
-
 - And as we discussed in Unit 1: **correlation does not imply causation!**
-
-. . .
-
-- We must be very careful about interpreting bivariate OLS results causally
 
 ## Visualizing OLS: Step 1 -- The Data {.smaller}
 
 Let's build up the intuition for what OLS does, step by step.
+
+. . .
 
 ```{r}
 #| echo: false
@@ -570,22 +599,31 @@ ggplot(demo_data, aes(x = x, y = y)) +
 #| fig-height: 4
 #| fig-align: center
 
+# Lock the plot's shape so squares can look square
+x_lim <- c(1, 10.5)
+y_lim <- c(4, 18)
+asp   <- 0.45                                  # plot height / width
+to_x  <- asp * diff(x_lim) / diff(y_lim)       # converts a y-distance to the x-distance that looks equal
+
 sq_size <- abs(hi$y - hi$fitted)
+sq_w    <- sq_size * to_x
 
 ggplot(demo_data, aes(x = x, y = y)) +
   geom_rect(data = hi,
-            aes(xmin = x, xmax = x + sq_size,
+            aes(xmin = x, xmax = x + sq_w,
                 ymin = pmin(y, fitted), ymax = pmax(y, fitted)),
             fill = "salmon", alpha = 0.4) +
   geom_smooth(method = "lm", se = FALSE, color = "steelblue", linewidth = 1.2) +
   geom_point(size = 3, alpha = 0.4) +
   geom_point(data = hi, size = 4, color = "red") +
-  annotate("text", x = hi$x + sq_size / 2, y = (hi$y + hi$fitted) / 2,
+  annotate("text", x = hi$x + sq_w / 2, y = (hi$y + hi$fitted) / 2,
            label = paste0("û² = ", round((hi$y - hi$fitted)^2, 1)),
            color = "darkred", fontface = "bold", size = 4.5) +
+  coord_cartesian(xlim = x_lim, ylim = y_lim, expand = FALSE) +
   labs(x = "x", y = "y",
        title = "Step 4: Square it -- this is what OLS minimizes") +
-  theme_minimal(base_size = 16)
+  theme_minimal(base_size = 16) +
+  theme(aspect.ratio = asp)
 ```
 
 - We **square** the residual so that positive and negative errors don't cancel
@@ -618,10 +656,6 @@ ggplot(demo_data, aes(x = x, y = y)) +
 
 ## The `lm()` Function {.smaller}
 
-::: {.callout-note icon=false}
-## 🖥️ Try it yourself!
-:::
-
 - In R, the `lm()` function ("linear model") performs OLS regression:
 
 . . .
@@ -631,15 +665,21 @@ ggplot(demo_data, aes(x = x, y = y)) +
 #| eval: false
 
 # General syntax
-lm(y ~ x, data = your_data)
+my_lm <- lm(y ~ x, data = your_data)
+
 ```
 
 . . .
 
 - The formula `y ~ x` says: "$y$ is the dependent variable, $x$ is the independent variable"
+- After you write the formula, include that `data = ` argument after a comma and point it towards your dataframe object
 - An **intercept** is included by default
+- We usually save our regression output to an object so we can refer to it later (e.g., `my_lm <- lm(...)`)
+- Use the `summary()` function on the `lm` object to access its stored estimates
 
 ## Example: MPG and Horsepower {.smaller}
+
+- Let's use the `mtcars` data to estimate the regression where our independent variable is `x = hp` and our dependent variable is `y = mpg`
 
 ::: {.callout-note icon=false}
 ## 🖥️ Try it yourself!
@@ -657,19 +697,27 @@ summary(lm_mpg)
 
 ## Reading the Output {.smaller}
 
-- $\hat{\beta}_0 = 30.10$: A car with **zero** horsepower is predicted to get 30.1 MPG (not meaningful here!)
+- For now, focus only on the **`Estimate` column** (we will get to the others in future units)
+  - The `(Intercept)` row is $\hat{\beta}_0$ and the `hp` row is $\hat{\beta}_1$
 
 . . .
 
-- $\hat{\beta}_1 = -0.068$: Each additional unit of horsepower is associated with about **0.07 fewer miles per gallon**
+- So our fitted regression line is:
+
+$$\widehat{mpg} = 30.10 - 0.068 \cdot hp$$
 
 . . .
 
-- **R-squared = 0.60**: Horsepower explains about **60%** of the variation in MPG
+- $\hat{\beta}_0 = 30.10$: a car with **zero** horsepower is predicted to get 30.1 MPG. Not meaningful here: the smallest engine in the data has 52 hp, so this is extrapolation
 
 . . .
 
-- We'll discuss standard errors and p-values in the next unit
+- $\hat{\beta}_1 = -0.068$: cars with one more horsepower get about **0.07 fewer miles per gallon**, on average
+- One horsepower is tiny, so scale up: 100 more horsepower means $100 \times (-0.068) \approx$ **6.8 fewer MPG**, on average
+
+. . .
+
+- **Prediction:** a 150 hp car is predicted to get $30.10 - 0.068 \times 150 \approx 19.9$ MPG
 
 ## Visualizing the Regression Output {.smaller}
 
@@ -703,7 +751,9 @@ ggplot(mtcars, aes(x = hp, y = mpg)) +
 #| output-location: fragment
 
 lm_wt <- lm(mpg ~ wt, data = mtcars)
-coef(lm_wt)
+
+summary(lm_wt)
+
 ```
 
 . . .
@@ -713,22 +763,30 @@ coef(lm_wt)
 
 # Goodness-of-Fit: R-Squared
 
-## How Well Does Our Line Fit?
+## How Well Does Our Line Fit? {.smaller}
 
-- **R-squared** ($R^2$) measures the fraction of variation in $y$ explained by the regression
-
-. . .
-
-$$R^2 = 1 - \frac{SSR}{SST}$$
+- **R-squared** ($R^2$): the fraction of the **total variation** in $y$ explained by the regression
 
 . . .
+
+$$R^2 = 1 - \frac{SSR}{SST} = \frac{SST - SSR}{SST} = \frac{\text{explained variation}}{\text{total variation}}$$
 
 where:
 
-- $SST = \sum(y_i - \bar{y})^2$ = **total** variation in $y$
-- $SSR = \sum\hat{\mu}_i^2$ = **unexplained** variation (residuals)
+- $SST = \sum(y_i - \bar{y})^2$ = **total** variation in $y$ (how spread out $y$ is around its mean)
+- $SSR = \sum\hat{\mu}_i^2$ = **unexplained** variation (what's left over, i.e., the residuals)
 
-## R-Squared: Nearly Useless Regression {.smaller}
+. . .
+
+- $R^2$ is always between 0 and 1:
+  - $R^2 = 0$: $x$ explains none of the variation in $y$ (a flat line, $\hat{\beta}_1 = 0$)
+  - $R^2 = 1$: $x$ explains all of it (every point is exactly on the line)
+
+. . .
+
+- `mpg` on `hp`: $R^2 = 0.60$ (`Multiple R-squared` in `summary()`), so horsepower explains about **60%** of the variation in MPG
+
+## R-Squared: Regression with little explanatory power {.smaller}
 
 ```{r}
 #| echo: false
@@ -800,9 +858,9 @@ ggplot(tibble(x = x_demo, y = y_tight), aes(x, y)) +
 ::: {.callout-warning}
 ## Don't Over-Interpret R-Squared
 
-- A **high** $R^2$ does NOT mean we have a causal estimate -- it just means $x$ is correlated with $y$
+- A **high** $R^2$ does NOT mean we have a causal estimate -- it just means $x$ is highly correlated with $y$ and we do a good job explaining to total variation in $y$
 
-- A **low** $R^2$ does NOT mean our estimate is wrong or unimportant
+- A **low** $R^2$ does NOT mean our estimate is wrong or unimportant - sometimes, we may not be interested in explaining **all** variation in $y$, but rather a subset of it
 
 - In cross-sectional data, $R^2$ values of 0.1 to 0.3 are common and can still represent economically meaningful relationships
 :::
@@ -1400,104 +1458,98 @@ Under all five Gauss-Markov assumptions, OLS is **BLUE**:
 - All five → OLS is **BLUE** (Best Linear Unbiased Estimator)
 
 
-# Practice Exercises
+# Interpretation Practice Exercises
 
-## Practice: Interpreting Regression Output {.smaller}
+## Practice 1: Studying and Exam Scores {.smaller}
 
-::: {.callout-note icon=false}
-## 🖥️ Your turn!
+A professor collects data on how many hours her students studied for an exam and estimates:
+
+$$\widehat{score} = 60 + 5 \cdot hours, \qquad R^2 = 0.20$$
+
+where $score$ is the exam score (out of 100) and $hours$ is hours spent studying
+
+::: {.nonincremental}
+1. Interpret the slope, $\hat{\beta}_1 = 5$
+2. Interpret the intercept, $\hat{\beta}_0 = 60$
+3. What is the predicted score for a student who studies 4 hours?
+4. Interpret the $R^2$
 :::
 
-**A researcher estimates the relationship between test scores and class size:**
+## Practice 1: Answers {.smaller}
 
-```
-             Estimate  Std. Error
-(Intercept)   698.93      10.36
-str            -2.28       0.52
+1. Students who study one more hour score **5 points higher**, on average
 
-n = 420, R-squared = 0.051
-```
+2. A student who studies **0 hours** is predicted to score **60**. Here the intercept is meaningful, since some students don't study at all!
 
-*(`str` = student-teacher ratio)*
+3. $60 + 5 \times 4 = 60 + 20 = 80$ points
 
-. . .
+4. Hours of studying explain **20%** of the variation in exam scores
 
-**Questions:**
+## Practice 2: Education and Wages {.smaller}
 
-1. What happens to predicted scores with 5 more students per teacher?
-2. What is the predicted score when `str = 20`?
-3. What does the R-squared tell us?
-
-## Practice: Answers {.smaller}
-
-1. $5 \times (-2.28) = -11.4$ points lower
-
-. . .
-
-2. $698.93 + (-2.28)(20) = 698.93 - 45.6 = 653.33$
-
-. . .
-
-3. About 5.1% of the variation in test scores is explained by class size. This is low, but does NOT mean class size is unimportant -- it just means other factors also matter.
-
-## Practice: Run a Full Analysis {.smaller}
-
-::: {.callout-note icon=false}
-## 🖥️ Your turn!
-:::
-
-Using `mtcars`, complete the following:
-
-1. Create a scatter plot of `disp` (displacement) vs. `mpg` with a line of best fit
-2. Run `lm(mpg ~ disp, data = mtcars)` and interpret the slope
-3. What is the R-squared? What does it mean?
-
-. . .
+Data on 526 U.S. workers in 1976: `wage` is dollars per hour, `educ` is years of education
 
 ```{r}
-#| output-location: fragment
-#| fig-height: 2.5
-
-ggplot(mtcars, aes(x = disp, y = mpg)) +
-  geom_point(alpha = 0.6) +
-  geom_smooth(method = "lm") +
-  labs(x = "Displacement (cu.in.)", y = "MPG",
-       title = "MPG vs. Engine Displacement") +
-  theme_minimal()
+wage_reg <- lm(wage ~ educ, data = wooldridge::wage1)
+round(coef(wage_reg), 2)
+round(summary(wage_reg)$r.squared, 2)
 ```
 
-## Practice: Results {.smaller}
-
-```{r}
-#| output-location: fragment
-
-summary(lm(mpg ~ disp, data = mtcars))
-```
-
-## Practice: Identifying Assumption Violations {.smaller}
-
-::: {.callout-note icon=false}
-## 🖥️ Your turn!
+::: {.nonincremental}
+1. Use the output to write down the fitted regression line
+2. Interpret $\hat{\beta}_1$
+3. What is the predicted wage for someone with 10 years of education?
+4. Interpret the $R^2$
 :::
 
-**For each scenario, which Gauss-Markov assumption is most likely violated? Discuss with your neighbor!**
+## Practice 2: Answers {.smaller}
 
-. . .
+1. $\widehat{wage} = -0.90 + 0.54 \cdot educ$
 
-1. You study the effect of education on wages, but can't observe ability
+2. Workers with one more year of education earn about **\$0.54/hour more**, on average
 
-. . .
+3. $-0.90 + 0.54 \times 10 = -0.90 + 5.40 = \$4.50$ per hour
 
-- *Assumption 4 (zero conditional mean): ability is in the error term and correlated with education*
+4. Education explains about **16%** of the variation in hourly wages
 
-. . .
+## Practice 3: Smoking and Birth Weight {.smaller}
 
-2. You survey only college students about the effect of income on happiness
+Data on 1,388 births: `bwght` is birth weight in ounces, `cigs` is cigarettes the mother smoked per day during pregnancy
 
-. . .
+::: {.panel-tabset}
 
-- *Assumption 2 (random sampling): your sample is not representative of the general population*
+### R Output
 
+```{r}
+summary(lm(bwght ~ cigs, data = wooldridge::bwght))
+```
+
+### Questions
+
+::: {.nonincremental}
+1. Find $\hat{\beta}_0$ and $\hat{\beta}_1$ in the output and write down the fitted regression line
+2. Interpret $\hat{\beta}_1$. How much lower is predicted birth weight for a mother who smokes a pack a day (20 cigarettes) than for one who doesn't smoke? Give your answer in ounces and in pounds (16 ounces = 1 pound)
+3. Suppose we measured smoking in **packs** per day instead of cigarettes. What would $\hat{\beta}_1$ be? What about $\hat{\beta}_0$ and $R^2$?
+4. Unlike the wage regression, this intercept **is** meaningful. Why?
+5. Smoking explains only about 2% of the variation in birth weight. Does that mean smoking doesn't matter?
+6. Can we conclude that smoking **causes** lower birth weight? Name something in $\mu$ that might be related to smoking
+:::
+
+:::
+
+## Practice 3: Answers {.smaller}
+
+1. $\widehat{bwght} = 119.77 - 0.514 \cdot cigs$
+
+2. Each additional cigarette per day is associated with about **0.51 ounces lower** birth weight, on average. A pack a day: $20 \times (-0.514) \approx -10.3$ ounces, or about $10.3 / 16 \approx 0.64$ pounds
+
+3. One more pack is 20 more cigarettes, so $\hat{\beta}_1 = 20 \times (-0.514) \approx -10.3$ ounces **per pack**. $\hat{\beta}_0$ and $R^2$ don't change: a non-smoker is still at zero, and we've only relabeled the units of $x$
+
+4. $\hat{\beta}_0 = 119.8$ ounces (about 7.5 pounds) is the predicted birth weight for babies whose mothers **didn't smoke**. It's meaningful because about 85% of mothers in the data didn't smoke
+
+5. No! A low $R^2$ means many other factors also affect birth weight. It doesn't mean the association is small: 10 ounces for a pack a day is roughly 9% of the average birth weight
+
+6. Not necessarily. $\mu$ includes things like income, education, prenatal care, and alcohol use, which are likely related to smoking. If so, $E[\mu \mid cigs] \neq 0$ and $\hat{\beta}_1$ mixes the effect of smoking with the effects of those other factors
 
 # Summary and Key Takeaways
 
@@ -1524,24 +1576,6 @@ summary(lm(mpg ~ disp, data = mtcars))
 . . .
 
 6. **Causality requires unbiasedness** -- only when $E[\mu|x] = 0$ can we interpret $\hat{\beta}_1$ causally
-
-## The Key Equations
-
-**The OLS Slope:**
-
-$$\hat{\beta}_1 = \frac{Cov(x, y)}{Var(x)} = \frac{\sum(x_i - \bar{x})(y_i - \bar{y})}{\sum(x_i - \bar{x})^2}$$
-
-. . .
-
-**The OLS Intercept:**
-
-$$\hat{\beta}_0 = \bar{y} - \hat{\beta}_1 \bar{x}$$
-
-. . .
-
-**The Variance of the Slope:**
-
-$$Var(\hat{\beta}_1) = \frac{\sigma^2}{SST_x}$$
 
 ## Looking Ahead
 
