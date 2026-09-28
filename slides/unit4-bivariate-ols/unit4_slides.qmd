@@ -79,7 +79,12 @@ $$E[Y | X = x]$$
 
 - (Recall some of the notation from the Potential Outcomes framework, e.g. $E[Y_{1i} | D_i = 1]$)
 
-- The conditional expectation is the central quantity we want to model and estimate
+- More specifically, we are interested in *changes* in this conditional expectation of $Y$ as $X$ varies, i.e,:
+
+. . .
+
+$$E[Y | X = x_1] - E[Y | X = x_0]$$ 
+
 
 ## Example: Education and Wages {.smaller}
 
@@ -307,22 +312,25 @@ where:
 
 - How does the regression model link back to our study of the "relationship between two variables"?
 
-- Recall our mathematical definition: $E[Y | X = x]$ as $x$ varies
+- Recall our mathematical definition: How does $E[Y | X = x]$ change as $x$ changes?
 
 - Average the model $y = \beta_0 + \beta_1 x + \mu$ among people with the same $educ$ (i..e, expectation of $y$ conditional on $x$)
 - Only $\mu$ varies within that group, so all other terms will be pulled out of the expectations operator (see expectations properties)
 
+. . .
+
 $$
 \begin{aligned}
 wage &= \beta_0 + \beta_1 \cdot educ + \mu \\[4pt]
-E[wage \mid educ] &= \beta_0 + \beta_1 \cdot educ + E[\mu \mid educ] \\[4pt]
+E[wage \mid educ] &= E[(\beta_0 + \beta_1 \cdot educ + \mu) \mid educ] \\[4pt]
+&= \beta_0 + \beta_1 \cdot educ + E[\mu \mid educ] \\[4pt]
 &= \beta_0 + \beta_1 \cdot educ \qquad \text{if } E[\mu \mid educ] = 0
 \end{aligned}
 $$
 
 . . .
 
-- So, the regression line *is* the way to describe how a variable $y$, on average, changes in response to another variable $x$!
+- A point on regression line *is* the conditional expectation of $Y$ for some $X = x$!
 
 ## Interpreting $\beta_1$: The Slope {.smaller}
 
@@ -341,6 +349,7 @@ E[wage \mid educ = e+1] - E[wage \mid educ = e]
 &= \beta_1
 \end{aligned}
 $$
+
 
 
 ## Interpreting $\beta_0$: The Intercept {.smaller}
@@ -373,7 +382,7 @@ $$E[wage \mid educ = 0] = \beta_0 + \beta_1 \cdot 0 = \beta_0$$
 
 . . .
 
-- Instead, we use our **sample** to compute **estimates**, which we write with "hats":
+- Instead, we use our **sample** to compute **estimates** of these parameters, which we write with "hats":
 
 . . .
 
@@ -382,7 +391,7 @@ $$E[wage \mid educ = 0] = \beta_0 + \beta_1 \cdot 0 = \beta_0$$
 
 ## Predicted Values and the Fitted Line
 
-- Using our estimates, we construct the **regression line**:
+- Using our estimates (we will talk about where they come from in a bit), we construct the **regression line**:
 
 . . .
 
@@ -395,7 +404,7 @@ $$\hat{y} = \hat{\beta}_0 + \hat{\beta}_1 x$$
 
 ## Residuals: The Prediction Errors
 
-- Our predictions won't be perfect. The **residual** for observation $i$ is:
+- Our predictions won't be perfect. The **residual** $\hat{\mu_i} for observation $i$ is:
 
 . . .
 
@@ -442,14 +451,11 @@ ggplot(mtcars_aug, aes(x = hp, y = mpg)) +
 
 ## The Goal: Minimize the Residuals
 
+- So where do we get our $\hat{\beta}$ estimates?
+- We get them by drawing the **best line through the data as possible**
+- And how do we do that? 
 - We want to make residuals as small as possible
-
-. . .
-
 - Can't just minimize $\sum \hat{\mu}_i$ since positive and negative residuals would cancel out!
-
-. . .
-
 - Instead, minimize the **Sum of Squared Residuals (SSR)**:
 
 . . .
@@ -508,17 +514,17 @@ $$\hat{\beta}_0 = \bar{y} - \hat{\beta}_1 \bar{x}$$
 
 ## An Important Observation
 
-- The slope can also be written as:
+- The slope $\hat{\beta_1}$ can also be written as:
 
 . . .
 
 $$\hat{\beta}_1 = \rho_{xy} \frac{\sigma_y}{\sigma_x}$$
 
 
-where $r_{xy}$ is the **correlation** between $x$ and $y$ and $\sigma_y$, $\sigma_x$ are the **standard deviations** of $x$ and $y$
+where $\rho_{xy}$ is the **correlation** between $x$ and $y$ and $\sigma_y$, $\sigma_x$ are the **standard deviations** of $x$ and $y$
 
 
-- Bivariate OLS is essentially a **scaled version of the correlation** between $x$ and $y$
+- Bivariate OLS is essentially estimating a **(scaled) correlation** between $x$ and $y$
 
 - And as we discussed in Unit 1: **correlation does not imply causation!**
 
@@ -564,7 +570,7 @@ ggplot(demo_data, aes(x = x, y = y)) +
   theme_minimal(base_size = 16)
 ```
 
-- The blue line is our "best guess" -- but what makes it "best"?
+- The blue line could be any line, but we need to start somewhere to find the *best* one
 
 ## Visualizing OLS: Step 3 -- One Residual {.smaller}
 
@@ -621,7 +627,7 @@ ggplot(demo_data, aes(x = x, y = y)) +
            color = "darkred", fontface = "bold", size = 4.5) +
   coord_cartesian(xlim = x_lim, ylim = y_lim, expand = FALSE) +
   labs(x = "x", y = "y",
-       title = "Step 4: Square it -- this is what OLS minimizes") +
+       title = "Step 4: Square the residual") +
   theme_minimal(base_size = 16) +
   theme(aspect.ratio = asp)
 ```
@@ -642,14 +648,20 @@ ggplot(demo_data, aes(x = x, y = y)) +
   geom_smooth(method = "lm", se = FALSE, color = "steelblue", linewidth = 1.2) +
   geom_point(size = 3) +
   labs(x = "x", y = "y",
-       title = "Step 5: OLS minimizes the TOTAL area of all squares",
-       subtitle = "Each pink square = one squared residual. OLS makes the total area as small as possible.") +
+       title = "Step 5: Sum the squared residuals for all points",
+       subtitle = "Each pink square = one squared residual") +
   theme_minimal(base_size = 16)
 ```
 
 . . .
 
-- OLS chooses $\hat{\beta}_0$ and $\hat{\beta}_1$ to make the **total pink area** as small as possible!
+- Find the **total sum of squares**
+
+- If it is not the smallest possible SSR you have found yet, draw a new line and try it again until you get the smallest!
+
+- In reality, the calculus optimization techniques saves us from having to make multiple attempts at a regression line estimate and SSR
+
+- The OLS formula chooses $\hat{\beta}_0$ and $\hat{\beta}_1$ to make the **total pink area** as small as possible!
 
 
 # Computing OLS in R
@@ -681,9 +693,7 @@ my_lm <- lm(y ~ x, data = your_data)
 
 - Let's use the `mtcars` data to estimate the regression where our independent variable is `x = hp` and our dependent variable is `y = mpg`
 
-::: {.callout-note icon=false}
-## 🖥️ Try it yourself!
-:::
+. . .
 
 ```{r}
 #| output-location: fragment
@@ -704,15 +714,17 @@ summary(lm_mpg)
 
 - So our fitted regression line is:
 
+. . .
+
 $$\widehat{mpg} = 30.10 - 0.068 \cdot hp$$
 
 . . .
 
-- $\hat{\beta}_0 = 30.10$: a car with **zero** horsepower is predicted to get 30.1 MPG. Not meaningful here: the smallest engine in the data has 52 hp, so this is extrapolation
+- $\hat{\beta}_0 = 30.10$: a car with **zero** horsepower is predicted to get 30.1 MPG (not meaningful here)
 
 . . .
 
-- $\hat{\beta}_1 = -0.068$: cars with one more horsepower get about **0.07 fewer miles per gallon**, on average
+- $\hat{\beta}_1 = -0.068$: cars with one more horsepower get about **0.07 fewer miles per gallon**, on average (often useful to do this when interpreting estimates)
 - One horsepower is tiny, so scale up: 100 more horsepower means $100 \times (-0.068) \approx$ **6.8 fewer MPG**, on average
 
 . . .
@@ -734,6 +746,69 @@ ggplot(mtcars, aes(x = hp, y = mpg)) +
                          " + (", round(coef(lm_mpg)[2], 3), ") × hp")) +
   theme_minimal()
 ```
+
+## Predicted Values and Residuals "By Hand" {.smaller}
+
+- Sometimes we may want to refer to the values predicted by the regression line $\hat{y}_i$ (as opposed to the actual value of the $y_i$),
+as well as the residual $\hat{\mu}_i$
+- We can do this two ways: "by hand" or with built-in functions
+- Recall: $\hat{y}_i = \hat{\beta}_0 + \hat{\beta}_1 x_i$ and $\hat{\mu}_i = y_i - \hat{y}_i$
+- `coef()` pulls the estimates out of our `lm` object; `mutate()` does the rest
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+b0 <- coef(lm_mpg)[1]   # intercept
+b1 <- coef(lm_mpg)[2]   # slope on hp
+
+mtcars_hat <- mtcars |>
+  select(mpg, hp) |>
+  mutate(mpg_hat   = b0 + b1 * hp,     # predicted value
+         mpg_resid = mpg - mpg_hat)    # residual
+
+head(mtcars_hat)
+```
+
+## Same Thing, Using Built-in Functions {.smaller}
+
+- `predict()` returns the predicted values and `residuals()` returns the residuals, straight from the `lm` object
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+mtcars_hat <- mtcars_hat |>
+  mutate(mpg_hat2   = predict(lm_mpg),     # predicted value
+         mpg_resid2 = residuals(lm_mpg))   # residual
+
+head(mtcars_hat)
+```
+
+. . .
+
+- Identical to what we computed by hand!
+
+## Predicting at New Values of $x$ {.smaller}
+
+- The `newdata` argument lets `predict()` compute $\hat{y}$ at **any** value of $x$, even ones not in our data
+- What MPG do we predict for a car with 150 horsepower?
+
+. . .
+
+```{r}
+#| output-location: fragment
+
+predict(lm_mpg, newdata = data.frame(hp = 150))
+```
+
+. . .
+
+- Same as our calculation from before: $30.10 - 0.068 \times 150 \approx 19.9$
+- `newdata` must be a data frame with a column named exactly like the $x$ variable (here, `hp`)
+- Tip for missing data: `lm()` drops rows with missing values, so `predict(lm_mpg)` and `residuals(lm_mpg)` come back too short for `mutate()`. `predict(lm_mpg, newdata = mtcars)` returns a value for every row (`NA` where `hp` is missing)
 
 ## Try It: Run Your Own Regression {.smaller}
 
@@ -759,6 +834,8 @@ summary(lm_wt)
 . . .
 
 - Each additional 1,000 lbs of weight is associated with about **5.3 fewer** miles per gallon
+
+
 
 
 # Goodness-of-Fit: R-Squared
