@@ -1,0 +1,458 @@
+<!--
+  Animated sampling distribution of the OLS slope (EC 325, Unit 4).
+
+  Used by the "Visualizing Unbiasedness" slide in unit4_slides.qmd. The R chunk
+  on that slide writes the estimates into <script id="unbiasedness-anim-data">
+  and then pastes this file in right after it.
+
+  What it does: when the slide is shown, it drops the estimates in one at a
+  time (slowly at first, then faster). Each estimate becomes one block in its
+  histogram bin. The dashed red line is the true slope, and the green line is
+  the running mean of the estimates drawn so far. The count axis grows as the
+  bars grow. It replays each time you arrive on the slide, and in PDF/print
+  mode it shows the finished histogram. There are Replay and Skip buttons in
+  the bottom-right corner.
+-->
+<div class="unbiasedness-anim" id="unbiasedness-anim">
+  <svg class="ua-svg" viewBox="0 0 1000 470" role="img"
+       aria-label="Animated histogram: OLS slope estimates from repeated random samples pile up one at a time and cluster around the true slope."></svg>
+  <div class="ua-controls">
+    <button type="button" class="ua-btn" data-ua="replay">&#8635; Replay</button>
+    <button type="button" class="ua-btn" data-ua="skip">Skip to end &#9654;&#9654;</button>
+  </div>
+</div>
+
+<style>
+.unbiasedness-anim { position: relative; width: 100%; margin: 0 auto; }
+.unbiasedness-anim .ua-svg { display: block; width: 100%; height: auto; }
+.unbiasedness-anim .ua-svg text { font-family: inherit; }
+.unbiasedness-anim .ua-controls {
+  position: absolute; right: 0; bottom: 0; display: flex; gap: 8px;
+}
+.unbiasedness-anim .ua-btn {
+  font-family: inherit; font-size: 14px; line-height: 1.2; color: #1A2D38;
+  background: #ffffff; border: 1px solid #9EA9B0; border-radius: 4px;
+  padding: 3px 9px; cursor: pointer; opacity: 0.55;
+}
+.unbiasedness-anim .ua-btn:hover { opacity: 1; }
+@media print { .unbiasedness-anim .ua-controls { display: none; } }
+</style>
+
+<script>
+(function () {
+  "use strict";
+
+  var wrap = document.getElementById("unbiasedness-anim");
+  var dataEl = document.getElementById("unbiasedness-anim-data");
+  if (!wrap || !dataEl) return;
+
+  var DATA = JSON.parse(dataEl.textContent);
+  var EST = DATA.b1_hat;            // the estimates, in the order they were drawn
+  var BETA = DATA.beta_true;        // true slope (red dashed line)
+  var BW = DATA.binwidth;           // histogram bin width
+  var NSAMP = DATA.sample_size;     // observations per sample
+  var N = EST.length;
+  if (!N) return;
+
+  var SVGNS = "http://www.w3.org/2000/svg";
+  var svg = wrap.querySelector("svg");
+
+  // ---- Colors -------------------------------------------------------------
+  var INK = "#1A2D38", AXIS = "#4D4D4D", GRID = "#EBEBEB";
+  var STEEL = [98, 149, 191];       // steelblue at 85% over white: settled blocks
+  var HOT = [240, 194, 45];         // Colby deep yellow at 85% over white: newest estimate
+  var TRUE_COL = "red", MEAN_COL = "forestgreen";
+
+  // ---- Layout (SVG user units; the viewBox is 1000 x 470) -----------------
+  var PX0 = 82, PX1 = 980;          // plot panel, left/right
+  var PY0 = 132, PY1 = 398;         // plot panel, top/bottom (bottom = count 0)
+  var R_DOT = 8;                    // radius of a falling estimate
+
+  // ---- x axis: nice ticks around the true slope, bins aligned to ticks -----
+  function niceStep(x) {
+    var p = Math.pow(10, Math.floor(Math.log10(x)));
+    var m = x / p;
+    return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * p;
+  }
+  var minE = Infinity, maxE = -Infinity, i;
+  for (i = 0; i < N; i++) {
+    if (EST[i] < minE) minE = EST[i];
+    if (EST[i] > maxE) maxE = EST[i];
+  }
+  var DEV = Math.max(BETA - minE, maxE - BETA, BW) + BW;
+  var TICK = niceStep(2 * DEV / 6);
+  var TICK_DEC = Math.max(0, -Math.floor(Math.log10(TICK) + 1e-9));
+  var LO = Math.floor((BETA - DEV) / TICK + 1e-9) * TICK;
+  var NB = Math.ceil((Math.ceil((BETA + DEV) / TICK - 1e-9) * TICK - LO) / BW - 1e-9);
+  var HI = LO + NB * BW;
+  var BIN_PX = (PX1 - PX0) / NB;
+
+  function xs(v) { return PX0 + (v - LO) / (HI - LO) * (PX1 - PX0); }
+  var BIN = new Array(N);
+  for (i = 0; i < N; i++) {
+    BIN[i] = Math.min(NB - 1, Math.max(0, Math.floor((EST[i] - LO) / BW)));
+  }
+
+  // ---- Timeline: slow for the first few estimates, then faster and faster --
+  // SLOW_GAPS: milliseconds from each of the first estimates to the next one
+  // (edit to taste; bigger = slower). After these, estimates come every 60 ms
+  // up to number 60, and the rest are spread over a final 3.5 seconds.
+  //   gap  = ms until the next estimate is drawn
+  //   fall = ms for the estimate to drop into its bin
+  //   glow = ms the new block stays highlighted (yellow)
+  //   label: show "Sample k: b1-hat = ..." above it (only when there is time to read it)
+  var SLOW_GAPS = [3000, 3000, 3000, 2000, 1500, 1100, 800, 600, 450, 330, 250, 180];
+  function phase(k) {               // k = 1, 2, ..., N
+    if (k <= SLOW_GAPS.length) {
+      var gap = SLOW_GAPS[k - 1];
+      var fall = clamp(0.35 * gap + 50, 260, 1100);
+      return { gap: gap, fall: fall, glow: Math.max(300, gap - fall), label: gap >= 500 };
+    }
+    if (k <= 60) return { gap: 60, fall: 260, glow: 300, label: false };
+    return { gap: Math.max(4, 3500 / Math.max(1, N - 60)), fall: 220, glow: 250, label: false };
+  }
+  var START_DELAY = 700;
+  var LAUNCH = new Array(N), FALL = new Array(N), GLOW = new Array(N),
+      LABEL = new Array(N), GAP = new Array(N);
+  var tt = START_DELAY;
+  for (i = 0; i < N; i++) {
+    var ph = phase(i + 1);
+    LAUNCH[i] = tt; FALL[i] = ph.fall; GLOW[i] = ph.glow; LABEL[i] = ph.label; GAP[i] = ph.gap;
+    tt += ph.gap;
+  }
+
+  // ---- SVG helpers ---------------------------------------------------------
+  function el(name, attrs, parent) {
+    var e = document.createElementNS(SVGNS, name);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function txt(attrs, s, parent) { var e = el("text", attrs, parent); e.textContent = s; return e; }
+  function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+  function mix(f) {                 // HOT -> STEEL as f goes 0 -> 1
+    return "rgb(" + Math.round(HOT[0] + (STEEL[0] - HOT[0]) * f) + "," +
+                    Math.round(HOT[1] + (STEEL[1] - HOT[1]) * f) + "," +
+                    Math.round(HOT[2] + (STEEL[2] - HOT[2]) * f) + ")";
+  }
+  var STEEL_RGB = "rgb(" + STEEL.join(",") + ")";
+  var HOT_RGB = "rgb(" + HOT.join(",") + ")";
+
+  // b1-hat. Fonts place a combining circumflex badly over a Greek beta, so the
+  // text is written as "beta sub-1" and the hat is drawn as a small path,
+  // centered over the beta glyph as actually rendered.
+  var BETA1 = "\u03B2\u2081";
+  function makeHat(parent, color, halo) {
+    var g = el("g", { fill: "none", "stroke-linecap": "round", "stroke-linejoin": "round",
+                      visibility: "hidden" }, parent);
+    var h = halo ? el("path", { stroke: "#ffffff" }, g) : null;
+    var p = el("path", { stroke: color }, g);
+    return { g: g, halo: h, path: p };
+  }
+  function placeHat(hat, textEl, idx, fs) {
+    var ok = false;
+    try {
+      var r = textEl.getExtentOfChar(idx);
+      if (r && r.width > 0) {
+        var base = parseFloat(textEl.getAttribute("y"));
+        var cx = r.x + r.width / 2;
+        var d = "M" + (cx - 0.21 * fs) + " " + (base - 0.86 * fs) +
+                " L" + cx + " " + (base - 1.0 * fs) +
+                " L" + (cx + 0.21 * fs) + " " + (base - 0.86 * fs);
+        hat.path.setAttribute("d", d);
+        hat.path.setAttribute("stroke-width", 0.075 * fs);
+        if (hat.halo) { hat.halo.setAttribute("d", d); hat.halo.setAttribute("stroke-width", 0.075 * fs + 5); }
+        ok = true;
+      }
+    } catch (err) { /* not rendered yet (slide hidden); try again next draw */ }
+    hat.g.setAttribute("visibility", ok ? "visible" : "hidden");
+  }
+
+  // ---- Static layers -------------------------------------------------------
+  var gGrid = el("g", {}, svg);
+  // solid fills + crisp edges, so stacked blocks merge into clean bars
+  var gBricks = el("g", { stroke: "#ffffff", "shape-rendering": "crispEdges" }, svg);
+  var gLines = el("g", {}, svg);
+  var gDots = el("g", {}, svg);
+  var gText = el("g", {}, svg);
+
+  txt({ x: PX0, y: 30, "font-size": 25, "font-weight": 600, fill: INK },
+      "Distribution of OLS Slope Estimates Across " + N + " Samples", gText);
+  txt({ x: PX0, y: 60, "font-size": 18, fill: "#595959" },
+      "Each block is the slope estimate from one random sample of n = " + NSAMP, gText);
+  var counterEl = txt({ x: PX1, y: 60, "text-anchor": "end", "font-size": 18,
+                        "font-weight": 600, fill: INK }, "", gText);
+
+  // x grid + tick labels
+  for (var k = 0; ; k++) {
+    var tv = LO + k * TICK;
+    if (tv > HI + 1e-9) break;
+    var tx = xs(tv);
+    el("line", { x1: tx, x2: tx, y1: PY0, y2: PY1, stroke: GRID, "stroke-width": 1.2 }, gGrid);
+    txt({ x: tx, y: PY1 + 27, "text-anchor": "middle", "font-size": 17, fill: AXIS },
+        tv.toFixed(TICK_DEC), gText);
+  }
+  // axis titles
+  var XT_FS = 24;
+  var xTitle = txt({ x: (PX0 + PX1) / 2, y: PY1 + 64, "text-anchor": "middle",
+                     "font-size": XT_FS, fill: INK }, BETA1, gText);
+  var xTitleHat = makeHat(gText, INK, false);
+  txt({ x: 0, y: 0, "text-anchor": "middle", "font-size": 19, fill: INK,
+        transform: "translate(26," + (PY0 + PY1) / 2 + ") rotate(-90)" }, "Count", gText);
+
+  // y grid + tick labels (pool, updated every frame as the axis grows)
+  var Y_POOL = 8, yLines = [], yLabels = [];
+  for (k = 0; k < Y_POOL; k++) {
+    yLines.push(el("line", { x1: PX0, x2: PX1, stroke: GRID, "stroke-width": 1.2 }, gGrid));
+    yLabels.push(txt({ x: PX0 - 10, "text-anchor": "end", "font-size": 17, fill: AXIS }, "", gText));
+  }
+  var Y_STEPS = [1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 5000];
+
+  // true-slope line + label
+  var xTrue = xs(BETA);
+  el("line", { x1: xTrue, x2: xTrue, y1: PY0 - 56, y2: PY1, stroke: TRUE_COL,
+               "stroke-width": 3, "stroke-dasharray": "10 7" }, gLines);
+  txt({ x: xTrue + 9, y: PY0 - 34, "font-size": 19, "font-weight": 700, fill: TRUE_COL },
+      "True \u03B2\u2081 = " + BETA, gText);
+
+  // running-mean line + label (the line stops below the true-slope label row)
+  var meanLine = el("line", { y1: PY0 - 25, y2: PY1, stroke: MEAN_COL, "stroke-width": 3 }, gLines);
+  var meanLabel = txt({ y: PY0 - 8, "font-size": 19, "font-weight": 700, fill: MEAN_COL }, "", gText);
+
+  // call-out above the first few estimates: "Sample k: b1-hat = ..."
+  var CO_FS = 19;
+  var callout = txt({ "font-size": CO_FS, "font-weight": 700, fill: INK, stroke: "#ffffff",
+                      "stroke-width": 5, "stroke-linejoin": "round", "paint-order": "stroke",
+                      "text-anchor": "middle" }, "", gText);
+  var calloutHat = makeHat(gText, INK, true);
+
+  // ---- Animation state -----------------------------------------------------
+  var counts, maxCount, sum, nLaunched, nLanded, falling, glowing, landed,
+      dotEl, brickEl, brickStack, brickLand, yMax, t0, lastNow, raf, running;
+
+  function yTarget() { return Math.max(5, maxCount * 1.15); }
+
+  // labelled estimates start a bit lower so their call-out stays inside the panel
+  function dropStart(j) { return PY0 + (LABEL[j] ? 46 : R_DOT); }
+
+  function launch(j) {
+    dotEl[j] = el("circle", { cx: xs(EST[j]), cy: dropStart(j), r: R_DOT, fill: HOT_RGB,
+                              stroke: "#8A6A00", "stroke-width": 1.5 }, gDots);
+    falling.push(j);
+  }
+
+  function land(j, tLand) {         // tLand = null: no highlight (skip / print)
+    var b = BIN[j];
+    brickStack[j] = counts[b];
+    counts[b] += 1;
+    if (counts[b] > maxCount) maxCount = counts[b];
+    sum += EST[j];
+    nLanded += 1;
+    brickEl[j] = el("rect", { x: xs(LO + b * BW) + 1, width: BIN_PX - 2,
+                              fill: tLand === null ? STEEL_RGB : HOT_RGB }, gBricks);
+    brickLand[j] = tLand;
+    landed.push(j);
+    if (tLand !== null) glowing.push(j);
+    if (dotEl[j]) { gDots.removeChild(dotEl[j]); dotEl[j] = null; }
+  }
+
+  function draw(t) {
+    var yEff = Math.max(yMax, maxCount, 1);
+    var u = (PY1 - PY0) / yEff;     // height of one block
+
+    // blocks (thin white seams between blocks while they are tall enough to see)
+    gBricks.setAttribute("stroke-width", (clamp((u - 4) / 6, 0, 1) * 1.5).toFixed(2));
+    for (var a = 0; a < landed.length; a++) {
+      var j = landed[a];
+      brickEl[j].setAttribute("y", PY1 - (brickStack[j] + 1) * u);
+      brickEl[j].setAttribute("height", u);
+    }
+    var still = [];
+    for (a = 0; a < glowing.length; a++) {
+      j = glowing[a];
+      var f = (t - brickLand[j]) / GLOW[j];   // stay yellow, then fade quickly to blue
+      if (f >= 1) brickEl[j].setAttribute("fill", STEEL_RGB);
+      else { brickEl[j].setAttribute("fill", mix(clamp((f - 0.8) / 0.2, 0, 1))); still.push(j); }
+    }
+    glowing = still;
+
+    // falling estimates: accelerate from the top of the panel onto their bin
+    for (a = 0; a < falling.length; a++) {
+      j = falling[a];
+      var p = clamp((t - LAUNCH[j]) / FALL[j], 0, 1);
+      var yEnd = PY1 - counts[BIN[j]] * u - R_DOT;
+      var yStart = Math.min(dropStart(j), yEnd);
+      dotEl[j].setAttribute("cy", yStart + (yEnd - yStart) * p * p);
+    }
+
+    // y axis
+    var step = Y_STEPS[Y_STEPS.length - 1];
+    for (a = 0; a < Y_STEPS.length; a++) { if (yEff / Y_STEPS[a] <= 5) { step = Y_STEPS[a]; break; } }
+    for (a = 0; a < Y_POOL; a++) {
+      var v = a * step;
+      var show = v <= yEff + 1e-9;
+      var y = PY1 - v * u;
+      yLines[a].setAttribute("visibility", show ? "visible" : "hidden");
+      yLabels[a].setAttribute("visibility", show ? "visible" : "hidden");
+      if (show) {
+        yLines[a].setAttribute("y1", y); yLines[a].setAttribute("y2", y);
+        yLabels[a].setAttribute("y", y + 6);
+        yLabels[a].textContent = String(v);
+      }
+    }
+
+    // running mean
+    if (nLanded > 0) {
+      var m = sum / nLanded, xm = xs(m);
+      meanLine.setAttribute("x1", xm); meanLine.setAttribute("x2", xm);
+      meanLine.setAttribute("visibility", "visible");
+      meanLabel.setAttribute("visibility", "visible");
+      meanLabel.textContent = "Mean of estimates = " + m.toFixed(3);
+      // put the label on the side away from the true-slope line
+      if (m <= BETA) { meanLabel.setAttribute("x", xm - 9); meanLabel.setAttribute("text-anchor", "end"); }
+      else { meanLabel.setAttribute("x", xm + 9); meanLabel.setAttribute("text-anchor", "start"); }
+    } else {
+      meanLine.setAttribute("visibility", "hidden");
+      meanLabel.setAttribute("visibility", "hidden");
+    }
+
+    // counter
+    counterEl.textContent = "Samples drawn: " + nLaunched + " of " + N;
+
+    // call-out above the most recent labelled estimate, until the next one is drawn
+    var c = nLaunched - 1;
+    if (c >= 0 && LABEL[c] && t < LAUNCH[c] + GAP[c]) {
+      var cx, top;
+      if (dotEl[c]) { cx = xs(EST[c]); top = parseFloat(dotEl[c].getAttribute("cy")) - R_DOT; }
+      else { cx = xs(LO + (BIN[c] + 0.5) * BW); top = PY1 - (brickStack[c] + 1) * u; }
+      var prefix = "Sample " + (c + 1) + ": ";
+      callout.textContent = prefix + BETA1 + " = " + EST[c].toFixed(3);
+      var half = 115;
+      try { half = callout.getComputedTextLength() / 2 + 4; } catch (err) { /* keep default */ }
+      callout.setAttribute("x", clamp(cx, PX0 + half, PX1 - half));
+      callout.setAttribute("y", top - 12);
+      callout.setAttribute("visibility", "visible");
+      placeHat(calloutHat, callout, prefix.length, CO_FS);
+    } else {
+      callout.setAttribute("visibility", "hidden");
+      calloutHat.g.setAttribute("visibility", "hidden");
+    }
+
+    // hat on the x-axis title
+    placeHat(xTitleHat, xTitle, 0, XT_FS);
+  }
+
+  function frame(now) {
+    if (!running) return;
+    if (t0 === null) t0 = now;
+    var t = now - t0;
+    var dt = lastNow === null ? 0 : Math.min(100, now - lastNow);
+    lastNow = now;
+
+    while (nLaunched < N && LAUNCH[nLaunched] <= t) { launch(nLaunched); nLaunched += 1; }
+    var still = [];
+    for (var a = 0; a < falling.length; a++) {
+      var j = falling[a];
+      if (t >= LAUNCH[j] + FALL[j]) land(j, LAUNCH[j] + FALL[j]); else still.push(j);
+    }
+    falling = still;
+
+    var target = yTarget();
+    yMax += (target - yMax) * (1 - Math.exp(-dt / 200));
+    var done = nLanded === N && glowing.length === 0 && Math.abs(target - yMax) < 0.002 * target;
+    if (done) yMax = target;
+    draw(t);
+    if (done) { running = false; raf = null; } else raf = requestAnimationFrame(frame);
+  }
+
+  function stop() {
+    running = false;
+    if (raf !== null && raf !== undefined) cancelAnimationFrame(raf);
+    raf = null;
+  }
+
+  function reset() {
+    stop();
+    while (gBricks.firstChild) gBricks.removeChild(gBricks.firstChild);
+    while (gDots.firstChild) gDots.removeChild(gDots.firstChild);
+    counts = new Array(NB); for (var b = 0; b < NB; b++) counts[b] = 0;
+    maxCount = 0; sum = 0; nLaunched = 0; nLanded = 0;
+    falling = []; glowing = []; landed = [];
+    dotEl = new Array(N); brickEl = new Array(N); brickStack = new Array(N); brickLand = new Array(N);
+    yMax = 5; t0 = null; lastNow = null;
+    draw(0);
+  }
+
+  function play() {
+    reset();
+    running = true;
+    raf = requestAnimationFrame(frame);
+  }
+
+  function showFinal() {
+    stop();
+    if (!counts) reset();
+    for (var a = 0; a < falling.length; a++) land(falling[a], null);
+    falling = [];
+    while (nLaunched < N) { land(nLaunched, null); nLaunched += 1; }
+    for (a = 0; a < glowing.length; a++) brickEl[glowing[a]].setAttribute("fill", STEEL_RGB);
+    glowing = [];
+    yMax = yTarget();
+    draw(Infinity);
+  }
+
+  reset();
+
+  // ---- Buttons -------------------------------------------------------------
+  wrap.querySelector('[data-ua="replay"]').addEventListener("click", function (e) {
+    play(); e.currentTarget.blur();
+  });
+  wrap.querySelector('[data-ua="skip"]').addEventListener("click", function (e) {
+    showFinal(); e.currentTarget.blur();
+  });
+
+  // ---- Start when the slide is shown ---------------------------------------
+  var hooked = false, onSlide = false;
+
+  function isPrint() {
+    try {
+      if (typeof Reveal.isPrintView === "function") return Reveal.isPrintView();
+      if (typeof Reveal.isPrintingPDF === "function") return Reveal.isPrintingPDF();
+    } catch (err) { /* fall through */ }
+    return /print-pdf/i.test(window.location.search);
+  }
+
+  function checkSlide() {
+    var cur = Reveal.getCurrentSlide();
+    var here = !!cur && cur.contains(wrap);
+    if (here && !onSlide) { onSlide = true; play(); }
+    else if (!here && onSlide) { onSlide = false; stop(); }
+  }
+
+  function hookReveal() {
+    if (hooked) return true;
+    if (!window.Reveal || typeof window.Reveal.on !== "function") return false;
+    hooked = true;
+    var start = function () { if (isPrint()) showFinal(); else checkSlide(); };
+    Reveal.on("slidechanged", function () { if (!isPrint()) checkSlide(); });
+    if (typeof Reveal.isReady === "function" && Reveal.isReady()) start();
+    else Reveal.on("ready", start);
+    return true;
+  }
+
+  function fallback() {             // not inside reveal.js: play when scrolled into view
+    if (!("IntersectionObserver" in window)) { play(); return; }
+    var io = new IntersectionObserver(function (entries) {
+      if (entries[0].isIntersecting) { io.disconnect(); play(); }
+    }, { threshold: 0.5 });
+    io.observe(wrap);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", hookReveal);
+  } else {
+    hookReveal();
+  }
+  window.addEventListener("load", function () { if (!hookReveal()) fallback(); });
+})();
+</script>

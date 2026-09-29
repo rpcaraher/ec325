@@ -810,33 +810,6 @@ predict(lm_mpg, newdata = data.frame(hp = 150))
 - `newdata` must be a data frame with a column named exactly like the $x$ variable (here, `hp`)
 - Tip for missing data: `lm()` drops rows with missing values, so `predict(lm_mpg)` and `residuals(lm_mpg)` come back too short for `mutate()`. `predict(lm_mpg, newdata = mtcars)` returns a value for every row (`NA` where `hp` is missing)
 
-## Try It: Run Your Own Regression {.smaller}
-
-::: {.callout-note icon=false}
-## 🖥️ Your turn!
-:::
-
-**Regress `mpg` on `wt` (weight) using the `mtcars` data. What does the slope tell you?**
-
-- *Hint:* Use `lm(mpg ~ wt, data = mtcars)` and `summary()`
-
-. . .
-
-```{r}
-#| output-location: fragment
-
-lm_wt <- lm(mpg ~ wt, data = mtcars)
-
-summary(lm_wt)
-
-```
-
-. . .
-
-- Each additional 1,000 lbs of weight is associated with about **5.3 fewer** miles per gallon
-
-
-
 
 # Goodness-of-Fit: R-Squared
 
@@ -1121,10 +1094,6 @@ ggplot(zcm_bad, aes(x = x, y = mu)) +
 
 ## Simulating Unbiasedness {.smaller}
 
-::: {.callout-note icon=false}
-## 🖥️ Try it yourself!
-:::
-
 Let's prove unbiasedness to ourselves! First, create a "population" with **known** parameters:
 
 . . .
@@ -1143,10 +1112,6 @@ pop_data <- tibble(
 ```
 
 ## Drawing Many Samples {.smaller}
-
-::: {.callout-note icon=false}
-## 🖥️ Try it yourself!
-:::
 
 Now draw 500 random samples and estimate $\hat{\beta}_1$ each time. We use a `for()` loop to repeat the same set of steps a fixed number of times. The loop runs the code inside `{}` once for each value of `i` (from 1 to 500), so we don't have to copy and paste the same code 500 times:
 
@@ -1173,29 +1138,30 @@ mean(sim_results$b1_hat)
 ## Visualizing Unbiasedness {.smaller}
 
 ```{r}
+#| label: unbiasedness-animation
 #| echo: false
-#| fig-height: 4
-#| fig-align: center
+#| output: asis
 
-ggplot(sim_results, aes(x = b1_hat)) +
-  geom_histogram(binwidth = 0.015, fill = "steelblue", alpha = 0.7, color = "white") +
-  geom_vline(xintercept = 2.21, color = "red", linewidth = 1.2, linetype = "dashed") +
-  geom_vline(xintercept = mean(sim_results$b1_hat), color = "forestgreen",
-             linewidth = 1.2) +
-  annotate("text", x = 2.275, y = 40, label = paste0("True β = 2.21"),
-           color = "red", size = 5, fontface = "bold") +
-  annotate("text", x = 2.145, y = 35,
-           label = paste0("Mean = ", round(mean(sim_results$b1_hat), 3)),
-           color = "forestgreen", size = 5, fontface = "bold") +
-  labs(x = expression(hat(beta)[1]), y = "Count",
-       title = "Distribution of OLS Slope Estimates Across 500 Samples",
-       subtitle = "Each bar represents estimates that fell in a narrow range") +
-  theme_minimal(base_size = 16)
+# Animated histogram: the 500 estimates from the previous slide drop in one at
+# a time and pile up around the true slope. The drawing code lives in
+# unbiasedness-animation.html (same folder); this chunk just hands it the data.
+anim_data <- sprintf(
+  '{"b1_hat": [%s], "beta_true": %s, "binwidth": %s, "sample_size": %d}',
+  paste(sprintf("%.10f", sim_results$b1_hat), collapse = ", "),
+  2.21,                    # true slope (red dashed line)
+  0.002,                   # histogram bin width
+  as.integer(sample_size)
+)
+cat("```{=html}",
+    paste0('<script type="application/json" id="unbiasedness-anim-data">',
+           anim_data, "</script>"),
+    readLines("unbiasedness-animation.html", encoding = "UTF-8"),
+    "```", sep = "\n")
 ```
 
 . . .
 
-- Individual estimates vary, but the **average** equals the true value!
+- Individual estimates vary, but the as we take more and more samples the **average** equals the true value!
 
 
 # So What? Bias, OVB, and Causality
@@ -1229,27 +1195,22 @@ ggplot(sim_results, aes(x = b1_hat)) +
 OLS always estimates *something*. Whether that something is a **causal effect** or merely a **correlation** depends entirely on whether the assumptions hold. Most of econometrics is about finding clever ways to make the zero conditional mean assumption more plausible.
 :::
 
-. . .
-
-::: {.callout-tip}
-## Coming Up Next
-**Multivariate regression** gives us the tools to **control for** confounding variables by adding more $x$'s to our model -- directly addressing omitted variable bias.
-:::
-
 
 # Variance, Standard Errors, and BLUE
 
-## Beyond Unbiasedness
+## Beyond Unbiasedness {.smaller}
 
 - Unbiasedness tells us OLS is "right on average" -- but individual estimates can vary a lot
 
-. . .
-
 - We also care about **precision**: how much do estimates bounce around from sample to sample?
 
-. . .
+- This is measured by the **variance** of the OLS estimator
+  - It asks: how much does our estimate $\hat{\beta}_1$ change if we draw a *different* sample?
+  - Formally, $Var(\hat{\beta}_1) = E[(\hat{\beta}_1 - E[\hat{\beta}_1])^2]$ -- the average squared distance of $\hat{\beta}_1$ from its mean
 
-- This is measured by the **variance** of the estimator
+- We saw this in our simulation: the 500 estimates were centered near 2.21, but individual estimates ranged from `r round(min(sim_results$b1_hat), 2)` to `r round(max(sim_results$b1_hat), 2)`. That **spread** is what the variance measures
+
+- Why it matters: in practice we only get **one** sample. The lower the variance, the more likely our one estimate is close to $\beta_1$
 
 ## Assumption 5: Homoskedasticity {.smaller}
 
@@ -1292,29 +1253,18 @@ ggplot(tibble(x = x_h, y = y_hetero), aes(x, y)) +
   theme_minimal(base_size = 14)
 ```
 
-## Deriving the Variance of $\hat{\beta}_1$: Sketch {.smaller}
+## The Variance of $\hat{\beta}_1$ {.smaller}
 
 - Start from the slope formula. Using the fact that $y_i = \beta_0 + \beta_1 x_i + \mu_i$:
 
 . . .
 
+
 $$\hat{\beta}_1 = \beta_1 + \frac{\sum(x_i - \bar{x})\mu_i}{\sum(x_i - \bar{x})^2}$$
 
 . . .
 
-- The only random piece is $\mu_i$, so the variance comes from the second term:
-
-. . .
-
-$$Var(\hat{\beta}_1) = Var\left(\frac{\sum(x_i - \bar{x})\mu_i}{\sum(x_i - \bar{x})^2}\right)$$
-
-## Deriving the Variance: Result {.smaller}
-
-- Since $\sum(x_i - \bar{x})^2$ is a constant (fixed in our sample) and the $\mu_i$ are independent with constant variance $\sigma^2$:
-
-. . .
-
-$$Var(\hat{\beta}_1) = \frac{\sum(x_i - \bar{x})^2 \cdot \sigma^2}{\left[\sum(x_i - \bar{x})^2\right]^2} = \frac{\sigma^2}{\sum(x_i - \bar{x})^2}$$
+- The only random piece is $\mu_i$. Since the $\mu_i$ are independent (random sampling) with constant variance $\sigma^2$ (homoskedasticity):
 
 . . .
 
@@ -1325,201 +1275,109 @@ $$Var(\hat{\beta}_1) = \frac{\sigma^2}{SST_x}$$
 where $\sigma^2 = Var(\mu)$ is the error variance and $SST_x = \sum(x_i - \bar{x})^2$ is the total variation in $x$.
 :::
 
-## What Affects Precision? {.smaller}
+::: {.callout-tip}
+## Full Derivation
+The step-by-step derivation is in Section 4.10 of the lecture notes.
+:::
+
+## What Affects Precision?
 
 $$Var(\hat{\beta}_1) = \frac{\sigma^2}{SST_x}$$
 
 . . .
 
-Two key insights:
+- **More noise** ($\sigma^2$ ↑) → **less** precise estimates
+- **More variation in $x$** ($SST_x$ ↑) → **more** precise estimates
+- **Larger samples** ($n$ ↑) → **more** precise estimates, since each observation adds to $SST_x$
 
-. . .
+## What Affects Precision? Simulations {.smaller}
 
-1. **More noise** ($\sigma^2$ ↑) → **less** precise estimates (wider distribution)
-
-. . .
-
-2. **More variation in $x$** ($SST_x$ ↑) → **more** precise estimates (tighter distribution)
-
-. . .
-
-- Let's see this with simulations!
-
-## Effect of Error Variance on Precision {.smaller}
+Each histogram shows 500 OLS estimates of $\beta_1$. Red dashed line: the true value, $\beta_1 = 2$.
 
 ```{r}
 #| echo: false
-#| fig-height: 4
-#| fig-align: center
+#| fig-width: 10
+#| fig-height: 5.2
+
+# OLS slopes from 500 random samples of size n drawn from a population
+sim_slopes <- function(pop, n) {
+  map_dbl(1:500, function(i) {
+    samp <- slice_sample(pop, n = n, replace = TRUE)
+    coef(lm(y ~ x, data = samp))[2]
+  })
+}
+
+# Make a population of 1,000 with true slope 2
+make_pop <- function(x_values, error_sd) {
+  tibble(x = sample(x_values, 1000, replace = TRUE),
+         y = 5 + 2 * x + rnorm(1000, 0, error_sd))
+}
 
 set.seed(444)
-n_var <- 500
+noise_high <- sim_slopes(make_pop(1:100, 50), n = 30)
+noise_low  <- sim_slopes(make_pop(1:100, 5),  n = 30)
+x_narrow   <- sim_slopes(make_pop(40:60, 15), n = 30)
+x_wide     <- sim_slopes(make_pop(1:100, 15), n = 30)
+pop_n      <- make_pop(1:100, 20)
+n_small    <- sim_slopes(pop_n, n = 15)
+n_large    <- sim_slopes(pop_n, n = 200)
 
-# Population with low noise
-pop_low <- tibble(x = sample(1:100, 1000, replace = TRUE),
-                  y = 5 + 2 * x + rnorm(1000, 0, 5))
-# Population with high noise
-pop_high <- tibble(x = sample(1:100, 1000, replace = TRUE),
-                   y = 5 + 2 * x + rnorm(1000, 0, 50))
+# One panel per comparison; `less` marks the less precise setting (coral)
+panels <- c("Noise", "Variation in x", "Sample size")
+sims <- bind_rows(
+  tibble(panel = "Noise",          less = TRUE,  label = "σ = 50",      estimate = noise_high),
+  tibble(panel = "Noise",          less = FALSE, label = "σ = 5",       estimate = noise_low),
+  tibble(panel = "Variation in x", less = TRUE,  label = "x: 40 to 60", estimate = x_narrow),
+  tibble(panel = "Variation in x", less = FALSE, label = "x: 1 to 100", estimate = x_wide),
+  tibble(panel = "Sample size",    less = TRUE,  label = "n = 15",      estimate = n_small),
+  tibble(panel = "Sample size",    less = FALSE, label = "n = 200",     estimate = n_large)
+) |>
+  mutate(panel = factor(panel, levels = panels))
 
-sim_var <- tibble(
-  iteration = 1:n_var,
-  low_noise = map_dbl(1:n_var, function(i) {
-    samp <- slice_sample(pop_low, n = 30, replace = TRUE)
-    coef(lm(y ~ x, data = samp))[2]
-  }),
-  high_noise = map_dbl(1:n_var, function(i) {
-    samp <- slice_sample(pop_high, n = 30, replace = TRUE)
-    coef(lm(y ~ x, data = samp))[2]
-  })
-)
+# Label each histogram in its own color: coral to the left, green to the right
+labels <- sims |>
+  group_by(panel, less, label) |>
+  summarize(spread = sd(estimate), .groups = "drop") |>
+  mutate(x     = if_else(less, 2 - 2.2 * spread, 2 + 2.5 * spread + 0.05),
+         hjust = if_else(less, 1, 0))
 
-sim_var_long <- sim_var |>
-  pivot_longer(cols = c(low_noise, high_noise),
-               names_to = "scenario", values_to = "estimate") |>
-  mutate(scenario = ifelse(scenario == "low_noise",
-                           paste0("Low noise (σ = 5), SD = ", round(sd(sim_var$low_noise), 2)),
-                           paste0("High noise (σ = 50), SD = ", round(sd(sim_var$high_noise), 2))))
-
-ggplot(sim_var_long, aes(x = estimate, fill = scenario)) +
-  geom_histogram(binwidth = 0.06, alpha = 0.6, position = "identity", color = "white") +
-  geom_vline(xintercept = 2, color = "red", linewidth = 1.2, linetype = "dashed") +
-  annotate("text", x = 2, y = 75, label = "True β = 2", color = "red",
-           size = 5, fontface = "bold", hjust = -0.1) +
-  scale_fill_manual(values = c("steelblue", "coral")) +
-  labs(x = expression(hat(beta)[1]), y = "Count", fill = "",
-       title = "More noise → less precise estimates",
-       subtitle = "Both are unbiased (centered on 2), but high noise has much wider spread") +
-  theme_minimal(base_size = 14) +
-  theme(legend.position = "bottom")
+ggplot(sims, aes(x = estimate, fill = less)) +
+  geom_histogram(binwidth = 0.05, alpha = 0.6, position = "identity", color = "white") +
+  geom_vline(xintercept = 2, color = "red", linewidth = 1, linetype = "dashed") +
+  geom_text(data = labels, aes(x = x, y = Inf, label = label, color = less, hjust = hjust),
+            vjust = 1.5, size = 6, fontface = "bold") +
+  facet_wrap(~ panel, ncol = 1, scales = "free_y") +
+  scale_fill_manual(values = c(`TRUE` = "coral", `FALSE` = "forestgreen"), guide = "none") +
+  scale_color_manual(values = c(`TRUE` = "coral3", `FALSE` = "forestgreen"), guide = "none") +
+  scale_y_continuous(n.breaks = 3) +
+  labs(x = expression(hat(beta)[1]), y = "Count") +
+  theme_minimal(base_size = 18) +
+  theme(strip.text = element_text(hjust = 0, face = "bold"))
 ```
 
-## Effect of Variation in $x$ on Precision {.smaller}
+## Standard Errors {.smaller}
 
-```{r}
-#| echo: false
-#| fig-height: 4
-#| fig-align: center
-
-set.seed(555)
-
-# Population with low variation in x
-pop_low_x <- tibble(x = sample(40:60, 1000, replace = TRUE),
-                    y = 5 + 2 * x + rnorm(1000, 0, 15))
-# Population with high variation in x
-pop_high_x <- tibble(x = sample(1:100, 1000, replace = TRUE),
-                     y = 5 + 2 * x + rnorm(1000, 0, 15))
-
-sim_x <- tibble(
-  iteration = 1:n_var,
-  low_var_x = map_dbl(1:n_var, function(i) {
-    samp <- slice_sample(pop_low_x, n = 30, replace = TRUE)
-    coef(lm(y ~ x, data = samp))[2]
-  }),
-  high_var_x = map_dbl(1:n_var, function(i) {
-    samp <- slice_sample(pop_high_x, n = 30, replace = TRUE)
-    coef(lm(y ~ x, data = samp))[2]
-  })
-)
-
-sim_x_long <- sim_x |>
-  pivot_longer(cols = c(low_var_x, high_var_x),
-               names_to = "scenario", values_to = "estimate") |>
-  mutate(scenario = ifelse(scenario == "low_var_x",
-                           paste0("x range: 40-60, SD = ", round(sd(sim_x$low_var_x), 2)),
-                           paste0("x range: 1-100, SD = ", round(sd(sim_x$high_var_x), 2))))
-
-ggplot(sim_x_long, aes(x = estimate, fill = scenario)) +
-  geom_histogram(binwidth = 0.06, alpha = 0.6, position = "identity", color = "white") +
-  geom_vline(xintercept = 2, color = "red", linewidth = 1.2, linetype = "dashed") +
-  annotate("text", x = 2, y = 70, label = "True β = 2", color = "red",
-           size = 5, fontface = "bold", hjust = -0.1) +
-  scale_fill_manual(values = c("coral", "forestgreen")) +
-  labs(x = expression(hat(beta)[1]), y = "Count", fill = "",
-       title = "More variation in x → more precise estimates",
-       subtitle = "Both are unbiased, but wider x range gives tighter estimates") +
-  theme_minimal(base_size = 14) +
-  theme(legend.position = "bottom")
-```
-
-## Effect of Sample Size on Precision {.smaller}
-
-```{r}
-#| echo: false
-#| fig-height: 4
-#| fig-align: center
-
-set.seed(666)
-
-pop_n <- tibble(x = sample(1:100, 2000, replace = TRUE),
-                y = 5 + 2 * x + rnorm(2000, 0, 20))
-
-sim_n <- tibble(
-  iteration = 1:n_var,
-  n_15 = map_dbl(1:n_var, function(i) {
-    samp <- slice_sample(pop_n, n = 15, replace = TRUE)
-    coef(lm(y ~ x, data = samp))[2]
-  }),
-  n_200 = map_dbl(1:n_var, function(i) {
-    samp <- slice_sample(pop_n, n = 200, replace = TRUE)
-    coef(lm(y ~ x, data = samp))[2]
-  })
-)
-
-sim_n_long <- sim_n |>
-  pivot_longer(cols = c(n_15, n_200),
-               names_to = "scenario", values_to = "estimate") |>
-  mutate(scenario = ifelse(scenario == "n_15",
-                           paste0("n = 15, SD = ", round(sd(sim_n$n_15), 2)),
-                           paste0("n = 200, SD = ", round(sd(sim_n$n_200), 2))))
-
-ggplot(sim_n_long, aes(x = estimate, fill = scenario)) +
-  geom_histogram(binwidth = 0.06, alpha = 0.6, position = "identity", color = "white") +
-  geom_vline(xintercept = 2, color = "red", linewidth = 1.2, linetype = "dashed") +
-  annotate("text", x = 2, y = 80, label = "True β = 2", color = "red",
-           size = 5, fontface = "bold", hjust = -0.1) +
-  scale_fill_manual(values = c("coral", "forestgreen")) +
-  labs(x = expression(hat(beta)[1]), y = "Count", fill = "",
-       title = "Larger samples → more precise estimates",
-       subtitle = "Larger n means more variation in x (higher SST_x) → tighter distribution") +
-  theme_minimal(base_size = 14) +
-  theme(legend.position = "bottom")
-```
-
-## Standard Errors
-
-- The **standard error** is the estimated standard deviation of $\hat{\beta}_1$:
+- The standard deviation of $\hat{\beta}_1$ is $\sqrt{Var(\hat{\beta}_1)} = \sigma / \sqrt{SST_x}$, but we don't know $\sigma$
 
 . . .
 
-$$se(\hat{\beta}_1) = \sqrt{Var(\hat{\beta}_1)} = \frac{\hat{\sigma}}{\sqrt{SST_x}}$$
+- The **standard error** replaces $\sigma$ with $\hat{\sigma}$, its estimate from the squared sum of residuals, SSR:
 
 . . .
 
-- where $\hat{\sigma}$ estimates the error standard deviation from the residuals
+$$se(\hat{\beta}_1) = \frac{\hat{\sigma}}{\sqrt{SST_x}}$$
+
+- where $\hat{\sigma} = \sqrt{SSR/(n-2)}$ (more on this next unit!)
+
+
+## OLS is BLUE {.smaller}
+
+::: {.callout-important}
+## BLUE: Best Linear Unbiased Estimator
+**Best** means OLS has the **lowest variance** of all linear unbiased estimators.
+:::
 
 . . .
-
-- Standard errors quantify the **precision** of our estimates
-
-- They are essential for hypothesis testing and confidence intervals (next unit!)
-
-## OLS is BLUE
-
-Under all five Gauss-Markov assumptions, OLS is **BLUE**:
-
-. . .
-
-- **B**est: Lowest variance among all linear unbiased estimators
-- **L**inear: A linear function of the data
-- **U**nbiased: $E[\hat{\beta}] = \beta$
-- **E**stimator: A rule for using sample data to estimate parameters
-
-. . .
-
-- You cannot do better without accepting some bias or using non-linear methods!
-
-## Which Assumptions Matter for What? {.smaller}
 
 | Assumption | Needed for Unbiasedness? | Needed for BLUE? |
 |------------|:------------------------:|:----------------:|
@@ -1532,7 +1390,13 @@ Under all five Gauss-Markov assumptions, OLS is **BLUE**:
 . . .
 
 - Assumptions 1-4 → OLS is **unbiased**
-- All five → OLS is **BLUE** (Best Linear Unbiased Estimator)
+- All five → OLS is **BLUE**
+
+## Implications of a BLUE Estimator
+
+- **OLS is the default choice**: when all five assumptions hold, it is not mathmatically possible to derive a more precise estimator
+
+- **"Best" doesn't mean "precise"**: with a lot of noise, little variation in $x$, or a small sample, even OLS estimates can be imprecise (though still better than next alternative)
 
 
 # Interpretation Practice Exercises
