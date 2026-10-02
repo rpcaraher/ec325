@@ -1168,25 +1168,15 @@ cat("```{=html}",
 
 ## When Assumption 4 Fails {.smaller}
 
-- When $E[\mu | x] \neq 0$, OLS is **biased** -- and the most common reason is **omitted variable bias**
-
-. . .
-
-- If a variable that belongs in the model is left out AND is correlated with $x$, our slope picks up the effect of both
-
-. . .
-
-- Example: estimating the return to education while omitting ability → $\hat{\beta}_1$ **overstates** the causal effect
-
-. . .
-
-- Remember from Unit 3: this is essentially **selection bias** -- people who choose more education also tend to have higher ability
-
-## The Big Picture {.smaller}
-
 - When $E[\mu | x] = 0$: $\hat{\beta}_1$ is an unbiased estimate of the **causal effect**
+- When $E[\mu | x] \neq 0$: OLS is **biased**, and $\hat{\beta}_1$ measures **correlation**, not causation
+  - Put differently: $E[\mu | x] \neq 0$ when **some factor in $\mu$ is correlated with $x$** -- then the average of $\mu$ is different at different values of $x$
 
-- When $E[\mu | x] \neq 0$: $\hat{\beta}_1$ measures **correlation**, not causation
+. . .
+
+- The most common reason is **omitted variable bias**: if a variable that belongs in the model is left out AND is correlated with $x$, our slope picks up the effect of both
+  - Example: estimating the return to education while omitting ability → $\hat{\beta}_1$ **overstates** the causal effect
+  - Remember from Unit 3: this is essentially **selection bias** -- people who choose more education also tend to have higher ability
 
 . . .
 

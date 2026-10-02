@@ -1,0 +1,1306 @@
+---
+title: "Multivariate Regression and OLS"
+subtitle: "EC 325: Econometrics"
+author: "Prof. Caraher"
+institute: "Colby College"
+date: "today"
+date-format: "medium"
+embed-resources: true
+format:
+  revealjs:
+    theme: colby-theme.scss
+    slide-number: true
+    incremental: true
+    footer: "EC325 | Unit 5 | Multivariate Regression and OLS"
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+#| echo: false
+
+library(tidyverse)
+```
+
+
+# From Bivariate to Multivariate OLS
+
+## Where We've Been {.smaller}
+
+- Last unit: **bivariate OLS**, $y = \beta_0 + \beta_1 x + \mu$, is **unbiased** when GM assumptions 1--4 hold
+- The hardest to satisfy is **GM4**, $E[\mu | x] = 0$: *everything else* affecting $y$ must be uncorrelated with $x$ --- almost never true in observational data!
+
+. . .
+
+**Example:** $wage = \beta_0 + \beta_1 \cdot educ + \mu$
+
+- The error term $\mu$ contains: ability, family connections, motivation, experience, etc.
+- Many of these are **correlated with education** --- wealthier families → more education *and* higher wages, i.e. $E[\mu | X] \neq 0 $
+
+. . .
+
+::: {.callout-important}
+## The Core Problem
+If confounders are in $\mu$ and correlated with $x$, then $E[\mu | x] \neq 0$ and $\hat{\beta}_1$ is **biased**.
+:::
+
+
+# The Multivariate Model
+
+## The Solution: Control for Confounders {.smaller}
+
+- **Today:** how adding **control variables** gets us closer to **causal** estimates
+
+. . .
+
+- If family income confounds the education-wage relationship, **include it**:
+
+$$wage = \beta_0 + \beta_1 \cdot educ + \beta_2 \cdot family\_income + \mu$$
+
+- Now $\beta_1$ is the effect of education **holding family income constant**
+- Family income is no longer in $\mu$ --- that source of bias is gone!
+
+. . .
+
+- In general, with $k$ independent variables:
+
+$$y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots + \beta_k x_k + \mu$$
+
+- $\mu$ now only contains factors **not included** in the model
+
+
+## Interpreting Coefficients {.smaller}
+
+- Each coefficient has a **ceteris paribus** interpretation: $\beta_j = \dfrac{\partial y}{\partial x_j}$
+- The change in $y$ for a one-unit increase in $x_j$, **holding all other $x$'s constant**
+
+. . .
+
+- This is the key difference from bivariate OLS!
+  - Bivariate: "associated with" (everything else floating)
+  - Multivariate: "holding constant" (controlling for other factors)
+
+. . .
+
+**Example:** $wage = \beta_0 + \beta_1 \cdot educ + \beta_2 \cdot family\_income + \mu$
+
+- $\beta_1$: Each additional year of education is associated with $\beta_1$ dollars more in wages, **holding family income constant**
+- $\beta_2$: Each additional dollar of family income is associated with $\beta_2$ dollars more in wages, **holding education constant**
+
+
+## Deriving the Multivariate OLS Estimator {.smaller}
+
+Same logic as bivariate OLS: choose the $\hat{\beta}$s to **minimize the sum of squared residuals**:
+
+$$SSR = \sum\nolimits_{i=1}^{n} (y_i - \hat{\beta}_0 - \hat{\beta}_1 x_{1i} - \hat{\beta}_2 x_{2i} - \cdots - \hat{\beta}_k x_{ki})^2$$
+
+. . .
+
+Set the partial derivative with respect to each $\hat{\beta}_j$ equal to zero → $k + 1$ **first-order conditions**:
+
+$$\begin{aligned}
+\sum\nolimits_{i=1}^{n}(y_i - \hat{\beta}_0 - \hat{\beta}_1 x_{1i} - \cdots - \hat{\beta}_k x_{ki}) &= 0 \\
+\sum\nolimits_{i=1}^{n} x_{ji}(y_i - \hat{\beta}_0 - \hat{\beta}_1 x_{1i} - \cdots - \hat{\beta}_k x_{ki}) &= 0 \quad \text{for } j = 1, \ldots, k
+\end{aligned}$$
+
+. . .
+
+- In words: the residuals **sum to zero** and are **uncorrelated with every $x_j$** (this comes back when we estimate $\sigma^2$)
+- Solving these $k + 1$ equations gives the OLS estimates: tedious and uninsightful by hand (matrix algebra)
+
+
+# Multivariate OLS in R
+
+## Adding Controls is Easy! {.smaller}
+
+Same `lm()` function --- just use `+` to add additional $x$, independent variables:
+
+```{r}
+#| echo: true
+
+data(mtcars)
+lm_biv   <- lm(mpg ~ hp, data = mtcars)        # bivariate
+lm_multi <- lm(mpg ~ hp + wt, data = mtcars)   # add weight as a control
+summary(lm_biv)
+```
+
+## Adding Controls is Easy! {.smaller}
+
+```{r}
+#| echo: true
+
+summary(lm_multi)
+
+```
+
+- Coefficient on `hp` dropped from **`r round(coef(lm_biv)["hp"], 3)`** to **`r round(coef(lm_multi)["hp"], 3)`** --- less than half!
+- Why? Horsepower and weight are correlated, and weight independently reduces MPG
+- The bivariate estimate was **conflating** the effect of hp with the effect of weight
+
+
+## Visualizing: The Bivariate View {.smaller}
+
+```{r}
+#| echo: false
+#| fig-height: 4.5
+#| fig-width: 9
+#| fig-align: center
+
+ggplot(mtcars, aes(x = hp, y = mpg)) +
+  geom_point(color = "#002169", alpha = 0.8, size = 3) +
+  geom_smooth(method = "lm", formula = y ~ x, se = FALSE, color = "#E63946", linewidth = 1.3) +
+  labs(title = "Bivariate: mpg ~ hp",
+       subtitle = paste0("Slope = ", round(coef(lm_biv)["hp"], 3),
+                         ": each extra horsepower is associated with ",
+                         abs(round(coef(lm_biv)["hp"], 3)), " fewer MPG"),
+       x = "Horsepower", y = "MPG") +
+  theme_minimal(base_size = 16)
+```
+
+The familiar 2D picture from Unit 4 --- but it **ignores weight entirely**. What happens to this slope if we hold weight fixed?
+
+
+## What's Hiding in the Bivariate View? {.smaller}
+
+```{r}
+#| echo: false
+#| fig-height: 4.5
+#| fig-width: 9
+#| fig-align: center
+
+b <- coef(lm_multi)
+slices <- tibble(wt = c(2.5, 4)) |>
+  mutate(intercept = b[1] + b["wt"] * wt,
+         label = paste0("Weight held at ", format(wt * 1000, big.mark = ","), " lbs"))
+
+ggplot(mtcars, aes(x = hp, y = mpg)) +
+  geom_abline(data = slices, aes(intercept = intercept, slope = b["hp"]),
+              color = "#A67C00", linewidth = 1.2, linetype = "dashed") +
+  geom_smooth(method = "lm", formula = y ~ x, se = FALSE, color = "#E63946", linewidth = 1.3) +
+  geom_point(aes(color = wt), size = 3.2) +
+  geom_text(data = slices, aes(x = 340, y = intercept + b["hp"] * 340, label = label),
+            hjust = 0, vjust = 0.5, color = "#A67C00", size = 4.3, fontface = "bold") +
+  scale_color_gradient(low = "#B9C8E8", high = "#001544", name = "Weight\n(1,000 lbs)") +
+  scale_x_continuous(limits = c(50, 470), breaks = seq(50, 350, 50)) +
+  labs(x = "Horsepower", y = "MPG") +
+  theme_minimal(base_size = 16)
+```
+
+- Heavier cars (**darker**) have more horsepower *and* lower MPG, so the red bivariate line picks up the effect of weight too
+- The gold lines **hold weight fixed** (slope `r round(coef(lm_multi)["hp"], 3)` each): this is what "controlling for weight" means. Each one is a slice of a **plane**...
+
+
+## Seeing It in 3D: The Regression Plane {.smaller}
+
+```{r}
+#| echo: false
+
+library(plotly)
+
+b      <- coef(lm_multi)
+b_biv  <- coef(lm_biv)
+wt_bar <- mean(mtcars$wt)
+wall   <- 5.75   # back wall (heavier than any car) for the 2D "shadow"
+
+# Fitted plane over the range of the data
+# (plotly wants z as a matrix with rows = y values (wt), columns = x values (hp))
+hp_grid <- seq(min(mtcars$hp), max(mtcars$hp), length.out = 25)
+wt_grid <- seq(min(mtcars$wt), max(mtcars$wt), length.out = 25)
+plane_z <- outer(wt_grid, hp_grid, function(w, h) b[1] + b["hp"] * h + b["wt"] * w)
+
+# Residual sticks: one segment per car from the point to the plane (NA breaks the line)
+stick <- function(v_from, v_to) as.vector(rbind(v_from, v_to, NA))
+sticks <- tibble(
+  hp  = stick(mtcars$hp, mtcars$hp),
+  wt  = stick(mtcars$wt, mtcars$wt),
+  mpg = stick(mtcars$mpg, fitted(lm_multi))
+)
+
+# Two lines on the back wall: the bivariate fit vs. the plane's hp slope at average weight
+hp_line <- seq(min(mtcars$hp), max(mtcars$hp), length.out = 50)
+wall_lines <- tibble(
+  hp      = hp_line,
+  wt      = wall,
+  biv     = b_biv[1] + b_biv["hp"] * hp_line,
+  plane   = b[1] + b["hp"] * hp_line + b["wt"] * wt_bar
+)
+
+cars <- mtcars |>
+  mutate(car = rownames(mtcars), fit = fitted(lm_multi), resid = mpg - fit,
+         wall_wt = wall)
+
+plot_ly(height = 490) |>
+  add_surface(
+    x = hp_grid, y = wt_grid, z = plane_z,
+    colorscale = list(c(0, "#EEB808"), c(1, "#EEB808")),
+    opacity = 0.5, showscale = FALSE, hoverinfo = "skip",
+    name = "Fitted plane", showlegend = TRUE
+  ) |>
+  add_trace(
+    data = sticks, x = ~hp, y = ~wt, z = ~mpg,
+    type = "scatter3d", mode = "lines", connectgaps = FALSE,
+    line = list(color = "#7F7F7F", width = 3),
+    hoverinfo = "skip", name = "Residuals", showlegend = FALSE
+  ) |>
+  add_markers(
+    data = cars, x = ~hp, y = ~wt, z = ~mpg,
+    marker = list(size = 5, color = "#002169",
+                  line = list(color = "white", width = 1)),
+    text = ~paste0("<b>", car, "</b>",
+                   "<br>HP: ", hp, "  Weight: ", wt,
+                   "<br>MPG: ", mpg, "  Fitted: ", round(fit, 1),
+                   "<br>Residual: ", round(resid, 1)),
+    hoverinfo = "text", name = "Cars"
+  ) |>
+  add_markers(
+    data = cars, x = ~hp, y = ~wall_wt, z = ~mpg,
+    marker = list(size = 3.5, color = "#9AA5B8"),
+    hoverinfo = "skip", name = "Shadow on back wall", showlegend = FALSE
+  ) |>
+  add_trace(
+    data = wall_lines, x = ~hp, y = ~wt, z = ~biv,
+    type = "scatter3d", mode = "lines",
+    line = list(color = "#E63946", width = 8),
+    hoverinfo = "skip",
+    name = paste0("Bivariate fit (slope ", round(b_biv["hp"], 3), ")")
+  ) |>
+  add_trace(
+    data = wall_lines, x = ~hp, y = ~wt, z = ~plane,
+    type = "scatter3d", mode = "lines",
+    line = list(color = "#A67C00", width = 8),
+    hoverinfo = "skip",
+    name = paste0("Plane at average weight (slope ", round(b["hp"], 3), ")")
+  ) |>
+  layout(
+    scene = list(
+      xaxis = list(title = "Horsepower"),
+      yaxis = list(title = "Weight (1,000 lbs)", range = c(1.3, wall + 0.05),
+                   showbackground = TRUE, backgroundcolor = "#EEF1F7"),
+      zaxis = list(title = "MPG"),
+      aspectmode = "manual", aspectratio = list(x = 1.5, y = 1, z = 0.9),
+      camera = list(eye = list(x = 0.4, y = -1.9, z = 0.5),
+                    center = list(x = 0, y = 0, z = -0.12))
+    ),
+    legend = list(orientation = "h", x = 0.5, xanchor = "center", y = 1.0,
+                  font = list(size = 14)),
+    margin = list(l = 0, r = 0, t = 0, b = 0)
+  )
+```
+
+The **back wall** is the 2D picture from the last two slides: the bivariate line (red) vs. the slope holding weight fixed (gold). The yellow **plane** is all of those weight slices at once, and each gray **stick** is a residual. Drag to rotate.
+
+
+# Multivariate OLS as Matching
+
+## Multivariate OLS as Matching: The Setup {.smaller}
+
+When we "control for" a variable, we're **comparing like with like**. Let's see this with a made-up population of **2,000 workers** where we **know the truth**:
+
+- The **true** gender wage gap is **−\$5,000**, holding occupation constant; office jobs pay a **\$20,000 premium** over manual jobs
+- Women are **more likely** to work in office jobs (70% vs. 40% for men), so a naive comparison will **understate** the gap
+
+```{r}
+#| echo: true
+#| code-line-numbers: false
+
+set.seed(42)
+n <- 2000
+wage_data <- tibble(
+  female = sample(c(0, 1), n, replace = TRUE),
+  office = rbinom(n, 1, prob = ifelse(female == 1, 0.70, 0.40)),
+  wage   = 30000 - 5000 * female + 20000 * office + rnorm(n, 0, 6000)
+) |>
+  mutate(gender = ifelse(female == 1, "Female", "Male"),
+         occupation = ifelse(office == 1, "Office", "Manual"))
+```
+
+
+## Matching by Hand {.smaller}
+
+**Steps 1--2:** compare men and women **within** each occupation. **Step 3:** take a weighted average of those gaps, weighting by each occupation's share of workers.
+
+```{r}
+#| echo: true
+
+within_diffs <- wage_data |>
+  group_by(occupation) |>
+  summarise(male_wage   = mean(wage[gender == "Male"]),
+            female_wage = mean(wage[gender == "Female"]),
+            gap         = female_wage - male_wage,        # Steps 1-2: gap within each occupation
+            n           = n()) |>
+  mutate(weight = n / sum(n))                               # Step 3: weight by group size
+
+within_diffs |> knitr::kable(
+  col.names = c("Occupation", "Male Avg", "Female Avg", "Gap (F − M)", "N", "Weight"),
+  digits = c(0, 0, 0, 0, 0, 3), format.args = list(big.mark = ","))
+
+weighted_estimate <- sum(within_diffs$gap * within_diffs$weight)
+```
+
+. . .
+
+**Weighted average of the within-occupation gaps:** `r format(round(weighted_estimate, 0), big.mark = ",")` --- close to the true **−\$5,000**!
+
+
+## The Matching Recipe {.smaller}
+
+::: {.callout-tip}
+## What Multivariate OLS Does Under the Hood
+:::
+
+::: {.nonincremental}
+1. **Group** observations by the control variable(s) (e.g., same occupation)
+2. **Compare** the outcome **within each group** (the gender gap among office workers, and among manual workers)
+3. **Aggregate** with a weighted average across groups
+:::
+
+. . .
+
+Regressing $wage$ on $female$ **and** $office$ automates this. (OLS weights each group by its size *and* by how much `female` varies within it; here the two are nearly identical.)
+
+```{r}
+#| echo: true
+
+lm_naive <- lm(wage ~ female, data = wage_data)            # no control
+lm_ctrl  <- lm(wage ~ female + office, data = wage_data)   # control for occupation
+
+c("Naive" = unname(coef(lm_naive)["female"]), "Matching" = weighted_estimate,
+  "Regression" = unname(coef(lm_ctrl)["female"]), "Truth" = -5000) |> round(0)
+```
+
+. . .
+
+- The naive estimate is badly **attenuated** (women sort into the higher-paying office jobs); matching and the regression both land near the truth
+
+
+# The Gauss-Markov Assumptions, Revisited
+
+## Gauss-Markov Assumptions (Extended) {.smaller}
+
+::: {.nonincremental}
+1. **Linear in parameters:** $y = \beta_0 + \beta_1 x_1 + \cdots + \beta_k x_k + \mu$
+2. **Random sampling**
+3. **No perfect multicollinearity** ← UPDATED!
+4. **Zero conditional mean:** $E[\mu | x_1, x_2, \ldots, x_k] = 0$ ← UPDATED!
+5. **Homoskedasticity:** $Var(\mu | x_1, \ldots, x_k) = \sigma^2$
+:::
+
+. . .
+
+- Assumptions 1--4 → OLS is **unbiased**; adding 5 gives us the **variance** formula (later today)
+
+. . .
+
+- Two assumptions change with multiple regressors. We'll take them in order: **assumption 3**, then **assumption 4**
+
+
+## Assumption 3: No Perfect Multicollinearity {.smaller}
+
+- New assumption 3 includes both **variation in $x_j$** and **no perfect multicollinearity**
+
+- **Perfect multicollinearity**: one variable is an exact linear function of others
+
+. . .
+
+Examples:
+
+- Including `income_dollars` and `income_thousands` (one = other × 1000)
+- Including `parent1_income` + `parent2_income` + `family_income` when family = parent1 + parent2
+
+. . .
+
+```{r}
+#| echo: true
+#| error: true
+
+# Create a perfectly collinear variable
+mtcars$hp_doubled <- 2 * mtcars$hp
+lm(mpg ~ hp + hp_doubled + wt, data = mtcars) |> coef()
+```
+
+. . .
+
+- R drops the collinear variable and gives you `NA` — but you should fix the model!
+
+
+## Assumption 4: Zero Conditional Mean {.smaller}
+
+$$E[\mu | x_1, x_2, \ldots, x_k] = 0$$
+
+- In words: once we know the $x$'s, the unobserved factors in $\mu$ are **zero on average** --- knowing $x_1, \ldots, x_k$ tells us nothing about $\mu$
+- So everything left in $\mu$ must be uncorrelated with **every** included $x$
+
+. . .
+
+- Each control we add **moves a factor out of $\mu$** --- that's why GM4 is **more plausible** with multivariate OLS
+- If GM 1--4 hold, OLS is **unbiased**: $E[\hat{\beta}_j] = \beta_j$, so $\hat{\beta}_j$ estimates the **ceteris paribus (causal)** effect of $x_j$
+
+. . .
+
+Two examples: one where a control makes GM4 **hold**, and one where it **helps but isn't enough**.
+
+
+## Example 1: A Control That Makes GM4 Hold {.smaller}
+
+Suppose crop yield depends on fertilizer, soil quality, rainfall, and pure luck (pests, hail):
+
+:::: {.columns}
+
+::: {.column width="50%"}
+**Bivariate:** $yield = \beta_0 + \beta_1 fertilizer + \mu$
+
+$\mu$ contains: **soil quality**, **rainfall**, luck
+
+→ farmers with better soil and more rain also use more fertilizer, so GM4 **fails**
+:::
+
+::: {.column width="50%"}
+**Multivariate:** $yield = \beta_0 + \beta_1 fertilizer + \beta_2 soil + \beta_3 rain + \mu$
+
+$\mu$ contains: luck
+
+→ luck is unrelated to how much fertilizer a farmer uses, so GM4 **holds**
+:::
+
+::::
+
+. . .
+
+- Controlling for soil quality and rainfall **pulls both confounders out of $\mu$**
+- What's left in $\mu$ (luck) is uncorrelated with fertilizer, so $\hat{\beta}_1$ is **unbiased**: the ceteris paribus effect of fertilizer
+
+
+## Example 2: A Control That Isn't Enough {.smaller}
+
+:::: {.columns}
+
+::: {.column width="50%"}
+**Bivariate:** $wage = \beta_0 + \beta_1 educ + \mu$
+
+$\mu$ contains: **family income**, ability, motivation, ...
+
+→ family income and ability are correlated with $educ$, so GM4 **fails**
+:::
+
+::: {.column width="50%"}
+**Multivariate:** $wage = \beta_0 + \beta_1 educ + \beta_2 faminc + \mu$
+
+$\mu$ contains: ability, motivation, ...
+
+→ family income has been **pulled out of $\mu$**; ability is still a concern
+:::
+
+::::
+
+. . .
+
+- Unlike the lottery, education is **chosen**, and the reasons people choose it (ability, motivation) are hard to measure
+- Controlling for family income makes GM4 **more plausible**, but it probably still **fails**: $\hat{\beta}_1$ is likely still biased by ability
+
+
+## When Does Zero Conditional Mean Hold? {.smaller}
+
+:::: {.columns}
+
+::: {.column width="50%"}
+**More plausible when:**
+
+- We include key confounders
+- Good theoretical motivation for controls
+- Rich set of observable controls
+:::
+
+::: {.column width="50%"}
+**Less plausible when:**
+
+- Important confounders are unobservable (ability, motivation)
+- Wrong functional form
+:::
+
+::::
+
+. . .
+
+::: {.callout-warning}
+## A Warning
+Adding controls helps but **doesn't guarantee** causality. Unobservable confounders can always lurk in $\mu$.
+:::
+
+
+<!-- ## Try It: Real Data — Boston Housing {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Your turn!
+:::
+
+Using the `Boston` dataset from `MASS`, estimate the effect of average room size (`rm`) on median home value (`medv`). Here are some available variables:
+
+| Variable | Description |
+|----------|-------------|
+| `medv` | Median home value ($1000s) |
+| `rm` | Average number of rooms per dwelling |
+| `crim` | Per capita crime rate |
+| `tax` | Property tax rate per $10,000 |
+| `ptratio` | Pupil-teacher ratio by town |
+| `lstat` | Percent lower-status population |
+| `dis` | Distance to employment centers |
+| `nox` | Nitrogen oxide concentration (pollution) |
+
+. . .
+
+**Your task:**
+
+1. Start with the bivariate model: `medv ~ rm`
+2. Choose **2--3 controls** you think are confounders. Justify your choices!
+3. Compare: how does the coefficient on `rm` change?
+
+. . .
+
+```{r}
+#| echo: true
+#| output-location: fragment
+
+library(MASS)
+data(Boston)
+
+# Bivariate
+coef(lm(medv ~ rm, data = Boston))["rm"]
+
+# Example: add your chosen controls
+coef(lm(medv ~ rm + crim + tax + ptratio, data = Boston))["rm"]
+```
+
+. . .
+
+**Discuss:** Why did the coefficient change? What confounders might *still* be missing? -->
+
+
+
+## What is Bias? {.smaller}
+
+- When GM4 fails because we **omit a relevant variable**, our estimate $\hat{\beta}_1$ is **biased**. But how should we define bias?
+
+. . .
+
+- Recall that an **unbiased** estimator is right on average: $E[\hat{\beta}_1] = \beta_1$. A **biased** one is, on average, the truth **plus something else**:
+
+$$E[\hat{\beta}_1] = \beta_1 + \text{something else}$$
+
+. . .
+
+- Call this *something else* the **bias**:
+
+$$\text{Bias}(\hat{\beta}_1) = E[\hat{\beta}_1] - \beta_1$$
+
+. . .
+
+- If $\text{Bias} = 0$, the estimator is **unbiased** — on average, we get the right answer
+- If $\text{Bias} \neq 0$, we are **systematically** over- or under-estimating the true effect
+
+. . .
+
+- Bias does **not** shrink with more data — it's a permanent problem!
+
+
+## The OVB Formula {.smaller}
+
+
+
+We want to estimate $\beta_1$. Suppose the **true** model is:
+
+. . .
+
+$$y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \mu$$
+
+. . .
+
+But we omit $x_2$ and estimate:
+
+. . .
+
+$$\tilde{y} = \tilde{\beta}_0 + \tilde{\beta}_1 x_1$$
+
+::: {.callout-note}
+## New notation
+From here on, **hats** ($\hat{\beta}$) are estimates from the **full** regression that includes $x_2$ (unbiased), and **tildes** ($\tilde{\beta}$) are estimates from the **short** regression that omits $x_2$ (biased). On the last slide, $\hat{\beta}_1$ stood for any estimator.
+:::
+
+. . .
+
+It turns out there is a simple relation between the true value of our parameter, $\beta_1$, 
+an *unbiased* estimate of our parameter $\hat{\beta}_1$,
+and the *biased* estimate of our parameter $\tilde{\beta}_1$:
+
+. . .
+
+$$\tilde{\beta}_1 = \hat{\beta}_1 + \hat{\beta}_2 \cdot \tilde{\delta}_1$$
+
+. . .
+
+where $\tilde{\delta}_1$ comes from regressing $x_2$ on $x_1$: 
+
+. . .
+
+$$\quad x_2 = \tilde{\delta}_0 + \tilde{\delta}_1 x_1$$
+
+
+## The OVB Formula {.smaller}
+
+- Taking expectations, we see that:
+
+. . .
+
+$$E[\tilde{\beta}_1] = E[\hat{\beta}_1 + \hat{\beta}_2 \cdot \tilde{\delta}_1]$$
+
+. . .
+
+$$E[\tilde{\beta}_1] = E[\hat{\beta}_1] + E[\hat{\beta}_2] \cdot \tilde{\delta}_1$$
+
+. . .
+
+- Since $E[\hat{\beta}_1] = \beta_1$ and $E[\hat{\beta}_2] = \beta_2$:
+
+. . .
+
+$$E[\tilde{\beta}_1] = \beta_1 + \beta_2 \cdot \tilde{\delta}_1$$
+
+. . .
+
+- Therefore, the bias is:
+
+. . .
+
+$$ Bias(\tilde{\beta}_1) = E[\tilde{\beta}_1] - \beta_1 = \beta_2 \cdot \tilde{\delta}_1$$
+
+. . .
+
+$$\underbrace{Bias(\tilde{\beta}_1)}_{\text{What we get wrong}} = \underbrace{\beta_2}_{\text{Effect of omitted on } y} \times \underbrace{\tilde{\delta}_1}_{\text{Relationship of omitted with } x_1}$$
+
+
+## Signing the Bias {.smaller}
+
+The bias depends on **two things** — and you can figure out the direction!
+
+. . .
+
+| | $Corr(x_1, x_2) > 0$ | $Corr(x_1, x_2) < 0$ |
+|-----|:-----:|:-----:|
+| $\beta_2 > 0$ | **Positive** bias ↑ | **Negative** bias ↓ |
+| $\beta_2 < 0$ | **Negative** bias ↓ | **Positive** bias ↑ |
+
+. . .
+
+- Positive × Positive = Positive (overestimate)
+- Positive × Negative = Negative (underestimate)
+
+. . .
+
+::: {.callout-tip}
+## Zero Bias When...
+If **either** $\beta_2 = 0$ (omitted variable doesn't affect $y$) **or** $\tilde{\delta}_1 = 0$ (omitted variable uncorrelated with $x_1$), there is **no bias**.
+:::
+
+
+## Seeing OVB in Action: The Setup {.smaller}
+
+Let's **simulate** OVB. Because we write the data-generating process (DGP) ourselves, we **know** the true $\beta_1 = 2$:
+
+```{r}
+#| echo: true
+
+set.seed(123)
+n <- 10000
+
+# True DGP: y = 3 + 2*x1 + 4*x2 + 3*x3 + error
+x2 <- rnorm(n)
+x3 <- rnorm(n)                     # x3 is independent of x1
+x1 <- -0.5 * x2 + rnorm(n)         # x1 and x2 are NEGATIVELY correlated
+y  <- 3 + 2 * x1 + 4 * x2 + 3 * x3 + rnorm(n)
+```
+
+. . .
+
+**Predict before we run it:** what happens to $\tilde{\beta}_1$ if we leave out $x_2$?
+
+- $\beta_2 = 4 > 0$: $x_2$ raises $y$ → **(+)**
+- $Corr(x_1, x_2) < 0$: $\tilde{\delta}_1$ will be negative → **(−)**
+- **Bias** $= (+) \times (-) = (-)$: the naive estimate of $\beta_1$ should be **too small**
+
+
+## Seeing OVB in Action: Naive vs. Full Model {.smaller}
+
+```{r}
+#| echo: true
+
+full  <- lm(y ~ x1 + x2 + x3)   # correct model
+naive <- lm(y ~ x1)             # omits x2 (and x3)
+no_x3 <- lm(y ~ x1 + x2)        # omits only x3, which is uncorrelated with x1
+
+b1 <- function(model) unname(coef(model)["x1"])   # pull out the coefficient on x1
+c("True beta1"      = 2,
+  "Full model"      = b1(full),
+  "Naive (omit x2)" = b1(naive),
+  "Omit only x3"    = b1(no_x3)) |> round(3)
+```
+
+. . .
+
+- The naive estimate is **far below** the truth: **negative** bias, just as we predicted
+- The full model gets it right (≈ 2)
+
+. . .
+
+- Omitting $x_3$ does **not** bias $\hat{\beta}_1$: $x_3$ affects $y$, but it is **uncorrelated** with $x_1$ (condition 2 fails)
+
+
+## Seeing OVB in Action: Checking the Formula {.smaller}
+
+$\text{Bias}(\tilde{\beta}_1) = \beta_2 \times \tilde{\delta}_1$ --- compute each piece:
+
+```{r}
+#| echo: true
+
+beta2          <- 4                           # Step 1: effect of x2 on y (from the DGP)
+delta1         <- coef(lm(x2 ~ x1))["x1"]     # Step 2: slope from regressing x2 on x1
+predicted_bias <- beta2 * delta1              # Step 3: OVB formula
+actual_bias    <- b1(naive) - 2               # Step 4: naive estimate minus the truth
+```
+
+```{r}
+#| echo: false
+
+tibble(
+  Step = c("1", "2", "3", "4"),
+  Quantity = c("$\\beta_2$ (effect of $x_2$ on $y$)",
+               "$\\tilde{\\delta}_1$ (regress $x_2$ on $x_1$)",
+               "Predicted bias $= \\beta_2 \\times \\tilde{\\delta}_1$",
+               "Actual bias $= \\tilde{\\beta}_1 - \\beta_1$"),
+  Sign = c("(+)", "(−)", "(+) × (−) = (−)", "(−)"),
+  Value = c(beta2, delta1, predicted_bias, actual_bias)
+) |>
+  knitr::kable(digits = 3, align = c("c", "l", "c", "r"))
+```
+
+. . .
+
+- The formula works: $\tilde{\beta}_1 \approx \beta_1 + \beta_2 \tilde{\delta}_1 = 2 + (4)(`r round(delta1, 2)`) = `r round(2 + predicted_bias, 2)`$, and the naive regression gave **`r round(b1(naive), 2)`**
+
+
+## Example: Positive Bias — Policing and Crime {.smaller}
+
+**True model:** $\quad crime = \beta_0 + \beta_1(police) + \beta_2(poverty) + \mu$
+
+. . .
+
+**What we estimate (omitting poverty):** $\quad \widetilde{crime} = \tilde{\beta}_0 + \tilde{\beta}_1(police)$
+
+. . .
+
+- **Omitted variable:** poverty
+
+. . .
+
+- $\beta_2$ (effect of poverty on crime):
+- **Positive** (more poverty → more crime)
+
+. . .
+
+- $\tilde{\delta}_1$ (correlation of poverty with policing):
+- **Positive** (high-poverty areas → more police)
+
+. . .
+
+$$\text{Bias} = (+)(+) = \text{Positive}$$
+
+. . .
+
+> The naive estimate makes policing look **less effective** than it actually is (or even that it *increases* crime).
+
+
+## Example: Negative Bias — Prenatal Care and Birth Weight {.smaller}
+
+**True model:** $\quad birthweight = \beta_0 + \beta_1(prenatal\_visits) + \beta_2(health\_risk) + \mu$
+
+. . .
+
+**What we estimate (omitting health risk):** $\quad \widetilde{birthweight} = \tilde{\beta}_0 + \tilde{\beta}_1(prenatal\_visits)$
+
+. . .
+
+- **Omitted variable:** maternal health risk
+
+. . .
+
+- $\beta_2$ (effect of health risk on birth weight):
+- **Negative** (higher risk → lower birth weight)
+
+. . .
+
+- $\tilde{\delta}_1$ (correlation of health risk with prenatal visits): **Positive** (higher-risk mothers get *more* prenatal visits)
+
+. . .
+
+$$\text{Bias} = (-)(+) = \text{Negative}$$
+
+. . .
+
+> The naive estimate **understates** the benefit of prenatal care — high-risk mothers visit more often *and* have worse outcomes, dragging the coefficient toward zero (or even making it negative!).
+
+
+## Class Activity: Sign the Bias! {.smaller}
+
+::: {.callout-note icon=false}
+## 🤔 Think-Pair-Share
+:::
+
+For each scenario, determine the **direction** of the omitted variable bias:
+
+. . .
+
+1. **Model:** $health = \beta_0 + \beta_1(exercise) + \mu$. Omitted: income.
+   - Higher income → more exercise? Higher income → better health?
+
+. . .
+
+2. **Model:** $test\_score = \beta_0 + \beta_1(class\_size) + \mu$. Omitted: school funding.
+   - More funding → smaller classes? More funding → higher scores?
+
+. . .
+
+3. **Model:** $crime = \beta_0 + \beta_1(unemployment) + \mu$. Omitted: urban density.
+   - Higher density → more unemployment? Higher density → more crime?
+
+
+# Goodness of Fit: Adjusted R²
+
+## The Problem with R², and the Fix {.smaller}
+
+- **Problem:** $R^2$ can **never decrease** when you add more variables --- even irrelevant ones!
+- **Fix:** the **adjusted** $R^2$ penalizes for the number of regressors $k$: $\quad \bar{R}^2 = 1 - \dfrac{(1 - R^2)(n - 1)}{n - k - 1}$
+
+. . .
+
+```{r}
+#| echo: true
+
+set.seed(42)
+noise <- matrix(rnorm(nrow(mtcars) * 10), ncol = 10)   # 10 pure-noise variables
+small <- summary(lm(mpg ~ hp + wt, data = mtcars))
+big   <- summary(lm(mpg ~ hp + wt + noise, data = mtcars))
+c("R²"     = small$r.squared,     "R² with noise"     = big$r.squared)
+c("Adj R²" = small$adj.r.squared, "Adj R² with noise" = big$adj.r.squared)
+```
+
+. . .
+
+- $R^2$ went **up** even though the noise variables are meaningless; adjusted $R^2$ went **down**, correctly penalizing them
+
+. . .
+
+- **Rule of thumb:** use **adjusted** $R^2$ when comparing models with different numbers of variables
+
+
+# Variance of the Multivariate OLS Estimator
+
+## Step 1: Recall the Bivariate Variance {.smaller}
+
+Under GM 1--5, the bivariate OLS slope has variance
+
+$$Var(\hat{\beta}_1) = \frac{\sigma^2}{SST_x}, \qquad SST_x = \sum_{i=1}^{n}(x_i - \bar{x})^2$$
+
+. . .
+
+- **Numerator, $\sigma^2$:** how noisy the unobserved factors in $\mu$ are → more noise, **less** precision
+- **Denominator, $SST_x$:** the total variation in $x$ → more spread in $x$ (or a bigger $n$) gives more information about the slope, **more** precision
+
+. . .
+
+In the multivariate case, the same idea applies, but with a twist: **not all of the variation in $x_j$ is useful**.
+
+
+## Step 2: How Much of $x_j$'s Variation Is Its Own? {.smaller}
+
+- Some variation in $x_j$ is **shared** with the other regressors --- OLS can't tell whether that shared variation moves $y$ through $x_j$ or through the other controls
+- Only the variation in $x_j$ that is **independent of the other regressors** identifies $\hat{\beta}_j$
+
+. . .
+
+To measure it, regress $x_j$ on **all the other regressors** and record the R-squared, $R_j^2$:
+
+- $R_j^2$ = share of $x_j$'s variation that is **shared** with the other controls
+- $1 - R_j^2$ = share that is **independent**
+
+. . .
+
+**Example:** in `mpg ~ hp + wt`, how much of horsepower's variation is shared with weight?
+
+```{r}
+#| echo: true
+
+r2_hp <- summary(lm(hp ~ wt, data = mtcars))$r.squared
+r2_hp
+```
+
+. . .
+
+About **`r round(100 * r2_hp)`%** of the variation in hp is shared with weight, so only **`r 100 - round(100 * r2_hp)`%** is left to identify the effect of hp.
+
+
+## Step 3: Swap In the Independent Variation {.smaller}
+
+::: {.nonincremental}
+- **Total** variation in $x_j$: $\quad SST_j = \sum_{i=1}^{n}(x_{ji} - \bar{x}_j)^2$
+- **Independent** variation in $x_j$: $\quad SST_j \times (1 - R_j^2)$
+:::
+
+. . .
+
+Replace $SST_x$ in the bivariate formula with the independent variation:
+
+$$Var(\hat{\beta}_1) = \frac{\sigma^2}{SST_x} \quad \Longrightarrow \quad Var(\hat{\beta}_j) = \frac{\sigma^2}{SST_j(1 - R_j^2)}$$
+
+. . .
+
+- If $x_j$ is uncorrelated with the other regressors, $R_j^2 = 0$ and we are back to the bivariate formula
+- The factor $\frac{1}{1 - R_j^2}$ is how much collinearity **inflates** the variance. For hp: $\frac{1}{1 - `r round(r2_hp, 2)`} \approx `r round(1 / (1 - r2_hp), 2)`$, so the variance is about `r round(100 * (1 / (1 - r2_hp) - 1))`% larger than if hp were uncorrelated with weight
+
+
+## Variance of $\hat{\beta}_j$: Result {.smaller}
+
+Putting it together, under GM 1--5:
+
+::: {.callout-important}
+## Variance of the Multivariate OLS Estimator
+$$Var(\hat{\beta}_j) = \frac{\sigma^2}{SST_j(1 - R_j^2)}$$
+
+where $\sigma^2$ is the error variance, $SST_j = \sum(x_{ji} - \bar{x}_j)^2$ is the total variation in $x_j$, and $R_j^2$ is the R-squared from regressing $x_j$ on all other regressors.
+:::
+
+. . .
+
+Three things **increase** variance: **more noise** ($\sigma^2$ ↑), **less variation in $x_j$** ($SST_j$ ↓), **higher collinearity** ($R_j^2$ ↑)
+
+. . .
+
+- **Imperfect multicollinearity** (high but not perfect correlation among the $x$'s) is *allowed*, but as $R_j^2 \rightarrow 1$, $Var(\hat{\beta}_j) \rightarrow \infty$
+- Highly correlated controls make it hard to **separate their individual effects** → imprecise estimates (large standard errors)
+
+
+## What Increases Variance? Simulation {.smaller}
+
+```{r}
+#| echo: false
+#| fig-height: 5.5
+#| fig-align: center
+#| cache: true
+
+set.seed(325)
+n <- 100
+n_sims <- 1000
+true_beta1 <- 2
+
+# --- Simulation function ---
+# DGP: y = 1 + 2*x1 + 1*x2 + error, with cor(x1, x2) = rho and sd(x1) = x1_sd
+run_sim <- function(n, sigma, x1_sd, rho, n_sims) {
+  estimates <- numeric(n_sims)
+  for (i in 1:n_sims) {
+    x2 <- rnorm(n)
+    x1 <- x1_sd * (rho * x2 + sqrt(1 - rho^2) * rnorm(n))
+    y <- 1 + true_beta1 * x1 + 1 * x2 + rnorm(n, sd = sigma)
+    estimates[i] <- coef(lm(y ~ x1 + x2))["x1"]
+  }
+  estimates
+}
+
+scenarios <- c(
+  "Baseline (σ = 1, sd = 1, ρ = 0.3)",
+  "More noise (σ = 3)",
+  "Less variation in x1 (sd = 0.3)",
+  "High collinearity (ρ = 0.95)"
+)
+
+df_sims <- bind_rows(
+  tibble(beta_hat = run_sim(n, sigma = 1, x1_sd = 1,   rho = 0.3,  n_sims), scenario = scenarios[1]),
+  tibble(beta_hat = run_sim(n, sigma = 3, x1_sd = 1,   rho = 0.3,  n_sims), scenario = scenarios[2]),
+  tibble(beta_hat = run_sim(n, sigma = 1, x1_sd = 0.3, rho = 0.3,  n_sims), scenario = scenarios[3]),
+  tibble(beta_hat = run_sim(n, sigma = 1, x1_sd = 1,   rho = 0.95, n_sims), scenario = scenarios[4])
+) |>
+  mutate(scenario = factor(scenario, levels = scenarios))
+
+sd_labels <- df_sims |>
+  group_by(scenario) |>
+  summarise(label = paste0("SD = ", sprintf("%.2f", sd(beta_hat))))
+
+ggplot(df_sims, aes(x = beta_hat)) +
+  geom_histogram(bins = 40, fill = "#5D8EE5", color = "white", alpha = 0.8) +
+  geom_vline(xintercept = true_beta1, color = "#E63946", linewidth = 1, linetype = "dashed") +
+  geom_text(data = sd_labels, aes(label = label), x = Inf, y = Inf,
+            hjust = 1.1, vjust = 1.5, size = 5, fontface = "bold", color = "gray25") +
+  facet_wrap(~ scenario, scales = "free_y", ncol = 2) +
+  labs(
+    x = expression(hat(beta)[1]),
+    y = "Count",
+    caption = paste0("1,000 simulations each | n = ", n, " | True β = ", true_beta1, " (dashed red)")
+  ) +
+  theme_minimal(base_size = 16) +
+  theme(
+    strip.text = element_text(face = "bold", size = 13),
+    panel.grid.minor = element_blank()
+  )
+```
+
+
+# Estimating $\sigma^2$ and the Standard Error
+
+## The Problem: $\sigma^2$ Is Unknown {.smaller}
+
+$$Var(\hat{\beta}_j) = \frac{\sigma^2}{SST_j(1 - R_j^2)}$$
+
+- We can compute $SST_j$ and $R_j^2$ from our data
+- But $\sigma^2 = Var(\mu | x_1, \ldots, x_k)$ is a **population parameter** --- we never observe it
+
+. . .
+
+**We need to estimate $\sigma^2$ from our sample**, in three steps:
+
+::: {.nonincremental}
+1. Write $\sigma^2$ as an **average** of something
+2. Find a **sample stand-in** for that something
+3. **Correct** for the fact that the stand-in is too small
+:::
+
+
+## Step 1: $\sigma^2$ Is the Average Squared Error {.smaller}
+
+From the Gauss-Markov assumptions:
+
+- **GM4:** $E[\mu_i] = 0$ $\qquad$ **GM5:** $Var(\mu_i) = \sigma^2$
+
+. . .
+
+From the stats review, the definition of variance is $Var(X) = E\big[(X - E[X])^2\big]$. Apply it to $\mu_i$:
+
+$$\sigma^2 = Var(\mu_i) = E\big[(\mu_i - E[\mu_i])^2\big] = E\big[(\mu_i - 0)^2\big] = E[\mu_i^2]$$
+
+. . .
+
+- $\sigma^2$ is just the **average squared error**
+- If we could see the errors, the natural estimate would be their sample average: $\; \dfrac{1}{n}\sum_{i=1}^{n} \mu_i^2$
+
+
+## Step 2: Residuals as Proxies for Errors {.smaller}
+
+**Problem:** we can't see $\mu_i$ --- computing it requires the **population** $\beta$'s, which is the whole reason we're running a regression!
+
+. . .
+
+::: {.nonincremental}
+- **True error:** $\quad \mu_i = y_i - (\beta_0 + \beta_1 x_{1i} + \dots + \beta_k x_{ki})$ --- uses the **unknown** $\beta$'s
+- **Residual:** $\quad \hat{\mu}_i = y_i - (\hat{\beta}_0 + \hat{\beta}_1 x_{1i} + \dots + \hat{\beta}_k x_{ki})$ --- uses our **estimates**
+:::
+
+. . .
+
+- **Plug in the residuals:** $\; \dfrac{1}{n}\sum_{i=1}^{n} \hat{\mu}_i^2 = \dfrac{SSR}{n}$
+
+. . .
+
+- But the residuals are **systematically smaller** than the true errors: OLS *chooses* the $\hat{\beta}$'s to make $\sum \hat{\mu}_i^2$ as small as possible --- smaller than $\sum \mu_i^2$ with the true $\beta$'s
+
+
+## Step 3: The Degrees-of-Freedom Correction {.smaller}
+
+Because the residuals are too small on average, $SSR / n$ **underestimates** $\sigma^2$.
+
+. . .
+
+- Recall the first-order conditions: the residuals must satisfy **$k + 1$ equations** ($\sum \hat{\mu}_i = 0$ and $\sum x_{ji} \hat{\mu}_i = 0$ for each $j$)
+- So only $n - k - 1$ residuals are free to vary --- each estimated parameter "uses up" one **degree of freedom**
+
+. . .
+
+The fix: divide by $n - k - 1$ instead of $n$:
+
+$$\hat{\sigma}^2 = \frac{\sum_{i=1}^{n}\hat{\mu}_i^2}{n - k - 1} = \frac{SSR}{n - k - 1}, \qquad E[\hat{\sigma}^2] = \sigma^2 \;\; \text{(unbiased)}$$
+
+. . .
+
+::: {.callout-note}
+$\hat{\sigma} = \sqrt{\hat{\sigma}^2}$ is what R reports as **"Residual standard error."** In the bivariate case ($k = 1$) the denominator is $n - 2$, the $n - 2$ from Unit 4.
+:::
+
+
+## From $\hat{\sigma}^2$ to the Standard Error {.smaller}
+
+Plug $\hat{\sigma}^2$ into the variance formula and take the square root:
+
+$$Var(\hat{\beta}_j) = \frac{\sigma^2}{SST_j(1-R_j^2)} \xrightarrow{\text{estimate } \sigma^2 \text{ with residuals}} se(\hat{\beta}_j) = \frac{\hat{\sigma}}{\sqrt{SST_j(1-R_j^2)}}$$
+
+. . .
+
+- The **standard error** is the estimated standard deviation of the sampling distribution of $\hat{\beta}_j$
+
+. . .
+
+- It tells us: *how much would our estimate typically vary across repeated samples?*
+
+. . .
+
+- Every time you see $se(\hat{\beta}_j)$ in a regression table or R output, this is what's being computed
+
+. . .
+
+> This standard error is the foundation of everything in the next unit: **t-statistics, p-values, and confidence intervals** all depend on it.
+
+
+## Seeing It in R: Every Piece by Hand {.smaller}
+
+For `lm_multi` ($mpg \sim hp + wt$, so $n = 32$ and $k = 2$), compute $se(\hat{\beta}_{hp})$ step by step:
+
+```{r}
+#| echo: true
+
+n_obs     <- nobs(lm_multi); k <- 2
+sigma_hat <- sqrt(sum(resid(lm_multi)^2) / (n_obs - k - 1))   # sigma-hat = sqrt(SSR / (n - k - 1))
+sst_hp    <- sum((mtcars$hp - mean(mtcars$hp))^2)             # SST for hp
+se_hp     <- sigma_hat / sqrt(sst_hp * (1 - r2_hp))           # r2_hp from the variance slides
+
+c("sigma-hat: by hand" = sigma_hat, "sigma-hat: R" = sigma(lm_multi))
+c("se(hp): by hand" = se_hp, "se(hp): R" = summary(lm_multi)$coefficients["hp", "Std. Error"])
+```
+
+. . .
+
+- Our $\hat{\sigma}$ matches R's **Residual standard error**, and our $se(\hat{\beta}_{hp})$ matches the **Std. Error** column of `summary(lm_multi)`
+
+
+# The Bias-Variance Tradeoff
+
+## Should You Include That Variable? {.smaller}
+
+Adding controls involves a **tradeoff**:
+
+. . .
+
+| Action | Bias | Variance |
+|--------|:----:|:--------:|
+| Omit a **relevant** variable | ↑ Increases | ↓ Decreases |
+| Include an **irrelevant** variable | No change | ↑ Increases |
+
+. . .
+
+- **Too few controls:** risk bias (omitted variable bias)
+- **Too many controls:** risk inflated variance (imprecise estimates)
+
+. . .
+
+> Because you can never know *for sure* the true population parameter model,
+you can never know *for sure* if a control variable is necessary or not!
+
+
+## Seeing the Tradeoff {.smaller}
+
+```{r}
+#| echo: false
+#| fig-height: 4
+#| fig-align: center
+#| cache: true
+
+# DGP: y = 8.78 + 2.21*x1 + beta2*x2 + error, with cor(x1, x2) = 0.7
+# Each simulation draws a fresh sample of n = 100
+sim_est <- function(beta2, include_x2, n_sims = 500, n = 100, rho = 0.7) {
+  map_dbl(1:n_sims, function(i) {
+    x2 <- rnorm(n)
+    x1 <- rho * x2 + sqrt(1 - rho^2) * rnorm(n)
+    y  <- 8.78 + 2.21 * x1 + beta2 * x2 + rnorm(n)
+    if (include_x2) coef(lm(y ~ x1 + x2))["x1"]
+    else coef(lm(y ~ x1))["x1"]
+  })
+}
+
+set.seed(42)
+results <- bind_rows(
+  tibble(b1 = sim_est(0,   FALSE), model = "Omit x2",    case = "x2 irrelevant (β2 = 0)"),
+  tibble(b1 = sim_est(0,   TRUE),  model = "Include x2", case = "x2 irrelevant (β2 = 0)"),
+  tibble(b1 = sim_est(0.5, FALSE), model = "Omit x2",    case = "x2 relevant (β2 = 0.5)"),
+  tibble(b1 = sim_est(0.5, TRUE),  model = "Include x2", case = "x2 relevant (β2 = 0.5)")
+)
+
+ggplot(results, aes(x = b1, fill = model)) +
+  geom_histogram(alpha = 0.5, bins = 30, color = "white", position = "identity") +
+  geom_vline(xintercept = 2.21, color = "darkred", linewidth = 1.2, linetype = "dashed") +
+  facet_wrap(~ case) +
+  scale_fill_manual(values = c("Omit x2" = "#5D8EE5", "Include x2" = "#EEB808")) +
+  labs(x = expression(hat(beta)[1]), y = "Count",
+       title = "The Bias-Variance Tradeoff",
+       subtitle = "Dashed line = true β1 = 2.21 | cor(x1, x2) = 0.7 | 500 samples of n = 100",
+       fill = "Model") +
+  theme_minimal(base_size = 13) +
+  theme(legend.position = "bottom")
+```
+
+
+## Reading the Simulation {.smaller}
+
+**Left panel** ($x_2$ irrelevant):
+
+- Both distributions centered on truth → no bias either way
+- Including $x_2$ (yellow) is **wider** → unnecessary variance, because $x_2$ soaks up some of $x_1$'s variation
+
+. . .
+
+**Right panel** ($x_2$ relevant):
+
+- Omitting $x_2$ (blue) is **shifted** away from truth → biased!
+- Including $x_2$ (yellow) is centered on truth → unbiased (but wider)
+
+. . .
+
+::: {.callout-important}
+## Key Takeaway
+**Bias is usually worse than variance.** A biased estimate is systematically wrong no matter how much data you collect. Extra variance shrinks with larger samples.
+:::
+
+
+## Practical Guidance {.smaller}
+
+::: {.callout-tip}
+## Rules of Thumb for Choosing Controls
+:::
+
+1. **Include** variables you have strong theoretical reason to believe are confounders
+
+. . .
+
+2. **Be cautious** with highly correlated controls — can inflate variance dramatically
+
+. . .
+
+3. **Larger samples help** — variance decreases with $n$, so the cost of extra controls falls
+
+. . .
+
+4. **Check sensitivity** — if adding a control substantially changes your coefficient of interest, it's probably important
+
+
+# Summary
+
+## Key Takeaways {.smaller}
+
+::: {.nonincremental}
+- **Multivariate OLS** includes control variables to address confounding: $\; y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots + \beta_k x_k + \mu$
+- Coefficients have **ceteris paribus** interpretations: the effect of $x_j$ holding all else constant --- under the hood, OLS is a **matching** estimator
+- **OVB formula** tells us the direction of bias: $\text{Bias} = \beta_2 \cdot \tilde{\delta}_1$
+- **Variance:** $Var(\hat{\beta}_j) = \sigma^2 / [SST_j(1 - R_j^2)]$; estimate $\sigma^2$ with $SSR/(n - k - 1)$ to get $se(\hat{\beta}_j)$
+- **Bias-variance tradeoff:** omitting relevant variables → bias; including irrelevant variables → extra variance
+- **Adjusted R²** penalizes for extra variables --- use it for model comparison
+- **Perfect multicollinearity** breaks OLS; imperfect multicollinearity inflates variance
+:::
+
+. . .
+
+**Next --- Unit 6: Statistical Inference.** We'll finally be able to answer: "Is this coefficient **statistically significant**?"
+

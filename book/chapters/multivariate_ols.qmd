@@ -229,13 +229,14 @@ E[\mu | x_1, x_2, \ldots, x_k] = 0
 $$
 
 This states that the average of unobserved factors is zero for *all unique combinations* of the independent variables.
-In other words,
-everything in $\mu$ must be uncorrelated with *all* the variables we've included.
+In particular,
+nothing in $\mu$ can be correlated with *any* of the variables we've included.
 
 This assumption is much more plausible than its bivariate counterpart.
 By including relevant control variables,
 we've removed them from $\mu$,
 making it more likely that what remains is uncorrelated with our variables of interest.
+We will discuss this more below.
 
 
 ## Deriving the Multivariate OLS Estimator
@@ -333,13 +334,14 @@ Horsepower and weight are positively correlated (more powerful engines tend to b
 and weight independently reduces fuel efficiency.
 The bivariate estimate was conflating the effect of horsepower with the effect of weight.
 Once we control for weight,
-we isolate the effect of horsepower alone.
+we remove the part of the bivariate relationship that was really about weight.
+(Other differences between cars could still be confounding the estimate---more on that below.)
 
 ::: {.callout-tip}
 ## What Changed?
 The coefficient on `hp` dropped from $-0.068$ to $-0.032$ when we added `wt`.
 This suggests that much of what appeared to be the "effect" of horsepower was actually the effect of weight.
-This is precisely what controlling for confounders accomplishes.
+This is what controlling for a confounder does: it takes that variable out of the comparison.
 :::
 
 
@@ -349,28 +351,35 @@ What is actually happening "under the hood" when we say we want to "control" for
 
 There's an intuitive way to understand what multivariate OLS does:
 it's essentially a **matching** estimator.
-When we "control for" a variable,
-we're comparing observations (i.e., values of $x_1$) that have similar values of a control variable (ie., $x_2$).
+When we "control for" a variable $x_2$,
+we compare observations that have different values of $x_1$
+but similar values of $x_2$.
+In other words,
+we compare like with like.
 
-### The Returns to Education Example
+### Example: The Gender Wage Gap and Occupation
 
-Suppose we want to estimate the effect of education on wages.
-A simple comparison of average wages across education levels might be misleading because people with more education tend to work in higher-paying industries.
-Part of the apparent "return to education" might actually be an "industry premium."
+Suppose we want to measure the gender wage gap.
+A simple comparison of average wages for men and women might be misleading if men and women tend to work in occupations that pay differently.
 
-Let's work through this with simulated data to see exactly how controlling for industry works.
+Let's work through this with simulated data to see exactly how controlling for occupation works.
+Specifically,
+let's create an imaginary population of 2,000 workers where:
 
-Specifically, let's create an imaginary population where:
-
-1. Individuals have either 12. 14, or 16 years of education
-2. Those with 12, 14, and 16 years of education have a 0.20, 0.40, and 0.65 chance of working in a high-paying industry
+1. About half of workers are women
+2. Every worker has either an office job or a manual job, and women are more likely to work in office jobs (70% of women vs. 40% of men)
 3. The "true" population regression model is:
 
 $$
-wage = 25000 + 3000 \cdot \text{education} + 15000 \cdot \text{professional industry} 
+wage = 30000 - 5000 \cdot female + 20000 \cdot office + \mu
 $$
 
-So, the "true" effect of an additional year of education on wages is thus 3000.
+where $\mu$ is random noise with a standard deviation of \$6,000.
+
+So,
+holding occupation constant,
+women earn \$5,000 less than men,
+and office jobs pay a \$20,000 premium over manual jobs.
 
 ```{r}
 #| echo: true
@@ -378,191 +387,165 @@ So, the "true" effect of an additional year of education on wages is thus 3000.
 #| code-summary: "Code: Simulated Population Data"
 
 # Simulate wage data
-set.seed(12345)
-n <- 5000
+set.seed(42)
+n <- 2000
 
-# Create data where:
-# - More educated workers are more likely to be in high-paying industries
-# - Industry independently affects wages
 wage_data <- tibble(
-  # Education: 1 = HS, 2 = Some College, 3 = Bachelor's+
-  educ_years = sample(c(12, 14, 16), n, replace = TRUE, prob = c(0.4, 0.3, 0.3)),
-  
-  # Higher education -> more likely in professional services (high pay industry)
-  ind_professional = rbinom(n, 1, prob = case_when(
-    educ_years == 12 ~ 0.20,
-    educ_years == 14 ~ 0.40,
-    educ_years == 16 ~ 0.65
-  )),
-  
-  # Wages depend on education AND industry
-  wage = 25000 + 
-    3000 * (educ_years - 12) +     # True education effect: $3000 per year
-    15000 * ind_professional +      # Industry premium: $15000
-    rnorm(n, 0, 8000)
+  # About half of workers are women
+  female = sample(c(0, 1), n, replace = TRUE),
+
+  # Women are more likely to work in (higher-paying) office jobs
+  office = rbinom(n, 1, prob = ifelse(female == 1, 0.70, 0.40)),
+
+  # Wages depend on gender AND occupation
+  wage   = 30000 - 5000 * female + 20000 * office + rnorm(n, 0, 6000)
 ) |>
-  mutate(
-    educ_cat = case_when(
-      educ_years == 12 ~ "HS Only",
-      educ_years == 14 ~ "Some College", 
-      educ_years == 16 ~ "Bachelor's+"
-    ),
-    industry = ifelse(ind_professional == 1, "Professional", "Other")
-  )
+  mutate(gender = ifelse(female == 1, "Female", "Male"),
+         occupation = ifelse(office == 1, "Office", "Manual"))
 ```
 
 ### The Naive Comparison
 
-First, let's compute average wages by education level without any controls:
+First,
+let's compare average wages for men and women without any controls:
 
 ```{r}
 #| echo: true
 
 naive_means <- wage_data |>
-  group_by(educ_cat, educ_years) |>
-  summarise(avg_wage = mean(wage), n = n(), .groups = "drop") |>
-  arrange(educ_years)
+  group_by(gender) |>
+  summarise(avg_wage = mean(wage), n = n())
 
 naive_means |>
   knitr::kable(
-    col.names = c("Education", "Years", "Avg Wage ($)", "N"),
-    digits = 0
+    col.names = c("Gender", "Avg Wage ($)", "N"),
+    digits = 0,
+    format.args = list(big.mark = ",")
   )
 ```
 
 ```{r}
 #| echo: false
 
-# Calculate naive differences
-hs_wage <- naive_means$avg_wage[naive_means$educ_years == 12]
-sc_wage <- naive_means$avg_wage[naive_means$educ_years == 14]
-ba_wage <- naive_means$avg_wage[naive_means$educ_years == 16]
-
-naive_sc_diff <- sc_wage - hs_wage
-naive_ba_diff <- ba_wage - hs_wage
+# Naive gap (women minus men)
+naive_gap <- naive_means$avg_wage[naive_means$gender == "Female"] -
+  naive_means$avg_wage[naive_means$gender == "Male"]
 ```
 
-The naive comparison suggests that going from high school to some college is associated with about $`r format(round(naive_sc_diff, 0), big.mark = ",")` higher wages,
-and going from high school to a bachelor's degree is associated with about $`r format(round(naive_ba_diff, 0), big.mark = ",")` higher wages (i.e., the difference between average wages for those with only 12 years of education vs. 14 years, and so on).
+The naive comparison suggests there is almost no gender wage gap at all:
+the difference in average wages (women minus men) is only `r format(round(naive_gap, 0), big.mark = ",")` dollars.
 
-But wait! 
-The true effect of education in our simulation is only \$3,000 per year (so \$6,000 for 2 extra years and \$12,000 for 4 extra years).
-The naive estimates are too large!
+But wait!
+We built a \$5,000 wage penalty for women into our simulation.
+Why doesn't it show up?
+
+Because women are much more likely to work in office jobs,
+and office jobs pay \$20,000 more.
+The office premium that women disproportionately receive offsets the wage penalty they face *within* each occupation,
+so the naive comparison **understates** the gap.
+By failing to account for the fact that some occupations simply pay more than others,
+our simple comparison mixes up the gender gap with the occupation premium.
 
 We can also see this in the results if we run a simple bivariate regression:
 
 ```{r}
 #| echo: true
 
-naive_ols <- lm(wage ~ educ_years, data = wage_data)
+lm_naive <- lm(wage ~ female, data = wage_data)
 
-summary(naive_ols)
-
+summary(lm_naive)
 ```
 
-The coefficient on `educ_years` is way bigger than the true effect!
+With a single dummy variable on the right-hand side,
+the coefficient on `female` is exactly the difference in average wages between women and men---the same naive gap as above.
 
-This is because more educated workers are more likely to be in high-paying industries.
-By failing to account that some industries just pay higher than others,
-our simple 
+### Step 1: Compute Within-Occupation Differences
 
-### Step 1: Compute Within-Industry Differences
-
-To control for industry,
-we first compute average wages separately for each education-industry combination:
+To control for occupation,
+we compare men and women **within** each occupation:
 
 ```{r}
 #| echo: true
 #| label: tbl-matching-detailed
-#| tbl-cap: "Average wages by education and industry"
+#| tbl-cap: "Average wages by gender within each occupation"
 
-cell_means <- wage_data |>
-  group_by(industry, educ_cat, educ_years) |>
-  summarise(avg_wage = mean(wage), n = n(), .groups = "drop") |>
-  arrange(industry, educ_years)
+within_diffs <- wage_data |>
+  group_by(occupation) |>
+  summarise(
+    male_wage   = mean(wage[gender == "Male"]),
+    female_wage = mean(wage[gender == "Female"]),
+    gap         = female_wage - male_wage,   # gender gap within each occupation
+    n           = n()
+  )
 
-cell_means |>
-  select(industry, educ_cat, avg_wage, n) |>
+within_diffs |>
   knitr::kable(
-    col.names = c("Industry", "Education", "Avg Wage ($)", "N"),
-    digits = 0
+    col.names = c("Occupation", "Male Avg ($)", "Female Avg ($)", "Gap (F - M)", "N"),
+    digits = 0,
+    format.args = list(big.mark = ",")
   )
 ```
-
-Now let's compute the wage differences **within** each industry:
 
 ```{r}
-#| echo: true
+#| echo: false
 
-within_industry <- cell_means |>
-  group_by(industry) |>
-  mutate(
-    diff_from_hs = avg_wage - avg_wage[educ_years == 12]
-  ) |>
-  filter(educ_years > 12) |>
-  select(industry, educ_cat, diff_from_hs, n)
-
-within_industry |>
-  knitr::kable(
-    col.names = c("Industry", "Education", "Wage Diff vs HS ($)", "N in Cell"),
-    digits = 0
-  )
+gap_manual <- within_diffs$gap[within_diffs$occupation == "Manual"]
+gap_office <- within_diffs$gap[within_diffs$occupation == "Office"]
 ```
 
-Notice that the within-industry differences are much closer to the true values (\$6,000 for Some College, \$12,000 for Bachelor's+).
+Notice that within each occupation,
+the gap is close to the true value:
+women earn \$`r format(abs(round(gap_manual, 0)), big.mark = ",")` less than men among manual workers
+and \$`r format(abs(round(gap_office, 0)), big.mark = ",")` less among office workers.
 
 ### Step 2: Compute Weights
 
-To combine these within-industry estimates into a single number,
+To combine these within-occupation estimates into a single number,
 we take a **weighted average**.
-The weights are based on the number of observations in each industry:
+For our matching estimate,
+we'll weight each occupation by its share of workers:
 
 ```{r}
 #| echo: true
 
-# Total workers in each industry
-industry_totals <- wage_data |>
-  count(industry) |>
+within_diffs <- within_diffs |>
   mutate(weight = n / sum(n))
 
-industry_totals |>
+within_diffs |>
+  select(occupation, gap, n, weight) |>
   knitr::kable(
-    col.names = c("Industry", "N", "Weight"),
-    digits = 3
+    col.names = c("Occupation", "Gap (F - M)", "N", "Weight"),
+    digits = c(0, 0, 0, 3),
+    format.args = list(big.mark = ",")
   )
 ```
 
 ### Step 3: Compute Weighted Average
 
-Now we combine the within-industry differences using these weights.
-Let's do this for the Bachelor's+ vs HS comparison:
+Now we combine the within-occupation gaps using these weights:
 
 ```{r}
 #| echo: true
 
-# Get the within-industry differences for Bachelor's+
-ba_diffs <- within_industry |>
-  filter(educ_cat == "Bachelor's+") |>
-  left_join(industry_totals, by = "industry")
+weighted_estimate <- sum(within_diffs$gap * within_diffs$weight)
+```
 
-ba_diffs |>
-  select(industry, diff_from_hs, weight) |>
-  knitr::kable(
-    col.names = c("Industry", "Within-Industry Diff ($)", "Weight"),
-    digits = c(0, 0, 3)
-  )
+```{r}
+#| echo: false
 
-# Weighted average
-weighted_avg <- sum(ba_diffs$diff_from_hs * ba_diffs$weight)
+# Format numbers for the equation below (e.g., -5{,}237 in LaTeX)
+fmt_math <- function(x) gsub(",", "{,}", format(round(x, 0), big.mark = ","))
+w_manual <- within_diffs$weight[within_diffs$occupation == "Manual"]
+w_office <- within_diffs$weight[within_diffs$occupation == "Office"]
 ```
 
 The weighted average is:
 
 $$
-(`r round(ba_diffs$diff_from_hs[1], 0)` \times `r round(ba_diffs$weight[1], 3)`) + (`r round(ba_diffs$diff_from_hs[2], 0)` \times `r round(ba_diffs$weight[2], 3)`) = `r format(round(weighted_avg, 0), big.mark = ",")`
+(`r fmt_math(gap_manual)` \times `r format(round(w_manual, 3), nsmall = 3)`) + (`r fmt_math(gap_office)` \times `r format(round(w_office, 3), nsmall = 3)`) = `r fmt_math(weighted_estimate)`
 $$
 
-This is much closer to the true effect of \$12,000!
+This is very close to the true gap of −\$5,000!
 
 ### The Regression Equivalent
 
@@ -571,27 +554,86 @@ Now let's see what regression gives us:
 ```{r}
 #| echo: true
 
-# Create numeric education variable (years beyond HS - just to get easier to interpret numbers)
-wage_data <- wage_data |>
-  mutate(educ_beyond_hs = educ_years - 12)
+# Regression controlling for occupation
+lm_ctrl <- lm(wage ~ female + office, data = wage_data)
 
-# Regression controlling for industry
-lm_controlled <- lm(wage ~ educ_beyond_hs + ind_professional, data = wage_data)
-summary(lm_controlled)
+summary(lm_ctrl)
 ```
 
-The coefficient on `educ_beyond_hs` is approximately \$3,000 per year—almost exactly the true value we built into the simulation!
-
-Compare this to the naive regression without the industry control:
+The coefficient on `female` is about −\$`r format(abs(round(coef(lm_ctrl)["female"], 0)), big.mark = ",")`---almost exactly our matching estimate,
+and close to the true value we built into the simulation.
+Let's put all three side by side:
 
 ```{r}
 #| echo: true
 
-lm_naive <- lm(wage ~ educ_beyond_hs, data = wage_data)
-coef(lm_naive)["educ_beyond_hs"]
+c("Naive"      = unname(coef(lm_naive)["female"]),
+  "Matching"   = weighted_estimate,
+  "Regression" = unname(coef(lm_ctrl)["female"]),
+  "Truth"      = -5000) |>
+  round(0)
 ```
 
-The naive estimate (`r format(round(coef(lm_naive)["educ_beyond_hs"], 0), big.mark = ",")`) is inflated because it conflates the education effect with the industry premium.
+The naive estimate is badly off because women sort into the higher-paying office jobs.
+Matching and regression both land near the truth.
+
+### How OLS Weights the Groups
+
+Notice that the matching and regression estimates are *nearly* identical,
+but not exactly the same.
+Why?
+
+Our matching estimate weighted each occupation by its share of workers.
+OLS uses slightly different weights.
+It weights each group by its size **and** by how much the variable of interest varies within that group:
+
+$$
+\text{weight}_g \propto n_g \times Var(female \mid g)
+$$
+
+The intuition is that a group can only tell us about the gender gap if it contains both men and women.
+An occupation that is half women and half men is very informative about the gap.
+An occupation that is 99% men tells us very little,
+because there are hardly any women to compare against.
+OLS puts more weight on groups with more variation in the variable of interest.
+
+We can check this directly.
+For a 0/1 variable,
+the variance is $p(1-p)$,
+where $p$ is the share of observations equal to 1:
+
+```{r}
+#| echo: true
+
+ols_weights <- wage_data |>
+  group_by(occupation) |>
+  summarise(n = n(), share_female = mean(female)) |>
+  mutate(
+    var_female = share_female * (1 - share_female),   # variance of a 0/1 variable
+    ols_weight = n * var_female / sum(n * var_female)
+  ) |>
+  left_join(select(within_diffs, occupation, gap, weight), by = "occupation")
+
+ols_weights |>
+  select(occupation, gap, weight, ols_weight) |>
+  knitr::kable(
+    col.names = c("Occupation", "Gap (F - M)", "Matching Weight", "OLS Weight"),
+    digits = c(0, 0, 3, 3),
+    format.args = list(big.mark = ",")
+  )
+
+# Weighted average using the OLS weights
+sum(ols_weights$gap * ols_weights$ols_weight)
+```
+
+Using the OLS weights reproduces the regression coefficient exactly.
+In this example,
+the two sets of weights are very similar,
+and the gap is about the same in both occupations,
+so matching and regression give almost the same answer.
+If the gap differed a lot across groups,
+and the variable of interest varied much more in some groups than in others,
+the two estimates could differ noticeably.
 
 ::: {.callout-note}
 ## Multivariate OLS as Matching
@@ -601,9 +643,9 @@ OLS is effectively:
 1. **Grouping** observations by similar values of the control variables
 2. **Computing** the relationship between $x$ and $y$ within each group
 3. **Taking a weighted average** across groups,
-where weights reflect group sizes
+where each group's weight depends on its size *and* on how much $x$ varies within it
 
-This is why multivariate regression can sometimes be thought of as a "matching" estimator—we're matching people who work in the same industry and then comparing their wages based on education.
+This is why multivariate regression can sometimes be thought of as a "matching" estimator---we're matching people who work in the same occupation and then comparing the wages of men and women.
 The same logic applies if we have multiple control variables,
 although the grouping gets complicated fast.
 :::
@@ -693,7 +735,12 @@ Examples:
 
 When perfect multicollinearity exists,
 the OLS formulas break down (the system of equations has no unique solution).
-R will typically drop one of the collinear variables automatically and issue a warning.
+R will drop one of the collinear variables automatically,
+but `lm()` does *not* issue a warning.
+Instead,
+the dropped variable's coefficient is reported as `NA`,
+and `summary()` notes that it was "not defined because of singularities."
+Always check your output for `NA` coefficients.
 :::
 
 ### Assumption 4: Zero Conditional Mean
@@ -739,11 +786,11 @@ and our independent variable of interest,
 we also probably have lots of **unobserved** correlation between variables.
 
 For example,
-there could be important components of $\mu$ that we simply cannot measure sufficiently--inherent motivation in a wage regression, for example.
+there could be important components of $\mu$ that we simply cannot measure sufficiently---inherent motivation in a wage regression, for example.
 Labor market surveys generally do not have an effective way to capture this,
-so this important determinant of wages is considered *unobserved*,
-and we thus have cannot include it in our multivariate regression model
-and we will therefore end up with a biased estimate.
+so this important determinant of wages is considered *unobserved*.
+We cannot include it in our multivariate regression model,
+so we will end up with a biased estimate.
 
 But this is not the end of the world.
 Throughout the course,
@@ -756,7 +803,7 @@ we can still reason about the **direction** of the bias.
 
 ### Setup
 
-Let's say our independent variable of interest is $beta_1$ (e.g., education).
+Let's say our independent variable of interest is $x_1$ (e.g., education).
 
 Suppose the true population regression model is:
 
@@ -765,10 +812,11 @@ y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \mu
 $$
 
 In an ideal world,
-we would be able to estimate an unbiased model:
+we would be able to estimate the correctly specified model,
+which gives unbiased estimates:
 
 $$
-\hat{y} = \hat{\beta_0} + \hat{\beta_1} x. 
+\hat{y} = \hat{\beta}_0 + \hat{\beta}_1 x_1 + \hat{\beta}_2 x_2
 $$
 
 But we can't observe $x_2$ (it may be motivation or ability, for example),
@@ -817,7 +865,7 @@ $$ {#eq-ovb-bias}
 The bias depends on two factors:
 
 1. **$\beta_2$:** The effect of the omitted variable on $y$
-2. **$\tilde{\delta}_1$:** The correlation between the omitted variable ($x_2$) and the included variable ($x_1$)
+2. **$\tilde{\delta}_1$:** The relationship between the omitted variable ($x_2$) and the included variable ($x_1$). Technically, it is the slope from regressing $x_2$ on $x_1$, but it always has the same sign as $Corr(x_1, x_2)$, which is all we need to sign the bias
 
 If either factor is zero,
 there is no bias.
@@ -897,7 +945,7 @@ when your variable of interest is highly correlated with control variables,
 your estimate becomes less precise.
 This is sometimes called **high multicollinearity** or the **multicollinearity problem**.
 
-Note this is different from **perfect multicolinearity**,
+Note this is different from **perfect multicollinearity**,
 which makes it *impossible* to get an estimate.
 Here, we still will be able to estimate our $\beta_j$ successfully,
 but it will have a high variance and be "noisy".
@@ -908,13 +956,13 @@ Look carefully at the variance formula above. The denominator contains quantitie
 
 So how do we estimate $\sigma^2$?
 
-Recall from the homoskedasticity assumption (GM.5) that $Var(\mu_i | \mathbf{x}_i) = \sigma^2$ for all observations $i$. Combined with the zero conditional mean assumption (GM.4), which gives us $E[\mu_i | \mathbf{x}_i] = 0$, we can show that $\sigma^2 = E[\mu_i^2]$. Let's work through why.
+Recall from the homoskedasticity assumption (Assumption 5) that $Var(\mu_i | \mathbf{x}_i) = \sigma^2$ for all observations $i$. Combined with the zero conditional mean assumption (Assumption 4), which gives us $E[\mu_i | \mathbf{x}_i] = 0$, we can show that $\sigma^2 = E[\mu_i^2]$. Let's work through why.
 
-From @sec-stats-review, the definition of variance is $Var(X) = E[(X - \mu)^2]$---the expected squared deviation from the mean. Applying this to $\mu_i$ and using the fact that $E[\mu_i] = 0$ from GM.4:
+From @sec-stats-review, the definition of variance is $Var(X) = E[(X - E[X])^2]$---the expected squared deviation from the mean. (In @sec-stats-review we wrote the mean as $\mu$; here we write $E[X]$ so it isn't confused with the error term $\mu_i$.) Applying this to $\mu_i$ and using the fact that $E[\mu_i] = 0$ from Assumption 4:
 
 $$Var(\mu_i) = E[(\mu_i - 0)^2] = E[\mu_i^2]$$
 
-And from GM.5, $Var(\mu_i) = \sigma^2$, giving us:
+And from Assumption 5, $Var(\mu_i) = \sigma^2$, giving us:
 
 $$\sigma^2 = E[\mu_i^2]$$
 
@@ -972,7 +1020,7 @@ Let's verify that $\hat{\sigma}^2 = SSR/(n-k-1)$ is a good estimator of $\sigma^
 set.seed(325)
 
 # --- Population parameters ---
-n <- 100          # sample size
+n <- 20           # sample size (small, so the degrees-of-freedom correction is easy to see)
 true_sigma2 <- 4  # the TRUE error variance (σ² = 4)
 n_sims <- 5000    # number of simulations
 
@@ -991,7 +1039,7 @@ for (i in 1:n_sims) {
 
   # Compute σ̂² = SSR / (n - k - 1)
   residuals_sq <- residuals(reg)^2
-  sigma2_hat[i] <- sum(residuals_sq) / (n - 2 - 1)  # n - k - 1 = 100 - 2 - 1 = 97
+  sigma2_hat[i] <- sum(residuals_sq) / (n - 2 - 1)  # n - k - 1 = 20 - 2 - 1 = 17
 }
 
 # --- Visualize the results ---
@@ -1011,7 +1059,7 @@ ggplot(tibble(sigma2_hat), aes(x = sigma2_hat)) +
   theme_minimal(base_size = 14)
 ```
 
-The simulation confirms two important things. First, the average of $\hat{\sigma}^2$ across all 5,000 samples is very close to the true $\sigma^2 = 4$---this is unbiasedness in action. Second, while any *single* estimate of $\hat{\sigma}^2$ can be above or below the true value, the distribution is centered in the right place.
+The simulation confirms that $\hat{\sigma}^2$ is unbiased: the average across all 5,000 samples is very close to the true $\sigma^2 = 4$. Any *single* estimate of $\hat{\sigma}^2$ can land well above or below the true value, but the distribution is centered in the right place.
 
 What happens if we divide by $n$ instead of $n - k - 1$? Let's check:
 
@@ -1030,6 +1078,9 @@ bind_rows(
 ) |>
   ggplot(aes(x = estimate, fill = type)) +
   geom_histogram(alpha = 0.6, bins = 50, color = "white", position = "identity") +
+  # Solid lines: the average of each estimator across the 5,000 samples
+  geom_vline(xintercept = mean(sigma2_hat), color = "steelblue", linewidth = 1.2) +
+  geom_vline(xintercept = mean(sigma2_naive), color = "darkorange", linewidth = 1.2) +
   geom_vline(xintercept = true_sigma2, color = "darkred", linewidth = 1.5, linetype = "dashed") +
   scale_fill_manual(values = c("steelblue", "orange")) +
   annotate("text", x = true_sigma2 + 0.1, y = Inf, vjust = 2,
@@ -1043,7 +1094,7 @@ bind_rows(
   theme(legend.position = "bottom")
 ```
 
-The orange distribution (dividing by $n$) is shifted to the left---it systematically *underestimates* $\sigma^2$. The degrees-of-freedom correction fixes this bias. The intuition is that the residuals are computed from the *estimated* regression line, which is already chosen to fit the data as closely as possible. This makes the residuals systematically smaller than the true errors, and dividing by $n - k - 1$ instead of $n$ corrects for this.
+The orange distribution (dividing by $n$) is shifted to the left---it systematically *underestimates* $\sigma^2$. With $n = 20$ and $k = 2$, dividing by $n$ instead of $n - k - 1 = 17$ understates $\sigma^2$ by 15% on average. The degrees-of-freedom correction fixes this bias. The intuition is that the residuals are computed from the *estimated* regression line, which is already chosen to fit the data as closely as possible. This makes the residuals systematically smaller than the true errors, and dividing by $n - k - 1$ instead of $n$ corrects for this. In large samples the correction barely matters: with $n = 1{,}000$, dividing by $n$ would understate $\sigma^2$ by only 0.3%.
 
 
 ## The Bias-Variance Tradeoff
@@ -1061,24 +1112,47 @@ Your estimate systematically misses the true value.
 
 What if you include a variable that doesn't belong ($\beta_2 = 0$)?
 
-From the OVB formula:
-$$E[\hat{\beta}_1] = \beta_1 + (0) \cdot \tilde{\delta}_1 = \beta_1$$
+In that case,
+the true model is just
+
+$$
+y = \beta_0 + \beta_1 x_1 + 0 \cdot x_2 + \mu,
+$$
+
+so the regression that includes $x_2$ is still correctly specified.
+Assumptions 1--4 still hold,
+which means:
+
+$$
+E[\hat{\beta}_1] = \beta_1 \quad \text{and} \quad E[\hat{\beta}_2] = 0
+$$
 
 No bias!
 Including an irrelevant variable doesn't bias your estimate.
 
 But look at the variance formula.
-Including an extra variable increases $R_1^2$ (the correlation between $x_1$ and other variables),
+If the extra variable is correlated with $x_1$,
+including it increases $R_1^2$ (the share of the variation in $x_1$ explained by the other independent variables),
 which increases the variance of $\hat{\beta}_1$.
 
-**Including irrelevant variables inflates variance without reducing bias.**
+**Including irrelevant variables that are correlated with $x_1$ inflates variance without reducing bias.**
 
 ### The Tradeoff
 
+For a variable that is correlated with $x_1$:
+
 | Action | Bias | Variance |
 |--------|------|----------|
-| Omit relevant variable | Increases | Decreases |
+| Omit relevant variable | Increases | Usually decreases |
 | Include irrelevant variable | No change | Increases |
+
+Why only "usually"?
+When you omit $x_2$,
+its effect ($\beta_2 x_2$) becomes part of the error term,
+which makes the error variance larger.
+If $\beta_2$ is big,
+that extra noise can outweigh the precision you gain from dropping $x_2$,
+and the short model can end up *noisier* than the long one.
 
 This is the **bias-variance tradeoff**:
 
@@ -1140,7 +1214,9 @@ pop_relevant <- tibble(
   x2 = rnorm(n_pop, 50, 15),
   err = rnorm(n_pop, 0, 10),
   x1 = 10 + 0.6 * x2 + rnorm(n_pop, 0, 8),
-  y = 8.78 + 2.21 * x1 + 1.5 * x2 + err  # x2 has effect
+  y = 8.78 + 2.21 * x1 + 0.5 * x2 + err  # x2 has effect
+  # (beta2 kept modest: with a large beta2, e.g. 1.5, omitting x2 adds so much
+  #  noise to the error that the short model has HIGHER variance than the long one)
 )
 
 # Simulation function
@@ -1199,14 +1275,15 @@ ggplot(all_sims, aes(x = b1, fill = fill_group)) +
              color = "black", linewidth = 0.8, linetype = "solid") +
   geom_label(
     data = sum_stats,
-    aes(x = Inf, y = Inf,
+    aes(x = -Inf, y = Inf,
         label = paste0("Mean = ", round(sim_mean, 3),
                         "\nSD = ", round(sim_sd, 3),
                         "\nBias = ", round(bias, 3))),
-    hjust = 1, vjust = 1.3, size = 3, fill = "white", alpha = 0.85,
+    hjust = -0.05, vjust = 1.3, size = 3, fill = "white", alpha = 0.85,
     label.size = 0.3, inherit.aes = FALSE
   ) +
-  facet_wrap(~ case, ncol = 2, scales = "free", labeller = label_parsed) +
+  # Shared x-axis so the spread of the four distributions can be compared by eye
+  facet_wrap(~ case, ncol = 2, scales = "free_y", labeller = label_parsed) +
   scale_fill_manual(values = c("omit" = "steelblue", "include" = "coral"),
                     labels = c("omit" = expression("Omit"~x[2]),
                                "include" = expression("Include"~x[2]))) +
@@ -1235,12 +1312,18 @@ Each panel shows one of the four possible scenarios:
 
 - **Case 3** (bottom-left): $x_2$ is relevant but we omit it.
   The distribution shifts away from the true $\beta_1$---this is **omitted variable bias**.
-  Even though the variance is low, the estimates are *systematically wrong*.
+  The variance is lower than in Case 4, but the estimates are *systematically wrong*.
 
 - **Case 4** (bottom-right): $x_2$ is relevant and we include it.
   The distribution is centered on the true value (no bias),
-  though variance is slightly higher than Case 1.
+  though it is wider than in Cases 1 and 3.
   This is the *correct* specification---the variance cost is worth paying to eliminate bias.
+
+Case 3 is narrower than Case 4 here,
+as the table above predicts.
+That isn't guaranteed, though.
+With a larger effect of $x_2$ (say, $\beta_2 = 1.5$ instead of $0.5$),
+omitting $x_2$ would add so much noise to the error term that Case 3 would actually be *wider* than Case 4.
 
 
 ## Summary
@@ -1259,14 +1342,22 @@ $\beta_j$ is the effect of $x_j$ holding all other variables constant
 - **The zero conditional mean assumption** now requires $E[\mu | x_1, \ldots, x_k] = 0$---more plausible with good controls
 
 - **Multivariate OLS is like matching:**
-It compares observations within groups defined by control variables
+It compares observations within groups defined by control variables,
+then takes a weighted average across groups (weighting by each group's size and by how much $x$ varies within it)
+
+- **Adjusted $R^2$** penalizes for the number of independent variables;
+regular $R^2$ never falls when you add a variable
 
 - **The OVB formula** tells us the direction of bias from omitting a variable:
 $$\text{Bias} = \beta_2 \cdot \tilde{\delta}_1$$
 
+- **The variance of $\hat{\beta}_j$** is $\sigma^2 / [SST_j(1 - R_j^2)]$.
+We estimate $\sigma^2$ with $\hat{\sigma}^2 = SSR/(n - k - 1)$,
+which gives the standard error $se(\hat{\beta}_j) = \hat{\sigma} / \sqrt{SST_j(1 - R_j^2)}$
+
 - **There's a bias-variance tradeoff:**
 Omitting relevant variables causes bias;
-including irrelevant variables inflates variance
+including irrelevant variables that are correlated with $x_1$ inflates variance
 
 - **Perfect multicollinearity** occurs when one variable is an exact linear function of others;
 it must be avoided
@@ -1334,7 +1425,7 @@ it must be avoided
 </div>
 
 <div class="answer-row">
-    <label>vi. If you include an irrelevant variable (one with \(\beta = 0\)), your estimate of \(\beta_1\) will be: </label>
+    <label>vi. If you include an irrelevant variable (one with \(\beta = 0\)) that is correlated with \(x_1\), your estimate of \(\beta_1\) will be: </label>
     <select onchange="checkAnswer(this, 'b')">
         <option value="">-- Select Answer --</option>
         <option value="a">Biased with lower variance</option>
@@ -1451,7 +1542,7 @@ free_lunch         -0.287      0.071
 
 n = 1,200, Adjusted R-squared = 0.23
 </pre>
-<em>Note: parent_college = 1 if at least one parent has college degree; free_lunch = 1 if eligible for free lunch program (proxy for low income)</em>
+<em>Note: hours_studied = hours of study per week; parent_college = 1 if at least one parent has college degree; free_lunch = 1 if eligible for free lunch program (proxy for low income)</em>
 </div>
 
 <div class="question">
@@ -1511,8 +1602,12 @@ preventing the mechanical increase that happens with regular R-squared when you 
 v. From the OVB formula: $\text{Bias} = \beta_2 \cdot \tilde{\delta}_1$.
 Bias equals zero if either $\beta_2 = 0$ (the omitted variable doesn't affect $y$) or $\tilde{\delta}_1 = 0$ (the omitted variable is uncorrelated with $x_1$).
 
-vi. Including an irrelevant variable doesn't cause bias (since $\beta_2 = 0$ in the OVB formula),
-but it does increase variance through the $(1 - R_j^2)$ term in the variance formula.
+vi. Including an irrelevant variable doesn't cause bias:
+with $\beta_2 = 0$,
+the model that includes $x_2$ is still correctly specified,
+so Assumptions 1--4 still hold.
+But because the irrelevant variable is correlated with $x_1$,
+it increases variance through the $(1 - R_j^2)$ term in the variance formula.
 
 vii. Income is positively correlated with both exercise and health.
 $\text{Bias} = (+)(+) = $ Positive.

@@ -1222,7 +1222,7 @@ Prof. Caraher
     </div>
 </div>
 
-  <p class="date">Last updated: 09-29-2026</p>
+  <p class="date">Last updated: 10-02-2026</p>
 </section>
 <section>
 <section id="from-rcts-to-regression" class="title-slide slide level1 center">
@@ -2819,30 +2819,21 @@ padding: 3px 9px; cursor: pointer; opacity: 0.55;
 <section id="when-assumption-4-fails" class="slide level2 smaller">
 <h2>When Assumption 4 Fails</h2>
 <ul>
-<li class="fragment">When <span class="math inline">\(E[\mu | x] \neq 0\)</span>, OLS is <strong>biased</strong> – and the most common reason is <strong>omitted variable bias</strong></li>
+<li class="fragment">When <span class="math inline">\(E[\mu | x] = 0\)</span>: <span class="math inline">\(\hat{\beta}_1\)</span> is an unbiased estimate of the <strong>causal effect</strong></li>
+<li class="fragment">When <span class="math inline">\(E[\mu | x] \neq 0\)</span>: OLS is <strong>biased</strong>, and <span class="math inline">\(\hat{\beta}_1\)</span> measures <strong>correlation</strong>, not causation
+<ul>
+<li class="fragment">Put differently: <span class="math inline">\(E[\mu | x] \neq 0\)</span> when <strong>some factor in <span class="math inline">\(\mu\)</span> is correlated with <span class="math inline">\(x\)</span></strong> – then the average of <span class="math inline">\(\mu\)</span> is different at different values of <span class="math inline">\(x\)</span></li>
+</ul></li>
 </ul>
 <div class="fragment">
 <ul>
-<li class="fragment">If a variable that belongs in the model is left out AND is correlated with <span class="math inline">\(x\)</span>, our slope picks up the effect of both</li>
-</ul>
-</div>
-<div class="fragment">
+<li class="fragment">The most common reason is <strong>omitted variable bias</strong>: if a variable that belongs in the model is left out AND is correlated with <span class="math inline">\(x\)</span>, our slope picks up the effect of both
 <ul>
 <li class="fragment">Example: estimating the return to education while omitting ability → <span class="math inline">\(\hat{\beta}_1\)</span> <strong>overstates</strong> the causal effect</li>
-</ul>
-</div>
-<div class="fragment">
-<ul>
 <li class="fragment">Remember from Unit 3: this is essentially <strong>selection bias</strong> – people who choose more education also tend to have higher ability</li>
+</ul></li>
 </ul>
 </div>
-</section>
-<section id="the-big-picture" class="slide level2 smaller">
-<h2>The Big Picture</h2>
-<ul>
-<li class="fragment"><p>When <span class="math inline">\(E[\mu | x] = 0\)</span>: <span class="math inline">\(\hat{\beta}_1\)</span> is an unbiased estimate of the <strong>causal effect</strong></p></li>
-<li class="fragment"><p>When <span class="math inline">\(E[\mu | x] \neq 0\)</span>: <span class="math inline">\(\hat{\beta}_1\)</span> measures <strong>correlation</strong>, not causation</p></li>
-</ul>
 <div class="fragment">
 <div class="callout callout-important callout-titled callout-style-default">
 <div class="callout-body">
