@@ -1169,12 +1169,13 @@ cat("```{=html}",
 ## When Assumption 4 Fails {.smaller}
 
 - When $E[\mu | x] = 0$: $\hat{\beta}_1$ is an unbiased estimate of the **causal effect**
-- When $E[\mu | x] \neq 0$: OLS is **biased**, and $\hat{\beta}_1$ measures **correlation**, not causation
-  - Put differently: $E[\mu | x] \neq 0$ when **some factor in $\mu$ is correlated with $x$** -- then the average of $\mu$ is different at different values of $x$
+- When $E[\mu | x] \neq 0$: OLS is **biased** -- $\hat{\beta}_1$ picks up the causal effect *plus* whatever in $\mu$ moves with $x$
+  - Why it fails: if **some factor in $\mu$ is correlated with $x$**, the average of $\mu$ changes as $x$ changes -- that is exactly $E[\mu | x] \neq 0$
+  - Education example: average **ability** (in $\mu$) rises with education, so a component of the error term $\mu$ is correlated with $x$
 
-. . .
+## Omitted Variable Bias {.smaller}
 
-- The most common reason is **omitted variable bias**: if a variable that belongs in the model is left out AND is correlated with $x$, our slope picks up the effect of both
+- The most common case is **omitted variable bias**: a variable that belongs in the model is left out (so it sits in $\mu$) AND is correlated with $x$, so our slope picks up the effect of both
   - Example: estimating the return to education while omitting ability → $\hat{\beta}_1$ **overstates** the causal effect
   - Remember from Unit 3: this is essentially **selection bias** -- people who choose more education also tend to have higher ability
 

@@ -38,7 +38,7 @@ library(tidyverse)
 **Example:** $wage = \beta_0 + \beta_1 \cdot educ + \mu$
 
 - The error term $\mu$ contains: ability, family connections, motivation, experience, etc.
-- Many of these are **correlated with education** --- wealthier families → more education *and* higher wages, i.e. $E[\mu | X] \neq 0 $
+- Many of these are **correlated with education** --- wealthier families → more education *and* higher wages, i.e. $E[\mu | X] \neq 0$
 
 . . .
 
@@ -58,6 +58,8 @@ If confounders are in $\mu$ and correlated with $x$, then $E[\mu | x] \neq 0$ an
 
 - If family income confounds the education-wage relationship, **include it**:
 
+. . .
+
 $$wage = \beta_0 + \beta_1 \cdot educ + \beta_2 \cdot family\_income + \mu$$
 
 - Now $\beta_1$ is the effect of education **holding family income constant**
@@ -66,6 +68,8 @@ $$wage = \beta_0 + \beta_1 \cdot educ + \beta_2 \cdot family\_income + \mu$$
 . . .
 
 - In general, with $k$ independent variables:
+
+. . .
 
 $$y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots + \beta_k x_k + \mu$$
 
@@ -81,7 +85,7 @@ $$y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots + \beta_k x_k + \mu$$
 
 - This is the key difference from bivariate OLS!
   - Bivariate: "associated with" (everything else floating)
-  - Multivariate: "holding constant" (controlling for other factors)
+  - Multivariate: "holding constant" (the other $x$'s **in the model**)
 
 . . .
 
@@ -89,6 +93,10 @@ $$y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots + \beta_k x_k + \mu$$
 
 - $\beta_1$: Each additional year of education is associated with $\beta_1$ dollars more in wages, **holding family income constant**
 - $\beta_2$: Each additional dollar of family income is associated with $\beta_2$ dollars more in wages, **holding education constant**
+
+. . .
+
+- **But** holding the other $x$'s constant is **not** the same as causal: $\hat{\beta}_1$ is causal only if nothing left in $\mu$ (e.g., ability) is correlated with $educ$ --- that's GM4, coming up
 
 
 ## Deriving the Multivariate OLS Estimator {.smaller}
@@ -99,16 +107,15 @@ $$SSR = \sum\nolimits_{i=1}^{n} (y_i - \hat{\beta}_0 - \hat{\beta}_1 x_{1i} - \h
 
 . . .
 
-Set the partial derivative with respect to each $\hat{\beta}_j$ equal to zero → $k + 1$ **first-order conditions**:
+Set the partial derivative with respect to each $\hat{\beta}_j$ equal to zero → $k + 1$ **first-order conditions**. The term in parentheses is the **residual**, $\hat{\mu}_i$:
 
 $$\begin{aligned}
-\sum\nolimits_{i=1}^{n}(y_i - \hat{\beta}_0 - \hat{\beta}_1 x_{1i} - \cdots - \hat{\beta}_k x_{ki}) &= 0 \\
-\sum\nolimits_{i=1}^{n} x_{ji}(y_i - \hat{\beta}_0 - \hat{\beta}_1 x_{1i} - \cdots - \hat{\beta}_k x_{ki}) &= 0 \quad \text{for } j = 1, \ldots, k
+\sum\nolimits_{i=1}^{n}(y_i - \hat{\beta}_0 - \hat{\beta}_1 x_{1i} - \cdots - \hat{\beta}_k x_{ki}) &= \sum\nolimits_{i=1}^{n} \hat{\mu}_i = 0 \\
+\sum\nolimits_{i=1}^{n} x_{ji}(y_i - \hat{\beta}_0 - \hat{\beta}_1 x_{1i} - \cdots - \hat{\beta}_k x_{ki}) &= \sum\nolimits_{i=1}^{n} x_{ji} \hat{\mu}_i = 0 \quad \text{for } j = 1, \ldots, k
 \end{aligned}$$
 
 . . .
 
-- In words: the residuals **sum to zero** and are **uncorrelated with every $x_j$** (this comes back when we estimate $\sigma^2$)
 - Solving these $k + 1$ equations gives the OLS estimates: tedious and uninsightful by hand (matrix algebra)
 
 
@@ -160,10 +167,143 @@ ggplot(mtcars, aes(x = hp, y = mpg)) +
   theme_minimal(base_size = 16)
 ```
 
-The familiar 2D picture from Unit 4 --- but it **ignores weight entirely**. What happens to this slope if we hold weight fixed?
+The familiar 2D picture from Unit 4: the best line through the horsepower--MPG points, **ignoring weight**. But every car also has a weight, so the data really live in **3D**...
 
 
-## What's Hiding in the Bivariate View? {.smaller}
+## Adding Weight: A Cloud of Points in 3D {.smaller}
+
+```{r}
+#| echo: false
+
+library(plotly)
+
+b      <- coef(lm_multi)
+b_biv  <- coef(lm_biv)
+wt_bar <- mean(mtcars$wt)
+wall   <- 5.75   # back wall (heavier than any car), where we draw the 2D "shadow"
+
+cars <- mtcars |>
+  mutate(car = rownames(mtcars), fit = fitted(lm_multi), wall_wt = wall)
+
+# Bivariate line and the plane's hp slope at average weight, both drawn on the back wall
+hp_line <- seq(min(mtcars$hp), max(mtcars$hp), length.out = 50)
+wall_lines <- tibble(
+  hp    = hp_line,
+  wt    = wall,
+  biv   = b_biv[1] + b_biv["hp"] * hp_line,
+  plane = b[1] + b["hp"] * hp_line + b["wt"] * wt_bar
+)
+
+# Fitted plane over the range of the data
+# (plotly wants z as a matrix with rows = y values (wt), columns = x values (hp))
+hp_grid <- seq(min(mtcars$hp), max(mtcars$hp), length.out = 25)
+wt_grid <- seq(min(mtcars$wt), max(mtcars$wt), length.out = 25)
+plane_z <- outer(wt_grid, hp_grid, function(w, h) b[1] + b["hp"] * h + b["wt"] * w)
+
+# Residual sticks: one segment per car from the point to the plane (NA breaks the line)
+stick <- function(v_from, v_to) as.vector(rbind(v_from, v_to, NA))
+sticks <- tibble(
+  hp  = stick(mtcars$hp, mtcars$hp),
+  wt  = stick(mtcars$wt, mtcars$wt),
+  mpg = stick(mtcars$mpg, fitted(lm_multi))
+)
+
+# One figure, built up across slides: same axes and camera every time
+fig_3d <- function(show_wall = FALSE, show_plane = FALSE) {
+  p <- plot_ly(height = 420)
+  if (show_plane) {
+    p <- p |>
+      add_surface(
+        x = hp_grid, y = wt_grid, z = plane_z,
+        colorscale = list(c(0, "#EEB808"), c(1, "#EEB808")),
+        opacity = 0.5, showscale = FALSE, hoverinfo = "skip",
+        name = "Fitted plane", showlegend = TRUE
+      ) |>
+      add_trace(
+        data = sticks, x = ~hp, y = ~wt, z = ~mpg,
+        type = "scatter3d", mode = "lines", connectgaps = FALSE,
+        line = list(color = "#7F7F7F", width = 3),
+        hoverinfo = "skip", name = "Residuals", showlegend = FALSE
+      )
+  }
+  p <- p |>
+    add_markers(
+      data = cars, x = ~hp, y = ~wt, z = ~mpg,
+      marker = list(size = 5, color = "#002169", line = list(color = "white", width = 1)),
+      text = ~paste0("<b>", car, "</b><br>HP: ", hp, "  Weight: ", wt, "<br>MPG: ", mpg),
+      hoverinfo = "text", name = "Cars"
+    )
+  if (show_wall) {
+    p <- p |>
+      add_markers(
+        data = cars, x = ~hp, y = ~wall_wt, z = ~mpg,
+        marker = list(size = 3.5, color = "#9AA5B8"),
+        hoverinfo = "skip", name = "Shadow (ignoring weight)"
+      ) |>
+      add_trace(
+        data = wall_lines, x = ~hp, y = ~wt, z = ~biv,
+        type = "scatter3d", mode = "lines", line = list(color = "#E63946", width = 8),
+        hoverinfo = "skip", name = paste0("Bivariate fit (slope ", round(b_biv["hp"], 3), ")")
+      )
+  }
+  if (show_plane) {
+    p <- p |>
+      add_trace(
+        data = wall_lines, x = ~hp, y = ~wt, z = ~plane,
+        type = "scatter3d", mode = "lines", line = list(color = "#A67C00", width = 8),
+        hoverinfo = "skip", name = paste0("Plane at average weight (slope ", round(b["hp"], 3), ")")
+      )
+  }
+  p |>
+    layout(
+      scene = list(
+        xaxis = list(title = "Horsepower", range = c(40, 345)),
+        yaxis = list(title = "Weight (1,000 lbs)", range = c(1.3, wall + 0.05),
+                     showbackground = TRUE, backgroundcolor = "#EEF1F7"),
+        zaxis = list(title = "MPG", range = c(4, 35)),
+        aspectmode = "manual", aspectratio = list(x = 1.5, y = 1, z = 0.9),
+        camera = list(eye = list(x = 0.4, y = -1.9, z = 0.5),
+                      center = list(x = 0, y = 0, z = -0.12))
+      ),
+      showlegend = TRUE,
+      legend = list(orientation = "h", x = 0.5, xanchor = "center", y = 1.0,
+                    font = list(size = 14)),
+      margin = list(l = 0, r = 0, t = 0, b = 0)
+    )
+}
+
+fig_3d()
+```
+
+- Each car is a point in 3D: **horsepower**, **weight**, and **MPG**. Drag to rotate!
+- Heavier cars have **more horsepower** (correlation `r round(cor(mtcars$hp, mtcars$wt), 2)`) and **lower MPG** (correlation `r round(cor(mtcars$wt, mtcars$mpg), 2)`)
+
+
+## The Bivariate Fit Lives on the Back Wall {.smaller}
+
+```{r}
+#| echo: false
+
+fig_3d(show_wall = TRUE)
+```
+
+- Flatten every car against the **back wall** (i.e., ignore weight) and you get the 2D scatter from before: the gray **shadow**
+- The bivariate regression fits its line (**red**, slope `r round(b_biv["hp"], 3)`) to this shadow, so it can't separate horsepower from weight
+
+
+## The Multivariate Fit: A Plane {.smaller}
+
+```{r}
+#| echo: false
+
+fig_3d(show_wall = TRUE, show_plane = TRUE)
+```
+
+- With two regressors, OLS fits a **plane** (yellow), choosing $\hat{\beta}_0, \hat{\beta}_1, \hat{\beta}_2$ to minimize the squared vertical **residuals** (gray sticks)
+- The plane's slope along horsepower, `r round(b["hp"], 3)`, is the effect of horsepower **holding weight fixed**. Its trace on the back wall (**gold**) is much flatter than the **red** bivariate line
+
+
+## Slicing the Plane: Holding Weight Fixed {.smaller}
 
 ```{r}
 #| echo: false
@@ -189,124 +329,32 @@ ggplot(mtcars, aes(x = hp, y = mpg)) +
   theme_minimal(base_size = 16)
 ```
 
+- Back in 2D: each gold line is a **slice of the plane** at a fixed weight, and every slice has the same slope (`r round(coef(lm_multi)["hp"], 3)`). This is what "controlling for weight" means
 - Heavier cars (**darker**) have more horsepower *and* lower MPG, so the red bivariate line picks up the effect of weight too
-- The gold lines **hold weight fixed** (slope `r round(coef(lm_multi)["hp"], 3)` each): this is what "controlling for weight" means. Each one is a slice of a **plane**...
-
-
-## Seeing It in 3D: The Regression Plane {.smaller}
-
-```{r}
-#| echo: false
-
-library(plotly)
-
-b      <- coef(lm_multi)
-b_biv  <- coef(lm_biv)
-wt_bar <- mean(mtcars$wt)
-wall   <- 5.75   # back wall (heavier than any car) for the 2D "shadow"
-
-# Fitted plane over the range of the data
-# (plotly wants z as a matrix with rows = y values (wt), columns = x values (hp))
-hp_grid <- seq(min(mtcars$hp), max(mtcars$hp), length.out = 25)
-wt_grid <- seq(min(mtcars$wt), max(mtcars$wt), length.out = 25)
-plane_z <- outer(wt_grid, hp_grid, function(w, h) b[1] + b["hp"] * h + b["wt"] * w)
-
-# Residual sticks: one segment per car from the point to the plane (NA breaks the line)
-stick <- function(v_from, v_to) as.vector(rbind(v_from, v_to, NA))
-sticks <- tibble(
-  hp  = stick(mtcars$hp, mtcars$hp),
-  wt  = stick(mtcars$wt, mtcars$wt),
-  mpg = stick(mtcars$mpg, fitted(lm_multi))
-)
-
-# Two lines on the back wall: the bivariate fit vs. the plane's hp slope at average weight
-hp_line <- seq(min(mtcars$hp), max(mtcars$hp), length.out = 50)
-wall_lines <- tibble(
-  hp      = hp_line,
-  wt      = wall,
-  biv     = b_biv[1] + b_biv["hp"] * hp_line,
-  plane   = b[1] + b["hp"] * hp_line + b["wt"] * wt_bar
-)
-
-cars <- mtcars |>
-  mutate(car = rownames(mtcars), fit = fitted(lm_multi), resid = mpg - fit,
-         wall_wt = wall)
-
-plot_ly(height = 490) |>
-  add_surface(
-    x = hp_grid, y = wt_grid, z = plane_z,
-    colorscale = list(c(0, "#EEB808"), c(1, "#EEB808")),
-    opacity = 0.5, showscale = FALSE, hoverinfo = "skip",
-    name = "Fitted plane", showlegend = TRUE
-  ) |>
-  add_trace(
-    data = sticks, x = ~hp, y = ~wt, z = ~mpg,
-    type = "scatter3d", mode = "lines", connectgaps = FALSE,
-    line = list(color = "#7F7F7F", width = 3),
-    hoverinfo = "skip", name = "Residuals", showlegend = FALSE
-  ) |>
-  add_markers(
-    data = cars, x = ~hp, y = ~wt, z = ~mpg,
-    marker = list(size = 5, color = "#002169",
-                  line = list(color = "white", width = 1)),
-    text = ~paste0("<b>", car, "</b>",
-                   "<br>HP: ", hp, "  Weight: ", wt,
-                   "<br>MPG: ", mpg, "  Fitted: ", round(fit, 1),
-                   "<br>Residual: ", round(resid, 1)),
-    hoverinfo = "text", name = "Cars"
-  ) |>
-  add_markers(
-    data = cars, x = ~hp, y = ~wall_wt, z = ~mpg,
-    marker = list(size = 3.5, color = "#9AA5B8"),
-    hoverinfo = "skip", name = "Shadow on back wall", showlegend = FALSE
-  ) |>
-  add_trace(
-    data = wall_lines, x = ~hp, y = ~wt, z = ~biv,
-    type = "scatter3d", mode = "lines",
-    line = list(color = "#E63946", width = 8),
-    hoverinfo = "skip",
-    name = paste0("Bivariate fit (slope ", round(b_biv["hp"], 3), ")")
-  ) |>
-  add_trace(
-    data = wall_lines, x = ~hp, y = ~wt, z = ~plane,
-    type = "scatter3d", mode = "lines",
-    line = list(color = "#A67C00", width = 8),
-    hoverinfo = "skip",
-    name = paste0("Plane at average weight (slope ", round(b["hp"], 3), ")")
-  ) |>
-  layout(
-    scene = list(
-      xaxis = list(title = "Horsepower"),
-      yaxis = list(title = "Weight (1,000 lbs)", range = c(1.3, wall + 0.05),
-                   showbackground = TRUE, backgroundcolor = "#EEF1F7"),
-      zaxis = list(title = "MPG"),
-      aspectmode = "manual", aspectratio = list(x = 1.5, y = 1, z = 0.9),
-      camera = list(eye = list(x = 0.4, y = -1.9, z = 0.5),
-                    center = list(x = 0, y = 0, z = -0.12))
-    ),
-    legend = list(orientation = "h", x = 0.5, xanchor = "center", y = 1.0,
-                  font = list(size = 14)),
-    margin = list(l = 0, r = 0, t = 0, b = 0)
-  )
-```
-
-The **back wall** is the 2D picture from the last two slides: the bivariate line (red) vs. the slope holding weight fixed (gold). The yellow **plane** is all of those weight slices at once, and each gray **stick** is a residual. Drag to rotate.
 
 
 # Multivariate OLS as Matching
 
-## Multivariate OLS as Matching: The Setup {.smaller}
+## Multivariate OLS as Matching: The Population {.smaller}
 
-When we "control for" a variable, we're **comparing like with like**. Let's see this with a made-up population of **2,000 workers** where we **know the truth**:
+When we "control for" a variable, we're **comparing like with like**. To see this, take a made-up population where we **know the truth**:
 
-- The **true** gender wage gap is **−\$5,000**, holding occupation constant; office jobs pay a **\$20,000 premium** over manual jobs
-- Women are **more likely** to work in office jobs (70% vs. 40% for men), so a naive comparison will **understate** the gap
+$$wage = 30{,}000 - 5{,}000 \cdot female + 20{,}000 \cdot office + \mu$$
+
+- The **true** gender wage gap is **−\$5,000**, holding occupation constant
+- Office jobs pay a **\$20,000 premium** over manual jobs
+- Women are **more likely** to work in office jobs: 70% vs. 40% for men
+
+. . .
+
+- We draw a **random sample of 2,000 workers** from this population and see what different approaches estimate
 
 ```{r}
 #| echo: true
-#| code-line-numbers: false
+#| code-fold: true
+#| code-summary: "Code: draw the sample"
 
-set.seed(42)
+set.seed(129)
 n <- 2000
 wage_data <- tibble(
   female = sample(c(0, 1), n, replace = TRUE),
@@ -317,35 +365,131 @@ wage_data <- tibble(
          occupation = ifelse(office == 1, "Office", "Manual"))
 ```
 
+```{r}
+#| echo: false
+# Number formatting for inline results ({,} keeps LaTeX from spacing the comma)
+fmt  <- function(x, d = 0) format(round(x, d), big.mark = ",", nsmall = d)
+fmtm <- function(x, d = 0) gsub(",", "{,}", fmt(x, d))
+```
 
-## Matching by Hand {.smaller}
 
-**Steps 1--2:** compare men and women **within** each occupation. **Step 3:** take a weighted average of those gaps, weighting by each occupation's share of workers.
+## The Naive Approach: Regress Wage on Female {.smaller .scrollable}
+
+Suppose we ignore occupation and just regress $wage$ on $female$:
+
+$$\widehat{wage} = \hat{\beta}_0 + \hat{\beta}_1 \cdot female$$
+
+::: {.callout-note}
+## Recall from Problem Set 1 (Q6d)
+When the only regressor is a 0/1 dummy, OLS just compares group averages: $\hat{\beta}_0$ is the average for the 0 group (men), and $\hat{\beta}_1$ is the **difference** in averages (women − men).
+:::
 
 ```{r}
 #| echo: true
+#| code-fold: true
+#| code-summary: "Show the code"
+
+lm_naive  <- lm(wage ~ female, data = wage_data)
+avg_men   <- mean(wage_data$wage[wage_data$female == 0])
+avg_women <- mean(wage_data$wage[wage_data$female == 1])
+
+tibble(
+  ` `                   = c("Men's average wage", "Women's minus men's average"),
+  `From group averages` = fmt(c(avg_men, avg_women - avg_men)),
+  `From the regression` = paste(c("$\\hat{\\beta}_0$ =", "$\\hat{\\beta}_1$ ="),
+                                fmt(coef(lm_naive)))
+) |>
+  knitr::kable(align = "lcc")
+```
+
+. . .
+
+- Women appear to earn **\$`r fmt(coef(lm_naive)["female"])` more** than men, but the true gap is **−\$5,000**. We got even the **sign** wrong!
+
+
+## What Are We Missing? Occupation {.smaller}
+
+- That's pretty far off. But remember: there's another variable, $office$, that is correlated with **both** $female$ (our $x$) **and** $wage$ (our $y$)!
+
+```{r}
+#| echo: true
+#| code-fold: true
+#| code-summary: "Show the code"
+
+office_share <- wage_data |> group_by(gender) |> summarise(share = mean(office))
+
+wage_data |>
+  summarise(`Corr(office, female)` = sprintf("%.2f", cor(office, female)),
+            `Corr(office, wage)`   = sprintf("%.2f", cor(office, wage))) |>
+  knitr::kable(align = "cc")
+```
+
+. . .
+
+- $office$ and $female$: women are more likely to have office jobs (`r fmt(100 * office_share$share[office_share$gender == "Female"])`% vs. `r fmt(100 * office_share$share[office_share$gender == "Male"])`% of men in our sample)
+- $office$ and $wage$: office jobs pay about \$20,000 more
+- So the naive $\hat{\beta}_1$ **mixes** the gender gap with the office premium: women look better paid partly because more of them have office jobs
+
+
+## Matching: Compare Within Occupations {.smaller .scrollable}
+
+- The fix: compare women and men **in the same occupation**, so the office premium drops out of the comparison
+
+```{r}
+#| echo: true
+#| code-fold: true
+#| code-summary: "Show the code"
 
 within_diffs <- wage_data |>
   group_by(occupation) |>
   summarise(male_wage   = mean(wage[gender == "Male"]),
             female_wage = mean(wage[gender == "Female"]),
-            gap         = female_wage - male_wage,        # Steps 1-2: gap within each occupation
+            gap         = female_wage - male_wage,    # gap within each occupation
             n           = n()) |>
-  mutate(weight = n / sum(n))                               # Step 3: weight by group size
+  mutate(weight = n / sum(n))                           # each occupation's share of workers
 
-within_diffs |> knitr::kable(
-  col.names = c("Occupation", "Male Avg", "Female Avg", "Gap (F − M)", "N", "Weight"),
-  digits = c(0, 0, 0, 0, 0, 3), format.args = list(big.mark = ","))
-
-weighted_estimate <- sum(within_diffs$gap * within_diffs$weight)
+within_diffs |>
+  select(occupation, male_wage, female_wage, gap) |>
+  knitr::kable(col.names = c("Occupation", "Men's Avg", "Women's Avg", "Gap (W − M)"),
+               digits = 0, format.args = list(big.mark = ","), align = "lccc")
 ```
 
 . . .
 
-**Weighted average of the within-occupation gaps:** `r format(round(weighted_estimate, 0), big.mark = ",")` --- close to the true **−\$5,000**!
+- In **both** occupations, the gap is close to the true **−\$5,000**
+- That's what "controlling for" occupation means: comparing like with like
 
 
-## The Matching Recipe {.smaller}
+## Matching: Average the Group Estimates {.smaller}
+
+- We now have **two** estimates of the gender gap, one per occupation. To get **one** number, take a **weighted average**, weighting each occupation by its share of workers:
+
+```{r}
+#| echo: false
+w   <- setNames(within_diffs$weight, within_diffs$occupation)
+gap <- setNames(within_diffs$gap,    within_diffs$occupation)
+```
+
+. . .
+
+$$
+\hat{\beta}_{match} = \underbrace{`r fmtm(w["Manual"], 3)`}_{\text{share manual}} \times (`r fmtm(gap["Manual"])`) + \underbrace{`r fmtm(w["Office"], 3)`}_{\text{share office}} \times (`r fmtm(gap["Office"])`) = `r fmtm(sum(w * gap))`
+$$
+
+```{r}
+#| echo: true
+#| code-fold: true
+#| code-summary: "Show the code"
+
+weighted_estimate <- sum(within_diffs$weight * within_diffs$gap)
+```
+
+. . .
+
+- Close to the true **−\$5,000**, and nowhere near the naive estimate of **+\$`r fmt(coef(lm_naive)["female"])`**
+
+
+## The Matching Recipe {.smaller .scrollable}
 
 ::: {.callout-tip}
 ## What Multivariate OLS Does Under the Hood
@@ -363,17 +507,23 @@ Regressing $wage$ on $female$ **and** $office$ automates this. (OLS weights each
 
 ```{r}
 #| echo: true
+#| code-fold: true
+#| code-summary: "Show the code"
 
-lm_naive <- lm(wage ~ female, data = wage_data)            # no control
-lm_ctrl  <- lm(wage ~ female + office, data = wage_data)   # control for occupation
+lm_ctrl <- lm(wage ~ female + office, data = wage_data)   # control for occupation
 
-c("Naive" = unname(coef(lm_naive)["female"]), "Matching" = weighted_estimate,
-  "Regression" = unname(coef(lm_ctrl)["female"]), "Truth" = -5000) |> round(0)
+tibble(
+  `Naive (no control)`    = coef(lm_naive)["female"],
+  `Matching by hand`      = weighted_estimate,
+  `Regression (+ office)` = coef(lm_ctrl)["female"],
+  `Truth`                 = -5000
+) |>
+  knitr::kable(digits = 0, format.args = list(big.mark = ","), align = "c")
 ```
 
 . . .
 
-- The naive estimate is badly **attenuated** (women sort into the higher-paying office jobs); matching and the regression both land near the truth
+- The naive regression gets even the **sign** wrong; matching and the multivariate regression both land near the truth
 
 
 # The Gauss-Markov Assumptions, Revisited
@@ -581,35 +731,35 @@ coef(lm(medv ~ rm + crim + tax + ptratio, data = Boston))["rm"]
 
 ## What is Bias? {.smaller}
 
-- When GM4 fails because we **omit a relevant variable**, our estimate $\hat{\beta}_1$ is **biased**. But how should we define bias?
+- When GM4 fails because we **omit a relevant variable**, our estimate is **biased**. But how should we define bias?
 
 . . .
 
-- Recall that an **unbiased** estimator is right on average: $E[\hat{\beta}_1] = \beta_1$. A **biased** one is, on average, the truth **plus something else**:
+- Recall that an **unbiased** estimator is right on average: $E[\hat{\beta}_1] = \beta_1$. A **biased** one -- call it $\tilde{\beta}_1$ -- is, on average, the truth **plus something else**:
 
-$$E[\hat{\beta}_1] = \beta_1 + \text{something else}$$
+. . .
+
+$$E[\tilde{\beta}_1] = \beta_1 + \text{something else}$$
 
 . . .
 
 - Call this *something else* the **bias**:
 
-$$\text{Bias}(\hat{\beta}_1) = E[\hat{\beta}_1] - \beta_1$$
+. . .
+
+$$\text{Bias}(\tilde{\beta}_1) = E[\tilde{\beta}_1] - \beta_1$$
 
 . . .
 
-- If $\text{Bias} = 0$, the estimator is **unbiased** — on average, we get the right answer
 - If $\text{Bias} \neq 0$, we are **systematically** over- or under-estimating the true effect
 
 . . .
 
-- Bias does **not** shrink with more data — it's a permanent problem!
-
+- **Question:** when we omit a variable, what exactly *is* the something else?
 
 ## The OVB Formula {.smaller}
 
-
-
-We want to estimate $\beta_1$. Suppose the **true** model is:
+To find the *something else*, suppose the **true** model is:
 
 . . .
 
@@ -625,14 +775,12 @@ $$\tilde{y} = \tilde{\beta}_0 + \tilde{\beta}_1 x_1$$
 
 ::: {.callout-note}
 ## New notation
-From here on, **hats** ($\hat{\beta}$) are estimates from the **full** regression that includes $x_2$ (unbiased), and **tildes** ($\tilde{\beta}$) are estimates from the **short** regression that omits $x_2$ (biased). On the last slide, $\hat{\beta}_1$ stood for any estimator.
+From here on, **hats** ($\hat{\beta}$) are estimates from the **full** regression that includes $x_2$ (unbiased), and **tildes** ($\tilde{\beta}$) are estimates from the **short** regression that omits $x_2$ (biased).
 :::
 
 . . .
 
-It turns out there is a simple relation between the true value of our parameter, $\beta_1$, 
-an *unbiased* estimate of our parameter $\hat{\beta}_1$,
-and the *biased* estimate of our parameter $\tilde{\beta}_1$:
+It turns out the *biased* and *unbiased* estimates are linked by a simple formula:
 
 . . .
 
@@ -669,7 +817,7 @@ $$E[\tilde{\beta}_1] = \beta_1 + \beta_2 \cdot \tilde{\delta}_1$$
 
 . . .
 
-- Therefore, the bias is:
+- So the *something else* -- the bias -- is:
 
 . . .
 
@@ -677,7 +825,7 @@ $$ Bias(\tilde{\beta}_1) = E[\tilde{\beta}_1] - \beta_1 = \beta_2 \cdot \tilde{\
 
 . . .
 
-$$\underbrace{Bias(\tilde{\beta}_1)}_{\text{What we get wrong}} = \underbrace{\beta_2}_{\text{Effect of omitted on } y} \times \underbrace{\tilde{\delta}_1}_{\text{Relationship of omitted with } x_1}$$
+$$\underbrace{Bias(\tilde{\beta}_1)}_{\text{What we get wrong}} = \underbrace{\beta_2}_{\text{Relationship of omitted with } y} \times \underbrace{\tilde{\delta}_1}_{\text{Relationship of omitted with } x_1}$$
 
 
 ## Signing the Bias {.smaller}
@@ -693,8 +841,8 @@ The bias depends on **two things** — and you can figure out the direction!
 
 . . .
 
-- Positive × Positive = Positive (overestimate)
-- Positive × Negative = Negative (underestimate)
+- Positive × Positive = Positive ($E[\tilde{\beta_1}] = \beta_1 + (+)$ - on average you *overestimate* true effect)
+- Positive × Negative = Negative ($E[\tilde{\beta_1}] = \beta_1 + (-)$ - on average you *underestimate* true effect)
 
 . . .
 
@@ -789,65 +937,64 @@ tibble(
 - The formula works: $\tilde{\beta}_1 \approx \beta_1 + \beta_2 \tilde{\delta}_1 = 2 + (4)(`r round(delta1, 2)`) = `r round(2 + predicted_bias, 2)`$, and the naive regression gave **`r round(b1(naive), 2)`**
 
 
-## Example: Positive Bias — Policing and Crime {.smaller}
+## Example: Positive Bias — The Gender Wage Gap {.smaller}
 
-**True model:** $\quad crime = \beta_0 + \beta_1(police) + \beta_2(poverty) + \mu$
+Back to the matching example, where we **know** the truth:
 
-. . .
-
-**What we estimate (omitting poverty):** $\quad \widetilde{crime} = \tilde{\beta}_0 + \tilde{\beta}_1(police)$
+**True model:** $\quad wage = \beta_0 + \beta_1(female) + \beta_2(office) + \mu$, with $\beta_1 = -5{,}000$ and $\beta_2 = 20{,}000$
 
 . . .
 
-- **Omitted variable:** poverty
+**What we estimate (omitting office):** $\quad \widetilde{wage} = \tilde{\beta}_0 + \tilde{\beta}_1(female)$
 
 . . .
 
-- $\beta_2$ (effect of poverty on crime):
-- **Positive** (more poverty → more crime)
+- **Omitted variable:** working in an office job
 
 . . .
 
-- $\tilde{\delta}_1$ (correlation of poverty with policing):
-- **Positive** (high-poverty areas → more police)
+- $\beta_2$ (effect of an office job on wages): **Positive** (+\$20,000)
 
 . . .
 
-$$\text{Bias} = (+)(+) = \text{Positive}$$
+- $\tilde{\delta}_1$ (slope from regressing $office$ on $female$): **Positive**. With a 0/1 regressor, it's the difference in averages: $0.70 - 0.40 = 0.30$
 
 . . .
 
-> The naive estimate makes policing look **less effective** than it actually is (or even that it *increases* crime).
-
-
-## Example: Negative Bias — Prenatal Care and Birth Weight {.smaller}
-
-**True model:** $\quad birthweight = \beta_0 + \beta_1(prenatal\_visits) + \beta_2(health\_risk) + \mu$
+$$\text{Bias} = \beta_2 \times \tilde{\delta}_1 = 20{,}000 \times 0.30 = +6{,}000$$
 
 . . .
 
-**What we estimate (omitting health risk):** $\quad \widetilde{birthweight} = \tilde{\beta}_0 + \tilde{\beta}_1(prenatal\_visits)$
+> So $E[\tilde{\beta}_1] = -5{,}000 + 6{,}000 = +1{,}000$, close to the naive **+\$`r fmt(coef(lm_naive)["female"])`** from our sample. Omitting occupation **flips the sign** of the gender gap!
+
+
+## Example: Negative Bias — Tutoring and Exams {.smaller}
+
+**True model:** $\quad exam = \beta_0 + \beta_1(tutoring\_hours) + \beta_2(prior\_GPA) + \mu$
 
 . . .
 
-- **Omitted variable:** maternal health risk
+**What we estimate (omitting prior GPA):** $\quad \widetilde{exam} = \tilde{\beta}_0 + \tilde{\beta}_1(tutoring\_hours)$
 
 . . .
 
-- $\beta_2$ (effect of health risk on birth weight):
-- **Negative** (higher risk → lower birth weight)
+- **Omitted variable:** prior GPA (how well the student was already doing)
 
 . . .
 
-- $\tilde{\delta}_1$ (correlation of health risk with prenatal visits): **Positive** (higher-risk mothers get *more* prenatal visits)
+- $\beta_2$ (effect of prior GPA on exam scores): **Positive** (stronger students score higher)
 
 . . .
 
-$$\text{Bias} = (-)(+) = \text{Negative}$$
+- $\tilde{\delta}_1$ (slope from regressing $prior\_GPA$ on $tutoring\_hours$): **Negative** (struggling students are the ones who go to tutoring)
 
 . . .
 
-> The naive estimate **understates** the benefit of prenatal care — high-risk mothers visit more often *and* have worse outcomes, dragging the coefficient toward zero (or even making it negative!).
+$$\text{Bias} = (+) \times (-) = \text{Negative}$$
+
+. . .
+
+> The naive estimate **understates** the benefit of tutoring. It can even make tutoring look *harmful*, because the students who use it were already doing worse.
 
 
 ## Class Activity: Sign the Bias! {.smaller}
@@ -872,6 +1019,15 @@ For each scenario, determine the **direction** of the omitted variable bias:
 
 3. **Model:** $crime = \beta_0 + \beta_1(unemployment) + \mu$. Omitted: urban density.
    - Higher density → more unemployment? Higher density → more crime?
+
+
+## Sign the Bias: Answers {.smaller}
+
+Bias $= \beta_2 \times \tilde{\delta}_1$:
+
+1. **Exercise → health, omitting income:** higher income → better health ($\beta_2 > 0$) and more exercise ($\tilde{\delta}_1 > 0$). Bias $= (+)(+) =$ **positive**: overstates the benefit of exercise
+2. **Class size → test scores, omitting funding:** more funding → higher scores ($\beta_2 > 0$) and smaller classes ($\tilde{\delta}_1 < 0$). Bias $= (+)(-) =$ **negative**: $\tilde{\beta}_1$ is too negative, so smaller classes look *more* beneficial than they are
+3. **Unemployment → crime, omitting density:** if denser areas have more crime ($\beta_2 > 0$) and more unemployment ($\tilde{\delta}_1 > 0$), then bias $= (+)(+) =$ **positive**: overstates the effect of unemployment on crime
 
 
 # Goodness of Fit: Adjusted R²
@@ -900,7 +1056,7 @@ c("Adj R²" = small$adj.r.squared, "Adj R² with noise" = big$adj.r.squared)
 
 . . .
 
-- **Rule of thumb:** use **adjusted** $R^2$ when comparing models with different numbers of variables
+- **Rule of thumb:** use **adjusted** $R^2$ to compare **fit** --- but for **causal** questions, choose controls by whether they're **confounders**, not by fit
 
 
 # Variance of the Multivariate OLS Estimator
@@ -1117,7 +1273,7 @@ Because the residuals are too small on average, $SSR / n$ **underestimates** $\s
 
 . . .
 
-- Recall the first-order conditions: the residuals must satisfy **$k + 1$ equations** ($\sum \hat{\mu}_i = 0$ and $\sum x_{ji} \hat{\mu}_i = 0$ for each $j$)
+- Recall the first-order conditions from the OLS derivation: the residuals must satisfy **$k + 1$ equations** ($\sum \hat{\mu}_i = 0$ and $\sum x_{ji} \hat{\mu}_i = 0$ for each $j$)
 - So only $n - k - 1$ residuals are free to vary --- each estimated parameter "uses up" one **degree of freedom**
 
 . . .
@@ -1192,8 +1348,8 @@ Adding controls involves a **tradeoff**:
 
 . . .
 
-- **Too few controls:** risk bias (omitted variable bias)
-- **Too many controls:** risk inflated variance (imprecise estimates)
+- **Too few controls → bias:** an omitted variable stays in $\mu$. If it affects $y$ ($\beta_2 \neq 0$) **and** moves with $x_1$ ($\tilde{\delta}_1 \neq 0$), then $\text{Bias} = \beta_2 \tilde{\delta}_1 \neq 0$
+- **Too many controls → variance:** an unneeded control that moves with $x_1$ raises $R_1^2$, leaving less independent variation in $x_1$, so $Var(\hat{\beta}_1) = \sigma^2 / [SST_1(1 - R_1^2)]$ rises
 
 . . .
 
@@ -1296,7 +1452,7 @@ ggplot(results, aes(x = b1, fill = model)) +
 - **OVB formula** tells us the direction of bias: $\text{Bias} = \beta_2 \cdot \tilde{\delta}_1$
 - **Variance:** $Var(\hat{\beta}_j) = \sigma^2 / [SST_j(1 - R_j^2)]$; estimate $\sigma^2$ with $SSR/(n - k - 1)$ to get $se(\hat{\beta}_j)$
 - **Bias-variance tradeoff:** omitting relevant variables → bias; including irrelevant variables → extra variance
-- **Adjusted R²** penalizes for extra variables --- use it for model comparison
+- **Adjusted R²** penalizes for extra variables --- use it to compare fit, not to choose controls
 - **Perfect multicollinearity** breaks OLS; imperfect multicollinearity inflates variance
 :::
 
