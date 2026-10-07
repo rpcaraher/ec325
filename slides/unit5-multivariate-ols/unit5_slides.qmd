@@ -131,16 +131,9 @@ Same `lm()` function --- just use `+` to add additional $x$, independent variabl
 data(mtcars)
 lm_biv   <- lm(mpg ~ hp, data = mtcars)        # bivariate
 lm_multi <- lm(mpg ~ hp + wt, data = mtcars)   # add weight as a control
-summary(lm_biv)
-```
 
-## Adding Controls is Easy! {.smaller}
-
-```{r}
-#| echo: true
-
-summary(lm_multi)
-
+coef(lm_biv)
+coef(lm_multi)
 ```
 
 - Coefficient on `hp` dropped from **`r round(coef(lm_biv)["hp"], 3)`** to **`r round(coef(lm_multi)["hp"], 3)`** --- less than half!
@@ -333,199 +326,6 @@ ggplot(mtcars, aes(x = hp, y = mpg)) +
 - Heavier cars (**darker**) have more horsepower *and* lower MPG, so the red bivariate line picks up the effect of weight too
 
 
-# Multivariate OLS as Matching
-
-## Multivariate OLS as Matching: The Population {.smaller}
-
-When we "control for" a variable, we're **comparing like with like**. To see this, take a made-up population where we **know the truth**:
-
-$$wage = 30{,}000 - 5{,}000 \cdot female + 20{,}000 \cdot office + \mu$$
-
-- The **true** gender wage gap is **−\$5,000**, holding occupation constant
-- Office jobs pay a **\$20,000 premium** over manual jobs
-- Women are **more likely** to work in office jobs: 70% vs. 40% for men
-
-. . .
-
-- We draw a **random sample of 2,000 workers** from this population and see what different approaches estimate
-
-```{r}
-#| echo: true
-#| code-fold: true
-#| code-summary: "Code: draw the sample"
-
-set.seed(129)
-n <- 2000
-wage_data <- tibble(
-  female = sample(c(0, 1), n, replace = TRUE),
-  office = rbinom(n, 1, prob = ifelse(female == 1, 0.70, 0.40)),
-  wage   = 30000 - 5000 * female + 20000 * office + rnorm(n, 0, 6000)
-) |>
-  mutate(gender = ifelse(female == 1, "Female", "Male"),
-         occupation = ifelse(office == 1, "Office", "Manual"))
-```
-
-```{r}
-#| echo: false
-# Number formatting for inline results ({,} keeps LaTeX from spacing the comma)
-fmt  <- function(x, d = 0) format(round(x, d), big.mark = ",", nsmall = d)
-fmtm <- function(x, d = 0) gsub(",", "{,}", fmt(x, d))
-```
-
-
-## The Naive Approach: Regress Wage on Female {.smaller .scrollable}
-
-Suppose we ignore occupation and just regress $wage$ on $female$:
-
-$$\widehat{wage} = \hat{\beta}_0 + \hat{\beta}_1 \cdot female$$
-
-::: {.callout-note}
-## Recall from Problem Set 1 (Q6d)
-When the only regressor is a 0/1 dummy, OLS just compares group averages: $\hat{\beta}_0$ is the average for the 0 group (men), and $\hat{\beta}_1$ is the **difference** in averages (women − men).
-:::
-
-```{r}
-#| echo: true
-#| code-fold: true
-#| code-summary: "Show the code"
-
-lm_naive  <- lm(wage ~ female, data = wage_data)
-avg_men   <- mean(wage_data$wage[wage_data$female == 0])
-avg_women <- mean(wage_data$wage[wage_data$female == 1])
-
-tibble(
-  ` `                   = c("Men's average wage", "Women's minus men's average"),
-  `From group averages` = fmt(c(avg_men, avg_women - avg_men)),
-  `From the regression` = paste(c("$\\hat{\\beta}_0$ =", "$\\hat{\\beta}_1$ ="),
-                                fmt(coef(lm_naive)))
-) |>
-  knitr::kable(align = "lcc")
-```
-
-. . .
-
-- Women appear to earn **\$`r fmt(coef(lm_naive)["female"])` more** than men, but the true gap is **−\$5,000**. We got even the **sign** wrong!
-
-
-## What Are We Missing? Occupation {.smaller}
-
-- That's pretty far off. But remember: there's another variable, $office$, that is correlated with **both** $female$ (our $x$) **and** $wage$ (our $y$)!
-
-```{r}
-#| echo: true
-#| code-fold: true
-#| code-summary: "Show the code"
-
-office_share <- wage_data |> group_by(gender) |> summarise(share = mean(office))
-
-wage_data |>
-  summarise(`Corr(office, female)` = sprintf("%.2f", cor(office, female)),
-            `Corr(office, wage)`   = sprintf("%.2f", cor(office, wage))) |>
-  knitr::kable(align = "cc")
-```
-
-. . .
-
-- $office$ and $female$: women are more likely to have office jobs (`r fmt(100 * office_share$share[office_share$gender == "Female"])`% vs. `r fmt(100 * office_share$share[office_share$gender == "Male"])`% of men in our sample)
-- $office$ and $wage$: office jobs pay about \$20,000 more
-- So the naive $\hat{\beta}_1$ **mixes** the gender gap with the office premium: women look better paid partly because more of them have office jobs
-
-
-## Matching: Compare Within Occupations {.smaller .scrollable}
-
-- The fix: compare women and men **in the same occupation**, so the office premium drops out of the comparison
-
-```{r}
-#| echo: true
-#| code-fold: true
-#| code-summary: "Show the code"
-
-within_diffs <- wage_data |>
-  group_by(occupation) |>
-  summarise(male_wage   = mean(wage[gender == "Male"]),
-            female_wage = mean(wage[gender == "Female"]),
-            gap         = female_wage - male_wage,    # gap within each occupation
-            n           = n()) |>
-  mutate(weight = n / sum(n))                           # each occupation's share of workers
-
-within_diffs |>
-  select(occupation, male_wage, female_wage, gap) |>
-  knitr::kable(col.names = c("Occupation", "Men's Avg", "Women's Avg", "Gap (W − M)"),
-               digits = 0, format.args = list(big.mark = ","), align = "lccc")
-```
-
-. . .
-
-- In **both** occupations, the gap is close to the true **−\$5,000**
-- That's what "controlling for" occupation means: comparing like with like
-
-
-## Matching: Average the Group Estimates {.smaller}
-
-- We now have **two** estimates of the gender gap, one per occupation. To get **one** number, take a **weighted average**, weighting each occupation by its share of workers:
-
-```{r}
-#| echo: false
-w   <- setNames(within_diffs$weight, within_diffs$occupation)
-gap <- setNames(within_diffs$gap,    within_diffs$occupation)
-```
-
-. . .
-
-$$
-\hat{\beta}_{match} = \underbrace{`r fmtm(w["Manual"], 3)`}_{\text{share manual}} \times (`r fmtm(gap["Manual"])`) + \underbrace{`r fmtm(w["Office"], 3)`}_{\text{share office}} \times (`r fmtm(gap["Office"])`) = `r fmtm(sum(w * gap))`
-$$
-
-```{r}
-#| echo: true
-#| code-fold: true
-#| code-summary: "Show the code"
-
-weighted_estimate <- sum(within_diffs$weight * within_diffs$gap)
-```
-
-. . .
-
-- Close to the true **−\$5,000**, and nowhere near the naive estimate of **+\$`r fmt(coef(lm_naive)["female"])`**
-
-
-## The Matching Recipe {.smaller .scrollable}
-
-::: {.callout-tip}
-## What Multivariate OLS Does Under the Hood
-:::
-
-::: {.nonincremental}
-1. **Group** observations by the control variable(s) (e.g., same occupation)
-2. **Compare** the outcome **within each group** (the gender gap among office workers, and among manual workers)
-3. **Aggregate** with a weighted average across groups
-:::
-
-. . .
-
-Regressing $wage$ on $female$ **and** $office$ automates this. (OLS weights each group by its size *and* by how much `female` varies within it; here the two are nearly identical.)
-
-```{r}
-#| echo: true
-#| code-fold: true
-#| code-summary: "Show the code"
-
-lm_ctrl <- lm(wage ~ female + office, data = wage_data)   # control for occupation
-
-tibble(
-  `Naive (no control)`    = coef(lm_naive)["female"],
-  `Matching by hand`      = weighted_estimate,
-  `Regression (+ office)` = coef(lm_ctrl)["female"],
-  `Truth`                 = -5000
-) |>
-  knitr::kable(digits = 0, format.args = list(big.mark = ","), align = "c")
-```
-
-. . .
-
-- The naive regression gets even the **sign** wrong; matching and the multivariate regression both land near the truth
-
-
 # The Gauss-Markov Assumptions, Revisited
 
 ## Gauss-Markov Assumptions (Extended) {.smaller}
@@ -581,9 +381,6 @@ lm(mpg ~ hp + hp_doubled + wt, data = mtcars) |> coef()
 $$E[\mu | x_1, x_2, \ldots, x_k] = 0$$
 
 - In words: once we know the $x$'s, the unobserved factors in $\mu$ are **zero on average** --- knowing $x_1, \ldots, x_k$ tells us nothing about $\mu$
-- So everything left in $\mu$ must be uncorrelated with **every** included $x$
-
-. . .
 
 - Each control we add **moves a factor out of $\mu$** --- that's why GM4 is **more plausible** with multivariate OLS
 - If GM 1--4 hold, OLS is **unbiased**: $E[\hat{\beta}_j] = \beta_j$, so $\hat{\beta}_j$ estimates the **ceteris paribus (causal)** effect of $x_j$
@@ -647,7 +444,7 @@ $\mu$ contains: ability, motivation, ...
 
 . . .
 
-- Unlike the lottery, education is **chosen**, and the reasons people choose it (ability, motivation) are hard to measure
+- Unlike soil and rainfall, the main confounders here (ability, motivation) are **hard to measure**, so we can't just add them as controls
 - Controlling for family income makes GM4 **more plausible**, but it probably still **fails**: $\hat{\beta}_1$ is likely still biased by ability
 
 
@@ -767,16 +564,15 @@ $$y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \mu$$
 
 . . .
 
-But we omit $x_2$ and estimate:
+If we estimate the **correct** regression, including $x_2$, we get the **unbiased** $\hat{\beta}$'s:
+
+$$\hat{y} = \hat{\beta}_0 + \hat{\beta}_1 x_1 + \hat{\beta}_2 x_2$$
 
 . . .
 
-$$\tilde{y} = \tilde{\beta}_0 + \tilde{\beta}_1 x_1$$
+But if we omit $x_2$, we get the **biased** $\tilde{\beta}$'s:
 
-::: {.callout-note}
-## New notation
-From here on, **hats** ($\hat{\beta}$) are estimates from the **full** regression that includes $x_2$ (unbiased), and **tildes** ($\tilde{\beta}$) are estimates from the **short** regression that omits $x_2$ (biased).
-:::
+$$\tilde{y} = \tilde{\beta}_0 + \tilde{\beta}_1 x_1$$
 
 . . .
 
@@ -878,68 +674,60 @@ y  <- 3 + 2 * x1 + 4 * x2 + 3 * x3 + rnorm(n)
 - **Bias** $= (+) \times (-) = (-)$: the naive estimate of $\beta_1$ should be **too small**
 
 
-## Seeing OVB in Action: Naive vs. Full Model {.smaller}
+## Seeing OVB in Action: Does the Formula Work? {.smaller}
 
 ```{r}
 #| echo: true
 
 full  <- lm(y ~ x1 + x2 + x3)   # correct model
 naive <- lm(y ~ x1)             # omits x2 (and x3)
-no_x3 <- lm(y ~ x1 + x2)        # omits only x3, which is uncorrelated with x1
+b1    <- function(model) unname(coef(model)["x1"])   # pull out the coefficient on x1
 
-b1 <- function(model) unname(coef(model)["x1"])   # pull out the coefficient on x1
-c("True beta1"      = 2,
-  "Full model"      = b1(full),
-  "Naive (omit x2)" = b1(naive),
-  "Omit only x3"    = b1(no_x3)) |> round(3)
+delta1         <- coef(lm(x2 ~ x1))["x1"]   # slope from regressing x2 on x1
+predicted_bias <- 4 * delta1                # OVB formula: beta2 (= 4, from the DGP) times delta1
+actual_bias    <- b1(naive) - 2             # naive estimate minus the truth
 ```
 
-. . .
+:::: {.columns}
 
-- The naive estimate is **far below** the truth: **negative** bias, just as we predicted
-- The full model gets it right (≈ 2)
-
-. . .
-
-- Omitting $x_3$ does **not** bias $\hat{\beta}_1$: $x_3$ affects $y$, but it is **uncorrelated** with $x_1$ (condition 2 fails)
-
-
-## Seeing OVB in Action: Checking the Formula {.smaller}
-
-$\text{Bias}(\tilde{\beta}_1) = \beta_2 \times \tilde{\delta}_1$ --- compute each piece:
-
+::: {.column width="36%"}
 ```{r}
-#| echo: true
+#| echo: false
 
-beta2          <- 4                           # Step 1: effect of x2 on y (from the DGP)
-delta1         <- coef(lm(x2 ~ x1))["x1"]     # Step 2: slope from regressing x2 on x1
-predicted_bias <- beta2 * delta1              # Step 3: OVB formula
-actual_bias    <- b1(naive) - 2               # Step 4: naive estimate minus the truth
+tibble(Model = c("Truth", "Full model", "Naive (omit $x_2$)"),
+       `$\\hat{\\beta}_1$` = c(2, b1(full), b1(naive))) |>
+  knitr::kable(digits = 3, align = c("l", "r"))
 ```
+:::
 
+::: {.column width="64%"}
 ```{r}
 #| echo: false
 
 tibble(
-  Step = c("1", "2", "3", "4"),
   Quantity = c("$\\beta_2$ (effect of $x_2$ on $y$)",
                "$\\tilde{\\delta}_1$ (regress $x_2$ on $x_1$)",
                "Predicted bias $= \\beta_2 \\times \\tilde{\\delta}_1$",
                "Actual bias $= \\tilde{\\beta}_1 - \\beta_1$"),
   Sign = c("(+)", "(−)", "(+) × (−) = (−)", "(−)"),
-  Value = c(beta2, delta1, predicted_bias, actual_bias)
+  Value = c(4, delta1, predicted_bias, actual_bias)
 ) |>
-  knitr::kable(digits = 3, align = c("c", "l", "c", "r"))
+  knitr::kable(digits = 3, align = c("l", "c", "r"))
 ```
+:::
+
+::::
 
 . . .
 
+- The naive estimate is **far below** the truth: **negative** bias, just as we predicted. The full model gets it right (≈ 2)
 - The formula works: $\tilde{\beta}_1 \approx \beta_1 + \beta_2 \tilde{\delta}_1 = 2 + (4)(`r round(delta1, 2)`) = `r round(2 + predicted_bias, 2)`$, and the naive regression gave **`r round(b1(naive), 2)`**
+- The naive model also omits $x_3$, but $x_3$ is **uncorrelated** with $x_1$ (condition 2 fails), so it adds **no** bias
 
 
 ## Example: Positive Bias — The Gender Wage Gap {.smaller}
 
-Back to the matching example, where we **know** the truth:
+A made-up example where we **know** the truth:
 
 **True model:** $\quad wage = \beta_0 + \beta_1(female) + \beta_2(office) + \mu$, with $\beta_1 = -5{,}000$ and $\beta_2 = 20{,}000$
 
@@ -957,7 +745,7 @@ Back to the matching example, where we **know** the truth:
 
 . . .
 
-- $\tilde{\delta}_1$ (slope from regressing $office$ on $female$): **Positive**. With a 0/1 regressor, it's the difference in averages: $0.70 - 0.40 = 0.30$
+- $\tilde{\delta}_1$ (slope from regressing $office$ on $female$): **Positive**. Say 70% of women and 40% of men work in office jobs. With a 0/1 regressor, the slope is the difference in averages: $0.70 - 0.40 = 0.30$
 
 . . .
 
@@ -965,7 +753,7 @@ $$\text{Bias} = \beta_2 \times \tilde{\delta}_1 = 20{,}000 \times 0.30 = +6{,}00
 
 . . .
 
-> So $E[\tilde{\beta}_1] = -5{,}000 + 6{,}000 = +1{,}000$, close to the naive **+\$`r fmt(coef(lm_naive)["female"])`** from our sample. Omitting occupation **flips the sign** of the gender gap!
+> So $E[\tilde{\beta}_1] = -5{,}000 + 6{,}000 = +1{,}000$: on average, the naive regression says women earn **more** than men. Omitting occupation **flips the sign** of the gender gap!
 
 
 ## Example: Negative Bias — Tutoring and Exams {.smaller}
@@ -1015,10 +803,6 @@ For each scenario, determine the **direction** of the omitted variable bias:
 2. **Model:** $test\_score = \beta_0 + \beta_1(class\_size) + \mu$. Omitted: school funding.
    - More funding → smaller classes? More funding → higher scores?
 
-. . .
-
-3. **Model:** $crime = \beta_0 + \beta_1(unemployment) + \mu$. Omitted: urban density.
-   - Higher density → more unemployment? Higher density → more crime?
 
 
 ## Sign the Bias: Answers {.smaller}
@@ -1027,8 +811,6 @@ Bias $= \beta_2 \times \tilde{\delta}_1$:
 
 1. **Exercise → health, omitting income:** higher income → better health ($\beta_2 > 0$) and more exercise ($\tilde{\delta}_1 > 0$). Bias $= (+)(+) =$ **positive**: overstates the benefit of exercise
 2. **Class size → test scores, omitting funding:** more funding → higher scores ($\beta_2 > 0$) and smaller classes ($\tilde{\delta}_1 < 0$). Bias $= (+)(-) =$ **negative**: $\tilde{\beta}_1$ is too negative, so smaller classes look *more* beneficial than they are
-3. **Unemployment → crime, omitting density:** if denser areas have more crime ($\beta_2 > 0$) and more unemployment ($\tilde{\delta}_1 > 0$), then bias $= (+)(+) =$ **positive**: overstates the effect of unemployment on crime
-
 
 # Goodness of Fit: Adjusted R²
 
@@ -1122,34 +904,20 @@ $$Var(\hat{\beta}_1) = \frac{\sigma^2}{SST_x} \quad \Longrightarrow \quad Var(\h
 
 - If $x_j$ is uncorrelated with the other regressors, $R_j^2 = 0$ and we are back to the bivariate formula
 - The factor $\frac{1}{1 - R_j^2}$ is how much collinearity **inflates** the variance. For hp: $\frac{1}{1 - `r round(r2_hp, 2)`} \approx `r round(1 / (1 - r2_hp), 2)`$, so the variance is about `r round(100 * (1 / (1 - r2_hp) - 1))`% larger than if hp were uncorrelated with weight
+- **Imperfect multicollinearity** (high but not perfect correlation among the $x$'s) is *allowed*, but as $R_j^2 \rightarrow 1$, $Var(\hat{\beta}_j) \rightarrow \infty$: highly correlated controls are hard to **separate**, so their estimates are imprecise
 
 
-## Variance of $\hat{\beta}_j$: Result {.smaller}
+## What Increases Variance? {.smaller}
 
-Putting it together, under GM 1--5:
+Under GM 1--5: $$Var(\hat{\beta}_j) = \frac{\sigma^2}{SST_j(1 - R_j^2)}$$
 
-::: {.callout-important}
-## Variance of the Multivariate OLS Estimator
-$$Var(\hat{\beta}_j) = \frac{\sigma^2}{SST_j(1 - R_j^2)}$$
-
-where $\sigma^2$ is the error variance, $SST_j = \sum(x_{ji} - \bar{x}_j)^2$ is the total variation in $x_j$, and $R_j^2$ is the R-squared from regressing $x_j$ on all other regressors.
-:::
+Three things **increase** variance: **more noise** ($\sigma^2$ ↑), **less variation in $x_j$** ($SST_j$ ↓), **higher collinearity** ($R_j^2$ ↑).
 
 . . .
-
-Three things **increase** variance: **more noise** ($\sigma^2$ ↑), **less variation in $x_j$** ($SST_j$ ↓), **higher collinearity** ($R_j^2$ ↑)
-
-. . .
-
-- **Imperfect multicollinearity** (high but not perfect correlation among the $x$'s) is *allowed*, but as $R_j^2 \rightarrow 1$, $Var(\hat{\beta}_j) \rightarrow \infty$
-- Highly correlated controls make it hard to **separate their individual effects** → imprecise estimates (large standard errors)
-
-
-## What Increases Variance? Simulation {.smaller}
 
 ```{r}
 #| echo: false
-#| fig-height: 5.5
+#| fig-height: 3.5
 #| fig-align: center
 #| cache: true
 
@@ -1211,25 +979,11 @@ ggplot(df_sims, aes(x = beta_hat)) +
 
 # Estimating $\sigma^2$ and the Standard Error
 
-## The Problem: $\sigma^2$ Is Unknown {.smaller}
+## Step 1: $\sigma^2$ Is the Average Squared Error {.smaller}
 
-$$Var(\hat{\beta}_j) = \frac{\sigma^2}{SST_j(1 - R_j^2)}$$
-
-- We can compute $SST_j$ and $R_j^2$ from our data
-- But $\sigma^2 = Var(\mu | x_1, \ldots, x_k)$ is a **population parameter** --- we never observe it
+We can compute $SST_j$ and $R_j^2$ from our data, but $\sigma^2 = Var(\mu | x_1, \ldots, x_k)$ is a **population parameter** we never observe. We estimate it in **three steps**: (1) write $\sigma^2$ as an **average**, (2) find a **sample stand-in**, (3) **correct** the stand-in, which is too small
 
 . . .
-
-**We need to estimate $\sigma^2$ from our sample**, in three steps:
-
-::: {.nonincremental}
-1. Write $\sigma^2$ as an **average** of something
-2. Find a **sample stand-in** for that something
-3. **Correct** for the fact that the stand-in is too small
-:::
-
-
-## Step 1: $\sigma^2$ Is the Average Squared Error {.smaller}
 
 From the Gauss-Markov assumptions:
 
@@ -1260,7 +1014,7 @@ $$\sigma^2 = Var(\mu_i) = E\big[(\mu_i - E[\mu_i])^2\big] = E\big[(\mu_i - 0)^2\
 
 . . .
 
-- **Plug in the residuals:** $\; \dfrac{1}{n}\sum_{i=1}^{n} \hat{\mu}_i^2 = \dfrac{SSR}{n}$
+- **The Solution: Use the residuals:** $\; \dfrac{1}{n}\sum_{i=1}^{n} \hat{\mu}_i^2 = \dfrac{SSR}{n}$
 
 . . .
 
@@ -1276,6 +1030,10 @@ Because the residuals are too small on average, $SSR / n$ **underestimates** $\s
 - Recall the first-order conditions from the OLS derivation: the residuals must satisfy **$k + 1$ equations** ($\sum \hat{\mu}_i = 0$ and $\sum x_{ji} \hat{\mu}_i = 0$ for each $j$)
 - So only $n - k - 1$ residuals are free to vary --- each estimated parameter "uses up" one **degree of freedom**
 
+::: {.callout-note appearance="simple" icon=false}
+**Degrees of freedom:** the number of residuals that are **free to vary**, i.e., $n$ minus the number of estimated parameters. **Example:** if 3 residuals must sum to zero and the first two are $+2$ and $-5$, the third **must** be $+3$, so only $3 - 1 = 2$ are free.
+:::
+
 . . .
 
 The fix: divide by $n - k - 1$ instead of $n$:
@@ -1289,48 +1047,40 @@ $\hat{\sigma} = \sqrt{\hat{\sigma}^2}$ is what R reports as **"Residual standard
 :::
 
 
-## From $\hat{\sigma}^2$ to the Standard Error {.smaller}
+## From $\hat{\sigma}$ to the Standard Error {.smaller}
 
-Plug $\hat{\sigma}^2$ into the variance formula and take the square root:
+Plug in $\hat{\sigma}^2$ and take the square root to get the **standard error**: the estimated standard deviation of $\hat{\beta}_j$ across repeated samples
 
 $$Var(\hat{\beta}_j) = \frac{\sigma^2}{SST_j(1-R_j^2)} \xrightarrow{\text{estimate } \sigma^2 \text{ with residuals}} se(\hat{\beta}_j) = \frac{\hat{\sigma}}{\sqrt{SST_j(1-R_j^2)}}$$
 
-. . .
-
-- The **standard error** is the estimated standard deviation of the sampling distribution of $\hat{\beta}_j$
-
-. . .
-
-- It tells us: *how much would our estimate typically vary across repeated samples?*
-
-. . .
-
-- Every time you see $se(\hat{\beta}_j)$ in a regression table or R output, this is what's being computed
-
-. . .
-
-> This standard error is the foundation of everything in the next unit: **t-statistics, p-values, and confidence intervals** all depend on it.
 
 
-## Seeing It in R: Every Piece by Hand {.smaller}
+## Reading the Standard Error in R Output {.smaller}
 
-For `lm_multi` ($mpg \sim hp + wt$, so $n = 32$ and $k = 2$), compute $se(\hat{\beta}_{hp})$ step by step:
+The **Coefficients** block of `summary(lm_multi)`:
 
 ```{r}
 #| echo: true
 
-n_obs     <- nobs(lm_multi); k <- 2
-sigma_hat <- sqrt(sum(resid(lm_multi)^2) / (n_obs - k - 1))   # sigma-hat = sqrt(SSR / (n - k - 1))
-sst_hp    <- sum((mtcars$hp - mean(mtcars$hp))^2)             # SST for hp
-se_hp     <- sigma_hat / sqrt(sst_hp * (1 - r2_hp))           # r2_hp from the variance slides
+summary(lm_multi)$coefficients
+```
 
-c("sigma-hat: by hand" = sigma_hat, "sigma-hat: R" = sigma(lm_multi))
-c("se(hp): by hand" = se_hp, "se(hp): R" = summary(lm_multi)$coefficients["hp", "Std. Error"])
+```{r}
+#| echo: false
+ct <- summary(lm_multi)$coefficients
 ```
 
 . . .
 
-- Our $\hat{\sigma}$ matches R's **Residual standard error**, and our $se(\hat{\beta}_{hp})$ matches the **Std. Error** column of `summary(lm_multi)`
+Read the `hp` row (we'll get to `t value` and `Pr(>|t|)` in Unit 6):
+
+- **Estimate:** holding weight constant, each extra horsepower is associated with `r abs(round(ct["hp", "Estimate"], 3))` fewer MPG
+- **Std. Error:** if we drew many samples of 32 cars and re-ran the regression, $\hat{\beta}_{hp}$ would typically land about **`r round(ct["hp", "Std. Error"], 3)`** away from the true $\beta_{hp}$
+
+. . .
+
+- The SE is in the **same units** as the estimate (MPG per horsepower), so judge it **relative to the estimate**
+- Don't compare SEs **across** variables with different units: `wt`'s SE (`r round(ct["wt", "Std. Error"], 3)`) appears bigger, but only because the units are different
 
 
 # The Bias-Variance Tradeoff
@@ -1361,7 +1111,7 @@ you can never know *for sure* if a control variable is necessary or not!
 
 ```{r}
 #| echo: false
-#| fig-height: 4
+#| fig-height: 3.4
 #| fig-align: center
 #| cache: true
 
@@ -1391,7 +1141,6 @@ ggplot(results, aes(x = b1, fill = model)) +
   facet_wrap(~ case) +
   scale_fill_manual(values = c("Omit x2" = "#5D8EE5", "Include x2" = "#EEB808")) +
   labs(x = expression(hat(beta)[1]), y = "Count",
-       title = "The Bias-Variance Tradeoff",
        subtitle = "Dashed line = true β1 = 2.21 | cor(x1, x2) = 0.7 | 500 samples of n = 100",
        fill = "Model") +
   theme_minimal(base_size = 13) +
@@ -1399,19 +1148,8 @@ ggplot(results, aes(x = b1, fill = model)) +
 ```
 
 
-## Reading the Simulation {.smaller}
-
-**Left panel** ($x_2$ irrelevant):
-
-- Both distributions centered on truth → no bias either way
-- Including $x_2$ (yellow) is **wider** → unnecessary variance, because $x_2$ soaks up some of $x_1$'s variation
-
-. . .
-
-**Right panel** ($x_2$ relevant):
-
-- Omitting $x_2$ (blue) is **shifted** away from truth → biased!
-- Including $x_2$ (yellow) is centered on truth → unbiased (but wider)
+- **Left** ($x_2$ irrelevant): both are centered on the truth, but including $x_2$ (yellow) is **wider**: $x_2$ soaks up some of $x_1$'s variation
+- **Right** ($x_2$ relevant): omitting $x_2$ (blue) is **shifted** away from the truth (biased); including it is centered (but wider)
 
 . . .
 
@@ -1421,34 +1159,13 @@ ggplot(results, aes(x = b1, fill = model)) +
 :::
 
 
-## Practical Guidance {.smaller}
-
-::: {.callout-tip}
-## Rules of Thumb for Choosing Controls
-:::
-
-1. **Include** variables you have strong theoretical reason to believe are confounders
-
-. . .
-
-2. **Be cautious** with highly correlated controls — can inflate variance dramatically
-
-. . .
-
-3. **Larger samples help** — variance decreases with $n$, so the cost of extra controls falls
-
-. . .
-
-4. **Check sensitivity** — if adding a control substantially changes your coefficient of interest, it's probably important
-
-
 # Summary
 
 ## Key Takeaways {.smaller}
 
 ::: {.nonincremental}
 - **Multivariate OLS** includes control variables to address confounding: $\; y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots + \beta_k x_k + \mu$
-- Coefficients have **ceteris paribus** interpretations: the effect of $x_j$ holding all else constant --- under the hood, OLS is a **matching** estimator
+- Coefficients have **ceteris paribus** interpretations: the effect of $x_j$ holding all else constant
 - **OVB formula** tells us the direction of bias: $\text{Bias} = \beta_2 \cdot \tilde{\delta}_1$
 - **Variance:** $Var(\hat{\beta}_j) = \sigma^2 / [SST_j(1 - R_j^2)]$; estimate $\sigma^2$ with $SSR/(n - k - 1)$ to get $se(\hat{\beta}_j)$
 - **Bias-variance tradeoff:** omitting relevant variables → bias; including irrelevant variables → extra variance
