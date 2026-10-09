@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Prof. Caraher">
-<meta name="dcterms.date" content="2026-09-30">
+<meta name="dcterms.date" content="2026-10-09">
 
 <title>Midterm Study Guide</title>
 <style>
@@ -3232,9 +3232,6 @@ window.Quarto = {
   <li><a href="#gm-assumption-5-and-properties-of-the-ols-estimator" id="toc-gm-assumption-5-and-properties-of-the-ols-estimator" class="nav-link" data-scroll-target="#gm-assumption-5-and-properties-of-the-ols-estimator">GM Assumption 5 and Properties of the OLS Estimator</a></li>
   <li><a href="#gm-assumption-5-homoskedasticity" id="toc-gm-assumption-5-homoskedasticity" class="nav-link" data-scroll-target="#gm-assumption-5-homoskedasticity">GM Assumption 5: Homoskedasticity</a></li>
   <li><a href="#variance-of-the-ols-estimator" id="toc-variance-of-the-ols-estimator" class="nav-link" data-scroll-target="#variance-of-the-ols-estimator">Variance of the OLS Estimator</a></li>
-  <li><a href="#estimating-sigma2-from-the-residuals" id="toc-estimating-sigma2-from-the-residuals" class="nav-link" data-scroll-target="#estimating-sigma2-from-the-residuals">Estimating <span class="math inline">\(\sigma^2\)</span> from the Residuals</a></li>
-  <li><a href="#the-standard-error-of-hatbeta_j" id="toc-the-standard-error-of-hatbeta_j" class="nav-link" data-scroll-target="#the-standard-error-of-hatbeta_j">The Standard Error of <span class="math inline">\(\hat{\beta}_j\)</span></a></li>
-  <li><a href="#the-biasvariance-tradeoff" id="toc-the-biasvariance-tradeoff" class="nav-link" data-scroll-target="#the-biasvariance-tradeoff">The Bias/Variance Tradeoff</a></li>
   </ul></li>
   </ul>
 <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="../midterm_study_guide.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
@@ -3261,7 +3258,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">September 30, 2026</p>
+      <p class="date">October 9, 2026</p>
     </div>
   </div>
   
@@ -3471,7 +3468,6 @@ E[Y_i | D_i = 1] - E[Y_i | D_i = 0] = \kappa + \underbrace{(E[Y_{0i} | D_i = 1] 
 <li>General formula: <span class="math inline">\(y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \dots + \beta_k x_k + \mu\)</span></li>
 <li>Interpretation: <span class="math inline">\(\hat{\beta}_j\)</span> is the ceteris paribus effect of <span class="math inline">\(x_j\)</span> on <span class="math inline">\(y\)</span>, holding all other included variables constant</li>
 <li>Zero Conditional Mean with <span class="math inline">\(k\)</span> variables: <span class="math inline">\(E[\mu | x_1, x_2, \dots, x_k] = 0\)</span></li>
-<li>Multivariate OLS as a matching estimator</li>
 </ul>
 </section>
 <section id="omitted-variable-bias-ovb" class="level3">
@@ -3542,40 +3538,6 @@ E[Y_i | D_i = 1] - E[Y_i | D_i = 0] = \kappa + \underbrace{(E[Y_{0i} | D_i = 1] 
 <li><span class="math inline">\(R_j^2\)</span> (multicollinearity): more correlation among <span class="math inline">\(x\)</span>’s <span class="math inline">\(\rightarrow\)</span> higher variance</li>
 </ul></li>
 <li>Larger sample size increases <span class="math inline">\(SST_j\)</span>, reducing variance</li>
-</ul>
-</section>
-<section id="estimating-sigma2-from-the-residuals" class="level3">
-<h3 class="anchored" data-anchor-id="estimating-sigma2-from-the-residuals">Estimating <span class="math inline">\(\sigma^2\)</span> from the Residuals</h3>
-<p>The variance formula contains <span class="math inline">\(\sigma^2\)</span>, a population parameter we cannot observe. We need to estimate it from sample data. The logic proceeds as follows:</p>
-<ol type="1">
-<li>From homoskedasticity and zero conditional mean: <span class="math inline">\(Var(\mu_i) = \sigma^2 = E[\mu_i^2]\)</span></li>
-<li>So to estimate <span class="math inline">\(\sigma^2\)</span>, we need a good estimate of the error terms <span class="math inline">\(\mu_i\)</span></li>
-<li>We cannot observe the true errors <span class="math inline">\(\mu_i\)</span>, but we can compute the <strong>residuals</strong>: <span class="math inline">\(\hat{\mu}_i = y_i - \hat{y}_i\)</span></li>
-<li>The average squared residual (adjusted for degrees of freedom) is an unbiased estimator of <span class="math inline">\(\sigma^2\)</span>:</li>
-</ol>
-<p><span class="math display">\[\hat{\sigma}^2 = \frac{\sum_{i=1}^{n}\hat{\mu}_i^2}{n - k - 1} = \frac{SSR}{n - k - 1}\]</span></p>
-<ul>
-<li>We divide by <span class="math inline">\(n - k - 1\)</span> (not <span class="math inline">\(n\)</span>) because estimating <span class="math inline">\(k + 1\)</span> parameters uses up <span class="math inline">\(k + 1\)</span> degrees of freedom</li>
-<li>In the bivariate case (<span class="math inline">\(k=1\)</span>), this is <span class="math inline">\(n - 2\)</span></li>
-</ul>
-</section>
-<section id="the-standard-error-of-hatbeta_j" class="level3">
-<h3 class="anchored" data-anchor-id="the-standard-error-of-hatbeta_j">The Standard Error of <span class="math inline">\(\hat{\beta}_j\)</span></h3>
-<ul>
-<li>Plugging <span class="math inline">\(\hat{\sigma}^2\)</span> into the variance formula and taking the square root gives the standard error:</li>
-</ul>
-<p><span class="math display">\[se(\hat{\beta}_j) = \frac{\hat{\sigma}}{\sqrt{SST_j(1 - R_j^2)}}\]</span></p>
-<ul>
-<li>The standard error measures the precision of our estimate — it is the estimated standard deviation of the sampling distribution of <span class="math inline">\(\hat{\beta}_j\)</span></li>
-<li><strong>Key chain of logic:</strong> We go from a formula involving an unknown population parameter (<span class="math inline">\(\sigma^2\)</span>) to a computable standard error by replacing <span class="math inline">\(\sigma^2\)</span> with its sample estimate from the residuals</li>
-</ul>
-</section>
-<section id="the-biasvariance-tradeoff" class="level3">
-<h3 class="anchored" data-anchor-id="the-biasvariance-tradeoff">The Bias/Variance Tradeoff</h3>
-<ul>
-<li>Including more controls: reduces bias but can inflate variance</li>
-<li>Omitting controls: lower variance but introduces bias</li>
-<li>Larger samples reduce variance, making the tradeoff less severe</li>
 </ul>
 </section>
 </section>
