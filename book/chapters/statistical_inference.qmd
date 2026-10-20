@@ -101,6 +101,7 @@ function checkAnswer(selectElement, correctValue) {
 ::: {.callout-tip collapse="true"}
 ## **Key Questions**
 - How do we know if our OLS estimate reflects a "real" effect or is just due to random chance?
+- How do we get from the variance of $\hat{\beta}_j$ to the standard error reported in regression output?
 - What is the sampling distribution of our OLS estimator and why does it matter?
 - How do we conduct hypothesis tests using t-statistics and p-values?
 - What do confidence intervals tell us about our estimates?
@@ -124,6 +125,210 @@ Our single estimate might be too high or too low relative to the truth, simply d
 **Statistical inference** is the set of tools that allows us to quantify this uncertainty and make statements about population parameters based on sample data.
 
 The central question of statistical inference is: *Is our single OLS estimate "real," or is it due to random chance?*
+
+
+## From Variance to Standard Error
+
+In @sec-multivariate we derived the variance of the OLS slope and learned how to estimate the error variance $\sigma^2$.
+Before we can do inference, we need to put those pieces together carefully, because three closely related quantities show up in this chapter and only one of them can actually be computed from data.
+
+### Three Related Quantities
+
+Under Assumptions 1--5 (the Gauss-Markov assumptions), the variance of the OLS slope is
+
+$$Var(\hat{\beta}_j) = \frac{\sigma^2}{SST_j(1 - R_j^2)}$$
+
+where $SST_j = \sum_i (x_{ji} - \bar{x}_j)^2$ is the total variation in $x_j$ and $R_j^2$ is the R-squared from regressing $x_j$ on the other regressors.
+This formula describes the *sampling distribution* of $\hat{\beta}_j$: how much the estimate would bounce around if we could draw sample after sample from the same population.
+
+Two things keep it from being directly useful.
+
+**First, it is in squared units.**
+In the Chapter 5 model `mpg ~ hp + wt`, $\hat{\beta}_{hp}$ is measured in miles per gallon per horsepower, so $Var(\hat{\beta}_{hp})$ is measured in (MPG per horsepower)$^2$, which has no natural interpretation.
+Taking the square root puts the spread back in the units of the estimate.
+This is the **standard deviation** of the sampling distribution:
+
+$$sd(\hat{\beta}_j) = \sqrt{Var(\hat{\beta}_j)} = \frac{\sigma}{\sqrt{SST_j(1 - R_j^2)}}$$
+
+Roughly, $sd(\hat{\beta}_j)$ is how far a typical sample's estimate lands from the true $\beta_j$.
+
+**Second, it depends on $\sigma$**, the standard deviation of the population errors, which we never observe.
+So we replace $\sigma$ with its estimate from @sec-multivariate, $\hat{\sigma} = \sqrt{SSR/(n-k-1)}$, which R reports as the "Residual standard error."
+The result is the **standard error**:
+
+$$se(\hat{\beta}_j) = \frac{\hat{\sigma}}{\sqrt{SST_j(1 - R_j^2)}}$$
+
+| Quantity | Formula uses | What it is |
+|----------|--------------|------------|
+| $Var(\hat{\beta}_j)$ | $\sigma^2$ | A fixed population quantity we **cannot** compute |
+| $sd(\hat{\beta}_j)$ | $\sigma$ | A fixed population quantity we **cannot** compute |
+| $se(\hat{\beta}_j)$ | $\hat{\sigma}$ | A **statistic** we compute from our one sample |
+
+::: {.callout-important}
+## The Standard Error Is an Estimate
+The standard error is our one sample's best guess at $sd(\hat{\beta}_j)$, the true spread of the sampling distribution.
+Like $\hat{\beta}_j$ itself, it would come out a little differently in a different sample.
+When people say "the standard error is the standard deviation of the sampling distribution," this is the shorthand they mean: the standard error *estimates* that standard deviation.
+:::
+
+### Computing the Standard Error by Hand
+
+Every ingredient of the standard error can be computed from the data.
+Using the Chapter 5 model:
+
+```{r}
+#| echo: true
+
+reg <- lm(mpg ~ hp + wt, data = mtcars)
+n <- nobs(reg)
+k <- 2
+
+# 1. Estimate sigma from the residuals (R's "Residual standard error")
+sigma_hat <- sqrt(sum(resid(reg)^2) / (n - k - 1))
+
+# 2. Total variation in hp
+sst_hp <- sum((mtcars$hp - mean(mtcars$hp))^2)
+
+# 3. Share of hp's variation that it shares with wt
+r2_hp <- summary(lm(hp ~ wt, data = mtcars))$r.squared
+
+# Put them together
+se_hp <- sigma_hat / sqrt(sst_hp * (1 - r2_hp))
+
+c(by_hand = se_hp,
+  from_summary = summary(reg)$coefficients["hp", "Std. Error"])
+```
+
+The hand calculation matches the `Std. Error` column of `summary()` exactly.
+Here $\hat{\sigma} = `r round(sigma_hat, 3)`$, $SST_{hp} = `r format(round(sst_hp), big.mark = ",")`$, and $R^2_{hp} = `r round(r2_hp, 2)`$.
+Nothing new is happening: it is the variance formula from @sec-multivariate with $\hat{\sigma}$ in place of $\sigma$, followed by a square root.
+
+### The Standard Error Is Itself an Estimate
+
+To see the difference between $sd(\hat{\beta}_j)$ and $se(\hat{\beta}_j)$, we can simulate.
+Keep the 32 cars' `hp` and `wt` exactly as they are, pretend the true coefficients are the ones we just estimated and the true $\sigma$ is 2.6, and redraw the errors 5,000 times.
+Because we chose $\sigma$, we can compute the true $sd(\hat{\beta}_{hp})$ from the formula and compare it with what each sample reports.
+
+```{r}
+#| label: fig-se-simulation
+#| fig-cap: "Left: 5,000 estimates of the hp slope, holding the cars' hp and wt fixed and redrawing the errors. Right: the standard error reported by each of those 5,000 regressions. The red line marks the true standard deviation of the sampling distribution."
+#| echo: true
+#| code-fold: true
+#| fig-width: 9
+#| fig-height: 3.5
+
+set.seed(325)
+b_true     <- coef(reg)
+sigma_true <- 2.6
+X          <- model.matrix(reg)
+sd_true    <- sigma_true / sqrt(sst_hp * (1 - r2_hp))
+
+se_sims <- map_dfr(1:5000, function(s) {
+  y_sim <- drop(X %*% b_true) + rnorm(n, 0, sigma_true)
+  ct <- summary(lm(y_sim ~ hp + wt, data = mtcars))$coefficients
+  tibble(b_hp = ct["hp", "Estimate"], se_hp = ct["hp", "Std. Error"])
+})
+
+p_b <- ggplot(se_sims, aes(x = b_hp)) +
+  geom_histogram(fill = "lightgrey", color = "black", bins = 40) +
+  geom_vline(xintercept = b_true["hp"], color = "darkgreen",
+             linewidth = 1.2, linetype = "dashed") +
+  annotate("segment", x = b_true["hp"], xend = b_true["hp"] + sd_true,
+           y = 470, yend = 470, color = "darkred", linewidth = 1.1,
+           arrow = arrow(ends = "both", length = unit(0.08, "inches"))) +
+  annotate("text", x = b_true["hp"] + sd_true + 0.001, y = 470,
+           label = "1 sd", color = "darkred", hjust = 0) +
+  labs(x = expression(hat(beta)[hp]), y = "Count",
+       title = "5,000 slope estimates") +
+  theme_minimal()
+
+p_se <- ggplot(se_sims, aes(x = se_hp)) +
+  geom_histogram(fill = "lightgrey", color = "black", bins = 40) +
+  geom_vline(xintercept = sd_true, color = "darkred", linewidth = 1.2) +
+  annotate("text", x = sd_true + 0.0002, y = Inf, vjust = 1.5, hjust = 0,
+           label = "true sd", color = "darkred") +
+  labs(x = expression(se(hat(beta)[hp])), y = "Count",
+       title = "5,000 standard errors") +
+  theme_minimal()
+
+p_b + p_se
+```
+
+The left panel is the sampling distribution of $\hat{\beta}_{hp}$.
+Its standard deviation across the 5,000 samples is `r sprintf("%.4f", sd(se_sims$b_hp))`, essentially the value the formula gives, $sd(\hat{\beta}_{hp}) = `r sprintf("%.4f", sd_true)`$.
+The right panel shows that each regression's *reported* standard error lands near that number but not exactly on it: the middle 90% of the standard errors run from `r sprintf("%.4f", quantile(se_sims$se_hp, 0.05))` to `r sprintf("%.4f", quantile(se_sims$se_hp, 0.95))`.
+In practice we see one sample, so we get one draw from the right panel and use it as our measure of precision.
+That works well, but the fact that the standard error is estimated will matter when we choose critical values below.
+
+### What Makes a Standard Error Small?
+
+Since $SST_j = n \cdot \widehat{Var}(x_j)$ (the sample variance with $n$ in the denominator), we can rewrite the standard error as
+
+$$se(\hat{\beta}_j) = \frac{\hat{\sigma}}{\sqrt{n} \cdot sd(x_j) \cdot \sqrt{1 - R_j^2}}$$
+
+This makes the four sources of precision easy to see:
+
+- **More data.** The standard error shrinks with $\sqrt{n}$. Quadrupling the sample size cuts the standard error in half. This is why very large samples can make even trivially small effects statistically significant, a point we return to under practical significance.
+- **Less noise.** A smaller $\hat{\sigma}$ means a smaller standard error. Adding controls that help predict $y$ lowers $\hat{\sigma}$, even if those controls are unrelated to $x_j$. You will see this in @tbl-housing-multi: the extra controls predict sale price but are unrelated to lot area, and the standard error on lot area falls as they are added.
+- **More variation in $x_j$.** If $x_j$ barely varies in the sample, the data contain little information about its slope.
+- **Less collinearity.** The larger $R_j^2$, the less of $x_j$'s variation is its own, and the larger the standard error (@sec-multivariate).
+
+:::: {.content-visible when-format="html"}
+
+::: {.problem}
+
+<div class="context">
+**Quick Check: From Variance to Standard Error**
+</div>
+
+<div class="question">
+<div class="answer-row">
+<label>Which of these can you compute from a single sample of data?</label>
+<select onchange="checkAnswer(this, 'c')">
+<option value="">Select answer...</option>
+<option value="a">Var(β̂ⱼ)</option>
+<option value="b">sd(β̂ⱼ)</option>
+<option value="c">se(β̂ⱼ)</option>
+<option value="d">All three</option>
+</select>
+</div>
+</div>
+
+<div class="question">
+<div class="answer-row">
+<label>Holding everything else fixed, if you collect four times as much data, the standard error will roughly:</label>
+<select onchange="checkAnswer(this, 'b')">
+<option value="">Select answer...</option>
+<option value="a">Quadruple</option>
+<option value="b">Fall by half</option>
+<option value="c">Fall to one quarter</option>
+<option value="d">Stay the same</option>
+</select>
+</div>
+</div>
+
+<div class="question">
+<div class="answer-row">
+<label>You add a control that strongly predicts y but is uncorrelated with x₁. What happens to se(β̂₁)?</label>
+<select onchange="checkAnswer(this, 'b')">
+<option value="">Select answer...</option>
+<option value="a">It rises, because there is more collinearity</option>
+<option value="b">It falls, because σ̂ falls and R₁² stays near zero</option>
+<option value="c">It does not change, because the control is unrelated to x₁</option>
+<option value="d">It becomes undefined</option>
+</select>
+</div>
+</div>
+
+:::
+
+::::
+
+:::: {.content-hidden when-format="html"}
+
+*Quick Check: This section contains interactive content only available in the HTML version.*
+
+::::
 
 
 ## The Sampling Distribution: A Simulation
@@ -195,7 +400,7 @@ ggplot(sim_results, aes(x = b1_hat)) +
 ```
 
 Look at what happened!
-Even though the true $\beta_1 = 0$, we got a *distribution* of different estimates ranging from about -0.02 to +0.02.
+Even though the true $\beta_1 = 0$, we got a *distribution* of different estimates ranging from about -0.015 to +0.015.
 Some samples produced positive estimates, others produced negative estimates.
 The average across all samples is very close to zero (as expected from unbiasedness), but any *individual* sample could give us an estimate that deviates from zero.
 
@@ -263,8 +468,8 @@ The tools of statistical inference formalize this intuition.
 
 ## The Sampling Distribution of $\hat{\beta}_j$
 
-To conduct statistical inference, we need to make a few assumptions.
-We've already established two key properties of our OLS estimator (under the Gauss-Markov assumptions):
+To conduct statistical inference, we need three facts about the sampling distribution of $\hat{\beta}_j$: its **center**, its **spread**, and its **shape**.
+We've already established the first two (under the Gauss-Markov assumptions):
 
 **Expected Value (Unbiasedness):**
 $$E[\hat{\beta}_j] = \beta_j$$
@@ -272,80 +477,35 @@ $$E[\hat{\beta}_j] = \beta_j$$
 **Variance (under homoskedasticity):**
 $$Var(\hat{\beta}_j) = \frac{\sigma^2}{SST_j(1 - R^2_j)}$$
 
-where $SST_j$ is the total sum of squares of $x_j$ and $R^2_j$ is the R-squared from regressing $x_j$ on all other independent variables.
+and, as we saw above, the standard error $se(\hat{\beta}_j)$ is our sample's estimate of its square root.
 
-But knowing the mean and variance isn't enough---we need to know the *shape* of the distribution. (Recall from the previous chapter that we estimate $\sigma^2$ from the residuals using $\hat{\sigma}^2 = SSR/(n-k-1)$, which gives us the computable standard error $se(\hat{\beta}_j) = \hat{\sigma}/\sqrt{SST_j(1 - R_j^2)}$.)
-
-
-### The Normality Assumption
-
-To fully characterize the sampling distribution, we make an additional assumption:
-
-::: {.callout-important}
-## Normality Assumption
-The population error $\mu$ is independent of the explanatory variables $x_1, x_2, ..., x_k$ and is normally distributed with zero mean and variance $\sigma^2$:
-
-$$\mu \sim Normal(0, \sigma^2)$$
-
-Equivalently, we can write:
-
-$$y | \mathbf{x} \sim Normal(\beta_0 + \beta_1 x_1 + ... + \beta_k x_k, \sigma^2)$$
-:::
-
-This says that conditional on the independent variables, the outcome $y$ follows a normal distribution centered on the regression line.
-
-Let's visualize what a normal distribution looks like:
-
-```{r}
-#| label: fig-normal-dist
-#| fig-cap: "The normal (Gaussian) distribution---the classic 'bell curve.' The example shows IQ scores, which are designed to follow N(100, 15)."
-#| echo: true
-#| code-fold: true
-
-set.seed(123)
-mu <- 100
-sigma <- 15
-
-normal_data <- tibble(
-  values = rnorm(n = 1000, mean = mu, sd = sigma)
-)
-
-ggplot(normal_data, aes(x = values)) +
-  geom_histogram(aes(y = after_stat(density)),
-                 bins = 30,
-                 fill = "skyblue",
-                 color = "white",
-                 alpha = 0.8) +
-  stat_function(fun = dnorm,
-                args = list(mean = mu, sd = sigma),
-                color = "darkred",
-                linewidth = 1.2) +
-  labs(
-    title = "Normal Distribution with Density Curve",
-    subtitle = paste0("Generated from N(μ = ", mu, ", σ = ", sigma, ")"),
-    x = "Values (e.g., IQ Scores)",
-    y = "Density"
-  ) +
-  theme_minimal()
-```
-
-At first glance, the normality assumption seems quite strong.
-For many economic variables---like wages, which are bounded below by zero and have a right skew---the distribution is clearly not normal.
-However, there's good news: as long as our sample size is large enough, the *sampling distribution of $\hat{\beta}_j$* will be approximately normal *even if the errors themselves aren't normally distributed*.
-This result is called **asymptotic normality** and follows from the Central Limit Theorem.
+But knowing the mean and variance isn't enough---we need to know the *shape* of the distribution.
+Two distributions can have the same mean and variance and still look very different: one bell-shaped, one flat, one with two humps.
+To judge whether a particular estimate is "surprising," we need to know which shape we are dealing with.
 
 
-### The Normal Sampling Distribution
+### The Shape: The Central Limit Theorem
 
-Under the classical linear model (CLM) assumptions---that is, the Gauss-Markov assumptions plus the normality assumption---the normality of the error term directly gives us:
+The shape comes from the **Central Limit Theorem (CLT)**.
+The OLS estimator $\hat{\beta}_j$ is a weighted average of the $y_i$ values, and by extension a weighted average of the errors $\mu_i$.
+The CLT tells us that averages of many independent random variables are approximately normal, even when the variables being averaged are far from normal themselves.
+So, under the Gauss-Markov assumptions (plus a few technical regularity conditions), in large samples
 
-$$\hat{\beta}_j \sim Normal\left[\beta_j, Var(\hat{\beta}_j)\right]$$
+$$\hat{\beta}_j \overset{a}{\sim} Normal\left[\beta_j, Var(\hat{\beta}_j)\right]$$
 
-We already showed above that the sampling distribution of $\hat{\beta}_1$ from our simulation looks like a bell curve. Let's overlay the theoretical normal density to confirm:
+where $\overset{a}{\sim}$ means "is approximately distributed as, in large samples."
+Equivalently, the standardized estimate converges to a standard normal as the sample size grows:
+
+$$\frac{\hat{\beta}_j - \beta_j}{se(\hat{\beta}_j)} \xrightarrow{d} Normal(0, 1)$$
+
+This result is called **asymptotic normality**.
+Notice what it does *not* require: we never had to assume anything about the shape of the errors themselves.
+
+We already saw that the sampling distribution of $\hat{\beta}_1$ from our first simulation looks like a bell curve. Let's overlay a normal density to confirm:
 
 ```{r}
 #| label: fig-normal-sampling
-#| fig-cap: "The sampling distribution of β̂₁ follows a normal distribution (red curve) centered on the true value."
+#| fig-cap: "The sampling distribution of β̂₁ from our first simulation is approximately normal (red curve) and centered on the true value."
 #| echo: true
 #| code-fold: true
 
@@ -370,15 +530,11 @@ ggplot(sim_results, aes(x = b1_hat)) +
   theme_minimal()
 ```
 
-The histogram of our 1,000 simulated estimates matches the theoretical normal curve almost perfectly. But in that simulation, the errors were drawn from a normal distribution. What if they aren't?
+The histogram of our 1,000 simulated estimates matches the normal curve almost perfectly. But in that simulation, the errors were drawn from a normal distribution, so perhaps that is no surprise. Does the CLT still deliver a bell curve when the errors are far from normal?
 
-### Asymptotic Normality: Why It Still Works with Non-Normal Errors
+### Does It Work with Non-Normal Errors?
 
-In practice, we rarely believe the error term is truly normal. Wages are right-skewed. Health expenditures have a long right tail. Test scores may be bimodal. But here is the good news: by the **Central Limit Theorem**, as $n \to \infty$, the sampling distribution of $\hat{\beta}_j$ converges to a normal distribution *regardless of the distribution of $u$*, provided the Guass-Markov assumptions hold and a few regularity conditions are satisfied. Formally:
-
-$$\frac{\hat{\beta}_j - \beta_j}{se(\hat{\beta}_j)} \xrightarrow{d} Normal(0, 1)$$
-
-The intuition is straightforward: $\hat{\beta}_j$ is a weighted average of the $y_i$ values, and by extension a weighted average of the $u_i$. The CLT tells us that averages of independent random variables become approximately normal, even when the underlying variables are far from normal themselves.
+In practice, we rarely believe the error term is normal. Wages are right-skewed. Health expenditures have a long right tail. Test scores may be bimodal. The CLT says this should not matter much once the sample is reasonably large.
 
 To see this in action, let's compare two data generating processes: one where the errors are well-behaved (normal), and one where they are heavily skewed---as we might expect when modeling something like wages.
 
@@ -386,7 +542,7 @@ To see this in action, let's compare two data generating processes: one where th
 
 Our first DGP uses the classic setup with normally distributed errors:
 
-$$y_i = 2 + 3x_i + u_i, \qquad u_i \sim Normal(0, 4)$$
+$$y_i = 2 + 3x_i + \mu_i, \qquad \mu_i \sim Normal(0, 4)$$
 
 ```{r}
 #| label: sim-normal-errors
@@ -415,7 +571,7 @@ for (s in 1:n_sims_asym) {
 
 Now consider a model that looks more like a wage equation. Wages are right-skewed: most workers earn moderate amounts, but a long tail stretches toward high earners. We can capture this by drawing errors from a shifted exponential distribution, which is decidedly non-normal:
 
-$$wage_i = 2 + 3 \cdot educ_i + u_i, \qquad u_i \sim Exponential(\lambda = 0.5) - 2$$
+$$wage_i = 2 + 3 \cdot educ_i + \mu_i, \qquad \mu_i \sim Exponential(\lambda = 0.5) - 2$$
 
 The errors here have a mean of zero (we shift the exponential so it's centered), but they are heavily right-skewed with a skewness of 2---very far from the symmetric bell curve.
 
@@ -459,7 +615,7 @@ ggplot(errors_df, aes(x = u)) +
   geom_histogram(aes(y = after_stat(density)),
                  fill = "lightgrey", color = "black", bins = 40) +
   facet_wrap(~Distribution, scales = "free") +
-  labs(x = "Error (u)", y = "Density") +
+  labs(x = expression(paste("Error (", mu, ")")), y = "Density") +
   theme_minimal()
 ```
 
@@ -506,11 +662,12 @@ ggplot(combined, aes(x = b1_hat)) +
 
 The normal curve fits both histograms remarkably well. Even with $n = 50$ and a heavily skewed error distribution, the CLT does its work. Both sampling distributions are centered on the true value $\beta_1 = 3$ (unbiasedness), and both are well-approximated by a normal density.
 
-This is why asymptotic normality is so powerful for applied econometrics: we don't need to believe that wages, test scores, or health expenditures are normally distributed. We only need a large enough sample for the CLT to kick in---and in practice, $n = 50$ is often sufficient.
+This is why the CLT is so powerful for applied econometrics: we don't need to believe that wages, test scores, or health expenditures are normally distributed. We only need a large enough sample for the CLT to kick in---and in practice, $n = 50$ is often sufficient.
+The approximation can be poor, however, when the sample is small *and* the errors are very skewed or have heavy tails (a few extreme outliers).
 
 ::: {.callout-note}
 ## Practical Implication
-This result justifies our use of $t$-statistics and confidence intervals even when the dependent variable (and hence the errors) is clearly non-normal. When you estimate a wage equation and `summary(lm(...))` reports $p$-values based on the $t$-distribution, it's asymptotic normality doing the heavy lifting.
+This result justifies our use of $t$-statistics and confidence intervals even when the dependent variable (and hence the errors) is clearly non-normal. When you estimate a wage equation and `summary(lm(...))` reports $p$-values based on the $t$-distribution, it's the CLT doing the heavy lifting.
 :::
 
 
@@ -593,7 +750,7 @@ The null hypothesis $H_0: \beta_2 = 0$ states that, after controlling for educat
 
 Before we get to any formulas, let's think about what the null hypothesis *implies*. If $H_0: \beta_j = 0$ is true---that is, if the variable truly has no effect---then our non-zero estimate $\hat{\beta}_j$ is just picking up random noise from sampling variation. Sometimes it'll be a little positive, sometimes a little negative, but it should hover around zero.
 
-We already saw this in our simulation earlier: when the true $\beta_1 = 0$, repeated sampling produced a bell-shaped distribution of estimates centered on zero. Under the null, the *standardized* version of our estimator follows a t-distribution:
+We already saw this in our simulation earlier: when the true $\beta_1 = 0$, repeated sampling produced a bell-shaped distribution of estimates centered on zero. Under the null, the *standardized* version of our estimator is approximately standard normal, and in practice we use the closely related $t$ distribution (we explain why below):
 
 ```{r}
 #| label: fig-t-dist-null
@@ -633,22 +790,47 @@ This is the world we're assuming when we conduct a hypothesis test. Most values 
 
 Now we need a tool for locating where our particular estimate falls on that distribution. We can't just use $\hat{\beta}_j$ directly, because the scale depends on the units of measurement and the amount of noise in the data. Instead, we *standardize* the estimate by dividing by its **standard error**.
 
-Recall that the standard error $se(\hat{\beta}_j)$ measures the standard deviation of the sampling distribution of $\hat{\beta}_j$---it tells us how much our estimate would typically vary across repeated samples. A large standard error means there's a lot of noise in our estimate; a small standard error means our estimate is relatively precise. When you run `summary()` on an `lm()` object in R, the standard error is reported in the `Std. Error` column right next to each coefficient.
+Recall that the standard error $se(\hat{\beta}_j)$ estimates the standard deviation of the sampling distribution of $\hat{\beta}_j$---it tells us how much our estimate would typically vary across repeated samples. A large standard error means there's a lot of noise in our estimate; a small standard error means our estimate is relatively precise. When you run `summary()` on an `lm()` object in R, the standard error is reported in the `Std. Error` column right next to each coefficient.
 
 We standardize by dividing our estimate by the standard error:
 
 $$t_{\hat{\beta}_j} = \frac{\hat{\beta}_j}{se(\hat{\beta}_j)}$$
 
-This is the **t-statistic**. It tells us: *how many standard errors away from zero is our estimate?* Under the null hypothesis, this quantity follows a t-distribution with $n - k - 1$ degrees of freedom:
+This is the **t-statistic**. It tells us: *how many standard errors away from zero is our estimate?* In large samples, this quantity is approximately standard normal under the null hypothesis. By convention we compare it to a $t$ distribution with $n - k - 1$ degrees of freedom, which is nearly identical in large samples (see the callout below):
 
-$$\frac{\hat{\beta}_j - \beta_j}{se(\hat{\beta}_j)} \sim t_{n-k-1}$$
+$$\frac{\hat{\beta}_j - \beta_j}{se(\hat{\beta}_j)} \overset{a}{\sim} t_{n-k-1}$$
 
 where $\beta_j$ is the assumed value of the true population parameter under the null hypothesis,
 $\hat{\beta}_j$ is the estimate,
 $se(\hat{\beta}_j)$ is the standard error of the estimate, and
-$n - k - 1$ are the degrees of freedom (sample size minus the number of parameters minus 1).
+$n - k - 1$ are the degrees of freedom (the sample size minus the $k + 1$ estimated parameters: $k$ slopes plus the intercept).
 
 When testing $H_0: \beta_j = 0$, the $\beta_j$ in the numerator drops out, giving us the simple formula above.
+
+::: {.callout-note}
+## Why a $t$ Distribution and Not a Normal?
+In large samples, the CLT tells us the standardized estimate is approximately $Normal(0, 1)$.
+But we standardize by the *estimated* standard error, and because $se(\hat{\beta}_j)$ is itself a noisy estimate (recall @fig-se-simulation), large values of the ratio happen somewhat more often in smaller samples than a normal distribution predicts.
+The standard practice (in R, Stata, and econometrics textbooks alike) is to play it safe by using the $t_{n-k-1}$ distribution, which has fatter tails and therefore slightly larger critical values.
+(If the errors happen to be exactly normally distributed, the $t$ distribution is exact in any sample size.)
+The fewer the degrees of freedom, the bigger the adjustment; as $n - k - 1$ grows, the $t$ distribution becomes indistinguishable from the normal.
+
+```{r}
+#| echo: false
+
+t_sims <- se_sims |> mutate(t = (b_hp - b_true["hp"]) / se_hp)
+share_196 <- mean(abs(t_sims$t) > 1.96)
+share_tc  <- mean(abs(t_sims$t) > qt(0.975, df = n - k - 1))
+```
+
+| Degrees of freedom | 5 | 10 | 29 | 100 | 1,000 | $\infty$ (Normal) |
+|---|---|---|---|---|---|---|
+| 5% two-sided critical value | `r round(qt(0.975, 5), 2)` | `r round(qt(0.975, 10), 2)` | `r round(qt(0.975, 29), 2)` | `r round(qt(0.975, 100), 2)` | `r round(qt(0.975, 1000), 2)` | `r round(qnorm(0.975), 2)` |
+
+In the `mtcars` simulation above ($n - k - 1 = 29$), the ratio $(\hat{\beta}_{hp} - \beta_{hp})/se(\hat{\beta}_{hp})$ fell beyond $\pm 1.96$ in `r sprintf("%.1f", 100 * share_196)`% of samples rather than 5%, and beyond the $t_{29}$ critical value of `r round(qt(0.975, 29), 3)` in `r sprintf("%.1f", 100 * share_tc)`%.
+With hundreds of observations the two critical values are nearly identical, which is why the Rule of 2 below works for typical datasets.
+:::
+
 
 The t-statistic has several useful properties:
 
@@ -856,6 +1038,34 @@ In other words, if your estimate is more than twice as large as its standard err
 :::
 
 
+### Testing Other Hypotheses
+
+Nothing about the t-test requires the null value to be zero.
+To test $H_0: \beta_j = c$ for any number $c$, center the t-statistic at $c$:
+
+$$t = \frac{\hat{\beta}_j - c}{se(\hat{\beta}_j)}$$
+
+and compare it to the same critical value as before.
+For example, suppose someone claims that each additional square foot of lot area adds \$3 to the sale price.
+In our housing regression:
+
+```{r}
+#| echo: true
+
+t_3 <- (b1_hat - 3) / se_b1
+cat("t-statistic for H0: beta_1 = 3:", round(t_3, 2), "\n")
+cat("Critical value (5%):", round(t_crit, 2), "\n")
+```
+
+Since $|t| = `r abs(round(t_3, 2))`$ exceeds `r round(t_crit, 2)`, we reject the claim that the effect is \$3 per square foot.
+
+**One-sided tests.** Sometimes theory says an effect can only go one way, and the alternative is $H_1: \beta_j > c$ (or $H_1: \beta_j < c$).
+A one-sided test puts the entire 5% rejection region in one tail, so the critical value is `qt(0.95, df)` $\approx 1.65$ rather than 1.96, and we reject only if the t-statistic falls in the predicted direction.
+For $H_0: \beta_1 = 0$ against $H_1: \beta_1 > 0$, our t-statistic of `r round(t_stat, 2)` exceeds `r round(qt(0.95, df = df), 2)`, so we reject.
+The direction must be chosen *before* looking at the data; picking it after seeing the sign of the estimate doubles the real false-positive rate.
+Most published work reports two-sided tests, and so will we unless stated otherwise.
+
+
 ## P-Values
 
 While the t-test with a fixed significance level is useful, it has limitations.
@@ -940,9 +1150,9 @@ ggplot() +
 
 The p-value tells us the probability of getting our estimate (or something more extreme) if the null were true:
 
-- **p = 0.035:** There's a 3.5% chance of getting our estimate if $\beta_j = 0$. That's quite unlikely---evidence against $H_0$.
+- **p = 0.035:** If $\beta_j = 0$, there's only a 3.5% chance of getting an estimate at least this far from zero. That's quite unlikely---evidence against $H_0$.
 
-- **p = 0.35:** There's a 35% chance of getting our estimate if $\beta_j = 0$. That's not unusual at all---no evidence against $H_0$.
+- **p = 0.35:** If $\beta_j = 0$, there's a 35% chance of getting an estimate at least this far from zero. That's not unusual at all---no evidence against $H_0$.
 
 Common decision rules:
 
@@ -960,6 +1170,13 @@ When we *cannot* reject the null hypothesis, we say:
 We do **not** say we "accept" the null.
 Why? Because there are many possible values of $\beta_j$ that we would also fail to reject.
 Failing to reject $\beta_j = 0$ doesn't mean $\beta_j$ actually equals zero---it just means our data aren't precise enough to distinguish $\beta_j$ from zero.
+Missing a real effect this way is called a **Type II error**.
+
+The confidence interval (next section) tells you how informative a null result is.
+Suppose two studies estimate a prenatal program's effect on birth weight, and neither is statistically significant.
+Study A finds 20 grams with a 95% CI of $[-180, 220]$: the data are consistent with harm, no effect, or a large benefit, so the study is *inconclusive*.
+Study B finds 5 grams with a CI of $[-15, 25]$: it rules out any effect larger than 25 grams, an *informative null*.
+Both "fail to reject," but they teach us very different things, which is why you should always report the interval.
 
 
 ### Statistical vs. Practical Significance
@@ -1050,7 +1267,7 @@ $$\hat{\beta}_j \pm c_{\alpha} \times se(\hat{\beta}_j)$$
 
 where $c_{\alpha}$ is the critical value at significance level $\alpha$.
 
-For a 95% confidence interval with large samples:
+For a 95% confidence interval, $c_{\alpha}$ is the same two-sided 5% critical value we used for the t-test, `qt(0.975, df = n - k - 1)`. With large samples it is about 1.96:
 
 $$\hat{\beta}_j \pm 1.96 \times se(\hat{\beta}_j)$$
 
@@ -1062,9 +1279,10 @@ Using our housing regression:
 ```{r}
 #| echo: true
 
-# 95% confidence interval for lot_area coefficient
-lower <- b1_hat - 1.96 * se_b1
-upper <- b1_hat + 1.96 * se_b1
+# 95% confidence interval for lot_area coefficient,
+# using the t critical value we found above (t_crit)
+lower <- b1_hat - t_crit * se_b1
+upper <- b1_hat + t_crit * se_b1
 
 cat("Point estimate:", round(b1_hat, 4), "\n")
 cat("95% CI: [", round(lower, 4), ",", round(upper, 4), "]\n")
@@ -1100,7 +1318,7 @@ Let's run a simulation to see what "95% confidence" really means. We'll use a si
 #| echo: true
 #| code-fold: true
 
-set.seed(321)
+set.seed(14)
 
 # Simple DGP: y = 5 + 3x + u, with enough noise to get some misses
 true_b0 <- 5
@@ -1138,10 +1356,8 @@ ggplot(ci_data, aes(y = reorder(factor(sample), sample))) +
   scale_color_manual(values = c("TRUE" = "steelblue", "FALSE" = "red"),
                      labels = c("TRUE" = "Contains true value",
                                 "FALSE" = "Misses true value")) +
-  annotate("text", x = max(ci_data$upper) - 0.5 + 1, y = 5,
-           label = paste0(n_covered, " of ", n_samples, " intervals\ncontain the true value"),
-           color = "grey30", size = 3.5, hjust = 1) +
   labs(
+    subtitle = paste0(n_covered, " of ", n_samples, " intervals contain the true value"),
     x = expression(hat(beta)[1]),
     y = "Sample",
     color = NULL
@@ -1153,7 +1369,7 @@ ggplot(ci_data, aes(y = reorder(factor(sample), sample))) +
   )
 ```
 
-Notice the red intervals: these are the roughly 5% of samples where the confidence interval happened to miss the true value. This is *not* a failure of the method---it's exactly what "95% confidence" means. The procedure works correctly 95% of the time, but any individual interval might be one of the unlucky ones. This is why we say we are "95% confident" rather than "100% certain."
+Notice the red intervals: in `r n_samples - n_covered` of the `r n_samples` samples, the confidence interval happened to miss the true value. On average, 5% of 95% intervals (2.5 out of 50) will miss. This is *not* a failure of the method---it's exactly what "95% confidence" means. The procedure works correctly 95% of the time, but any individual interval might be one of the unlucky ones. This is why we say we are "95% confident" rather than "100% certain."
 
 
 ## T-Tests, P-Values, and CIs: A Comparison
@@ -1163,7 +1379,7 @@ These three approaches are closely related but answer slightly different questio
 | Method | Question Answered |
 |--------|-------------------|
 | T-statistic | Is my estimate large relative to the noise in the data? |
-| P-value | What's the probability of seeing my estimate if $H_0$ were true? |
+| P-value | If $H_0$ were true, how likely is an estimate at least as extreme as mine? |
 | Confidence Interval | What range of values is plausible for $\beta_j$? |
 
 All three are mathematically connected:
@@ -1188,7 +1404,7 @@ There are two issues with testing each coefficient individually:
 
 2. **Multiple comparisons problem:** If you run many tests at the 5% level, you'll reject *some* true null hypotheses just by chance. With 20 tests, you'd expect about 1 false rejection even if all nulls are true!
 
-The **F-test** solves both problems by testing multiple coefficients simultaneously.
+The **F-test** addresses both problems by testing multiple coefficients simultaneously: it asks one joint question, so there is one test with one 5% chance of a false rejection.
 
 
 ### Setting Up the F-Test
@@ -1297,7 +1513,7 @@ If $R^2_{UR}$ is much larger than $R^2_R$, the F-statistic will be large, and we
 - The F-statistic is always non-negative, so F-tests are always **one-sided**
 - If the null is rejected, we say the variables are **jointly statistically significant**
 - We cannot determine *which* individual variable is significant---only that at least one is
-- If variables are jointly insignificant, it provides justification for dropping them from the model
+- Failing to reject does not show the coefficients are zero. Whether to keep a control depends on whether it is a confounder (@sec-multivariate), not on its p-value
 :::
 
 
@@ -1322,9 +1538,9 @@ The output has several blocks. Let's walk through them.
 
 - **`Estimate`**: You know this one. It is the OLS point estimates $\hat{\beta}_j$. For lot area, this is the estimated effect of one additional square foot of lot area on sale price.
 
-- **`Std. Error`**: The standard error $se(\hat{\beta}_j)$ (i.e., the square root of the variance) of each estimate. This measures the precision of our estimate---how much it would typically vary across repeated samples. Smaller standard errors mean more precise estimates.
+- **`Std. Error`**: The standard error $se(\hat{\beta}_j)$ of each estimate: the square root of the *estimated* variance of $\hat{\beta}_j$ (see "From Variance to Standard Error" above). This measures the precision of our estimate---how much it would typically vary across repeated samples. Smaller standard errors mean more precise estimates.
 
-- **`t value`**: The t-statistic based on a null hypothesis where $H_0 = 0$, computed as `Estimate / Std. Error`. This is exactly the calculation we did by hand earlier. It tells us how many standard errors our estimate is from zero.
+- **`t value`**: The t-statistic for testing $H_0: \beta_j = 0$, computed as `Estimate / Std. Error`. This is exactly the calculation we did by hand earlier. It tells us how many standard errors our estimate is from zero.
 
 - **`Pr(>|t|)`**: The **p-value** for the two-sided test $H_0: \beta_j = 0$. Smaller numbers mean stronger evidence against the null. A value below 0.05 means the estimate is statistically significant at the 5% level.
 
@@ -1338,9 +1554,8 @@ The output has several blocks. Let's walk through them.
 
 More stars = stronger evidence against the null. But remember: statistical significance is not the same as practical significance!
 
-**Residual standard error** ($\hat{\sigma}$) is an estimate of the standard deviation of the error term $u$. It tells you the typical size of the prediction error in the units of $y$. The degrees of freedom ($n - k - 1$) appear next to it.
-This is not something that is useful on its own,
-so we won't refer to it very often.
+**Residual standard error** ($\hat{\sigma}$) is an estimate of the standard deviation of the error term $\mu$. It tells you the typical size of the prediction error in the units of $y$. The degrees of freedom ($n - k - 1$) appear next to it.
+We rarely interpret it on its own, but it is the $\hat{\sigma}$ in the numerator of every standard error in the table.
 
 **Multiple R-squared** ($R^2$) is the fraction of variation in $y$ explained by the model. **Adjusted R-squared** penalizes for adding more variables and is generally preferred for comparing models with different numbers of regressors,
 as discussed in @sec-multivariate.
@@ -1425,9 +1640,14 @@ modelsummary(
 )
 ```
 
-Notice how the coefficient on Lot Area changes across specifications.
-In column (1), without controls, the estimate is different from column (3).
-This pattern often reveals omitted variable bias in simpler specifications.
+Notice what changes across the columns.
+In this simulated data, lot area was generated independently of the other variables, so leaving them out causes no omitted variable bias: the estimates of `r round(coef(reg1)["lot_area"], 2)`, `r round(coef(reg2)["lot_area"], 2)`, and `r round(coef(reg3)["lot_area"], 2)` differ only because of sampling noise.
+What does change is the **precision**.
+Pool area, garage area, and the year variables explain much of the variation in sale price, so adding them shrinks $\hat{\sigma}$, and the standard error on lot area falls from `r round(summary(reg1)$coefficients["lot_area", "Std. Error"], 3)` to `r round(summary(reg3)$coefficients["lot_area", "Std. Error"], 3)`.
+As a result, lot area goes from statistically insignificant in column (1) to significant at the 1% level in column (3).
+
+In real data the regressors are usually correlated with each other, and a coefficient that moves a lot when controls are added is a warning sign of omitted variable bias in the shorter specification.
+Reading across columns lets you check both things: whether the estimate is stable, and how precise it is.
 
 
 ### What to Look for in Regression Tables
@@ -1472,6 +1692,7 @@ modelsummary(
     "ros" = "Return on Stock (%)",
     "log(sales)" = "Log(Sales)"
   ),
+  fmt = 4,
   gof_map = c("nobs", "adj.r.squared"),
   title = "Effect of Stock Performance on CEO Salary"
 )
@@ -1502,16 +1723,23 @@ modelsummary(
 
 <div class="question">
 <div class="answer-row">
-<label>Based on this table, which variable appears to be a more important determinant of CEO salary?</label>
+<label>In column (2), compare a one-standard-deviation increase in each variable (about 30 percentage points for return on stock, about 1 for log sales). Which is associated with the larger change in predicted log salary?</label>
 <select onchange="checkAnswer(this, 'b')">
 <option value="">Select answer...</option>
 <option value="a">Return on Stock</option>
-<option value="b">Company Sales</option>
-<option value="c">Both are equally important</option>
+<option value="b">Log(Sales)</option>
+<option value="c">About the same</option>
 </select>
 </div>
 </div>
 
+:::
+
+::: {.callout-tip collapse="true"}
+## Show Explanation
+1. No. In column (1), the coefficient on return on stock is `r round(coef(ceo_reg1)["ros"], 4)` with a standard error of `r round(summary(ceo_reg1)$coefficients["ros", "Std. Error"], 4)`, so $|t| = `r abs(round(summary(ceo_reg1)$coefficients["ros", "t value"], 2))`$, well below 1.96. There are no stars.
+2. Adjusted $R^2$ rises from `r round(summary(ceo_reg1)$adj.r.squared, 3)` to `r round(summary(ceo_reg2)$adj.r.squared, 3)`: log sales explains much more of the variation in log salary.
+3. Log sales. A 30-point increase in return on stock is associated with $30 \times `r round(coef(ceo_reg2)["ros"], 4)` \approx `r round(30 * coef(ceo_reg2)["ros"], 3)`$ log points of salary, while a one-unit increase in log sales is associated with `r round(coef(ceo_reg2)["log(sales)"], 3)` log points. Comparing *effect sizes for comparable changes* is the right way to judge importance; stars and $R^2$ alone are not.
 :::
 
 
@@ -1522,19 +1750,21 @@ modelsummary(
 
 1. **Statistical inference** allows us to move from sample estimates to statements about population parameters, accounting for sampling variability.
 
-2. The **sampling distribution** of $\hat{\beta}_j$ describes how our estimates would vary across repeated samples. Under the normality assumption (or with large samples), it follows a normal distribution.
+2. The **standard error** is our one-sample estimate of the standard deviation of $\hat{\beta}_j$: $se(\hat{\beta}_j) = \hat{\sigma}/\sqrt{SST_j(1-R_j^2)}$. Because it is estimated, we use $t_{n-k-1}$ critical values, which are slightly larger than the normal's in small samples.
 
-3. **Hypothesis testing** uses the t-statistic to determine whether our estimate is "far enough" from zero to reject the null hypothesis: $t = \hat{\beta}_j / se(\hat{\beta}_j)$
+3. The **sampling distribution** of $\hat{\beta}_j$ describes how our estimates would vary across repeated samples. In large samples, the Central Limit Theorem makes it approximately normal, whatever the distribution of the errors.
 
-4. **P-values** tell us the probability of seeing our data if the null were true. Smaller p-values provide stronger evidence against $H_0$.
+4. **Hypothesis testing** uses the t-statistic to determine whether our estimate is "far enough" from zero to reject the null hypothesis: $t = \hat{\beta}_j / se(\hat{\beta}_j)$
 
-5. **Confidence intervals** provide a range of plausible values for the population parameter. A 95% CI excludes zero if and only if the estimate is significant at the 5% level.
+5. **P-values** tell us how likely an estimate at least as extreme as ours would be if the null were true. Smaller p-values provide stronger evidence against $H_0$. Failing to reject is not evidence of no effect; check how wide the confidence interval is.
 
-6. **Statistical significance ≠ practical significance.** Always consider the magnitude of effects, not just their p-values.
+6. **Confidence intervals** provide a range of plausible values for the population parameter. A 95% CI excludes zero if and only if the estimate is significant at the 5% level.
 
-7. **F-tests** allow us to test multiple hypotheses simultaneously, avoiding the multiple comparisons problem.
+7. **Statistical significance ≠ practical significance.** Always consider the magnitude of effects, not just their p-values.
 
-8. **Regression tables** in academic papers present coefficients, standard errors (in parentheses), and significance stars. Multiple columns show robustness across specifications.
+8. **F-tests** test several restrictions jointly with a single test, rather than reading many separate t-tests.
+
+9. **Regression tables** in academic papers present coefficients, standard errors (in parentheses), and significance stars. Multiple columns show robustness across specifications.
 :::
 
 
@@ -1798,7 +2028,7 @@ n = 2,450, Adjusted R-squared = 0.31
 </div>
 
 <div class="answer-row">
-    <label>xix. Comparing two students with identical high school GPAs and SAT scores, where one is a legacy and one is not, the legacy student has a predicted college GPA that is: </label>
+    <label>xix. Comparing two students with identical high school GPAs, SAT scores, and athlete status, where one is a legacy and one is not, the legacy student has a predicted college GPA that is: </label>
     <select onchange="checkAnswer(this, 'c')">
         <option value="">-- Select Answer --</option>
         <option value="a">0.142 points lower</option>
@@ -1863,7 +2093,7 @@ x. With p = 0.523, we cannot reject at any conventional level. There is a 52.3% 
 
 **Statistical vs. Practical Significance (xi-xii):**
 
-xi. A $50/year effect is statistically significant (p < 0.001) but practically trivial. This is less than 25 cents per hour---hardly worth an extra year of schooling! Large samples can detect tiny effects.
+xi. A $50/year effect is statistically significant (p < 0.001) but practically trivial. That is about 2.4 cents per hour of full-time work (\$50 / 2,080 hours)---hardly worth an extra year of schooling! Large samples can detect tiny effects.
 
 xii. The standard error shrinks as $n$ increases (specifically, $se \propto 1/\sqrt{n}$). With huge samples, even tiny deviations from zero become "detectable" statistically, even if they're meaningless practically.
 

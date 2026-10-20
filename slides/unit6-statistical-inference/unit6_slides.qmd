@@ -1,0 +1,1298 @@
+---
+title: "Statistical Inference"
+subtitle: "EC 325: Econometrics"
+author: "Prof. Caraher"
+institute: "Colby College"
+date: "today"
+date-format: "medium"
+embed-resources: true
+format:
+  revealjs:
+    theme: colby-theme.scss
+    slide-number: true
+    incremental: true
+    footer: "EC325 | Unit 6 | Statistical Inference"
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+#| echo: false
+
+library(tidyverse)
+library(patchwork)
+library(modelsummary)
+options(scipen = 5)  # large numbers (like SSRs) print in full; tiny p-values print as e.g. 9.65e-14
+```
+
+
+# From Estimates to Evidence
+
+## Where We've Been
+
+- We know how to **estimate** $\hat{\beta}_j$ using OLS
+
+. . .
+
+- We know the Gauss-Markov assumptions guarantee OLS is **BLUE**
+
+. . .
+
+- But every estimate comes from *one sample* — a different sample gives a different $\hat{\beta}_j$
+
+. . .
+
+::: {.callout-important}
+## The Big Question Today
+How do we know if our estimate reflects a **real** relationship — or just **noise** from sampling?
+We do this by asking whether our estimate would be **surprising** if there were no real relationship
+:::
+
+
+## The Roadmap {.smaller}
+
+First, we turn Unit 5's variance formula into something we can compute: the **standard error**.
+
+. . .
+
+Then we build five tools for answering the big question:
+
+. . .
+
+1. **The sampling distribution** — what would happen across many samples?
+
+. . .
+
+2. **Hypothesis testing** — is there evidence of a real effect?
+
+. . .
+
+3. **P-values** — how strong is that evidence?
+
+. . .
+
+4. **Confidence intervals** — what's the plausible range for $\beta_j$?
+
+. . .
+
+5. **F-tests** — do several variables matter jointly?
+
+
+# From Variance to Standard Error
+
+
+## Step 1: Variance → Standard Deviation {.smaller}
+
+From Unit 5, under GM 1--5, the sampling distribution of $\hat{\beta}_j$ has variance
+
+$$Var(\hat{\beta}_j) = \frac{\sigma^2}{SST_j(1 - R_j^2)}$$
+
+. . .
+
+Variance is in **squared units**: $\hat{\beta}_{hp}$ is in MPG per horsepower, so $Var(\hat{\beta}_{hp})$ is in (MPG per hp)$^2$. This is not very meaningful!
+
+. . .
+
+Let's take the square root instead to get **standard deviation**:
+
+$$sd(\hat{\beta}_j) = \sqrt{Var(\hat{\beta}_j)} = \frac{\sigma}{\sqrt{SST_j(1 - R_j^2)}}$$
+
+- Now, same units as $\hat{\beta}_j$
+
+- But we have one big problem: **$sd(\hat{\beta}_j)$ depends on $\sigma$, the standard deviation of the *population* errors.**
+
+- So, we need a way to **estimate** $\sigma^2$ and $\sigma$
+
+
+## Step 2: From $\sigma$ to $\hat{\sigma}$ {.smaller}
+
+- To do so, we bring back GM5, $Var(\mu_i) = \sigma^2$. Plugging in the definition of variance and using GM4 ($E[\mu_i] = 0$):
+
+. . .
+
+$$\sigma^2 = Var(\mu_i) = E\big[(\mu_i - E[\mu_i])^2\big] = E\big[\mu_i^2\big] \quad \text{: the } \textbf{average squared error}$$
+
+. . .
+
+1. **Average the squared errors:** We need to compute the average for our sample $\frac{1}{n}\sum_{i} \mu_i^2$. But we can't see $\mu_i$ (it needs the true $\beta$'s)
+2. **Use the residuals instead:** $\frac{1}{n}\sum_{i} \hat{\mu}_i^2 = \frac{SSR}{n}$. But it's **too small**: OLS minimizes $\sum \hat{\mu}_i^2$
+3. **Divide by the degrees of freedom:** only $n - k - 1$ residuals are free to vary, where $n$ is the number of observations, and $k$ is the number of RHS variables
+
+. . .
+
+$$\hat{\sigma}^2 = \frac{SSR}{n - k - 1}, \qquad E[\hat{\sigma}^2] = \sigma^2 \;\; \text{(unbiased)}$$
+
+- $\hat{\sigma} = \sqrt{\hat{\sigma}^2}$ is R's **"Residual standard error"**: `r round(sigma(lm(mpg ~ hp + wt, data = mtcars)), 3)` MPG for `mpg ~ hp + wt`
+
+## Step 3: Standard Deviation → Standard Error {.smaller}
+
+Swap $\hat{\sigma}$ in for the unknown $\sigma$:
+
+$$sd(\hat{\beta}_j) = \frac{\sigma}{\sqrt{SST_j(1 - R_j^2)}} \quad \Longrightarrow \quad se(\hat{\beta}_j) = \frac{\hat{\sigma}}{\sqrt{SST_j(1 - R_j^2)}}$$
+
+. . .
+
+::: {.callout-important}
+## The Standard Error Is an *Estimate*
+$se(\hat{\beta}_j)$ is our one sample's best guess at $sd(\hat{\beta}_j)$. A different sample would give a slightly different standard error, since the residuals $\hat{\mu}_i$ also vary sample-to-sample.
+:::
+
+## The Standard Error Is an Estimate: A Simulation {.smaller}
+
+::: {.callout-note}
+## What the Standard Error Is Trying to Capture
+We only ever get **one** estimate $\hat{\beta}_j$. The standard error tries to answer: *if we could redraw the sample over and over, how far would $\hat{\beta}_j$ typically land from the true $\beta_j$?* That spread is $sd(\hat{\beta}_j)$, and $se(\hat{\beta}_j)$ is our best guess at it using just the one sample we have.
+:::
+
+To see it, re-run `mtcars` 5,000 times (same 32 cars, new random errors) and plot the results:
+
+```{r}
+#| echo: false
+#| fig-height: 2.5
+#| fig-width: 10
+#| fig-align: center
+
+# The model and pieces we need (defined here so this slide can come first)
+reg    <- lm(mpg ~ hp + wt, data = mtcars)
+n      <- nobs(reg)
+sst_hp <- sum((mtcars$hp - mean(mtcars$hp))^2)
+r2_hp  <- summary(lm(hp ~ wt, data = mtcars))$r.squared
+
+# The truth we pretend to know
+b_true     <- coef(reg)
+sigma_true <- 2.6
+X          <- model.matrix(reg)
+sd_true    <- sigma_true / sqrt(sst_hp * (1 - r2_hp))
+
+# 5,000 re-runs: same cars (same X), new errors each time
+set.seed(325)
+se_sims <- map_dfr(1:5000, function(s) {
+  y_sim <- drop(X %*% b_true) + rnorm(n, 0, sigma_true)
+  ct <- summary(lm(y_sim ~ hp + wt, data = mtcars))$coefficients
+  tibble(b_hp = ct["hp", "Estimate"], se_hp = ct["hp", "Std. Error"])
+})
+
+# Labels go above the tallest bar so they don't sit on the histogram
+p_b    <- ggplot(se_sims, aes(x = b_hp)) +
+  geom_histogram(fill = "lightblue", color = "black", bins = 40)
+top_b  <- max(ggplot_build(p_b)$data[[1]]$count)
+p_b <- p_b +
+  geom_vline(xintercept = b_true["hp"], color = "#002169",
+             linewidth = 1.2, linetype = "dashed") +
+  annotate("text", x = b_true["hp"], y = 1.25 * top_b, hjust = 1.1,
+           label = "true~beta[hp]", parse = TRUE, color = "#002169", size = 5) +
+  annotate("segment", x = b_true["hp"], xend = b_true["hp"] + sd_true,
+           y = 1.08 * top_b, yend = 1.08 * top_b, color = "#E63946", linewidth = 1.2,
+           arrow = arrow(ends = "both", length = unit(0.08, "inches"))) +
+  annotate("text", x = b_true["hp"] + sd_true + 0.001, y = 1.08 * top_b,
+           label = "1 sd", color = "#E63946", size = 5, hjust = 0) +
+  labs(x = expression(hat(beta)[hp]), y = "Count",
+       title = "The 5,000 slope estimates") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+  theme_minimal(base_size = 14)
+
+p_se   <- ggplot(se_sims, aes(x = se_hp)) +
+  geom_histogram(fill = "lightgrey", color = "black", bins = 40)
+top_se <- max(ggplot_build(p_se)$data[[1]]$count)
+p_se <- p_se +
+  geom_vline(xintercept = sd_true, color = "#E63946", linewidth = 1.2) +
+  annotate("text", x = sd_true + 0.0002, y = 1.2 * top_se, hjust = 0,
+           label = "true sd", color = "#E63946", size = 5) +
+  labs(x = expression(se(hat(beta)[hp])), y = "Count",
+       title = "The 5,000 standard errors") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+  theme_minimal(base_size = 14)
+
+p_b + p_se
+```
+
+. . .
+
+- **Left:** if we *could* observe 5,000 samples, the standard deviation of the estimates would be `r sprintf("%.4f", sd(se_sims$b_hp))`. That spread **is** $sd(\hat{\beta}_{hp})$ (the formula gives `r sprintf("%.4f", sd_true)`), but in real life we never see it
+- **Right:** each sample's $se$ is its *guess* at that spread: **near** the truth, but not on it (middle 90%: `r sprintf("%.4f", quantile(se_sims$se_hp, 0.05))` to `r sprintf("%.4f", quantile(se_sims$se_hp, 0.95))`)
+
+
+
+## Computing the Standard Error in R{.smaller}
+
+- In R, the standard error is reported for each coefficient next to its estimate
+
+. . .
+
+```{r}
+reg <- lm(mpg ~ hp + wt, data = mtcars)
+
+summary(reg)
+
+```
+
+## Computing the Standard Error by Hand {.smaller}
+
+- Let's check our formula works!
+
+. . .
+
+```{r}
+#| echo: true
+
+reg <- lm(mpg ~ hp + wt, data = mtcars)
+n <- nobs(reg)
+k <- 2
+
+sigma_hat <- sqrt(sum(resid(reg)^2) / (n - k - 1))        # residual standard error
+sst_hp    <- sum((mtcars$hp - mean(mtcars$hp))^2)          # total variation in hp
+r2_hp     <- summary(lm(hp ~ wt, data = mtcars))$r.squared # share of hp shared with wt
+
+se_hp <- sigma_hat / sqrt(sst_hp * (1 - r2_hp))
+c(by_hand = se_hp, from_summary = summary(reg)$coefficients["hp", "Std. Error"])
+```
+
+
+
+
+
+# The Sampling Distribution
+
+## Center, Spread, Shape {.smaller}
+
+- Recall: we need a way to figure out how "surprising" our specific estimate is
+- To do so, we need to know its full **sampling distribution**
+  - **Sampling distribution:** the distribution of $\hat{\beta}_j$ across all the samples we *could* have drawn from the population
+
+- To figure out the sampling distribution, we need to know 3 things (some we already do!)
+
+. . .
+
+::: {.nonincremental}
+| | Question | What we know |
+|---|---|---|
+| **1. Center** | Where is it centered? | ✅ $E[\hat{\beta}_j] = \beta_j$ (unbiasedness, GM 1--4) |
+| **2. Spread** | How much does it vary? | ✅ $sd(\hat{\beta}_j)$, estimated by $se(\hat{\beta}_j)$: the `Std. Error` column |
+| **3. Shape** | What distribution does it follow? | ❓ Not yet |
+:::
+
+
+## The Missing Piece: Shape {.smaller}
+
+We know the center and the spread — but that's not enough.
+
+. . .
+
+Lots of distributions can have the same mean and standard deviation but look **very different**:
+
+```{r}
+#| echo: false
+#| fig-height: 3
+#| fig-align: center
+
+set.seed(42)
+shape_df <- tibble(
+  Normal = rnorm(5000, 0, 1),
+  Uniform = runif(5000, -sqrt(3), sqrt(3)),
+  `Bimodal` = c(rnorm(2500, -1, 0.5), rnorm(2500, 1, 0.5))
+) |>
+  pivot_longer(everything(), names_to = "Distribution", values_to = "value")
+
+ggplot(shape_df, aes(x = value)) +
+  geom_histogram(aes(y = after_stat(density)),
+                 fill = "lightblue", color = "black", bins = 40) +
+  facet_wrap(~Distribution, scales = "free_y") +
+  labs(x = "Value", y = "Density",
+       title = "Same mean and (approx.) same SD — very different shapes") +
+  theme_minimal(base_size = 14)
+```
+
+. . .
+
+To know what's "surprising" vs. "expected" — to do hypothesis tests and build confidence intervals — we need to know the **shape**.
+
+
+## The Central Limit Theorem Gives Us the Shape {.smaller}
+
+::: {.callout-important appearance="simple"}
+**Central Limit Theorem (CLT):** sums and averages of many independent random pieces are approximately **normal** in large samples, **whatever** the distribution of the individual pieces.
+:::
+
+. . .
+
+**Why does this apply to $\hat{\beta}_j$?** Because under the hood it is just a weighted sum of the errors!
+
+. . .
+
+So in large samples ($\overset{a}{\sim}$ means "approximately distributed as"):
+
+$$\hat{\beta}_j \overset{a}{\sim} Normal\left(\beta_j, \; Var(\hat{\beta}_j)\right) \qquad \text{equivalently} \qquad \frac{\hat{\beta}_j - \beta_j}{se(\hat{\beta}_j)} \overset{a}{\sim} Normal(0, 1)$$
+
+- This means that as long as $n$ is sufficiently large, the sampling distribution of $\hat{\beta}_j$ **will always be (approximately) normally distributed**
+
+
+## Simulation: Normal vs. Skewed Errors {.smaller}
+
+```{r}
+#| echo: false
+#| fig-height: 1.9
+#| fig-width: 10
+#| fig-align: center
+
+set.seed(42)
+n_obs <- 50
+n_sims_asym <- 2000
+
+errors_df <- tibble(
+  `Normal Errors` = rnorm(500, 0, 2),
+  `Skewed Errors` = rexp(500, rate = 0.5) - 2
+) |>
+  pivot_longer(everything(), names_to = "DGP", values_to = "u")
+
+ggplot(errors_df, aes(x = u)) +
+  geom_histogram(aes(y = after_stat(density)),
+                 fill = "lightgrey", color = "black", bins = 40) +
+  facet_wrap(~DGP, scales = "free") +
+  labs(x = expression(paste("Error (", mu, ")")), y = "Density") +
+  theme_minimal(base_size = 14)
+```
+
+Symmetric errors vs. heavily right-skewed errors (like wages). Is $\hat{\beta}_1$ still normal?
+
+. . .
+
+```{r}
+#| echo: false
+#| fig-height: 2.1
+#| fig-width: 10
+#| fig-align: center
+
+sim_normal <- tibble(b1_hat = numeric(n_sims_asym))
+sim_skewed <- tibble(b1_hat = numeric(n_sims_asym))
+beta1_true <- 3
+
+for (s in 1:n_sims_asym) {
+  x <- runif(n_obs, 1, 10)
+  u_norm <- rnorm(n_obs, 0, 2)
+  u_skew <- rexp(n_obs, rate = 0.5) - 2
+  y_norm <- 2 + beta1_true * x + u_norm
+  y_skew <- 2 + beta1_true * x + u_skew
+  sim_normal$b1_hat[s] <- coef(lm(y_norm ~ x))["x"]
+  sim_skewed$b1_hat[s] <- coef(lm(y_skew ~ x))["x"]
+}
+
+combined <- bind_rows(
+  sim_normal |> mutate(DGP = "Normal Errors"),
+  sim_skewed |> mutate(DGP = "Skewed Errors")
+)
+
+ggplot(combined, aes(x = b1_hat)) +
+  geom_histogram(aes(y = after_stat(density)),
+                 fill = "lightblue", color = "black", bins = 40) +
+  stat_function(
+    data = combined |> filter(DGP == "Normal Errors"),
+    fun = dnorm,
+    args = list(mean = mean(sim_normal$b1_hat), sd = sd(sim_normal$b1_hat)),
+    color = "#E63946", linewidth = 1.2) +
+  stat_function(
+    data = combined |> filter(DGP == "Skewed Errors"),
+    fun = dnorm,
+    args = list(mean = mean(sim_skewed$b1_hat), sd = sd(sim_skewed$b1_hat)),
+    color = "#E63946", linewidth = 1.2) +
+  geom_vline(xintercept = beta1_true, color = "#002169",
+             linewidth = 1.2, linetype = "dashed") +
+  facet_wrap(~DGP) +
+  labs(x = expression(hat(beta)[1]), y = "Density") +
+  theme_minimal(base_size = 14)
+```
+
+The normal curve fits **both**, even with $n = 50$: the **CLT** at work.
+
+
+# Hypothesis Testing
+
+## The Logic of the Test {.smaller}
+
+Now that we know the center, spread, and shape of $\hat{\beta}_j$'s sampling distribution, we can test whether **our one estimate** is "surprising" given a baseline value for $\beta_j$.
+We call this a **hypothesis test**!
+
+. . .
+
+We usually want to know **does $x_j$ actually affect $y$?** So, let's use $\beta_j = 0$ as the baseline for our test!
+
+. . .
+
+
+We formalize this as testing the *Null Hypothesis* against an *Alternative Hypothesis*:
+
+- **Null hypothesis:** $H_0: \beta_j = 0$ — no effect
+
+- **Alternative:** $H_1: \beta_j \neq 0$ — there is an effect
+
+. . .
+
+How does the test work?
+
+::: {.callout-tip}
+## The Strategy
+1. **Assume** $H_0$ is true and construct a hypothetical sampling distribution around that null hypothesis value (\beta_j = 0$, usually)
+2. Ask: "Would my estimate be surprising under this assumption?"
+3. If yes → reject $H_0$ (evidence of a real effect)
+:::
+
+. . .
+
+**Caution:** rejecting $H_0$ is evidence that $\beta_j \neq 0$. But $\beta_j$ is a causal effect only if GM4 holds (no omitted confounders, Unit 5). A significant result does not fix omitted variable bias.
+
+
+## Step 1: Under the Null, We Know What to Expect {.smaller}
+
+If $H_0: \beta_j = 0$ is true, we can construct the **entire sampling distribution** of $\hat{\beta}_j$, so we know what the "no effect" distribution of $\hat{\beta}_j$ looks like:
+
+. . .
+
+- **Center:** $E[\hat{\beta}_j] = 0$ (unbiasedness + the null)
+- **Spread:** measured by $se(\hat{\beta}_j)$ (from the data)
+- **Shape:** approximately normal (CLT)
+
+. . .
+
+```{r}
+#| echo: false
+#| fig-height: 2.4
+#| fig-align: center
+
+set.seed(42)
+df_value <- 100
+t_sample <- tibble(t_value = rt(10000, df = df_value))
+
+ggplot(t_sample, aes(x = t_value)) +
+  geom_histogram(aes(y = after_stat(density)),
+                 bins = 50, fill = "lightblue", color = "black") +
+  stat_function(fun = dt, args = list(df = df_value),
+                color = "#E63946", linewidth = 1.2) +
+  geom_vline(xintercept = 0, color = "#002169", linewidth = 1.2) +
+  annotate("text", x = 1.8, y = 0.35,
+           label = "'Distribution under' ~ H[0]", parse = TRUE, color = "#002169", size = 5) +
+  labs(x = expression("Standardized estimate: " * hat(beta)[j] / se(hat(beta)[j])),
+       y = "Density") +
+  coord_cartesian(xlim = c(-4, 4)) +
+  theme_minimal(base_size = 16)
+```
+
+. . .
+
+Most values cluster near zero; values far from zero are **rare**. **Question:** Does our estimate look like it belongs here, or does it seem unlikely based on the sampling distribution?
+
+
+## Step 2: The t-Statistic {.smaller}
+
+We need to **standardize** our estimate so we can place it on that distribution:
+
+. . .
+
+$$
+t_{\hat{\beta}_j} = \frac{\hat{\beta}_j}{se(\hat{\beta}_j)}
+$$
+
+. . .
+
+- This tells us: **how many standard errors away from zero** is our estimate?
+
+. . .
+
+| $t$-stat | Interpretation |
+|----------|---------------|
+| $t = 0.5$ | Half a standard error from zero — could easily be noise |
+| $t = 2.0$ | Two standard errors away — unusual under $H_0$ |
+| $t = 4.0$ | Four standard errors away — very unlikely to be noise |
+
+. . .
+
+- Same sign as $\hat{\beta}_j$ (since $se > 0$); bigger $|t|$ = stronger evidence against $H_0$
+
+
+## Step 3: How Far Is "Too Far"? {.smaller}
+
+```{r}
+#| echo: false
+#| fig-height: 3.5
+#| fig-align: center
+
+p_close <- ggplot(t_sample, aes(x = t_value)) +
+  geom_histogram(aes(y = after_stat(density)),
+                 bins = 50, fill = "lightblue", color = "black") +
+  stat_function(fun = dt, args = list(df = df_value),
+                color = "#E63946", linewidth = 1.2) +
+  geom_vline(xintercept = 0.85, color = "#002169", linewidth = 1.5) +
+  annotate("text", x = 0.85, y = 0.42, label = "t = 0.85",
+           color = "#002169", size = 4, hjust = -0.1) +
+  labs(x = "t-values", y = "Density") +
+  coord_cartesian(xlim = c(-4, 4)) +
+  theme_minimal(base_size = 14)
+
+p_far <- ggplot(t_sample, aes(x = t_value)) +
+  geom_histogram(aes(y = after_stat(density)),
+                 bins = 50, fill = "lightblue", color = "black") +
+  stat_function(fun = dt, args = list(df = df_value),
+                color = "#E63946", linewidth = 1.2) +
+  geom_vline(xintercept = 2.8, color = "#E63946", linewidth = 1.5) +
+  annotate("text", x = 2.8, y = 0.15, label = "t = 2.8",
+           color = "#E63946", size = 4, hjust = -0.1) +
+  labs(x = "t-values", y = "Density") +
+  coord_cartesian(xlim = c(-4, 4)) +
+  theme_minimal(base_size = 14)
+
+p_close + p_far
+```
+
+. . .
+
+- $t = 0.85$: well within the distribution of likely estimates — no reason to doubt $H_0$
+- $t = 2.8$: out in the tail — this would be **rare** if $H_0$ were true
+
+
+## A Decision Rule: Type I Error and $\alpha$ {.smaller}
+
+$t = 0.85$ feels "fine" and $t = 2.8$ feels "surprising," but where exactly do we draw the line?
+
+. . .
+
+- Even when $H_0$ is true, sampling variability sometimes produces a large $t$-stat **by chance**
+- Rejecting $H_0$ when it's actually true is a **Type I error** (a "false positive")
+- Set the bar **too low** → lots of false alarms. Set it **too high** → we miss real effects
+
+. . .
+
+We can't eliminate this risk, but we can **control** it:
+
+- The **significance level** $\alpha$ is our tolerance for a Type I error: $\alpha = 0.05$ accepts a 5% chance of false rejection; $\alpha = 0.01$ only 1%
+- The **critical value** $c$ is the threshold: reject if $|t| > c$
+
+. . .
+
+::: {.callout-note}
+## Where Do Critical Values Come From?
+1. **The source:** the $t_{n-k-1}$ distribution, which describes our $t$-statistic when $H_0$ is true. (It's the normal with slightly fatter tails, because $se$ is estimated.) $c$ is the cutoff that leaves $\alpha/2$ in each tail
+2. **What determines them:** the significance level $\alpha$ (smaller $\alpha$ → larger $c$) and the degrees of freedom $n - k - 1$ (fewer df → fatter tails → larger $c$). For $\alpha = 0.05$ with large $n$, $c \approx 1.96$
+3. **In R:** `qt(1 - alpha/2, df = n - k - 1)`. For example, `qt(0.975, df = 29)` gives `r round(qt(0.975, 29), 2)` and `qt(0.975, df = 1000)` gives `r round(qt(0.975, 1000), 2)`
+:::
+
+
+## Critical Values and Rejection Regions {.smaller}
+
+```{r}
+#| echo: false
+#| fig-height: 3.3
+#| fig-align: center
+
+c_val <- 1.96
+
+t_grid <- seq(-4, 4, length.out = 500)
+t_dens <- dt(t_grid, df = df_value)
+
+shade_data <- tibble(t_value = t_grid, density = t_dens) |>
+  mutate(region = case_when(
+    t_value < -c_val ~ "reject",
+    t_value > c_val ~ "reject",
+    TRUE ~ "fail_to_reject"
+  ))
+
+ggplot() +
+  geom_ribbon(data = shade_data |> filter(region == "fail_to_reject"),
+              aes(x = t_value, ymin = 0, ymax = density),
+              fill = "lightblue", alpha = 0.7) +
+  geom_ribbon(data = shade_data |> filter(t_value <= -c_val),
+              aes(x = t_value, ymin = 0, ymax = density),
+              fill = "#E63946", alpha = 0.5) +
+  geom_ribbon(data = shade_data |> filter(t_value >= c_val),
+              aes(x = t_value, ymin = 0, ymax = density),
+              fill = "#E63946", alpha = 0.5) +
+  stat_function(fun = dt, args = list(df = df_value),
+                color = "#002169", linewidth = 1.2) +
+  geom_vline(xintercept = c(-c_val, c_val),
+             color = "#EEB808", linewidth = 1.2, linetype = "dashed") +
+  # Label the "fail to reject" region
+  annotate("text", x = 0, y = 0.22,
+           label = "'Fail to reject' ~ H[0]", parse = TRUE, color = "#002169", size = 4) +
+  annotate("text", x = 0, y = 0.17,
+           label = paste0("(", 100 * (1 - 0.05), "% of the distribution)"),
+           color = "#002169", size = 3.5) +
+  # Label the rejection regions with Type I error connection
+  annotate("text", x = 3.3, y = 0.08,
+           label = "Rejection\nregion", color = "#E63946", size = 3, fontface = "bold") +
+  annotate("text", x = 3.3, y = 0.035,
+           label = paste0("(", 100 * 0.05/2, "% = \u03b1/2)"),
+           color = "#E63946", size = 2.8) +
+  annotate("text", x = -3.3, y = 0.08,
+           label = "Rejection\nregion", color = "#E63946", size = 3, fontface = "bold") +
+  annotate("text", x = -3.3, y = 0.035,
+           label = paste0("(", 100 * 0.05/2, "% = \u03b1/2)"),
+           color = "#E63946", size = 2.8) +
+  # Label the critical values
+  annotate("text", x = -c_val, y = 0.42,
+           label = "paste(c == -1.96, ' (critical value)')",
+           parse = TRUE, color = "#EEB808", size = 3.5, hjust = 1.05) +
+  annotate("text", x = c_val, y = 0.42,
+           label = "paste(c == +1.96, ' (critical value)')",
+           parse = TRUE, color = "#EEB808", size = 3.5, hjust = -0.05) +
+  # Label the overall curve
+  annotate("text", x = 0, y = 0.41,
+           label = "paste('Sampling distribution under ', H[0])",
+           parse = TRUE, color = "#002169", size = 3.5) +
+  labs(x = "t-statistic", y = "Density") +
+  coord_cartesian(xlim = c(-4.5, 4.5)) +
+  theme_minimal(base_size = 16)
+```
+
+. . .
+
+- The **red areas** combined = $\alpha = 5\%$ — the probability of a Type I error (rejecting when $H_0$ is true)
+- The **dashed lines** at $\pm 1.96$ are the **critical values** — our decision boundary
+- **Decision rule:** reject $H_0$ if $|t| > 1.96$
+- **Rule of 2:** in large samples, an estimate is significant at 5% if it's more than **twice** its standard error, $|\hat{\beta}_j| > 2 \times se(\hat{\beta}_j)$. Handy when scanning regression output
+
+
+## Testing Other Values {.smaller}
+
+$H_0: \beta_j = 0$ is the default, but we can test **any** value $a_j$ by centering the $t$-statistic there:
+
+$$t = \frac{\hat{\beta}_j - a_j}{se(\hat{\beta}_j)}$$
+
+. . .
+
+**Example:** Is health care a "luxury good"? Suppose the estimated income elasticity of health spending is $\hat{\beta}_1 = 0.82$ with $se = 0.07$. Test $H_0: \beta_1 = 1$:
+
+$$t = \frac{0.82 - 1}{0.07} = -2.57 \quad \Rightarrow \quad |t| > 1.96, \text{ so reject } \beta_1 = 1$$
+
+The elasticity is significantly **below** 1: health care looks like a necessity, not a luxury.
+
+. . .
+
+- Same critical values, same decision rule: only the center moves
+- **One-sided tests** ($H_1: \beta_j > a_j$) put all 5% in one tail, so the critical value is `qt(0.95, df)` $\approx 1.65$. Choose the direction **before** seeing the data
+
+
+# P-Values
+
+## Beyond "Reject" or "Fail to Reject" {.smaller}
+
+The t-test with a fixed critical value gives a **binary** answer: significant or not.
+
+. . .
+
+But it doesn't tell us **how strongly** we reject — was it a narrow rejection or a knockout?
+
+. . .
+
+The **p-value** answers this:
+
+::: {.callout-important}
+## Definition
+The p-value is the **probability of seeing a t-statistic as extreme as ours** (or more extreme), *if the null hypothesis were true*.
+
+Equivalently: the **smallest significance level** at which we would reject $H_0$.
+:::
+
+
+## Visualizing the P-Value {.smaller}
+
+Think back to the rejection region plot. Instead of asking "is my t-stat past the critical value?", the p-value asks: **how much of the distribution is more extreme than my t-stat?**
+
+. . .
+
+Suppose we observe $t = 2.3$. What fraction of the distribution under $H_0$ lies beyond $\pm 2.3$?
+
+```{r}
+#| echo: false
+#| fig-height: 2.6
+#| fig-align: center
+
+df_viz <- 250
+observed_t <- 2.3
+p_val <- 2 * pt(abs(observed_t), df = df_viz, lower.tail = FALSE)
+
+t_grid <- seq(-4, 4, length.out = 500)
+t_dens <- dt(t_grid, df = df_viz)
+shade_data <- tibble(t_value = t_grid, density = t_dens) |>
+  mutate(in_tail = abs(t_value) >= abs(observed_t))
+
+ggplot() +
+  geom_line(data = shade_data, aes(x = t_value, y = density),
+            color = "#002169", linewidth = 1.2) +
+  geom_area(data = shade_data |> filter(in_tail & t_value > 0),
+            aes(x = t_value, y = density), fill = "#E63946", alpha = 0.6) +
+  geom_area(data = shade_data |> filter(in_tail & t_value < 0),
+            aes(x = t_value, y = density), fill = "#E63946", alpha = 0.6) +
+  geom_vline(xintercept = c(-observed_t, observed_t),
+             color = "#002169", linewidth = 1, linetype = "dashed") +
+  annotate("text", x = observed_t + 0.3, y = 0.05,
+           label = paste0("t = ", observed_t), color = "#002169", size = 5, hjust = 0) +
+  annotate("text", x = 0, y = 0.2,
+           label = paste0("p = ", round(p_val, 4)),
+           color = "#E63946", size = 6) +
+  labs(x = "t-statistic", y = "Density") +
+  coord_cartesian(xlim = c(-4, 4)) +
+  theme_minimal(base_size = 16)
+```
+
+. . .
+
+The red area = p-value = `r round(p_val, 4)`. If $H_0$ were true, only a `r round(p_val * 100, 1)`% chance of a $t$-statistic at least this far from zero.
+
+**In R:** `2 * pt(-abs(t), df = n - k - 1)`. Here, `2 * pt(-2.3, df = `r df_viz`)` gives `r round(p_val, 4)`.
+
+
+## Interpreting P-Values {.smaller}
+
+- **p = 0.03:** If $\beta_j = 0$, only a 3% chance of an estimate at least this far from zero. That's unlikely — reject $H_0$ at 5%.
+
+. . .
+
+- **p = 0.35:** If $\beta_j = 0$, a 35% chance of an estimate at least this far from zero. Not unusual at all — fail to reject.
+
+. . .
+
+**Decision rule:** Reject $H_0$ if $p < \alpha$ (your chosen significance level)
+
+. . .
+
+::: {.callout-warning}
+## Common Misconception
+The p-value is **NOT** the probability that $H_0$ is true!
+
+It's the probability of **seeing data this extreme** if $H_0$ *were* true. Big difference.
+:::
+
+
+## Statistical vs. Practical Significance {.smaller}
+
+::: {.callout-important}
+## Key Distinction
+A **statistically significant** result ($p < 0.05$) is not necessarily **practically important**.
+:::
+
+. . .
+
+- With a large enough sample, even **tiny** effects become significant
+
+. . .
+
+- Example: A drug lowers blood pressure by 0.1 mmHg ($p = 0.001$)
+  - Statistically significant? ✅
+  - Clinically meaningful? ❌
+
+. . .
+
+- **Always** look at the **magnitude** of $\hat{\beta}_j$, not just the p-value!
+
+
+# Applying It All in R
+
+## Example: Housing Prices {.smaller}
+
+Now we have the full toolkit — t-statistics, p-values, and the logic connecting them. Let's see how all of these show up in R's regression output.
+
+. . .
+
+```{r}
+#| echo: true
+
+set.seed(2025)
+n <- 500
+housing_data <- tibble(
+  sqft = runif(n, 800, 3500),
+  bedrooms = sample(1:5, n, replace = TRUE),
+  age = sample(0:60, n, replace = TRUE),
+  sale_price = 50000 + 100 * sqft + 8000 * bedrooms -
+               500 * age + rnorm(n, 0, 40000)
+)
+
+# Three specifications: bivariate → add a control → full model
+reg1 <- lm(sale_price ~ sqft, data = housing_data)
+reg2 <- lm(sale_price ~ sqft + bedrooms, data = housing_data)
+reg3 <- lm(sale_price ~ sqft + bedrooms + age, data = housing_data)
+```
+
+
+## Reading the Output {.smaller}
+
+```{r}
+#| echo: true
+summary(reg3)
+```
+
+
+## Decoding `summary()` {.smaller}
+
+The **Coefficients table** has four columns:
+
+| Column | What it shows |
+|--------|--------------|
+| `Estimate` | $\hat{\beta}_j$ — the point estimate |
+| `Std. Error` | $se(\hat{\beta}_j)$ — how precise the estimate is |
+| `t value` | $\hat{\beta}_j / se(\hat{\beta}_j)$ — the t-statistic |
+| `Pr(>|t|)` | The p-value |
+
+. . .
+
+**Significance stars:**
+
+| Stars | Meaning |
+|-------|---------|
+| (none) | $p \geq 0.10$ |
+| `.` | $p < 0.10$ |
+| `*` | $p < 0.05$ |
+| `**` | $p < 0.01$ |
+| `***` | $p < 0.001$ |
+
+
+## Reading a Regression Table {.smaller}
+
+In published research (and in your problem sets!), you won't see raw `summary()` output. Instead, results are presented in a **regression table** using packages like `modelsummary`:
+
+```{r}
+#| echo: false
+
+modelsummary(
+  list("(1)" = reg1, "(2)" = reg2, "(3)" = reg3),
+  stars = c('*' = 0.1, '**' = 0.05, '***' = 0.01),
+  coef_rename = c(
+    "(Intercept)" = "Constant",
+    "sqft" = "Square Feet",
+    "bedrooms" = "Bedrooms",
+    "age" = "House Age"
+  ),
+  fmt = 1,
+  gof_map = c("nobs", "r.squared", "adj.r.squared"),
+  notes = "Standard errors in parentheses."
+)
+```
+
+
+## Anatomy of a Regression Table {.smaller}
+
+**Rows:** Each row is one regressor ($x_j$). The top number is $\hat{\beta}_j$; the number in parentheses below it is $se(\hat{\beta}_j)$.
+
+. . .
+
+**Columns:** Each column is a different regression specification. Here, (1) is bivariate, (2) adds bedrooms, and (3) adds house age. Placing them side-by-side lets you see how coefficients change as controls are added — this is how researchers show their results are (or aren't) robust.
+
+. . .
+
+**Stars:** Indicate statistical significance — but the thresholds vary by paper! Always check the **notes at the bottom** for the convention (e.g., `* p < 0.1, ** p < 0.05, *** p < 0.01`).
+
+. . .
+
+**Bottom rows:** Summary statistics — typically $N$, $R^2$, adjusted $R^2$.
+
+. . .
+
+::: {.callout-warning}
+## Common Mistakes When Reading Tables
+- The parentheses contain **standard errors** — not t-statistics, not confidence intervals!
+- Stars don't tell you about practical significance — always look at the **magnitude** of $\hat{\beta}_j$
+- Authors usually put regressions in the same table for a reason — understanding why is important for understanding the argument of the author!
+:::
+
+
+## Practice: Fully Interpret a Regression Table {.smaller}
+
+:::: {.columns}
+
+::: {.column width="50%"}
+::: {style="font-size: 75%;"}
+```{r}
+#| echo: false
+
+library(wooldridge)
+# Same births in both columns: keep those with both parents' education
+bw_cc <- bwght |> filter(!is.na(motheduc), !is.na(fatheduc))
+m_biv  <- lm(bwght ~ cigs, data = bw_cc)
+m_mult <- lm(bwght ~ cigs + parity + motheduc + fatheduc, data = bw_cc)
+
+modelsummary(
+  list("(1)" = m_biv, "(2)" = m_mult),
+  stars = c('*' = 0.1, '**' = 0.05, '***' = 0.01),
+  fmt = 3,
+  coef_rename = c(
+    "(Intercept)" = "Constant",
+    "cigs"     = "Cigarettes per day",
+    "parity"   = "Birth order",
+    "motheduc" = "Mother's educ. (years)",
+    "fatheduc" = "Father's educ. (years)"
+  ),
+  gof_map = c("nobs", "r.squared"),
+  title = "Dependent variable: birth weight (ounces)",
+  notes = "Standard errors in parentheses."
+)
+
+ct1 <- coef(summary(m_biv))
+ct2 <- coef(summary(m_mult))
+```
+:::
+:::
+
+::: {.column width="50%"}
+Births from the 1988 National Health Interview Survey (`bwght`). Cigarettes are smoked per day during pregnancy.
+
+:::: {.fragment}
+::: {.callout-tip icon=false}
+## Worked example: column (1)
+- **Cigarettes:** each additional cigarette per day is associated with a **`r abs(round(ct1["cigs", 1], 2))` oz lower** birth weight. Statistically significant at the **1%** level
+- **Constant:** babies of mothers who don't smoke have a predicted birth weight of **`r round(ct1["(Intercept)", 1], 1)` oz**
+:::
+::::
+
+:::: {.fragment}
+::: {.callout-note icon=false}
+## 🖥️ Your turn: column (2)
+For **each** coefficient, state the effect in the **correct units** (holding the others constant) and whether it's significant at **1%, 5%, 10%**, or not at all
+:::
+::::
+:::
+
+::::
+
+
+## Practice: Answers for Column (2) {.smaller}
+
+**Model answer:** Holding birth order and parents' education constant, each additional cigarette smoked per day during pregnancy is associated with a **`r abs(round(ct2["cigs", 1], 2))` oz lower** birth weight. This is statistically significant at the **1%** level.
+
+. . .
+
+- **Birth order:** each later birth (e.g., 2nd vs. 1st child) → **`r round(ct2["parity", 1], 2)` oz higher**. Significant at **1%**
+- **Mother's educ.:** each extra year → `r abs(round(ct2["motheduc", 1], 2))` oz lower. **Not** significant, even at 10% (p = `r round(ct2["motheduc", 4], 2)`)
+- **Father's educ.:** each extra year → **`r round(ct2["fatheduc", 1], 2)` oz higher**. Significant at **5%**, not 1% (p = `r round(ct2["fatheduc", 4], 3)`)
+- **Constant:** `r round(ct2["(Intercept)", 1], 1)` oz is the prediction when every regressor is 0 (birth order 0, parents with no schooling). Birth order starts at 1, so it has no useful interpretation here
+
+. . .
+
+- **Compare to (1):** the cigarette effect barely moves (`r round(ct1["cigs", 1], 2)` → `r round(ct2["cigs", 1], 2)`) once we add the controls
+
+
+# Confidence Intervals
+
+## From Point Estimates to Ranges {.smaller}
+
+- While t-tests and p-values are useful for determining if your estimate is likely or not under a null hypothesis,
+they don't tell you much about the actual possible values $\beta_j$ can take
+
+- A **confidence interval** gives a **range of plausible values** for $\beta_j$:
+
+. . .
+
+$$CI = \hat{\beta}_j \pm c \cdot se(\hat{\beta}_j)$$
+
+. . .
+
+For a 95% CI, $c$ is the 5% two-sided critical value, `qt(0.975, df = n - k - 1)`. With large $n$, $c \approx 1.96$:
+
+$$CI_{95\%} = \hat{\beta}_j \pm 1.96 \cdot se(\hat{\beta}_j)$$
+
+
+## Computing CIs in R {.smaller}
+
+::: {.callout-note icon=false}
+## 🖥️ Try it yourself!
+:::
+
+```{r}
+#| echo: true
+
+# By hand, with the t critical value (df = n - k - 1)
+b1    <- coef(reg3)["sqft"]
+se1   <- summary(reg3)$coefficients["sqft", "Std. Error"]
+c_95  <- qt(0.975, df = df.residual(reg3))
+lower <- b1 - c_95 * se1
+upper <- b1 + c_95 * se1
+cat("Manual 95% CI: [", round(lower, 4), ",", round(upper, 4), "]\n")
+```
+
+. . .
+
+Or use R's `confint()` function:
+
+```{r}
+#| echo: true
+
+# confint() computes CIs directly
+# First arg = model, second = which coefficient, level = confidence level
+confint(reg3, "sqft", level = 0.95)
+```
+
+
+## What Does "95% Confident" Mean? {.smaller}
+
+If we drew many samples and built a 95% CI from each, about **95%** of the intervals would contain the true $\beta_j$. The "95%" describes the **procedure**: any one interval either contains $\beta_j$ or it doesn't, and we can't tell which.
+
+```{r}
+#| echo: false
+#| fig-height: 3.4
+#| fig-align: center
+
+set.seed(14)
+true_b1_ci <- 3
+n_per_sample <- 30
+n_ci_sims <- 50
+
+ci_data <- map_dfr(1:n_ci_sims, function(i) {
+  x <- runif(n_per_sample, 0, 10)
+  u <- rnorm(n_per_sample, 0, 8)
+  y <- 5 + true_b1_ci * x + u
+  reg <- lm(y ~ x)
+  ci <- confint(reg, "x", level = 0.95)
+  tibble(sample = i, estimate = coef(reg)["x"],
+         lower = ci[1], upper = ci[2],
+         covers_true = lower <= true_b1_ci & upper >= true_b1_ci)
+})
+
+n_covered <- sum(ci_data$covers_true)
+
+ggplot(ci_data, aes(y = reorder(factor(sample), sample))) +
+  geom_vline(xintercept = true_b1_ci, linetype = "dashed",
+             color = "#002169", linewidth = 1) +
+  geom_errorbar(aes(xmin = lower, xmax = upper, color = covers_true),
+                width = 0.3, linewidth = 0.6, orientation = "y") +
+  geom_point(aes(x = estimate, color = covers_true), size = 1.5) +
+  scale_color_manual(values = c("TRUE" = "#5D8EE5", "FALSE" = "#E63946"),
+                     labels = c("TRUE" = "Contains true value",
+                                "FALSE" = "Misses true value")) +
+  labs(x = expression(hat(beta)[1]), y = "Sample", color = NULL,
+       title = paste0("True value = ", true_b1_ci, " (dashed line): ", n_covered, " of ",
+                      n_ci_sims, " intervals contain it")) +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom", axis.text.y = element_blank())
+```
+
+
+## The CI ↔ Hypothesis Test Connection {.smaller}
+
+There's a direct link between CIs and hypothesis testing:
+
+. . .
+
+| If the 95% CI... | Then at the 5% level... |
+|-------------------|------------------------|
+| **Excludes** zero | We **reject** $H_0: \beta_j = 0$ |
+| **Includes** zero | We **fail to reject** $H_0: \beta_j = 0$ |
+
+. . .
+
+This makes CIs a handy visual shortcut — just check if zero is inside the interval!
+
+. . .
+
+::: {.callout-tip}
+## Three Tools, One Answer
+$|t| > 1.96$ ⟺ $p < 0.05$ ⟺ 95% CI excludes zero
+
+They always agree, but each answers a different question: Is my estimate large relative to the noise ($t$)? How surprising would it be if $H_0$ were true ($p$)? What values of $\beta_j$ are plausible (CI)?
+:::
+
+
+## Fail to Reject ≠ "No Effect" {.smaller}
+
+Failing to reject $H_0: \beta_j = 0$ does **not necessarily** show the effect is zero. Our data may just be too noisy to detect it (a **Type II error**: missing a real effect).
+
+. . .
+
+The CI tells you which case you're in. Two studies of a prenatal program's effect on birth weight (grams), neither statistically significant:
+
+::: {.nonincremental}
+| Study | Estimate | 95% CI | What we learn |
+|-------|----------|--------|---------------|
+| A | 20 | [−180, 220] | **Inconclusive:** consistent with large harm, no effect, or a large benefit |
+| B | 5 | [−15, 25] | **Informative null:** small or near-zero effect |
+:::
+
+. . .
+
+- Say "we fail to reject $H_0$," never "we accept $H_0$"
+- Report the CI so readers can tell which kind of insignificant result you have — large and uncertain, or a precise zero!
+
+
+# F-Tests: Testing Multiple Hypotheses
+
+## The Problem with Multiple t-Tests
+
+So far, all our tools test **one coefficient at a time**.
+
+. . .
+
+But what if we want to ask: "Do `bedrooms` and `age` **jointly** matter for house prices?"
+
+. . .
+
+You might think: just look at each t-test separately!
+
+. . .
+
+::: {.callout-warning}
+## Two Problems with That Approach
+1. **No restrictions on other parameters:** A t-test on $\beta_2$ puts no restrictions on $\beta_3$. Both could be individually insignificant yet *jointly* explain a lot.
+
+2. **Multiple comparisons:** Running many tests at 5% means you'll reject some true nulls by chance. With 20 tests of true nulls, expect about 1 false rejection!
+:::
+
+
+## The F-Test Solution {.smaller}
+
+The **F-test** tests multiple coefficients **simultaneously**: one joint question, one test, one 5% chance of a false rejection.
+
+. . .
+
+Do `bedrooms` and `age` *jointly* matter? $\quad H_0: \beta_2 = \beta_3 = 0 \qquad H_1: \text{at least one} \neq 0$
+
+. . .
+
+Compare the model **with** and **without** them:
+
+- **Unrestricted** (full model): $\; price = \beta_0 + \beta_1(sqft) + \beta_2(bedrooms) + \beta_3(age) + \mu$
+- **Restricted** (imposes $H_0$): $\; price = \beta_0 + \beta_1(sqft) + \mu$
+
+. . .
+
+If `bedrooms` and `age` actually matter, **dropping them should make the fit much worse**. The F-statistic measures *how much worse*.
+
+
+## The F-Statistic Formula {.smaller}
+
+$$F = \frac{(SSR_R - SSR_{UR})/q}{SSR_{UR}/df_{UR}}$$
+
+. . .
+
+| Symbol | Meaning |
+|--------|---------|
+| $SSR_R$ | Sum of squared residuals from **restricted** model |
+| $SSR_{UR}$ | Sum of squared residuals from **unrestricted** model |
+| $q$ | Number of restrictions (variables dropped) |
+| $df_{UR}$ | Degrees of freedom in unrestricted model ($n - k - 1$) |
+
+. . .
+
+**Intuition:** The numerator captures how much the fit worsens when we drop the variables. The denominator scales by the noise in the data. A large $F$ means the dropped variables really mattered.
+
+
+## F-Test: Computing It by Hand {.smaller}
+
+```{r}
+#| echo: true
+
+reg_unrestricted <- lm(sale_price ~ sqft + bedrooms + age, data = housing_data)
+reg_restricted   <- lm(sale_price ~ sqft, data = housing_data)   # imposes H0
+
+ssr_r  <- sum(resid(reg_restricted)^2)
+ssr_ur <- sum(resid(reg_unrestricted)^2)
+q      <- 2                                  # number of restrictions
+df_ur  <- df.residual(reg_unrestricted)      # n - k - 1
+
+f_stat <- ((ssr_r - ssr_ur) / q) / (ssr_ur / df_ur)
+f_crit <- qf(0.95, df1 = q, df2 = df_ur)     # 5% critical value
+c(F = f_stat, F_crit = f_crit)
+```
+
+. . .
+
+::: {.callout-note}
+## Where Does the F Critical Value Come From?
+1. **The source:** the **F distribution**, which describes the $F$-statistic when $H_0$ is true. It's right-skewed and never negative (dropping variables can only raise SSR), and averages about 1 when the dropped variables don't matter. So we reject only in the **right tail**: $F > F_{crit}$
+2. **What determines it:** the significance level $\alpha$ and **two** degrees of freedom: $q$ (number of restrictions) and $df_{UR} = n - k - 1$
+3. **In R:** `qf(1 - alpha, df1 = q, df2 = df_ur)`. Here, `qf(0.95, 2, `r df_ur`)` gives `r round(f_crit, 2)`
+:::
+
+. . .
+
+- Our $F = `r round(f_stat, 2)`$ is far above `r round(f_crit, 2)`: **reject $H_0$**. `bedrooms` and `age` jointly matter
+
+
+## The Easy Way: `anova()` {.smaller}
+
+In practice, use R's `anova()` function — pass it the restricted model first, then the unrestricted:
+
+. . .
+
+```{r}
+#| echo: true
+
+anova(reg_restricted, reg_unrestricted)
+```
+
+. . .
+
+- It gives you the F-statistic, degrees of freedom, and p-value directly
+- If we reject $H_0$, the variables are **jointly statistically significant**, but we **can't** tell *which* one matters
+- Failing to reject does **not** show the coefficients are zero. Whether to keep a control depends on whether it's a **confounder** (Unit 5), not on its p-value
+
+
+## The F-Statistic in Terms of $R^2$ {.smaller}
+
+The F-statistic can also be written using R-squared values:
+
+$$F = \frac{(R^2_{UR} - R^2_R)/q}{(1 - R^2_{UR})/df_{UR}}$$
+
+. . .
+
+This version makes the intuition even clearer:
+
+- **Numerator:** How much does $R^2$ *improve* when we add the extra variables?
+- **Denominator:** How much unexplained variation remains in the full model?
+
+. . .
+
+```{r}
+#| echo: true
+
+r2_r <- summary(reg_restricted)$r.squared
+r2_ur <- summary(reg_unrestricted)$r.squared
+
+f_r2 <- ((r2_ur - r2_r) / q) / ((1 - r2_ur) / df_ur)
+round(c(F_from_SSR = f_stat, F_from_R2 = f_r2), 2)
+```
+
+Same answer — just two ways to compute the same thing.
+
+
+## F-Test Example: Parents' Education {.smaller}
+
+Back to column (2) of the birth weight table: do mother's and father's education **jointly** matter? $\;H_0: \beta_{motheduc} = \beta_{fatheduc} = 0$
+
+```{r}
+#| echo: true
+
+# Unrestricted = column (2); the restricted model drops both education variables
+m_restricted <- lm(bwght ~ cigs + parity, data = bw_cc)
+bw_f <- anova(m_restricted, m_mult)
+bw_f
+```
+
+. . .
+
+- $F = `r sprintf("%.2f", bw_f$F[2])`$, $p = `r sprintf("%.3f", bw_f[["Pr(>F)"]][2])`$: **fail to reject** $H_0$ at 5%, but reject at 10%
+- Father's education **alone** is significant at 5% ($p = `r sprintf("%.3f", ct2["fatheduc", 4])`$), but **jointly** the two are not
+
+. . .
+
+::: {.callout-warning}
+## Watch the Sample
+`lm()` silently drops rows with missing values. Fit the restricted model on all of `bwght` and it uses `r format(nrow(bwght), big.mark = ",")` births instead of `r format(nrow(bw_cc), big.mark = ",")`, so `anova()` stops with *"models were not all fitted to the same size of dataset."* Both models must use the **same observations**.
+:::
+
+
+# Wrapping Up
+
+## Key Takeaways {.smaller}
+
+::: {.callout-tip}
+## What You Should Remember
+
+1. **Standard error:** $\hat{\beta}_j$ varies across samples; $se(\hat{\beta}_j)$ is our one-sample *estimate* of how much
+
+2. **Hypothesis test:** Compare your t-stat to the $t_{n-k-1}$ critical value ($\approx 1.96$ in large samples, the Rule of 2)
+
+3. **P-value:** If $H_0$ were true, the probability of an estimate at least as extreme as ours. Small $p$ = strong evidence against $H_0$
+
+4. **Confidence interval:** A range of plausible values for $\beta_j$. Failing to reject is not evidence of no effect: check how wide the CI is
+
+5. **F-test:** Tests whether multiple coefficients are *jointly* significant — use `anova()` in R
+
+6. **Statistical ≠ practical significance** — always look at the *magnitude*, not just the stars!
+:::
