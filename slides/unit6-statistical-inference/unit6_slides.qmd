@@ -892,6 +892,75 @@ A **statistically significant** result ($p < 0.05$) is not necessarily **practic
 - **Always** look at the **magnitude** of $\hat{\beta}_j$, not just the p-value!
 
 
+## Do P-Values Work? {.smaller}
+
+Simulate a world where $H_0$ is **true**: the same 32 cars, but horsepower has **no effect** on MPG, $\beta_{hp} = 0$. In each of 5,000 samples, run `lm(mpg ~ hp + wt)` and test $H_0: \beta_{hp} = 0$ at $\alpha = 0.05$.
+
+. . .
+
+```{r}
+#| echo: false
+#| fig-height: 2.4
+#| fig-width: 10
+#| fig-align: center
+
+# A world where H0 is TRUE: same 32 cars (same X), but hp has no effect on mpg
+null_reg       <- lm(mpg ~ hp + wt, data = mtcars)
+null_X         <- model.matrix(null_reg)
+null_b         <- coef(null_reg)
+null_b[["hp"]] <- 0                                   # the truth: beta_hp = 0
+null_df        <- df.residual(null_reg)               # 32 - 2 - 1 = 29
+null_c         <- qt(0.975, df = null_df)             # critical value, about 2.05
+
+# 5,000 samples: new errors each time, test H0: beta_hp = 0 in each one
+set.seed(325)
+null_sims <- map_dfr(1:5000, function(s) {
+  y_sim <- drop(null_X %*% null_b) + rnorm(nrow(mtcars), 0, 2.6)
+  ct <- summary(lm(y_sim ~ hp + wt, data = mtcars))$coefficients
+  tibble(t = ct["hp", "t value"], p = ct["hp", "Pr(>|t|)"])
+}) |>
+  mutate(reject = abs(t) > null_c)
+
+null_n_rej <- sum(null_sims$reject)
+null_pct   <- function(x) sprintf("%.1f%%", 100 * mean(x))
+
+# Left: the t-statistics. Bin edges sit exactly on +/- c so no bar straddles the line
+null_bw <- null_c / 8
+p_null_t <- ggplot(null_sims, aes(x = t, fill = reject)) +
+  geom_histogram(binwidth = null_bw, boundary = null_c, color = "black") +
+  stat_function(fun = function(x) dt(x, df = null_df) * 5000 * null_bw,
+                inherit.aes = FALSE, color = "#002169", linewidth = 1) +
+  geom_vline(xintercept = c(-null_c, null_c), color = "#EEB808",
+             linewidth = 1.1, linetype = "dashed") +
+  scale_fill_manual(values = c(`FALSE` = "lightblue", `TRUE` = "#E63946"), guide = "none") +
+  coord_cartesian(xlim = c(-4.5, 4.5)) +
+  labs(x = "t-statistic", y = "Count",
+       title = expression("5,000 t-statistics when " * beta[hp] == 0),
+       subtitle = paste0("|t| > ", sprintf("%.2f", null_c), " (reject): ",
+                         null_n_rej, " samples, ", null_pct(null_sims$reject))) +
+  theme_minimal(base_size = 14) +
+  theme(plot.subtitle = element_text(color = "#E63946", face = "bold"))
+
+# Right: the p-values from the same 5,000 regressions, in bars 0.05 wide
+p_null_p <- ggplot(null_sims, aes(x = p, fill = p < 0.05)) +
+  geom_histogram(breaks = seq(0, 1, by = 0.05), color = "black") +
+  scale_fill_manual(values = c(`FALSE` = "lightblue", `TRUE` = "#E63946"), guide = "none") +
+  labs(x = "p-value", y = "Count", title = "The 5,000 p-values",
+       subtitle = paste0("p < 0.05: ", sum(null_sims$p < 0.05), " samples, ",
+                         null_pct(null_sims$p < 0.05))) +
+  theme_minimal(base_size = 14) +
+  theme(plot.subtitle = element_text(color = "#E63946", face = "bold"))
+
+p_null_t + p_null_p
+```
+
+. . .
+
+- **Type I error:** $H_0$ is true every time, yet we reject it in `r null_n_rej` of 5,000 samples (`r null_pct(null_sims$reject)`): the 5% that $\alpha = 0.05$ promised
+- **The p-values:** spread **evenly** from 0 to 1 when $H_0$ is true, so $p < \alpha$ happens $\alpha$ of the time: $p < 0.05$ in the **same** `r null_n_rej` samples, $p < 0.10$ in `r null_pct(null_sims$p < 0.10)`
+- **One p-value, checked:** `2 * pt(-2.3, df = 29)` = `r sprintf("%.3f", 2 * pt(-2.3, df = null_df))`, and `r null_pct(abs(null_sims$t) >= 2.3)` of the simulated $t$'s land beyond $\pm 2.3$
+
+
 # Applying It All in R
 
 ## Example: Housing Prices {.smaller}
