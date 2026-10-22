@@ -433,7 +433,7 @@ How does the test work?
 
 ::: {.callout-tip}
 ## The Strategy
-1. **Assume** $H_0$ is true and construct a hypothetical sampling distribution around that null hypothesis value (\beta_j = 0$, usually)
+1. **Assume** $H_0$ is true and construct a hypothetical sampling distribution around that null hypothesis value ($\beta_j = 0$, usually)
 2. Ask: "Would my estimate be surprising under this assumption?"
 3. If yes → reject $H_0$ (evidence of a real effect)
 :::
@@ -671,6 +671,106 @@ The elasticity is significantly **below** 1: health care looks like a necessity,
 - **One-sided tests** ($H_1: \beta_j > a_j$) put all 5% in one tail, so the critical value is `qt(0.95, df)` $\approx 1.65$. Choose the direction **before** seeing the data
 
 
+## The t-Test, Step by Step {.smaller}
+
+Every t-test follows the same six steps:
+
+1. **State the hypotheses:** $H_0: \beta_j = a_j$ vs. $H_1: \beta_j \neq a_j$. Usually $a_j = 0$ ("no effect")
+2. **Choose the significance level** $\alpha$ *before* looking at the results. Usually $\alpha = 0.05$
+3. **Compute the t-statistic:** $t = \dfrac{\hat{\beta}_j - a_j}{se(\hat{\beta}_j)}$, with $\hat{\beta}_j$ and $se(\hat{\beta}_j)$ from the regression output. Usually, we are testing if an estimate is statistically different from **zero** (i.e., no effect), so $a_j = 0$
+4. **Find the critical value** $c$ from the $t_{n-k-1}$ distribution: `qt(1 - alpha/2, df = n - k - 1)`. About 1.96 when $n$ is large
+5. **Decide:** reject $H_0$ if $|t| > c$. Otherwise, **fail to reject** $H_0$ (never "accept")
+6. **Conclude in words:** is $x_j$ statistically significant at the $\alpha$ level? What does $\hat{\beta}_j$ mean in the units of $x_j$ and $y$?
+
+
+## t-Test Example 1: Horsepower and Fuel Economy {.smaller}
+
+```{r}
+#| echo: false
+
+ex1    <- lm(mpg ~ hp + wt, data = mtcars)
+ex1_b  <- coef(ex1)[["hp"]]
+ex1_se <- summary(ex1)$coefficients["hp", "Std. Error"]
+ex1_t  <- ex1_b / ex1_se
+ex1_c  <- qt(0.975, df = df.residual(ex1))
+```
+
+Back to `lm(mpg ~ hp + wt, data = mtcars)`: $\hat{\beta}_{hp} = `r sprintf("%.5f", ex1_b)`$ and $se(\hat{\beta}_{hp}) = `r sprintf("%.5f", ex1_se)`$, with $n = 32$ cars and $k = 2$
+
+1. **Hypotheses:** $H_0: \beta_{hp} = 0$ vs. $H_1: \beta_{hp} \neq 0$
+2. **Significance level:** $\alpha = 0.05$
+3. **t-statistic:** $t = \dfrac{`r sprintf("%.5f", ex1_b)` - 0}{`r sprintf("%.5f", ex1_se)`} = `r sprintf("%.2f", ex1_t)`$
+4. **Critical value:** $df = 32 - 2 - 1 = 29$, so $c$ = `qt(0.975, df = 29)` = `r sprintf("%.2f", ex1_c)`. Larger than 1.96, because with only 32 cars the $t$ distribution has fatter tails
+5. **Decision:** $|t| = `r sprintf("%.2f", abs(ex1_t))` > `r sprintf("%.2f", ex1_c)`$, so **reject $H_0$**
+6. **Conclusion:** holding weight constant, each extra horsepower is associated with `r sprintf("%.3f", abs(ex1_b))` fewer MPG (about `r sprintf("%.1f", abs(100 * ex1_b))` MPG per 100 hp). This is statistically significant at the 5% level
+
+
+## t-Test Example 2: ACT Scores and College GPA {.smaller}
+
+141 college students in `wooldridge::gpa1`: college GPA (`colGPA`), high school GPA (`hsGPA`), and ACT score (`ACT`)
+
+1. **Hypotheses:** $H_0: \beta_{ACT} = 0$ vs. $H_1: \beta_{ACT} \neq 0$, holding `hsGPA` constant
+2. **Significance level:** $\alpha = 0.05$
+
+. . .
+
+Steps 3--5 in R:
+
+```{r}
+#| echo: true
+#| results: hold
+
+library(wooldridge)
+reg_gpa <- lm(colGPA ~ hsGPA + ACT, data = gpa1)
+b_act   <- coef(reg_gpa)[["ACT"]]
+se_act  <- summary(reg_gpa)$coefficients["ACT", "Std. Error"]
+t_act   <- (b_act - 0) / se_act                        # Step 3
+c_05    <- qt(1 - 0.05/2, df = df.residual(reg_gpa))   # Step 4: df = n - k - 1
+round(c(estimate = b_act, se = se_act, t = t_act, crit = c_05), 4)
+abs(t_act) > c_05                                      # Step 5: reject?
+```
+
+```{r}
+#| echo: false
+
+t_act_alone <- summary(lm(colGPA ~ ACT, data = gpa1))$coefficients["ACT", "t value"]
+```
+
+. . .
+
+6. **Conclusion:** holding high school GPA constant, ACT is **not** statistically significant at 5% (`r sprintf("%.3f", b_act)` GPA points per ACT point). On its own, it is ($t = `r sprintf("%.2f", t_act_alone)`$): most of what ACT tells us, high school GPA already does
+
+
+## t-Test Example 3: A Close Call {.smaller}
+
+```{r}
+#| echo: false
+
+reg_ceo <- lm(salary ~ sales + roe, data = ceosal1)
+b_roe   <- coef(reg_ceo)[["roe"]]
+se_roe  <- summary(reg_ceo)$coefficients["roe", "Std. Error"]
+t_roe   <- b_roe / se_roe
+df_ceo  <- df.residual(reg_ceo)
+```
+
+Are CEOs paid for performance? `lm(salary ~ sales + roe, data = ceosal1)` for `r nobs(reg_ceo)` CEOs: `salary` is in \$1,000s, `sales` in \$ millions, and `roe` is the firm's return on equity (%). We get $\hat{\beta}_{roe} = `r sprintf("%.2f", b_roe)`$ and $se(\hat{\beta}_{roe}) = `r sprintf("%.2f", se_roe)`$.
+
+1. **Hypotheses:** $H_0: \beta_{roe} = 0$ vs. $H_1: \beta_{roe} \neq 0$
+2. **Significance level:** $\alpha = 0.05$
+3. **t-statistic:** $t = \dfrac{`r sprintf("%.2f", b_roe)` - 0}{`r sprintf("%.2f", se_roe)`} = `r sprintf("%.2f", t_roe)`$
+4. **Critical value:** $df = `r nobs(reg_ceo)` - 2 - 1 = `r df_ceo`$, so $c$ = `qt(0.975, df = `r df_ceo`)` = `r sprintf("%.2f", qt(0.975, df_ceo))`
+5. **Decision:** $|t| = `r sprintf("%.2f", abs(t_roe))` < `r sprintf("%.2f", qt(0.975, df_ceo))`$, so **fail to reject $H_0$** at 5%
+
+. . .
+
+Had we chosen $\alpha = 0.10$ in step 2, $c$ = `qt(0.95, df = `r df_ceo`)` = `r sprintf("%.2f", qt(0.95, df_ceo))` and we would **reject**. Same data, same $t$: the verdict depends on $\alpha$, which is why we choose it *before* looking.
+
+. . .
+
+- Example 2 ($t = `r sprintf("%.2f", t_act)`$) and Example 3 ($t = `r sprintf("%.2f", t_roe)`$) both "fail to reject" at 5%, but the evidence is very different
+- "Reject" or "fail to reject" hides **how close** the call was. That is what **p-values** measure
+
+
 # P-Values
 
 ## Beyond "Reject" or "Fail to Reject" {.smaller}
@@ -765,6 +865,13 @@ It's the probability of **seeing data this extreme** if $H_0$ *were* true. Big d
 
 ## Statistical vs. Practical Significance {.smaller}
 
+::: {.callout-note}
+## Remember: What Are We Actually Testing?
+All a significance test asks is whether $\hat{\beta}_j$ is **statistically different from zero**. It asks the question: is our estimate picking up a **real relationship** between $x$ and $y$, or could it just be **noise** from the particular sample we happened to draw? The test says nothing about whether that relationship is **big** or **meaningful**.
+:::
+
+. . .
+
 ::: {.callout-important}
 ## Key Distinction
 A **statistically significant** result ($p < 0.05$) is not necessarily **practically important**.
@@ -772,11 +879,11 @@ A **statistically significant** result ($p < 0.05$) is not necessarily **practic
 
 . . .
 
-- With a large enough sample, even **tiny** effects become significant
+- Example: with a large enough sample, even **tiny** effects become significant
 
 . . .
 
-- Example: A drug lowers blood pressure by 0.1 mmHg ($p = 0.001$)
+- Suppose a drug lowers blood pressure by 0.1 mmHg ($p = 0.001$)
   - Statistically significant? ✅
   - Clinically meaningful? ❌
 
