@@ -1,0 +1,1024 @@
+---
+title: "Dummy Variables and Non-Linear Models"
+author: "Prof. Caraher"
+institute: "Colby College"
+date: "today"
+date-format: "medium"
+embed-resources: true
+format:
+  revealjs:
+    theme: colby-theme.scss
+    slide-number: true
+    incremental: true
+    footer: "EC325 | Unit 7 | Dummy Variables and Non-Linear Models"
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+#| echo: false
+
+library(tidyverse)
+library(wooldridge)   # wage1, hprice1, and ceosal1 (practice slide)
+library(modelsummary)
+library(patchwork)
+options(scipen = 5)
+
+acs    <- read_csv("../../data/acs_wages/acs_wages.csv")
+gap_ts <- read_csv("../../data/census_earnings_ratio/census_earnings_ratio.csv")
+
+# small helpers for inline numbers
+f2  <- function(x) sprintf("%.2f", x)
+pct <- function(b) 100 * (exp(b) - 1)   # exact % difference from a log coefficient
+# exact % difference computed from the coefficient as it is SHOWN (rounded), so the
+# arithmetic on the slide reproduces exactly
+pct_shown <- function(b, digits = 3) pct(round(b, digits))
+big <- function(x) format(round(x), big.mark = "{,}")   # thousands separators inside math
+```
+
+
+## Roadmap {.smaller}
+
+- **Where we are:** we can estimate multivariate regressions, interpret them, and test hypotheses. Now we make our models more **flexible**
+- **Running example:** the **gender wage gap**, measured with real data on `r format(nrow(acs), big.mark = ",")` U.S. workers
+
+. . .
+
+::: {style="font-size: 1.25em;"}
+|   | The question | The tool |
+|:-:|:------------------------------|:---------------|
+| 1 | How much less do women earn than men? | **Dummy variables** |
+| 2 | How do we compare five race and ethnicity groups? | **Multiple categories** |
+| 3 | How big is the gap in **percent**? | **Logs** |
+| 4 | How do wages grow over a career? | **Quadratics** |
+| 5 | What gap is left when we hold everything constant? | **Putting it all together** |
+:::
+
+
+## The Gender Wage Gap {.smaller}
+
+:::: {.columns}
+::: {.column width="45%"}
+![President Kennedy signs the Equal Pay Act, June 10, 1963](images/equal_pay_act_1963.jpg){width=100%}
+:::
+::: {.column width="55%"}
+- The **gender wage gap**: how much less women earn than men, usually reported as women's pay as a **share** of men's pay
+
+- **1963:** The Equal Pay Act bans paying women less than men for equal work. Kennedy: "the average woman worker earns only 60 percent of the average wage for men"
+
+- **2025:** Among full-time, year-round workers, women's median earnings were **`r sprintf("%.1f", 100 * gap_ts$ratio[gap_ts$year == 2025])`%** of men's, about 84 cents on the dollar
+:::
+::::
+
+::: {.aside}
+Photo: Abbie Rowe, White House Photographs, JFK Presidential Library (public domain). 2025 figure: U.S. Census Bureau (2026), *Income in the United States: 2025*.
+:::
+
+
+## The Gap Over Time {.smaller}
+
+```{r}
+#| echo: false
+#| fig-width: 10
+#| fig-height: 4.5
+
+last <- gap_ts |> filter(year == max(year))
+
+ggplot(gap_ts, aes(x = year, y = 100 * ratio)) +
+  annotate("rect", xmin = 1960, xmax = 1980, ymin = 52, ymax = 88,
+           fill = "#9EA9B0", alpha = 0.15) +
+  annotate("text", x = 1970, y = 66, label = "About 60%\nfor two decades",
+           size = 5, color = "gray30") +
+  geom_vline(xintercept = 1963, linetype = "dashed", color = "gray40") +
+  annotate("label", x = 1963.6, y = 84, label = "1963: Equal Pay Act",
+           hjust = 0, size = 4.6, label.size = 0) +
+  geom_line(color = "#002169", linewidth = 1.2) +
+  geom_point(color = "#002169", size = 1.6) +
+  annotate("label", x = last$year - 0.6, y = 100 * last$ratio + 3.6,
+           label = paste0(last$year, ": ", sprintf("%.1f", 100 * last$ratio), "%"),
+           hjust = 1, fontface = "bold", size = 5, label.size = 0, color = "#002169") +
+  scale_x_continuous(breaks = seq(1960, 2020, 10)) +
+  coord_cartesian(ylim = c(52, 88)) +
+  labs(x = NULL, y = "Women's earnings as % of men's",
+       caption = "Median annual earnings, full-time, year-round workers. Source: U.S. Census Bureau, CPS ASEC.") +
+  theme_minimal(base_size = 16)
+```
+
+- Stuck near 60% until 1980, rapid catch-up in the 1980s, slower gains since
+- Why is there still a gap? Research points to differences in **jobs**, **hours**, and what happens after **children** arrive. We'll come back to each one
+
+
+# Measuring the Gap: Dummy Variables
+
+[Suppose we want to measure the gender wage gap ourselves. How do we do it?]{style="color: #5D8EE5; font-style: italic;"}
+
+## Our Data: The American Community Survey {.smaller}
+
+- First, we need data on workers' **wages** and **sex**
+- Each year the Census Bureau's **American Community Survey** (ACS) samples about 3.5 million U.S. addresses
+- We use **`r format(nrow(acs), big.mark = ",")` full-time, year-round workers** ages 25–64 from the **2024 ACS** (`data/acs_wages/`)
+
+. . .
+
+```{r}
+#| eval: false
+
+acs <- read_csv("data/acs_wages/acs_wages.csv")
+```
+
+```{r}
+acs |> select(wage, educ, exper, sex, race_eth) |> head(5)
+```
+
+. . .
+
+- `wage` is the **hourly** wage (\$): annual earnings ÷ (weekly hours × weeks worked)
+- `sex` and `race_eth` are **words**, not numbers. How do we put them in a regression?
+
+
+## What Are Dummy Variables? {.smaller}
+
+- So far we've used **quantitative** variables: wages, education, experience...
+
+- But many important variables are **qualitative**: sex, race, region, marital status, program participation
+
+- A **dummy variable** (aka indicator or binary variable) translates **qualitative info into numbers**:
+
+. . .
+
+$$
+D = \begin{cases} 1 & \text{if the characteristic is present} \\ 0 & \text{otherwise} \end{cases}
+$$
+
+. . .
+
+- To measure the gender gap, we recode `sex` as a dummy:
+
+. . .
+
+$$
+female_i = \begin{cases} 1 & \text{if worker $i$ is a woman} \\ 0 & \text{otherwise} \end{cases}
+$$
+
+- Other examples: $married = 1$ if married, $south = 1$ if in the South, $treated = 1$ if in the treatment group (we have seen this one before!)
+
+
+## Creating a Dummy Variable with `case_when()` {.smaller}
+
+::: columns
+::: {.column width="45%"}
+```r
+case_when(
+  condition1 ~ value1,
+  condition2 ~ value2,
+  TRUE       ~ default_value
+)
+```
+
+- Each line is a **condition ~ value** pair, checked top to bottom
+- `TRUE ~ ...` is a catch-all "else"
+- Careful: `TRUE ~ 0` also turns **missing** values into 0
+:::
+::: {.column width="55%"}
+```{r}
+acs <- acs |>
+  mutate(female = case_when(
+    sex == "Female" ~ 1,
+    sex == "Male"   ~ 0
+  ))
+
+# check: every "Female" is a 1 and every "Male" is a 0
+acs |> count(sex, female)
+```
+:::
+:::
+
+
+## The Raw Gap: Regression on a Dummy {.smaller}
+
+To estimate the gender wage gap, we simply include the dummy on the right-hand side:
+
+. . .
+
+$$wage = \beta_0 + \beta_1(female) + \mu$$
+
+```{r}
+lm_raw <- lm(wage ~ female, data = acs)
+coef(lm_raw) |> round(2)
+```
+
+```{r}
+#| echo: false
+b_raw <- coef(lm_raw)
+```
+
+. . .
+
+- **Men** ($female = 0$): $\widehat{wage} = \hat{\beta}_0 = `r f2(b_raw[1])`$
+- **Women** ($female = 1$): $\widehat{wage} = \hat{\beta}_0 + \hat{\beta}_1 = `r f2(b_raw[1])` - `r f2(-b_raw[2])` = `r f2(b_raw[1] + b_raw[2])`$
+- $\hat{\beta}_1 \approx `r f2(b_raw[2])`$: on average, women earn **\$`r f2(-b_raw[2])`/hr less** than men, the **raw** gap
+
+. . .
+
+```{r}
+acs |> group_by(sex) |> summarize(avg_wage = mean(wage))
+```
+
+- Why does this work? One dummy just compares **group means**: $\hat{\beta}_0$ = the baseline group's average, $\hat{\beta}_1$ = the difference
+
+## Adjusting for Differences
+
+
+- The premise of the Equal Pay Act is that firms can't discriminate between workers at the same job with equal qualifications
+- So to measure the gender wage gap, we need to make sure we have an **apples-to-apples** (or ceteris paribus) comparison. How do we do that?
+- We can use **multivariate OLS** to help ensure we are controlling for differences between men and women in terms of education, experience, etc.
+
+
+## The Adjusted Gap: Holding Education Constant {.smaller}
+
+Let's start with an estimate of the wage gap **controlling for education**. Add $educ$:
+
+$$wage = \beta_0 + \beta_1(female) + \beta_2(educ) + \mu$$
+
+```{r}
+lm_educ <- lm(wage ~ female + educ, data = acs)
+printCoefmat(coef(summary(lm_educ)), digits = 3)
+```
+
+```{r}
+#| echo: false
+b_educ <- coef(lm_educ)
+educ_by_sex <- acs |> group_by(sex) |> summarize(educ = mean(educ))
+```
+
+. . .
+
+- $\hat{\beta}_1 \approx `r f2(b_educ["female"])`$: with the **same education**, women earn \$`r f2(-b_educ["female"])`/hr less than men
+- Why is the gap **bigger** than the raw gap? Women in our data have **more** schooling (`r sprintf("%.1f", educ_by_sex$educ[educ_by_sex$sex == "Female"])` vs. `r sprintf("%.1f", educ_by_sex$educ[educ_by_sex$sex == "Male"])` years), so leaving education out **hid** part of the gap: omitted variable bias!
+
+. . .
+
+::: {.callout-warning}
+## Adjusted Gap ≠ Discrimination
+$\hat{\beta}_1$ compares men and women who are alike in the ways **we measure**. Unmeasured differences (and which controls we choose) change the answer.
+:::
+
+
+## What Dummies Do: A Picture {.smaller}
+
+- Dummy variables essentially give each group its **own intercept**, but the same slope
+
+. . .
+
+```{r}
+#| echo: false
+#| fig-width: 10
+#| fig-height: 4.4
+
+educ_means <- acs |>
+  filter(educ >= 8) |>
+  group_by(educ, sex) |>
+  summarize(avg_wage = mean(wage), n = n(), .groups = "drop")
+
+x_arrow <- 18.6
+
+ggplot(educ_means, aes(x = educ, y = avg_wage, color = sex)) +
+  geom_point(aes(size = n), alpha = 0.6) +
+  geom_abline(intercept = b_educ[1], slope = b_educ["educ"],
+              color = "#0072B2", linewidth = 1.2) +
+  geom_abline(intercept = b_educ[1] + b_educ["female"], slope = b_educ["educ"],
+              color = "#D55E00", linewidth = 1.2) +
+  annotate("segment", x = x_arrow, xend = x_arrow,
+           y = b_educ[1] + b_educ["educ"] * x_arrow,
+           yend = b_educ[1] + b_educ["female"] + b_educ["educ"] * x_arrow,
+           arrow = arrow(ends = "both", length = unit(0.12, "inches")),
+           linewidth = 0.8) +
+  annotate("label", x = x_arrow + 0.25,
+           y = b_educ[1] + b_educ["female"] / 2 + b_educ["educ"] * x_arrow,
+           label = paste0("hat(beta)[1] %~~% ", f2(b_educ["female"])), parse = TRUE,
+           hjust = 0, size = 5.5, label.size = 0) +
+  scale_color_manual(values = c("Male" = "#0072B2", "Female" = "#D55E00"),
+                     breaks = c("Male", "Female"),
+                     labels = c("Male" = "Men", "Female" = "Women")) +
+  scale_size_area(max_size = 6, guide = "none") +
+  scale_x_continuous(breaks = seq(8, 20, 2)) +
+  coord_cartesian(xlim = c(8, 20.8), ylim = c(0, 100)) +
+  labs(x = "Years of education", y = "Hourly wage ($)", color = NULL,
+       caption = "Dots: average wage at each education level (bigger dots = more workers). Lines: the fitted regression.") +
+  theme_minimal(base_size = 16) +
+  theme(legend.position = "bottom")
+```
+
+
+## The Dummy Variable Trap {.smaller}
+
+Why not include dummies for **both** groups?
+
+$$wage = \beta_0 + \beta_1(female) + \beta_2(male) + \beta_3(educ) + \mu$$
+
+. . .
+
+- For every worker: $female + male = 1$, so $male = 1 - female$
+- $male$ is an exact linear function of the intercept's "1" and $female$: **perfect multicollinearity**
+
+. . .
+
+```{r}
+acs <- acs |> mutate(male = 1 - female)
+lm(wage ~ female + male + educ, data = acs) |> coef() |> round(2)
+```
+
+- R won't give an error: `lm()` silently drops one and reports its coefficient as `NA`
+
+. . .
+
+::: {.callout-important}
+## The Rule
+Always **omit one group** when including dummy variables. The omitted category is the **baseline** (reference group).
+:::
+
+
+## Multiple Categories: Race and Ethnicity {.smaller}
+
+:::: {.columns}
+::: {.column width="55%"}
+- Now suppose we want to compare workers by **race and ethnicity**. How many groups does `race_eth` have?
+- **Five.** With $g$ categories, we create $g - 1$ dummies, so we need **four**
+:::
+::: {.column width="45%"}
+```{r}
+acs |> count(race_eth)
+```
+:::
+::::
+
+. . .
+
+```{r}
+acs <- acs |>
+  mutate(black    = case_when(race_eth == "Black"    ~ 1, TRUE ~ 0),
+         hispanic = case_when(race_eth == "Hispanic" ~ 1, TRUE ~ 0),
+         asian    = case_when(race_eth == "Asian"    ~ 1, TRUE ~ 0),
+         other    = case_when(race_eth == "Other"    ~ 1, TRUE ~ 0))
+
+acs |> distinct(race_eth, black, hispanic, asian, other) |> arrange(race_eth)
+```
+
+- Each group gets its own pattern of 1s and 0s. White workers have all four dummies = 0: they are the **baseline**
+
+
+## Interpreting: Relative to the Baseline {.smaller}
+
+$$wage = \beta_0 + \beta_1(female) + \beta_2(educ) + \beta_3(black) + \beta_4(hispanic) + \beta_5(asian) + \beta_6(other) + \mu$$
+
+```{r}
+lm_race <- lm(wage ~ female + educ + black + hispanic + asian + other, data = acs)
+coef(lm_race) |> round(2)
+```
+
+```{r}
+#| echo: false
+b_race <- coef(lm_race)
+```
+
+. . .
+
+- Interpret dummy variables with multiple categories **relative to the omitted category (i.e., the baseline)**
+
+- $\hat{\beta}_3 \approx `r f2(b_race["black"])`$: Black workers earn \$`r f2(-b_race["black"])`/hr less than **White** workers *of the same sex and education*
+
+. . .
+
+- $\hat{\beta}_5 \approx `r f2(b_race["asian"])`$: Asian workers earn \$`r f2(b_race["asian"])`/hr more than **White** workers, holding sex and education constant
+
+. . .
+
+- The gender gap barely moves: $\hat{\beta}_1 \approx `r f2(b_race["female"])`$ (it was $`r f2(b_educ["female"])`$)
+
+
+## Factor Variables and Changing the Baseline {.smaller}
+
+- R creates the dummies for you when a variable is text or a **factor**:
+
+```{r}
+lm(wage ~ female + educ + race_eth, data = acs) |> coef() |> round(2)
+```
+
+- R's baseline is the **first level** (alphabetical): **Asian**. Every race coefficient is now relative to Asian workers!
+
+. . .
+
+```{r}
+acs <- acs |> mutate(race_eth = relevel(factor(race_eth), ref = "White"))
+lm(wage ~ female + educ + race_eth, data = acs) |> coef() |> round(2)
+```
+
+- Same as our hand-made dummies. The baseline doesn't change `female`, `educ`, $R^2$, or the gaps **between** groups (Asian − Black = $`r f2(b_race["asian"])` - (`r f2(b_race["black"])`) = `r f2(b_race["asian"] - b_race["black"])`$ either way)
+
+. . .
+
+- **Practical advice:** pick the baseline that matches the comparison you want (e.g., men for the gender gap)
+
+
+# Log Wages: The Gap in Percent
+
+[Suppose we want to measure the gap in **percent** instead of dollars. How do we do it?]{style="color: #5D8EE5; font-style: italic;"}
+
+## Why Log Wages? {.smaller}
+
+```{r}
+#| echo: false
+wage_q <- quantile(acs$wage, c(0.25, 0.75))
+```
+
+- Wages are **right-skewed**: the middle half of workers earn \$`r round(wage_q[1])`–\$`r round(wage_q[2])` an hour, but `r sum(acs$wage > 200)` of the `r format(nrow(acs), big.mark = ",")` earn more than \$200
+- Logging compresses the right tail → a more symmetric distribution
+
+. . .
+
+```{r}
+#| echo: false
+#| fig-width: 10
+#| fig-height: 3.6
+
+p1 <- ggplot(acs, aes(x = wage)) +
+  geom_histogram(fill = "#0072B2", color = "white", bins = 50) +
+  labs(x = "Hourly wage ($)", y = "Count", title = "Wages (in Levels)") +
+  theme_minimal(base_size = 14)
+
+p2 <- ggplot(acs, aes(x = log(wage))) +
+  geom_histogram(fill = "#D55E00", color = "white", bins = 50) +
+  labs(x = "ln(Hourly wage)", y = "Count", title = "Wages (Logged)") +
+  theme_minimal(base_size = 14)
+
+p1 + p2
+```
+
+. . .
+
+- More importantly: a \$`r f2(-b_raw[2])` gap is **huge** for a \$20/hr worker but **small** for a \$100/hr worker. Logs let us measure gaps in **percent**
+
+
+## From Logs to Percent Changes {.smaller}
+
+We need one key property of logs:
+
+$$\ln(Y_1) - \ln(Y_0) = \ln\!\left(\frac{Y_1}{Y_0}\right) \approx \frac{Y_1 - Y_0}{Y_0}$$
+
+. . .
+
+A **difference in logs** $\approx$ the **proportional change** (for small changes) [see lecture notes for full proof]
+
+. . .
+
+| Wage Change | Proportional Change | Difference in Logs |
+|:----------:|:-------------------:|:-----------------:|
+| \$20 → \$21 | $1/20 = 0.050$ | $\ln(21)-\ln(20) = 0.049$ |
+| \$20 → \$22 | $2/20 = 0.100$ | $\ln(22)-\ln(20) = 0.095$ |
+| \$20 → \$25 | $5/20 = 0.250$ | $\ln(25)-\ln(20) = 0.223$ |
+| \$20 → \$50 | $30/20 = 1.500$ | $\ln(50)-\ln(20) = 0.916$ |
+
+. . .
+
+Works well for small changes; it breaks down for large ones
+
+
+## Interpreting the Log-Level Model {.smaller}
+
+$$\ln(Y) = \beta_0 + \beta_1 X + \mu$$
+
+What happens when $X$ increases by one unit?
+
+. . .
+
+**Steps 1–2:** Write the model at $X_0 + 1$ and $X_0$, then subtract:
+
+$$\ln(Y_1) - \ln(Y_0) = [\beta_0 + \beta_1(X_0 + 1)] - [\beta_0 + \beta_1 X_0] = \beta_1$$
+
+. . .
+
+**Steps 3–4:** Apply the approximation, then multiply by 100:
+
+$$\frac{Y_1 - Y_0}{Y_0} \approx \beta_1 \quad \Rightarrow \quad \text{% change in } Y \approx 100 \times \beta_1$$
+
+. . .
+
+::: {.callout-important}
+## Log-Level Interpretation
+A **one-unit** increase in $X$ → approximately $100 \times \beta_1$ **percent** change in $Y$
+
+If $X$ is a **dummy**, $100 \times \beta_1$ is the approximate **percent difference** from the baseline group
+
+For big coefficients (roughly $|\beta_1| > 0.20$), use the exact formula: $100 \times (e^{\beta_1} - 1)$ percent
+:::
+
+
+## The Gender Gap in Percent {.smaller}
+
+$$\ln(wage) = \beta_0 + \beta_1(female) + \mu$$
+
+```{r}
+acs <- acs |> mutate(log_wage = log(wage))
+lm(log_wage ~ female, data = acs) |> coef() |> round(3)
+```
+
+```{r}
+#| echo: false
+b_log  <- round(coef(lm(log_wage ~ female, data = acs)), 3)          # as shown above
+med_earn <- tapply(acs$earnings, acs$sex, median)
+```
+
+. . .
+
+- Women earn about **`r sprintf("%.1f", -100 * b_log["female"])`% less** than men ($100 \times \hat{\beta}_1$)
+
+. . .
+
+- $|\hat{\beta}_1|$ is close to 0.20, so check the exact formula: $100 \times (e^{`r sprintf("%.3f", b_log["female"])`} - 1) = `r sprintf("%.1f", pct(b_log["female"]))`\%$, so women earn **`r sprintf("%.1f", -pct(b_log["female"]))`% less**
+
+. . .
+
+- $e^{\hat{\beta}_1} = `r f2(exp(b_log["female"]))`$: women's (geometric) average **hourly** wage is `r round(100 * exp(b_log["female"]))`% of men's. Their median **annual** earnings are only `r round(100 * med_earn["Female"] / med_earn["Male"])`% of men's, partly because men work more hours
+
+
+## Adding Education: The Return to Schooling {.smaller}
+
+```{r}
+lm(log_wage ~ female + educ, data = acs) |> coef() |> round(3)
+```
+
+```{r}
+#| echo: false
+b_log2 <- round(coef(lm(log_wage ~ female + educ, data = acs)), 3)   # as shown above
+```
+
+- Same education: $100 \times (e^{`r sprintf("%.3f", b_log2["female"])`} - 1) = `r sprintf("%.1f", pct(b_log2["female"]))`\%$, so women earn **`r sprintf("%.1f", -pct(b_log2["female"]))`% less** than men
+- Each extra year of school → about **`r sprintf("%.0f", 100 * b_log2["educ"])`% higher** wages: the **return to schooling**
+
+. . .
+
+```{r}
+#| echo: false
+#| fig-width: 10
+#| fig-height: 3.0
+
+geo_means <- acs |>
+  filter(educ >= 8) |>
+  group_by(educ, sex) |>
+  summarize(typ_wage = exp(mean(log_wage)), n = n(), .groups = "drop")
+
+curves <- expand_grid(educ = seq(8, 20, 0.1), female = 0:1) |>
+  mutate(fit = exp(b_log2[1] + b_log2["female"] * female + b_log2["educ"] * educ),
+         sex = if_else(female == 1, "Female", "Male"))
+
+ggplot(geo_means, aes(x = educ, y = typ_wage, color = sex)) +
+  geom_point(aes(size = n), alpha = 0.6) +
+  geom_line(data = curves, aes(y = fit), linewidth = 1.2) +
+  scale_color_manual(values = c("Male" = "#0072B2", "Female" = "#D55E00"),
+                     breaks = c("Male", "Female"),
+                     labels = c("Male" = "Men", "Female" = "Women")) +
+  scale_size_area(max_size = 5, guide = "none") +
+  scale_x_continuous(breaks = seq(8, 20, 2)) +
+  labs(x = "Years of education", y = "Hourly wage ($)", color = NULL,
+       caption = "Dots: typical (geometric mean) wage. Curves: the fitted log model, in dollars.") +
+  theme_minimal(base_size = 15) +
+  theme(legend.position = "right")
+```
+
+- A constant **percent** return is a **curve** in dollars, and a constant **percent** gap is more dollars at higher wages: the lines are no longer parallel
+
+
+## Other Log Models {.smaller}
+
+| Model | Equation | $X$ changes by... | $Y$ changes by... |
+|:------|:---------|:------------------:|:------------------:|
+| [**Level-Level**]{style="white-space: nowrap;"} | $Y = \beta_0 + \beta_1 X$ | 1 unit | $\beta_1$ units |
+| **Log-Level** | $\ln(Y) = \beta_0 + \beta_1 X$ | 1 unit | $(100\beta_1)$% |
+| **Level-Log** | $Y = \beta_0 + \beta_1\ln(X)$ | 1% | $\beta_1/100$ units |
+| **Log-Log** | $\ln(Y) = \beta_0 + \beta_1\ln(X)$ | 1% | $\beta_1$% |
+
+. . .
+
+::: {.callout-tip}
+## Quick Rule
+- **Logged** variable → think in **percents**
+- **Level** variable → think in **units**
+:::
+
+
+## Log Models: Examples {.smaller}
+
+```{r}
+#| echo: false
+ex_lvlog  <- coef(lm(earnings ~ log(hours), data = acs))
+ex_loglog <- coef(lm(log(earnings) ~ log(hours), data = acs))
+```
+
+Suppose we want to know how annual **earnings** change with weekly **hours** (our ACS data):
+
+::: columns
+::: {.column width="50%"}
+
+**Level-Log**
+
+$\widehat{earnings} = `r big(ex_lvlog[1])` + `r big(ex_lvlog[2])` \cdot \ln(hours)$
+
+Formula: $\Delta Y = \frac{\beta_1}{100} \cdot \%\Delta X$
+
+$\Delta earnings = \frac{`r big(ex_lvlog[2])`}{100} \cdot 1 \approx \$`r big(ex_lvlog[2] / 100)`$
+
+1% more weekly hours → about **\$`r format(round(ex_lvlog[2] / 100), big.mark = ",")` more** per year
+
+:::
+::: {.column width="50%"}
+
+**Log-Log**
+
+$\widehat{\ln(earnings)} = `r f2(ex_loglog[1])` + `r f2(ex_loglog[2])` \cdot \ln(hours)$
+
+Formula: $\%\Delta Y = \beta_1 \cdot \%\Delta X$
+
+$\%\Delta earnings = `r f2(ex_loglog[2])` \cdot 1 = `r f2(ex_loglog[2])`\%$
+
+1% more weekly hours → **`r f2(ex_loglog[2])`%** higher earnings
+
+$\beta_1$ is the **elasticity**: a unit-free measure of responsiveness
+
+:::
+:::
+
+
+## When to Use Logs? {.smaller}
+
+**Commonly logged:**
+
+- Wages, income, prices, population, firm revenue, expenditures
+- Positive, right-skewed, where % changes are more meaningful
+
+. . .
+
+**Typically NOT logged:**
+
+- Education (years), age, experience, rates/percentages, dummy variables
+- Variables that can be zero or negative ($\ln(0)$ is undefined!)
+
+. . .
+
+::: {.callout-warning}
+## Watch Out
+1) The "$100 \times \beta_1$%" approximation works for small $\beta_1$ (roughly $|\beta_1| < 0.20$). For larger coefficients, use the **exact** formula: $100 \times (e^{\beta_1} - 1)$%
+2) Be wary if your pre-logged variable contains negative numbers or zeros! (Our data only include workers with positive wages.)
+:::
+
+
+## Practice: Log Models {.smaller}
+
+```{r}
+#| echo: false
+p_a <- coef(lm(log(wage) ~ educ, data = wage1))
+p_b <- coef(lm(price ~ log(lotsize), data = hprice1))
+p_c <- coef(lm(log(salary) ~ log(sales), data = ceosal1))
+p_d <- round(coef(lm(log_wage ~ married, data = acs)), 3)   # as shown in (d)
+```
+
+Name the model and interpret $\hat{\beta}_1$:
+
+::: {.nonincremental}
+a) $\ln(\widehat{wage}) = `r f2(p_a[1])` + `r sprintf("%.3f", p_a[2])` \cdot educ$ (1976 workers, `wage1`)
+b) $\widehat{price} = `r f2(p_b[1])` + `r f2(p_b[2])` \cdot \ln(lotsize)$, price in \$1,000s (houses, `hprice1`)
+c) $\ln(\widehat{salary}) = `r f2(p_c[1])` + `r sprintf("%.3f", p_c[2])` \cdot \ln(sales)$ (CEOs, `ceosal1`)
+d) $\ln(\widehat{wage}) = `r f2(p_d[1])` + `r sprintf("%.3f", p_d[2])` \cdot married$ (our ACS data)
+:::
+
+::: {.fragment .nonincremental}
+**Answers:**
+
+a) **Log-level:** 1 more year of school → ≈ **`r sprintf("%.1f", 100 * p_a[2])`%** higher wage
+b) **Level-log:** 1% larger lot → $`r f2(p_b[2])`/100 \approx `r sprintf("%.3f", p_b[2] / 100)`$ thousand, so about **\$`r format(round(10 * p_b[2]), big.mark = ",")`** higher price
+c) **Log-log:** 1% more sales → **`r sprintf("%.3f", p_c[2])`%** higher salary (an elasticity)
+d) **Log-level, dummy:** married workers earn ≈ `r sprintf("%.1f", 100 * p_d[2])`% more; $\hat{\beta}_1 > 0.20$, so exact: $100 \times (e^{`r sprintf("%.3f", p_d[2])`} - 1) =$ **`r sprintf("%.1f", pct(p_d[2]))`%**
+:::
+
+
+# Experience: Non-Linear Models
+
+[Suppose we want to know how wages grow over a career. How do we do it?]{style="color: #5D8EE5; font-style: italic;"}
+
+## Why Non-Linear? {.smaller}
+
+- Linear models assume a **constant** marginal effect: every extra year of experience raises wages by the same amount
+
+. . .
+
+- But many relationships curve:
+  - **Experience → wages:** rise fast early, then flatten (and may fall near retirement). **Human capital theory** (Mincer 1974): workers invest in skills early in their careers
+  - **Temperature → electricity demand:** high when it's cold *and* when it's hot (U-shape)
+  - **Advertising → sales:** diminishing returns
+
+. . .
+
+- We can capture this with a **quadratic** (polynomial) model:
+
+. . .
+
+$$Y = \beta_0 + \beta_1 X + \beta_2 X^2 + \mu$$
+
+- $\beta_2 < 0$: inverted-U (wages & experience)
+- $\beta_2 > 0$: U-shape (electricity demand & temperature)
+
+
+## Estimating a Quadratic {.smaller}
+
+$$\ln(wage) = \beta_0 + \beta_1(exper) + \beta_2(exper^2) + \mu$$
+
+$exper$ is **potential experience**, the years since leaving school: $exper = age - educ - 6$ (the ACS doesn't ask about work history)
+
+**Key idea:** create a new variable $exper^2$ and include it as an additional regressor
+
+. . . 
+
+**Step 1:** Keep workers with a bachelor's degree (this holds education fixed), then create the squared term
+
+```{r}
+ba <- acs |>
+  filter(degree == "Bachelor's") |>
+  mutate(exper2 = exper^2)
+```
+
+. . .
+
+**Step 2:** Run OLS with both $exper$ and $exper^2$
+
+```{r}
+lm_quad <- lm(log_wage ~ exper + exper2, data = ba)
+coef(lm_quad) |> round(6)
+```
+
+```{r}
+#| echo: false
+b_q <- coef(lm_quad)
+```
+
+. . .
+
+- $\hat{\beta}_1 > 0$ and $\hat{\beta}_2 < 0$ → inverted-U confirmed!
+- This is still OLS: we just added $X^2$ as another variable
+
+
+## Visualizing the Quadratic Fit {.smaller}
+
+```{r}
+#| echo: false
+#| fig-width: 10
+#| fig-height: 5.2
+
+ba_means <- ba |>
+  group_by(exper) |>
+  summarize(avg_log_wage = mean(log_wage), n = n())
+
+ggplot(ba_means, aes(x = exper, y = avg_log_wage)) +
+  geom_point(aes(size = n), color = "gray50", alpha = 0.7) +
+  geom_smooth(data = ba, aes(x = exper, y = log_wage, color = "Linear"),
+              method = "lm", formula = y ~ x, se = FALSE, linewidth = 1.2) +
+  geom_smooth(data = ba, aes(x = exper, y = log_wage, color = "Quadratic"),
+              method = "lm", formula = y ~ x + I(x^2), se = FALSE, linewidth = 1.2) +
+  scale_color_manual(values = c("Linear" = "#0072B2", "Quadratic" = "#D55E00")) +
+  scale_size_area(max_size = 5, guide = "none") +
+  labs(x = "Potential experience (years)", y = "Average ln(hourly wage)", color = "Model",
+       title = "Bachelor's degree holders: the linear fit misses the rise and flattening",
+       caption = "Dots: average ln(wage) at each year of experience (bigger dots = more workers).") +
+  theme_minimal(base_size = 16) +
+  theme(legend.position = "bottom", plot.title = element_text(size = 16))
+```
+
+
+## Interpreting Quadratics {.smaller}
+
+The marginal effect of $X$ on $Y$ is **not constant**: it depends on $X$
+
+$$\frac{\partial Y}{\partial X} = \beta_1 + 2\beta_2 X$$
+
+. . .
+
+With $\hat{\beta}_1 \approx `r sprintf("%.4f", b_q["exper"])`$ and $\hat{\beta}_2 \approx `r sprintf("%.6f", b_q["exper2"])`$ (and $Y = \ln(wage)$, so we multiply by 100 to get %):
+
+```{r}
+#| echo: false
+# use the coefficients exactly as shown on the slide, so the arithmetic reproduces
+b1_s <- round(unname(b_q["exper"]), 4)
+b2_s <- round(unname(b_q["exper2"]), 6)
+me <- function(x) 100 * (b1_s + 2 * b2_s * x)
+peak <- -b1_s / (2 * b2_s)
+show_me <- function(x) paste0("$100 \\times [", sprintf("%.4f", b1_s), " + 2(", sprintf("%.6f", b2_s), ")(", x, ")] = ", sprintf("%.1f", me(x)), "$")
+```
+
+. . .
+
+| Experience | Marginal Effect (%) | Interpretation |
+|:----------:|:---------------:|:---------------|
+| 5 years | `r show_me(5)` | $+`r sprintf("%.1f", me(5))`$% per extra year |
+| 20 years | `r show_me(20)` | $+`r sprintf("%.1f", me(20))`$% per extra year |
+| 35 years | `r show_me(35)` | $`r sprintf("%.1f", me(35))`$% per extra year (past the peak) |
+
+. . .
+
+**Peak:** $x^* = -\frac{\beta_1}{2\beta_2} = -\frac{`r sprintf("%.4f", b_q["exper"])`}{2(`r sprintf("%.6f", b_q["exper2"])`)} \approx `r round(peak)`$ years
+
+```{r}
+#| echo: false
+b_all <- coef(lm(log_wage ~ exper + I(exper^2), data = acs))
+peak_all <- -b_all[2] / (2 * b_all[3])
+```
+
+
+# Putting It All Together
+
+[Suppose we want to hold **everything** constant at once. How do we do it?]{style="color: #5D8EE5; font-style: italic;"}
+
+## Why Control for Everything? {.smaller}
+
+- **Remember the goal:** the Equal Pay Act requires equal pay for **equal work** (jobs requiring equal skill, effort, and responsibility). To measure the gap, we want an **apples-to-apples** (ceteris paribus) comparison
+
+. . .
+
+- Men and women differ in ways that also affect wages: education, experience, race/ethnicity, occupation, hours...
+- If a variable affects wages **and** differs between men and women, leaving it out mixes its effect into the "gap": **omitted variable bias**
+
+. . .
+
+- We saw this with education: women have **more** schooling, so the raw gap (\$`r f2(-b_raw[2])`/hr) **understated** the gap between equally educated men and women (\$`r f2(-b_educ["female"])`/hr)
+
+## What Could We Control For? {.smaller}
+
+:::: {.columns}
+::: {.column width="50%"}
+**In our ACS data**
+
+::: {.nonincremental style="font-size: 0.9em;"}
+- Education and potential experience
+- Race and ethnicity (5 groups)
+- Marital status
+- Occupation (22 groups)
+- State (51) → **region** of the country
+- Usual weekly hours
+:::
+:::
+::: {.column width="50%"}
+**Not in our data** (richer data sets have them)
+
+::: {.nonincremental style="font-size: 0.9em;"}
+- **Industry** (e.g., retail vs. finance)
+- Actual years of work experience
+- Children
+- Union membership
+- The employer itself
+- College major
+:::
+:::
+::::
+
+. . .
+
+- Many controls are **categories** with **many groups**. Make them **factors** with `as.factor()`, and `lm()` turns each one into $g - 1$ dummies, dropping a baseline for us (no dummy trap):
+
+```{r}
+# state and occ_group are text (character vectors): make them factors
+acs <- acs |> mutate(state = as.factor(state), occ_group = as.factor(occ_group))
+m_big <- lm(log_wage ~ female + educ + occ_group + state, data = acs)
+length(coef(m_big))   # intercept + female + educ + 21 occupation + 50 state dummies
+```
+
+- `as.factor()` matters most when groups are stored as **numbers** (e.g., state codes 1–56): otherwise R treats them as one continuous variable!
+
+
+## How to Read a Regression Table {.smaller}
+
+```{r}
+#| echo: false
+
+# the regressions in this section (experience squared is divided by 100 so its
+# coefficient is readable at 3 decimals; this doesn't change any other coefficient)
+acs <- acs |> mutate(exper2_100 = exper^2 / 100)
+m1 <- lm(log_wage ~ female, data = acs)
+m2 <- lm(log_wage ~ female + educ, data = acs)
+m3 <- lm(log_wage ~ female + educ + exper + exper2_100, data = acs)
+m4 <- lm(log_wage ~ female + educ + exper + exper2_100 + black + hispanic + asian + other, data = acs)
+m5 <- lm(log_wage ~ female + educ + exper + exper2_100 + black + hispanic + asian + other +
+           factor(occ_group), data = acs)
+
+gap <- function(m) pct_shown(coef(m)["female"])   # from the coefficient as shown (3 decimals)
+```
+
+:::: {.columns}
+::: {.column width="45%"}
+::: {style="font-size: 0.85em;"}
+```{r}
+#| echo: false
+modelsummary(
+  list("(1)" = m1, "(2)" = m2),
+  coef_map = c("female" = "Female", "educ" = "Years of education", "(Intercept)" = "Constant"),
+  stars = c("*" = 0.1, "**" = 0.05, "***" = 0.01),
+  fmt = 3,
+  gof_map = c("nobs", "r.squared"),
+  notes = "Outcome: ln(hourly wage). Standard errors in parentheses."
+)
+```
+:::
+:::
+::: {.column width="55%"}
+- **Columns:** each column is a different **regression**. (1) is the raw gap; (2) adds education. Side by side, we see how $\hat{\beta}$ **changes** as we add controls
+- **Rows:** one per regressor. The top number is $\hat{\beta}_j$; the number in **parentheses** is its **standard error**
+- **Stars:** significance levels, defined in the **notes** at the bottom
+- **Blank cell:** that variable is **not in** that regression
+- **Bottom rows:** sample size ($N$) and $R^2$
+:::
+::::
+
+. . .
+
+::: {.callout-warning}
+## Common Mistakes When Reading Tables
+Parentheses hold **standard errors**, not t-statistics or confidence intervals. Stars are not **practical** significance: always look at the **size** of $\hat{\beta}_j$
+:::
+
+
+## The Adjusted Gap: Holding Everything Constant {.smaller}
+
+::: {style="font-size: 0.6em;"}
+```{r}
+#| echo: false
+
+occ_row <- tribble(
+  ~term, ~`(1)`, ~`(2)`, ~`(3)`, ~`(4)`, ~`(5)`,
+  "Occupation dummies (22 groups)", "", "", "", "", "Yes"
+)
+attr(occ_row, "position") <- 17   # right after the 8 coefficients (estimate + SE rows)
+
+modelsummary(
+  list("(1)" = m1, "(2)" = m2, "(3)" = m3, "(4)" = m4, "(5)" = m5),
+  coef_map = c("female" = "Female", "educ" = "Years of education",
+               "exper" = "Potential experience", "exper2_100" = "Potential experience² / 100",
+               "black" = "Black", "hispanic" = "Hispanic", "asian" = "Asian",
+               "other" = "Other race/ethnicity"),
+  stars = c("*" = 0.1, "**" = 0.05, "***" = 0.01),
+  fmt = 3,
+  gof_map = c("nobs", "r.squared"),
+  add_rows = occ_row,
+  notes = "Outcome: ln(hourly wage). Race/ethnicity baseline: White. Standard errors in parentheses."
+)
+```
+:::
+
+
+## What the Table Tells Us {.smaller}
+
+```{r}
+#| echo: false
+b4 <- round(coef(m4), 3)   # column (4), as shown in the table
+```
+
+- **The gender gap** depends on what we hold constant: `r sprintf("%.1f", -gap(m1))`% raw (1), `r sprintf("%.1f", -gap(m2))`% with the same education (2), and `r sprintf("%.1f", -gap(m4))`% with the same education, potential experience (≈ age), and race/ethnicity (4)
+
+. . .
+
+- **The other rows** answer other questions. In column (4):
+  - Each extra year of school → about **`r sprintf("%.0f", 100 * b4["educ"])`%** higher wages
+  - Experience: $+$ on the linear term, $-$ on the squared term → wages rise with experience, but more and more slowly
+  - Black workers earn **`r sprintf("%.1f", -pct(b4["black"]))`%** less than White workers of the same sex, education, and experience; Asian workers earn **`r sprintf("%.1f", pct(b4["asian"]))`%** more
+
+. . .
+
+- **Same occupation** too (5): `r sprintf("%.1f", -gap(m5))`% less. Occupation and industry are also the largest measured factors nationally (Blau & Kahn 2017). But should we control for occupation? What if women are steered away from higher-paying jobs?
+
+. . .
+
+- $R^2$ climbs from `r sprintf("%.2f", summary(m1)$r.squared)` to `r sprintf("%.2f", summary(m5)$r.squared)`, but a high $R^2$ isn't the goal: we care about the coefficient on $female$
+
+
+## Key Takeaways {.smaller}
+
+::: {.nonincremental}
+- **Dummy variables:** shift the intercept; each coefficient is the gap from the omitted **baseline** ($g$ groups → $g - 1$ dummies)
+- **Log-level:** 1-unit ↑ $X$ → ≈ $100\beta_1$% change in $Y$; for big $\beta_1$, use $100(e^{\beta_1} - 1)$%. For a dummy, it's the % gap from the baseline
+- **Level-log:** 1% ↑ $X$ → $\beta_1/100$-unit change in $Y$
+- **Log-log:** 1% ↑ $X$ → $\beta_1$% change in $Y$ (an **elasticity**)
+- **Quadratics:** the marginal effect $\beta_1 + 2\beta_2 X$ changes with $X$, peaking (or bottoming out) at $X^* = -\beta_1 / (2\beta_2)$; rarely go past a cubic
+- **Always ask first:** Is $Y$ logged? Is $X$ logged? Who is the baseline? That decides the interpretation
+- **The gender gap depends on what you hold constant:** `r sprintf("%.1f", -gap(m1))`% raw, `r sprintf("%.1f", -gap(m4))`% with education, experience, and race/ethnicity, `r sprintf("%.1f", -gap(m5))`% adding occupation
+:::
+
+## The Big Reference Table {.smaller}
+
+| Model | Equation | Interpretation of $\hat{\beta}_1$ |
+|:------|:---------|:----------------------------------|
+| **Level-Level** | $Y = \beta_0 + \beta_1 X$ | 1-unit ↑ $X$ → $\beta_1$-unit Δ $Y$ |
+| **Log-Level** | $\ln(Y) = \beta_0 + \beta_1 X$ | 1-unit ↑ $X$ → $(100\beta_1)$% Δ $Y$ |
+| **Level-Log** | $Y = \beta_0 + \beta_1 \ln(X)$ | 1% ↑ $X$ → $\beta_1/100$ unit Δ $Y$ |
+| **Log-Log** | $\ln(Y) = \beta_0 + \beta_1 \ln(X)$ | 1% ↑ $X$ → $\beta_1$% Δ $Y$ (elasticity) |
+| **Quadratic** | $Y = \beta_0 + \beta_1 X + \beta_2 X^2$ | Marginal effect $= \beta_1 + 2\beta_2 X$; peak at $X^* = -\beta_1 / (2\beta_2)$ |
+| **Dummy** | $Y = \beta_0 + \beta_1 D$ | Difference between $D = 1$ and the baseline |
+| **Dummy (log)** | $\ln(Y) = \beta_0 + \beta_1 D$ | ≈ $(100\beta_1)$% difference from the baseline; exact: $100(e^{\beta_1} - 1)$% |
+
