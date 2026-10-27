@@ -1332,20 +1332,22 @@ If `bedrooms` and `age` actually matter, **dropping them should make the fit muc
 
 ## The F-Statistic Formula {.smaller}
 
-$$F = \frac{(SSR_R - SSR_{UR})/q}{SSR_{UR}/df_{UR}}$$
+$$F = \frac{(R^2_{UR} - R^2_R)\,/\,q}{(1 - R^2_{UR})\,/\,df_{UR}}$$
 
 . . .
 
 | Symbol | Meaning |
 |--------|---------|
-| $SSR_R$ | Sum of squared residuals from **restricted** model |
-| $SSR_{UR}$ | Sum of squared residuals from **unrestricted** model |
+| $R^2_{UR}$ | $R^2$ from the **unrestricted** (full) model |
+| $R^2_R$ | $R^2$ from the **restricted** model (the $H_0$ variables dropped) |
 | $q$ | Number of restrictions (variables dropped) |
-| $df_{UR}$ | Degrees of freedom in unrestricted model ($n - k - 1$) |
+| $df_{UR}$ | Degrees of freedom in the unrestricted model ($n - k - 1$) |
 
 . . .
 
-**Intuition:** The numerator captures how much the fit worsens when we drop the variables. The denominator scales by the noise in the data. A large $F$ means the dropped variables really mattered.
+- **Numerator:** how much $R^2$ *improves* when we add the variables back, per restriction
+- **Denominator:** how much variation the full model *still* leaves unexplained, per degree of freedom (the noise)
+- A large $F$ means the variables explain far more than noise alone would. Adding variables never lowers $R^2$, so $F \geq 0$
 
 
 ## F-Test: Computing It by Hand {.smaller}
@@ -1356,21 +1358,21 @@ $$F = \frac{(SSR_R - SSR_{UR})/q}{SSR_{UR}/df_{UR}}$$
 reg_unrestricted <- lm(sale_price ~ sqft + bedrooms + age, data = housing_data)
 reg_restricted   <- lm(sale_price ~ sqft, data = housing_data)   # imposes H0
 
-ssr_r  <- sum(resid(reg_restricted)^2)
-ssr_ur <- sum(resid(reg_unrestricted)^2)
-q      <- 2                                  # number of restrictions
-df_ur  <- df.residual(reg_unrestricted)      # n - k - 1
+r2_ur <- summary(reg_unrestricted)$r.squared
+r2_r  <- summary(reg_restricted)$r.squared
+q     <- 2                                   # number of restrictions
+df_ur <- df.residual(reg_unrestricted)       # n - k - 1
 
-f_stat <- ((ssr_r - ssr_ur) / q) / (ssr_ur / df_ur)
+f_stat <- ((r2_ur - r2_r) / q) / ((1 - r2_ur) / df_ur)
 f_crit <- qf(0.95, df1 = q, df2 = df_ur)     # 5% critical value
-c(F = f_stat, F_crit = f_crit)
+round(c(R2_R = r2_r, R2_UR = r2_ur, F = f_stat, F_crit = f_crit), 3)
 ```
 
 . . .
 
 ::: {.callout-note}
 ## Where Does the F Critical Value Come From?
-1. **The source:** the **F distribution**, which describes the $F$-statistic when $H_0$ is true. It's right-skewed and never negative (dropping variables can only raise SSR), and averages about 1 when the dropped variables don't matter. So we reject only in the **right tail**: $F > F_{crit}$
+1. **The source:** the **F distribution**, which describes the $F$-statistic when $H_0$ is true. It's right-skewed and never negative (dropping variables can only lower $R^2$), and averages about 1 when the dropped variables don't matter. So we reject only in the **right tail**: $F > F_{crit}$
 2. **What determines it:** the significance level $\alpha$ and **two** degrees of freedom: $q$ (number of restrictions) and $df_{UR} = n - k - 1$
 3. **In R:** `qf(1 - alpha, df1 = q, df2 = df_ur)`. Here, `qf(0.95, 2, `r df_ur`)` gives `r round(f_crit, 2)`
 :::
@@ -1394,37 +1396,38 @@ anova(reg_restricted, reg_unrestricted)
 
 . . .
 
-- It gives you the F-statistic, degrees of freedom, and p-value directly
+- Same $F = `r round(f_stat, 2)`$ we computed by hand, plus its p-value
 - If we reject $H_0$, the variables are **jointly statistically significant**, but we **can't** tell *which* one matters
 - Failing to reject does **not** show the coefficients are zero. Whether to keep a control depends on whether it's a **confounder** (Unit 5), not on its p-value
 
 
-## The F-Statistic in Terms of $R^2$ {.smaller}
-
-The F-statistic can also be written using R-squared values:
-
-$$F = \frac{(R^2_{UR} - R^2_R)/q}{(1 - R^2_{UR})/df_{UR}}$$
-
-. . .
-
-This version makes the intuition even clearer:
-
-- **Numerator:** How much does $R^2$ *improve* when we add the extra variables?
-- **Denominator:** How much unexplained variation remains in the full model?
-
-. . .
+## Reading the `anova()` Output {.smaller}
 
 ```{r}
-#| echo: true
+#| echo: false
 
-r2_r <- summary(reg_restricted)$r.squared
-r2_ur <- summary(reg_unrestricted)$r.squared
-
-f_r2 <- ((r2_ur - r2_r) / q) / ((1 - r2_ur) / df_ur)
-round(c(F_from_SSR = f_stat, F_from_R2 = f_r2), 2)
+f_test <- anova(reg_restricted, reg_unrestricted)
+sst    <- sum((housing_data$sale_price - mean(housing_data$sale_price))^2)
+bn     <- function(x) paste0(format(round(x / 1e9, 1), nsmall = 1, big.mark = ","), "B")
 ```
 
-Same answer — just two ways to compute the same thing.
+Row 1 is the restricted model, row 2 the unrestricted. Each column is a piece of the formula (B = billion):
+
+| Column | Here | What it is | In the formula |
+|-------|---------|-------------------|-----------------|
+| `Res.Df` | `r f_test$Res.Df[1]`, `r f_test$Res.Df[2]` | Residual df, $n - k - 1$ | Row 2 is $df_{UR}$ |
+| `RSS` | `r bn(f_test$RSS[1])`, `r bn(f_test$RSS[2])` | SSR: variation left unexplained | $RSS / SST = 1 - R^2$ |
+| `Df` | `r f_test$Df[2]` | Drop in `Res.Df` = variables dropped | $q$ |
+| `Sum of Sq` | `r bn(f_test[["Sum of Sq"]][2])` | Drop in `RSS` = extra variation explained | $\text{Sum of Sq} / SST = R^2_{UR} - R^2_R$ |
+| `F` | `r round(f_test$F[2], 2)` | The F-statistic | $F$ |
+| `Pr(>F)` | `r sprintf("%.1e", f_test[["Pr(>F)"]][2])` | p-value: chance of an $F$ this big if $H_0$ true | Reject $H_0$ if $p < \alpha$ |
+
+. . .
+
+::: {.callout-tip}
+## Why RSS Instead of $R^2$?
+Both models explain the same $y$, so they share one $SST$ (here `r bn(sst)`). Divide by it: `r bn(f_test$RSS[2])` / `r bn(sst)` = `r round(1 - r2_ur, 3)` $= 1 - R^2_{UR}$, and `r bn(f_test[["Sum of Sq"]][2])` / `r bn(sst)` = `r round(r2_ur - r2_r, 3)` $= R^2_{UR} - R^2_R$. $SST$ cancels in the ratio, so it's the same $F$.
+:::
 
 
 ## F-Test Example: Parents' Education {.smaller}
