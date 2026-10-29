@@ -1,0 +1,761 @@
+---
+title: "Heteroskedasticity"
+subtitle: "EC 325: Econometrics"
+author: "Prof. Caraher"
+institute: "Colby College"
+date: today
+format:
+  revealjs:
+    theme: colby-theme.scss
+    slide-number: true
+    incremental: true
+    embed-resources: true
+    fig-align: center
+    code-overflow: wrap
+    footer: "EC325 | Unit 9 | Heteroskedasticity"
+execute:
+  echo: false
+  message: false
+  warning: false
+  cache: true
+---
+
+```{r}
+#| label: setup
+#| cache: false
+
+library(tidyverse)
+library(lmtest)
+library(sandwich)
+library(fixest)
+library(modelsummary)
+
+options(scipen = 999)
+
+theme_set(theme_minimal(base_size = 16) +
+          theme(plot.title = element_text(face = "bold", size = 18),
+                plot.subtitle = element_text(size = 13, color = "gray40"),
+                panel.grid.minor = element_blank()))
+
+pct <- function(p) scales::percent(p, accuracy = 0.1)
+
+movies <- read_csv("../../data/movies/movies.csv")
+```
+
+
+## Previous Assumptions
+
+- Units 7--8 made our **models** more flexible: dummies, logs, interactions
+- GM 1--4 guarantee OLS is **unbiased**
+- GM5 (**homoskedasticity**) makes our usual standard error formula valid
+- Today: what happens when GM5 fails, and how to fix it
+
+. . .
+
+::: {.callout-note}
+## Gauss-Markov Assumption 5 (Homoskedasticity)
+$$Var(\mu \mid x_1, x_2, \ldots, x_k) = \sigma^2$$
+
+The error variance is **constant**: it doesn't depend on the $x$'s.
+:::
+
+
+## Is Horror the Best Investment in Hollywood?
+
+```{r}
+#| label: hook-movies
+#| fig-width: 10
+#| fig-height: 4.2
+
+paranormal <- movies |> filter(movie == "Paranormal Activity")
+
+movies |>
+    mutate(type = ifelse(genre == "Horror", "Horror", "Other genres")) |>
+    ggplot(aes(x = budget, y = worldwide_gross, color = type)) +
+    geom_point(alpha = 0.5, size = 1.8) +
+    annotate("label", x = 20, y = 900, hjust = 0, size = 4,
+             label = "Paranormal Activity:\n$0.45M budget, $194M gross") +
+    annotate("segment", x = 19, y = 840, xend = paranormal$budget + 1,
+             yend = paranormal$worldwide_gross + 20, color = "darkred") +
+    scale_color_manual(values = c("Horror" = "darkred", "Other genres" = "steelblue")) +
+    scale_x_continuous(labels = scales::dollar_format(suffix = "M")) +
+    scale_y_continuous(labels = scales::dollar_format(suffix = "M")) +
+    labs(title = paste0("Budget vs. Worldwide Gross: ",
+                        format(nrow(movies), big.mark = ","), " Films Released 2000-2018"),
+         subtitle = "Question from FiveThirtyEight; data from the-numbers.com via TidyTuesday",
+         x = "Production budget", y = "Worldwide gross", color = NULL) +
+    theme(legend.position = "top")
+
+roi_by_genre <- movies |>
+    group_by(genre) |>
+    summarise(roi = mean(roi))
+roi_horror <- sprintf("%.1f", roi_by_genre$roi[roi_by_genre$genre == "Horror"])
+roi_drama  <- sprintf("%.1f", roi_by_genre$roi[roi_by_genre$genre == "Drama"])
+
+sd_by_budget <- movies |>
+    mutate(bin = cut(budget, c(0, 10, 25, 50, 100, 175))) |>
+    group_by(bin) |>
+    summarise(sd = sd(worldwide_gross))
+sd_low  <- round(sd_by_budget$sd[1])
+sd_high <- round(sd_by_budget$sd[5])
+```
+
+- Horror films gross **`r roi_horror`×** their budget on average; dramas gross **`r roi_drama`×**. Is that edge real?
+- Grosses spread out as budgets grow: SD of \$`r sd_low`M for budgets up to \$10M vs. \$`r sd_high`M above \$100M
+
+
+## Homoskedastic vs. Heteroskedastic
+
+```{r}
+#| label: side-by-side
+#| fig-width: 10
+#| fig-height: 4.3
+
+set.seed(123)
+n <- 200
+
+homo_data <- tibble(
+    x = runif(n, 0, 100),
+    error = rnorm(n, 0, 15),
+    y = 10 + 0.5 * x + error
+)
+
+set.seed(123)
+
+hetero_data <- tibble(
+    x = runif(n, 0, 100),
+    error = rnorm(n, 0, 0.3 * x),
+    y = 10 + 0.5 * x + error
+)
+
+# Bands = true line +/- 2 error SDs
+bands <- tibble(x = seq(0, 100, length.out = 101)) |>
+    mutate(yhat = 10 + 0.5 * x)
+
+band_df <- bind_rows(
+    bands |> mutate(type = "Homoskedastic", lo = yhat - 30, hi = yhat + 30),
+    bands |> mutate(type = "Heteroskedastic", lo = yhat - 0.6 * x, hi = yhat + 0.6 * x)
+)
+
+bind_rows(
+    homo_data |> mutate(type = "Homoskedastic"),
+    hetero_data |> mutate(type = "Heteroskedastic")
+) |>
+    ggplot(aes(x = x, y = y)) +
+    geom_ribbon(data = band_df, aes(x = x, ymin = lo, ymax = hi),
+                fill = "darkred", alpha = 0.12, inherit.aes = FALSE) +
+    geom_point(alpha = 0.5, color = "steelblue") +
+    geom_smooth(method = "lm", se = FALSE, color = "darkred", linewidth = 1.2) +
+    facet_wrap(~ factor(type, levels = c("Homoskedastic", "Heteroskedastic"))) +
+    labs(x = "X", y = "Y")
+```
+
+- **Heteroskedasticity** = the error variance changes with $x$. Here the spread "fans out"
+- Same true line in both panels: $y = 10 + 0.5x$
+- Movie grosses look like the right panel
+
+
+## What Breaks? {.smaller}
+
+Recall the three features of the sampling distribution of $\hat{\beta}_j$ (Unit 6):
+
+::: {.nonincremental}
+| | Question | Under heteroskedasticity |
+|---|---|---|
+| **1. Center** | Where is it centered? | ✅ Still $E[\hat{\beta}_j] = \beta_j$: unbiasedness needs only GM 1--4 |
+| **2. Spread** | How much does it vary? | ❌ The usual $se(\hat{\beta}_j)$ formula assumed GM5, so it is **wrong** |
+| **3. Shape** | What distribution does it follow? | ✅ Still approximately normal in large samples (CLT) |
+:::
+
+. . .
+
+- The usual SEs are often **too small** (though not always)
+- Too-small SEs → $t$-statistics too large → $p$-values too small
+- So **we reject a true null hypothesis too often**
+
+
+## Simulating the Problem {.smaller}
+
+::: {.callout-important}
+## Type I Error (Unit 6)
+Rejecting a **true** null hypothesis. At $\alpha = 0.05$, a working test does this 5% of the time.
+:::
+
+We simulate data where the **true slope is zero** and count how often we (wrongly) reject $H_0: \beta_1 = 0$.
+
+```{r}
+#| echo: true
+
+n_sims <- 2000       # Number of simulated samples
+n_obs <- 500         # Observations per sample
+beta0_true <- 5      # True intercept
+beta1_true <- 0      # True slope (THE NULL IS TRUE!)
+```
+
+. . .
+
+Run 2,000 regressions under each scenario:
+
+- **Homoskedastic**: SD of the error $= 10$ at every $x$
+- **Heteroskedastic**: SD of the error $= 0.15x^2$, so it grows with $x$
+
+```{r}
+#| label: run-simulations
+
+set.seed(42)
+
+# Homoskedastic simulations: usual and robust SEs
+run_homo_trial <- function(i) {
+    x <- runif(n_obs, 1, 50)
+    error <- rnorm(n_obs, mean = 0, sd = 10)
+    y <- beta0_true + beta1_true * x + error
+    model <- lm(y ~ x)
+    res_ols <- coeftest(model)
+    res_robust <- coeftest(model, vcov. = vcovHC(model, type = "HC1"))
+    data.frame(
+        beta1_hat = coef(model)["x"],
+        se_ols = res_ols["x", "Std. Error"],
+        se_robust = res_robust["x", "Std. Error"],
+        pval_ols = res_ols["x", "Pr(>|t|)"],
+        pval_robust = res_robust["x", "Pr(>|t|)"]
+    )
+}
+
+homo_results <- map_dfr(1:n_sims, run_homo_trial)
+homo_reject_rate <- mean(homo_results$pval_ols < 0.05)
+homo_robust_reject <- mean(homo_results$pval_robust < 0.05)
+homo_avg_se <- mean(homo_results$se_ols)
+homo_avg_se_robust <- mean(homo_results$se_robust)
+homo_true_sd <- sd(homo_results$beta1_hat)
+
+# Heteroskedastic simulations: usual and robust SEs
+run_hetero_trial <- function(i) {
+    x <- runif(n_obs, 1, 50)
+    error <- rnorm(n_obs, mean = 0, sd = 0.15 * x^2)
+    y <- beta0_true + beta1_true * x + error
+    model <- lm(y ~ x)
+    res_ols <- coeftest(model)
+    res_robust <- coeftest(model, vcov. = vcovHC(model, type = "HC1"))
+    data.frame(
+        beta1_hat = coef(model)["x"],
+        se_ols = res_ols["x", "Std. Error"],
+        se_robust = res_robust["x", "Std. Error"],
+        pval_ols = res_ols["x", "Pr(>|t|)"],
+        pval_robust = res_robust["x", "Pr(>|t|)"]
+    )
+}
+
+hetero_results <- map_dfr(1:n_sims, run_hetero_trial)
+ols_reject_rate <- mean(hetero_results$pval_ols < 0.05)
+robust_reject_rate <- mean(hetero_results$pval_robust < 0.05)
+hetero_avg_se <- mean(hetero_results$se_ols)
+avg_se_robust <- mean(hetero_results$se_robust)
+hetero_true_sd <- sd(hetero_results$beta1_hat)
+```
+
+
+## One Simulated Sample of Each
+
+```{r}
+#| label: sim-data
+#| fig-width: 10
+#| fig-height: 4.3
+
+set.seed(42)
+sim_homo <- tibble(
+    x = runif(n_obs, 1, 50),
+    y = beta0_true + beta1_true * x + rnorm(n_obs, 0, 10),
+    type = "Homoskedastic"
+)
+sim_hetero <- tibble(
+    x = runif(n_obs, 1, 50),
+    y = beta0_true + beta1_true * x + rnorm(n_obs, 0, 0.15 * x^2),
+    type = "Heteroskedastic"
+)
+
+bind_rows(sim_homo, sim_hetero) |>
+    mutate(type = factor(type, levels = c("Homoskedastic", "Heteroskedastic"))) |>
+    ggplot(aes(x = x, y = y)) +
+    geom_point(alpha = 0.4, color = "steelblue") +
+    geom_smooth(method = "lm", se = FALSE, color = "darkred", linewidth = 1.2) +
+    facet_wrap(~type, scales = "free_y") +
+    labs(x = "X", y = "Y")
+```
+
+True $\beta_1 = 0$ in both panels. On the right, the spread fans out as $x$ grows (note the different $y$-axes).
+
+
+## Homoskedasticity: The Usual SE Works
+
+```{r}
+#| label: homo-dist-setup
+
+xlim_homo <- c(-1, 1) * 4 * homo_true_sd
+peak_homo <- dnorm(0, 0, homo_avg_se)
+
+# Fixed bins centered on 0, so the histogram is identical on every click
+bw_homo <- homo_true_sd / 4
+
+homo_rejected <- homo_results |> filter(pval_ols < 0.05)
+
+homo_hist <- ggplot(homo_results, aes(x = beta1_hat)) +
+    geom_histogram(aes(y = after_stat(count) / (n_sims * bw_homo)),
+                   binwidth = bw_homo, center = 0,
+                   fill = "steelblue", alpha = 0.7, color = "white") +
+    geom_vline(xintercept = 0, linetype = "dotted", linewidth = 0.8)
+
+ylim_homo <- c(0, max(layer_data(homo_hist, 1)$y, peak_homo) * 1.05)
+
+homo_finish <- list(
+    coord_cartesian(xlim = xlim_homo, ylim = ylim_homo),
+    labs(title = "Homoskedastic: 2,000 Estimates of the Slope",
+         x = expression(hat(beta)[1]), y = "Density"),
+    theme(legend.position = "none")
+)
+
+homo_red <- stat_function(fun = dnorm, args = list(mean = 0, sd = homo_avg_se),
+                          color = "red", linewidth = 1.3, linetype = "dashed")
+
+homo_box <- function(label) {
+    annotate("label", x = xlim_homo[2], y = peak_homo, label = label,
+             hjust = 1, vjust = 1, size = 4.5, fill = "white")
+}
+box_text <- paste0("True SD: ", signif(homo_true_sd, 3),
+                   "\nAvg usual SE: ", signif(homo_avg_se, 3))
+```
+
+::: {.r-stack}
+```{r}
+#| label: homo-dist-1
+#| fig-width: 9
+#| fig-height: 4.0
+
+homo_hist + homo_finish +
+    labs(subtitle = "Blue = actual sampling distribution of the 2,000 estimates")
+```
+
+::: {.fragment fragment-index=1}
+```{r}
+#| label: homo-dist-2
+#| fig-width: 9
+#| fig-height: 4.0
+
+homo_hist + homo_red + homo_finish + homo_box(box_text) +
+    labs(subtitle = "Red dashed = sampling distribution implied by the usual SE formula")
+```
+:::
+
+::: {.fragment fragment-index=2}
+```{r}
+#| label: homo-dist-3
+#| fig-width: 9
+#| fig-height: 4.0
+
+homo_hist +
+    geom_histogram(data = homo_rejected,
+                   aes(y = after_stat(count) / (n_sims * bw_homo)),
+                   binwidth = bw_homo, center = 0,
+                   fill = "darkorange", color = "white") +
+    annotate("text", x = c(-1, 1) * 3.2 * homo_true_sd, y = ylim_homo[2] * 0.3,
+             label = "Reject", color = "darkorange", fontface = "bold", size = 5) +
+    homo_red + homo_finish +
+    homo_box(paste0(box_text, "\nType I error: ", pct(homo_reject_rate))) +
+    labs(subtitle = "Orange = samples where we reject the (true) null at the 5% level")
+```
+:::
+:::
+
+::: {.fragment fragment-index=1}
+Red matches blue: the usual SE gets the spread right.
+:::
+
+::: {.fragment fragment-index=2}
+We wrongly reject $H_0: \beta_1 = 0$ in `r pct(homo_reject_rate)` of samples: on target.
+:::
+
+
+## Heteroskedasticity: The Usual SE Is Too Small
+
+**Predict:** with heteroskedasticity and the usual SEs, how often will we falsely reject: 5%, 10%, or 25%?
+
+```{r}
+#| label: hetero-setup
+
+xlim_fix <- c(-1, 1) * quantile(abs(hetero_results$beta1_hat), 0.99) * 1.3
+ylim_fix <- c(0, dnorm(0, 0, hetero_avg_se) * 1.15)
+
+# Fixed bins centered on 0, so the histogram is identical on every click and slide
+bw_het <- hetero_true_sd / 4
+
+het_hist <- function(data = hetero_results, fill = "steelblue", alpha = 0.7) {
+    geom_histogram(data = data, aes(y = after_stat(count) / (n_sims * bw_het)),
+                   binwidth = bw_het, center = 0,
+                   fill = fill, alpha = alpha, color = "white")
+}
+
+het_red   <- stat_function(fun = dnorm, args = list(mean = 0, sd = hetero_avg_se),
+                           color = "red", linewidth = 1.3, linetype = "dashed")
+het_green <- stat_function(fun = dnorm, args = list(mean = 0, sd = avg_se_robust),
+                           color = "darkgreen", linewidth = 1.3)
+
+het_finish <- list(
+    geom_vline(xintercept = 0, linetype = "dotted", linewidth = 0.8),
+    coord_cartesian(xlim = xlim_fix, ylim = ylim_fix),
+    labs(title = "Heteroskedastic: 2,000 Estimates of the Slope",
+         x = expression(hat(beta)[1]), y = "Density")
+)
+
+het_box <- function(label) {
+    annotate("label", x = xlim_fix[2], y = ylim_fix[2], label = label,
+             hjust = 1, vjust = 1, size = 4.5, fill = "white")
+}
+
+het_reject_text <- function(color) {
+    annotate("text", x = c(-1, 1) * 2.6 * hetero_true_sd, y = ylim_fix[2] * 0.3,
+             label = "Reject", color = color, fontface = "bold", size = 5)
+}
+
+het_box_usual <- paste0("True SD: ", signif(hetero_true_sd, 3),
+                        "\nAvg usual SE: ", signif(hetero_avg_se, 3))
+```
+
+::: {.r-stack}
+::: {.fragment fragment-index=1}
+```{r}
+#| label: hetero-dist-1
+#| fig-width: 9
+#| fig-height: 3.4
+
+ggplot(hetero_results, aes(x = beta1_hat)) +
+    het_hist() + het_red + het_finish + het_box(het_box_usual) +
+    labs(subtitle = "Blue = actual estimates | Red dashed = sampling distribution implied by the usual SE formula")
+```
+:::
+
+::: {.fragment fragment-index=2}
+```{r}
+#| label: hetero-dist-2
+#| fig-width: 9
+#| fig-height: 3.4
+
+ggplot(hetero_results, aes(x = beta1_hat)) +
+    het_hist() +
+    het_hist(data = filter(hetero_results, pval_ols < 0.05), fill = "darkorange", alpha = 1) +
+    het_reject_text("darkorange") +
+    het_red + het_finish +
+    het_box(paste0(het_box_usual, "\nType I error: ", pct(ols_reject_rate))) +
+    labs(subtitle = "Orange = samples where we reject the (true) null using the usual SE")
+```
+:::
+:::
+
+::: {.fragment fragment-index=1}
+The usual SE is `r scales::percent(1 - hetero_avg_se / hetero_true_sd)` too small: red is narrower than blue.
+:::
+
+::: {.fragment fragment-index=2}
+We wrongly reject $H_0: \beta_1 = 0$ in `r pct(ols_reject_rate)` of samples: double the 5% target.
+:::
+
+
+## The Fix: Robust Standard Errors {.smaller}
+
+In a simple regression, we can write both formulas the same way:
+
+$$\text{Usual (Unit 6):} \quad se(\hat{\beta}_1)^2 = \frac{\sum_{i=1}^{n} (x_i - \bar{x})^2 \, \hat{\sigma}^2}{SST_x^2} = \frac{\hat{\sigma}^2}{SST_x}$$
+
+$$\text{Robust:} \quad se(\hat{\beta}_1)^2 = \frac{\sum_{i=1}^{n} (x_i - \bar{x})^2 \, (\hat{\mu}_i)^2}{SST_x^2}$$
+
+. . .
+
+- The **only** difference: the usual formula gives every observation the **same** error variance, $\hat{\sigma}^2 = SSR/(n-2)$. The robust formula uses each observation's **own** squared residual, $(\hat{\mu}_i)^2$
+- If errors are bigger where $x$ is far from $\bar{x}$, the usual formula **averages that away**. The robust formula picks it up
+- Also called **heteroskedasticity-robust** or **White** standard errors
+
+
+## Why the Usual SE Is Too Small: The Movies
+
+```{r}
+#| label: movies-resid-setup
+
+# Residuals from regressing worldwide gross on budget
+m_bh <- lm(worldwide_gross ~ budget, data = movies)
+
+bh <- movies |>
+    mutate(resid = residuals(m_bh),
+           w     = (budget - mean(budget))^2)    # weight: how hard each film pulls on the slope
+
+sigma_bh     <- sqrt(sum(bh$resid^2) / (nrow(bh) - 2))
+se_usual_bh  <- sqrt(sigma_bh^2 / sum(bh$w))                 # usual formula
+se_robust_bh <- sqrt(sum(bh$w * bh$resid^2) / sum(bh$w)^2)   # robust formula
+
+out_small <- mean(abs(bh$resid[bh$budget <= 10]) > 2 * sigma_bh)
+out_big   <- mean(abs(bh$resid[bh$budget > 100]) > 2 * sigma_bh)
+
+res_base <- list(
+    geom_hline(yintercept = 0, color = "gray40"),
+    scale_x_continuous(labels = scales::dollar_format(suffix = "M")),
+    scale_y_continuous(labels = scales::dollar_format(suffix = "M")),
+    coord_cartesian(xlim = c(0, 175), ylim = range(bh$resid)),
+    labs(title = "Residuals from Regressing Worldwide Gross on Budget",
+         x = "Production budget", y = "Residual"),
+    theme(legend.position = "none")
+)
+
+res_band <- list(
+    annotate("rect", xmin = -Inf, xmax = Inf,
+             ymin = -2 * sigma_bh, ymax = 2 * sigma_bh, fill = "red", alpha = 0.08),
+    geom_hline(yintercept = c(-2, 2) * sigma_bh, color = "red",
+               linetype = "dashed", linewidth = 1)
+)
+
+res_dots <- geom_point(color = "steelblue", alpha = 0.35, size = 1.5)
+```
+
+::: {.r-stack}
+```{r}
+#| label: movies-resid-1
+#| fig-width: 9
+#| fig-height: 3.4
+
+ggplot(bh, aes(x = budget, y = resid)) +
+    res_dots + res_base +
+    labs(subtitle = "Each dot is one film")
+```
+
+::: {.fragment fragment-index=1}
+```{r}
+#| label: movies-resid-2
+#| fig-width: 9
+#| fig-height: 3.4
+
+ggplot(bh, aes(x = budget, y = resid)) +
+    res_band + res_dots + res_base +
+    labs(subtitle = "Red band = ±2 pooled SDs: the spread the usual formula assumes for every film")
+```
+:::
+
+::: {.fragment fragment-index=2}
+```{r}
+#| label: movies-resid-3
+#| fig-width: 9
+#| fig-height: 3.4
+
+ggplot(bh, aes(x = budget, y = resid)) +
+    res_band +
+    geom_point(aes(size = w), color = "steelblue", alpha = 0.35) +
+    scale_size_area(max_size = 7) +
+    res_base +
+    labs(subtitle = paste0("Dot size = how hard each film pulls on the slope (biggest far from the $",
+                           round(mean(bh$budget)), "M average budget)"))
+```
+:::
+:::
+
+Residuals fan out: big-budget films miss by far more.
+
+::: {.fragment fragment-index=1}
+Outside the band: `r scales::percent(out_big)` of films over \$100M, but only `r scales::percent(out_small, accuracy = 0.1)` under \$10M.
+:::
+
+::: {.fragment fragment-index=2}
+The big dots pull hardest on the slope *and* miss the most: robust SE `r round(se_robust_bh, 3)` vs. usual `r round(se_usual_bh, 3)`.
+:::
+
+
+## Robust SEs Match the Actual Spread
+
+```{r}
+#| label: robust-setup
+
+het_box_robust <- paste0("True SD: ", signif(hetero_true_sd, 3),
+                         "\nAvg usual SE: ", signif(hetero_avg_se, 3),
+                         "\nAvg robust SE: ", signif(avg_se_robust, 3))
+```
+
+::: {.r-stack}
+```{r}
+#| label: robust-fix-1
+#| fig-width: 9
+#| fig-height: 4
+
+ggplot(hetero_results, aes(x = beta1_hat)) +
+    het_hist() + het_red + het_green + het_finish + het_box(het_box_robust) +
+    labs(subtitle = "Sampling distributions implied by the usual SE formula (red dashed) and the robust SE formula (green)")
+```
+
+::: {.fragment fragment-index=1}
+```{r}
+#| label: robust-fix-2
+#| fig-width: 9
+#| fig-height: 4
+
+ggplot(hetero_results, aes(x = beta1_hat)) +
+    het_hist() +
+    het_hist(data = filter(hetero_results, pval_robust < 0.05), fill = "mediumseagreen", alpha = 1) +
+    het_reject_text("seagreen") +
+    het_red + het_green + het_finish +
+    het_box(paste0(het_box_robust, "\nType I error (robust): ", pct(robust_reject_rate))) +
+    labs(subtitle = "Green bars = samples where we reject the (true) null using the robust SE")
+```
+:::
+:::
+
+The green curve (robust SE) matches the actual spread of the estimates.
+
+::: {.fragment fragment-index=1}
+With robust SEs, we wrongly reject in `r pct(robust_reject_rate)` of samples, back near the 5% target.
+:::
+
+
+## Type I Error Rates
+
+```{r}
+#| label: type1-rates
+#| fig-width: 9
+#| fig-height: 4.6
+
+type1_data <- tibble(
+    Scenario = c("Homoskedastic\n(usual SE)",
+                 "Heteroskedastic\n(usual SE)",
+                 "Heteroskedastic\n(robust SE)"),
+    Rate = c(homo_reject_rate, ols_reject_rate, robust_reject_rate),
+    Status = c("Correct", "Inflated", "Correct")
+) |>
+    mutate(Scenario = factor(Scenario, levels = Scenario))
+
+ggplot(type1_data, aes(x = Scenario, y = Rate, fill = Status)) +
+    geom_col(width = 0.6) +
+    geom_hline(yintercept = 0.05, linetype = "dashed", color = "black", linewidth = 1) +
+    geom_text(aes(label = pct(Rate)), vjust = -0.5, size = 6, fontface = "bold") +
+    scale_fill_manual(values = c("Correct" = "steelblue", "Inflated" = "coral")) +
+    scale_y_continuous(labels = scales::percent,
+                       limits = c(0, max(type1_data$Rate) * 1.25)) +
+    labs(title = "How Often We Falsely Reject a True Null",
+         subtitle = "Dashed line = target 5% rate",
+         x = NULL, y = "Type I error rate") +
+    theme(legend.position = "none")
+```
+
+Robust SEs bring the false-positive rate back to about 5%.
+
+
+## Robust SEs in R: Back to the Movies {.smaller}
+
+From now on we use `feols()` from the **fixest** package: the same OLS estimates as `lm()`, and robust SEs take one argument.
+
+```{r}
+#| echo: true
+
+library(fixest)
+
+m_usual  <- feols(worldwide_gross ~ budget, data = movies)
+m_robust <- feols(worldwide_gross ~ budget, data = movies, vcov = "HC1")
+```
+
+```{r}
+#| label: movies-table
+
+modelsummary(
+    list("Usual SE" = m_usual, "Robust SE" = m_robust),
+    stars = c("*" = 0.1, "**" = 0.05, "***" = 0.01),
+    gof_map = "nobs"
+)
+```
+
+. . .
+
+Same coefficient (each \$1 of budget goes with \$`r round(coef(m_usual)["budget"], 2)` of worldwide gross), but the robust SE is `r scales::percent(se(m_robust)["budget"] / se(m_usual)["budget"] - 1)` larger. The usual SE **overstated our precision**.
+
+
+## Is Horror's Edge Real? {.smaller}
+
+Regress each film's return (worldwide gross ÷ budget) on genre dummies, with drama as the baseline (Unit 7):
+
+```{r}
+#| echo: true
+
+movies <- movies |> mutate(genre = relevel(factor(genre), ref = "Drama"))
+
+m_genre_usual  <- feols(roi ~ genre, data = movies)
+m_genre_robust <- feols(roi ~ genre, data = movies, vcov = "HC1")
+```
+
+```{r}
+#| label: genre-table
+
+genre_tab <- tibble(
+    Genre = sub("genre", "", names(coef(m_genre_usual))[-1]),
+    `Gap vs. drama` = coef(m_genre_usual)[-1],
+    `Usual SE` = se(m_genre_usual)[-1],
+    `Robust SE` = se(m_genre_robust)[-1],
+    `Usual t` = tstat(m_genre_usual)[-1],
+    `Robust t` = tstat(m_genre_robust)[-1]
+)
+
+knitr::kable(genre_tab, digits = 2)
+
+t_horror_u   <- round(tstat(m_genre_usual)["genreHorror"], 1)
+t_horror_r   <- round(tstat(m_genre_robust)["genreHorror"], 1)
+se_ratio_hor <- round(se(m_genre_robust)["genreHorror"] / se(m_genre_usual)["genreHorror"], 1)
+se_ratio_act <- round(se(m_genre_robust)["genreAction"] / se(m_genre_usual)["genreAction"], 2)
+```
+
+. . .
+
+- **Horror:** the robust SE is `r se_ratio_hor` times as large, so $t$ falls from `r t_horror_u` to `r t_horror_r`. The edge is still significant, but far less certain
+- **Action:** the robust SE is *smaller*, `r se_ratio_act` times the usual SE. The usual formula pools horror's wild returns into one $\hat{\sigma}^2$ for **every** genre; the robust formula uses each film's own $(\hat{\mu}_i)^2$
+
+
+## What If There's No Heteroskedasticity?
+
+Is there a **cost** to using robust SEs when we don't need them? Back to the homoskedastic simulation, which computed both SEs each time:
+
+```{r}
+#| label: homo-robust
+#| fig-width: 9
+#| fig-height: 4
+
+homo_results |>
+    select(se_ols, se_robust) |>
+    pivot_longer(everything(), names_to = "type", values_to = "se") |>
+    mutate(type = factor(ifelse(type == "se_ols", "Usual SE", "Robust SE"),
+                         levels = c("Usual SE", "Robust SE"))) |>
+    ggplot(aes(x = se, color = type, fill = type)) +
+    geom_density(alpha = 0.2, linewidth = 1.2) +
+    scale_color_manual(values = c("Usual SE" = "steelblue", "Robust SE" = "darkgreen")) +
+    scale_fill_manual(values = c("Usual SE" = "steelblue", "Robust SE" = "darkgreen")) +
+    labs(title = "Homoskedastic: The Two SEs Across 2,000 Samples",
+         x = "Standard error", y = "Density", color = NULL, fill = NULL) +
+    theme(legend.position = "top")
+```
+
+
+## The Cost Is Small
+
+- **Same center:** the average usual SE is `r round(homo_avg_se, 4)`; the average robust SE is `r round(homo_avg_se_robust, 4)`
+- **A bit noisier:** robust SEs vary `r scales::percent(sd(homo_results$se_robust) / sd(homo_results$se_ols) - 1)` more from sample to sample, because they use each $(\hat{\mu}_i)^2$ instead of one pooled $\hat{\sigma}^2$
+- **Type I error:** `r pct(homo_reject_rate)` (usual) vs. `r pct(homo_robust_reject)` (robust), both about 5%
+
+. . .
+
+::: {.highlight-box}
+Small cost when unnecessary. Large benefit when needed. **Use robust SEs by default.**
+:::
+
+
+## Summary {.smaller}
+
+::: {.nonincremental}
+1. **Heteroskedasticity**: the error variance changes with $x$. It's common: movie grosses spread out as budgets grow
+2. $\hat{\beta}$ is still **unbiased** (center ✅), but the usual SEs are **wrong** (spread ❌)
+3. Wrong SEs → too many false positives: `r pct(ols_reject_rate)` instead of 5% in our simulation
+4. **Robust SEs** replace the pooled $\hat{\sigma}^2$ with each observation's own $(\hat{\mu}_i)^2$
+5. Using robust SEs when they aren't needed costs almost nothing
+:::
+
+. . .
+
+::: {.highlight-box}
+**Bottom line**: always use `vcov = "HC1"` in `feols()`. In Unit 10 (binary outcomes), heteroskedasticity is guaranteed, so you'll use this every time.
+:::

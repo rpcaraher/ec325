@@ -585,12 +585,13 @@ use a different formula for the standard errors---one that accounts for heterosk
 These are called **heteroskedasticity-robust standard errors** (also known as White or Huber-White standard errors).
 
 The standard OLS variance formula is:
-$$Var(\hat{\beta}_1) = \frac{\sum_{i=1}^{n}\hat{u}_i^2 / (n-2)}{SST_x^2}$$
+$$Var(\hat{\beta}_1) = \frac{\sum_{i=1}^{n}\hat{u}_i^2 / (n-2)}{SST_x}$$
 
 The heteroskedasticity-robust formula is:
 $$Var(\hat{\beta}_1) = \frac{\sum_{i=1}^{n}(x_i - \bar{x})^2\hat{u}_i^2}{SST_x^2}$$
 
-The key, intuitive difference is that robust standard errors **weight each squared residual by how far its $x_i$ is from the mean**.
+The key difference is that the standard formula uses **one pooled estimate** of the error variance, $\hat{\sigma}^2 = \sum_{i=1}^{n}\hat{u}_i^2 / (n-2)$, for every observation,
+while the robust formula uses **each observation's own squared residual** $\hat{u}_i^2$, weighted by $(x_i - \bar{x})^2$.
 This accounts for the fact that residuals may have different variances at different values of $x$.
 
 ### A Small Numerical Example
@@ -896,7 +897,7 @@ homo_robust_avg_se <- mean(homo_robust_results$se_robust)
 #| message: false
 #| warning: false
 #| label: fig-homo-robust-comparison
-#| fig-cap: "Under homoskedasticity, robust standard errors are slightly larger than standard OLS SEs, but the Type I error rate remains close to 5%."
+#| fig-cap: "Under homoskedasticity, robust and standard OLS SEs have nearly the same average, though robust SEs vary a bit more from sample to sample. The Type I error rate remains close to 5% either way."
 #| fig-width: 10
 #| fig-height: 4
 
@@ -916,7 +917,7 @@ ggplot(homo_se_comparison, aes(x = se, fill = method)) +
     scale_fill_manual(values = c("steelblue", "darkgreen")) +
     labs(
         title = "Standard Errors Under Homoskedasticity: OLS vs. Robust",
-        subtitle = "Robust SEs are slightly larger on average, but not by much",
+        subtitle = "Nearly the same average; robust SEs are a bit more spread out",
         x = "Standard Error",
         y = "Density",
         fill = ""
@@ -932,9 +933,9 @@ meaning wider confidence intervals and lower power.
 In practice the two distributions nearly overlap.
 
 The two SE estimates track each other closely.
-The average robust SE (`r round(homo_robust_avg_se, 4)`) is slightly
-larger than the average OLS SE (`r round(homo_ols_avg_se, 4)`)---a
-difference of about `r scales::percent((homo_robust_avg_se - homo_ols_avg_se) / homo_ols_avg_se, accuracy = 0.1)`.
+The average robust SE (`r round(homo_robust_avg_se, 4)`) and the average OLS SE (`r round(homo_ols_avg_se, 4)`) are nearly identical.
+The robust SEs are a bit noisier: their standard deviation across simulations is
+`r scales::percent(sd(homo_robust_results$se_robust) / sd(homo_robust_results$se_ols) - 1)` larger.
 The Type I error rate is
 `r scales::percent(homo_robust_reject, accuracy = 0.1)` with robust SEs
 versus `r scales::percent(homo_ols_reject, accuracy = 0.1)` with standard SEs---both
