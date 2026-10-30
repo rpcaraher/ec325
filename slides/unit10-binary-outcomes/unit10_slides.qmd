@@ -1,0 +1,710 @@
+---
+title: "Binary Outcomes"
+subtitle: "EC 325: Econometrics"
+author: "Prof. Caraher"
+institute: "Colby College"
+date: today
+format:
+  revealjs:
+    theme: colby-theme.scss
+    slide-number: true
+    incremental: true
+    embed-resources: true
+    fig-align: center
+    code-overflow: wrap
+    footer: "EC325 | Unit 10 | Binary Outcomes"
+    scrollable: true
+execute:
+  echo: false
+  message: false
+  warning: false
+  cache: true
+---
+
+```{r}
+#| label: setup
+#| cache: false
+
+library(tidyverse)
+library(wooldridge)
+library(fixest)
+library(modelsummary)
+library(patchwork)
+
+options(scipen = 999)
+
+theme_set(theme_minimal(base_size = 16) +
+          theme(plot.title = element_text(face = "bold", size = 18),
+                plot.subtitle = element_text(size = 13, color = "gray40"),
+                panel.grid.minor = element_blank()))
+```
+
+
+## Where We Are
+
+- We've been building a regression toolkit all semester
+- Started with bivariate OLS, added multiple regression, statistical inference
+- Incorporated **qualitative information on the right-hand side**: dummy variables for categories, interaction effects for differential slopes
+- Made our models more flexible: polynomials, logs, robust SEs
+
+. . .
+
+Today: what happens when the **left-hand side** --- the dependent variable --- is qualitative?
+
+
+## Do Young Children Keep Women From Working? {.smaller}
+
+```{r}
+#| label: data-setup
+
+lf_data <- wooldridge::mroz
+
+lfp_by_kids <- lf_data |>
+    group_by(kidslt6) |>
+    summarise(pct_inlf = mean(inlf), n = n())
+
+share_kids <- sprintf("%.1f", 100 * lfp_by_kids$pct_inlf)
+drop_kids <- round(-diff(100 * lfp_by_kids$pct_inlf))
+```
+
+The `mroz` data: **753 married women** in 1975. `r round(100 * mean(lf_data$inlf))`% were in the labor force.
+
+**Predict:** how much less likely is a woman with one child under 6 to be in the labor force than a woman with none: 5, 20, or 40 percentage points?
+
+. . .
+
+```{r}
+#| label: kids-lfp
+#| fig-width: 8
+#| fig-height: 3
+
+ggplot(lfp_by_kids, aes(x = factor(kidslt6), y = pct_inlf)) +
+    geom_col(fill = "steelblue", width = 0.5) +
+    geom_text(aes(label = paste0(sprintf("%.1f", pct_inlf * 100), "%\n(n=", n, ")")),
+              vjust = -0.3, size = 4) +
+    scale_y_continuous(labels = scales::percent_format(), limits = c(0, 0.8)) +
+    labs(x = "Number of Children Under Age 6",
+         y = "Share in Labor Force",
+         title = "Labor Force Participation by Number of Young Children") +
+    theme(plot.title = element_text(hjust = 0.5))
+```
+
+**`r drop_kids[1]` points lower** (`r share_kids[1]`% → `r share_kids[2]`%). The second child costs only `r drop_kids[2]` more (→ `r share_kids[3]`%). We'll come back to that.
+
+
+## When $y$ Is Binary, $\hat{y}$ Is a Probability {.smaller}
+
+Labor force participation is a **binary** outcome: $y = 1$ if a woman is in the labor force, $y = 0$ if not.
+
+. . .
+
+What does $E(y \mid \mathbf{x})$ mean when $y$ can only be 0 or 1?
+
+$$
+\begin{aligned}
+E(y \mid \mathbf{x}) &= \textstyle\sum [\text{value} \times P(\text{value})] \\
+&= 1 \times P(y = 1 \mid \mathbf{x}) + 0 \times P(y = 0 \mid \mathbf{x}) \\
+&= P(y = 1 \mid \mathbf{x})
+\end{aligned}
+$$
+
+. . .
+
+OLS estimates $E(y \mid \mathbf{x})$, so with a binary $y$ it estimates a **probability**.
+
+::: {.highlight-box}
+With a binary dependent variable, $\hat{y}$ is the **predicted probability** that $y = 1$, given $\mathbf{x}$.
+:::
+
+
+## The Linear Probability Model {.smaller}
+
+Run OLS with a binary $y$. This is the **linear probability model** (LPM):
+
+$$y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots + \beta_k x_k + \mu$$
+
+::: {.highlight-box}
+$\hat{\beta}_j$ = the change in the **probability** that $y = 1$ for a one-unit increase in $x_j$, holding all else constant.
+:::
+
+. . .
+
+::: {.callout-warning}
+## Say "percentage points," not "percent"
+If $\hat{\beta}_1 = -0.15$: "A one-unit increase in $x_1$ **decreases the probability** of $y = 1$ by **15 percentage points**."
+
+Going from 0.60 to 0.45 is a 15 **percentage point** decrease but a 25 **percent** decrease ($0.15 / 0.60 = 0.25$).
+:::
+
+
+## Estimating the LPM {.smaller}
+
+Back to `mroz`: what predicts whether a married woman is in the labor force?
+
+::: {.columns}
+::: {.column width="50%"}
+::: {.nonincremental}
+- `inlf` = 1 if in the labor force, 0 otherwise
+- `kidslt6` = number of children under age 6
+- `kidsge6` = number of children aged 6--18
+:::
+:::
+
+::: {.column width="50%"}
+::: {.nonincremental}
+- `nwifeinc` = family income minus her earnings (thousands of \$)
+- `educ` = her years of education
+:::
+:::
+:::
+
+```{r}
+#| echo: true
+
+reg_lpm <- feols(inlf ~ kidslt6 + kidsge6 + nwifeinc + educ,
+                 data = lf_data)
+summary(reg_lpm)
+```
+
+
+## Interpreting the Coefficients {.smaller}
+
+```{r}
+#| label: lpm-coefs
+#| cache: false
+
+b_lpm <- coef(reg_lpm)
+```
+
+::: {.columns}
+::: {.column width="50%"}
+### `kidslt6`: $\hat{\beta}_1 \approx `r round(b_lpm["kidslt6"], 3)`$
+
+Each additional child under 6 **decreases** the probability of being in the labor force by about `r round(-100 * b_lpm["kidslt6"])` percentage points.
+
+### `educ`: $\hat{\beta}_4 \approx `r round(b_lpm["educ"], 3)`$
+
+Each additional year of education **increases** it by about `r round(100 * b_lpm["educ"])` percentage points.
+:::
+
+::: {.column width="50%"}
+### `kidsge6`: $\hat{\beta}_2 \approx `r round(b_lpm["kidsge6"], 3)`$
+
+Older children have little effect: small and not statistically significant.
+
+### `nwifeinc`: $\hat{\beta}_3 \approx `r round(b_lpm["nwifeinc"], 3)`$
+
+Each additional \$1,000 of other family income decreases it by about `r round(-100 * b_lpm["nwifeinc"], 1)` percentage points.
+:::
+:::
+
+. . .
+
+The LPM is simple and intuitive, but it has **two problems**: built-in heteroskedasticity, and out-of-bounds predictions (below 0 or above 1).
+
+
+## Problem 1: Built-In Heteroskedasticity {.smaller}
+
+For a given $\mathbf{x}$, the error $\mu = y - p(\mathbf{x})$, where $p(\mathbf{x}) = E(y \mid \mathbf{x})$, can take only **two values**:
+
+- If $y = 1$: $\;\mu = 1 - p(\mathbf{x})$, which happens with probability $p(\mathbf{x})$
+- If $y = 0$: $\;\mu = -p(\mathbf{x})$, which happens with probability $1 - p(\mathbf{x})$
+
+. . .
+
+$$\text{Var}(\mu \mid \mathbf{x}) = p(\mathbf{x})\big[1 - p(\mathbf{x})\big]^2 + \big[1 - p(\mathbf{x})\big]\big[p(\mathbf{x})\big]^2 = p(\mathbf{x})\big(1 - p(\mathbf{x})\big)$$
+
+. . .
+
+::: {.columns}
+::: {.column width="45%"}
+The variance depends on $p(\mathbf{x})$, so it **changes with $\mathbf{x}$**. That's heteroskedasticity by definition: Gauss-Markov assumption 5 fails.
+
+It is largest at $p = 0.5$ and shrinks toward 0 and 1.
+:::
+
+::: {.column width="55%"}
+```{r}
+#| label: het-variance
+#| fig-width: 5.5
+#| fig-height: 3
+
+p_seq <- seq(0.01, 0.99, by = 0.01)
+ggplot(tibble(p = p_seq, v = p_seq * (1 - p_seq)), aes(x = p, y = v)) +
+    geom_line(color = "steelblue", linewidth = 1.2) +
+    geom_point(data = tibble(p = 0.5, v = 0.25), size = 3, color = "#D55E00") +
+    annotate("text", x = 0.5, y = 0.215, label = "Max at p = 0.5",
+             color = "#D55E00", size = 4.5) +
+    scale_y_continuous(limits = c(0, 0.27)) +
+    labs(x = "p(x)", y = "Var(error) = p(1 - p)",
+         title = "Error Variance in the LPM")
+```
+:::
+:::
+
+
+## Visualizing LPM Heteroskedasticity
+
+```{r}
+#| label: het-residuals
+#| fig-width: 9
+#| fig-height: 4
+
+set.seed(42)
+n_sim <- 200
+x_sim <- runif(n_sim, -3, 3)
+p_true <- plogis(-1 + 1.5 * x_sim)
+y_sim <- rbinom(n_sim, 1, p_true)
+sim_df <- tibble(x = x_sim, y = y_sim)
+lpm_sim <- lm(y ~ x, data = sim_df)
+sim_df$fitted <- fitted(lpm_sim)
+
+ggplot(sim_df, aes(x = x, y = y)) +
+    geom_segment(aes(xend = x, yend = fitted), color = "gray60", alpha = 0.4) +
+    geom_point(aes(color = factor(y)), alpha = 0.7, size = 2) +
+    geom_smooth(method = "lm", se = FALSE, color = "darkred", linewidth = 1, linetype = "dashed") +
+    scale_color_manual(values = c("0" = "steelblue", "1" = "#D55E00"),
+                       labels = c("y = 0", "y = 1"), name = NULL) +
+    annotate("label", x = -2.2, y = 0.6, size = 3.5, fill = "white", label = "Low p̂ → small residuals") +
+    annotate("label", x = 0.8, y = -0.18, size = 3.5, fill = "white", label = "p̂ ≈ 0.5 → large residuals") +
+    annotate("label", x = 2.3, y = 0.4, size = 3.5, fill = "white", label = "High p̂ → small residuals") +
+    labs(x = "x", y = "y (0 or 1)",
+         title = "Residuals Fan Out in the Middle",
+         subtitle = "Residual spread is largest where p̂ ≈ 0.5 and smallest near 0 or 1") +
+    theme(legend.position = "bottom")
+```
+
+
+## The Fix: Robust Standard Errors
+
+We already know the fix from Unit 9: `vcov = "HC1"`.
+
+```{r}
+#| echo: true
+
+lpm_robust <- feols(inlf ~ kidslt6 + kidsge6 + nwifeinc + educ,
+                    vcov = "HC1", data = lf_data)
+rbind(usual = se(reg_lpm), robust = se(lpm_robust)) |> round(4)
+```
+
+```{r}
+#| label: se-change
+#| cache: false
+
+se_shrink_kids <- round(100 * (1 - se(lpm_robust)["kidslt6"] / se(reg_lpm)["kidslt6"]))
+```
+
+. . .
+
+- The $\hat{\beta}$s are the same. Here the SEs barely move (the one on `kidslt6` is `r se_shrink_kids`% *smaller*), but you can't know that in advance: **always use robust SEs with the LPM.**
+- Problem 1: solved. On to Problem 2.
+
+
+## Problem 2: Out-of-Bounds Predictions
+
+```{r}
+#| label: oob
+#| fig-width: 9
+#| fig-height: 4
+
+lf_data <- lf_data |>
+    mutate(pred_lpm = predict(reg_lpm, type = "response"),
+           out_of_bounds = pred_lpm < 0 | pred_lpm > 1)
+
+n_below <- sum(lf_data$pred_lpm < 0)
+n_above <- sum(lf_data$pred_lpm > 1)
+lowest <- lf_data |> slice_min(pred_lpm, n = 1)
+highest <- lf_data |> slice_max(pred_lpm, n = 1)
+
+set.seed(325)
+ggplot(lf_data, aes(x = kidslt6, y = pred_lpm)) +
+    annotate("rect", xmin = -0.5, xmax = 3.5, ymin = -0.5, ymax = 0,
+             alpha = 0.12, fill = "red") +
+    annotate("rect", xmin = -0.5, xmax = 3.5, ymin = 1, ymax = 1.15,
+             alpha = 0.12, fill = "red") +
+    geom_hline(yintercept = c(0, 1), linetype = "dashed", color = "red", linewidth = 0.8) +
+    geom_jitter(aes(color = out_of_bounds, size = out_of_bounds),
+                width = 0.15, height = 0, alpha = 0.6) +
+    scale_color_manual(values = c("FALSE" = "steelblue", "TRUE" = "red")) +
+    scale_size_manual(values = c("FALSE" = 1.5, "TRUE" = 3.5)) +
+    annotate("label", x = 2.35, y = lowest$pred_lpm, hjust = 1, size = 3.8,
+             label = paste0("p̂ = ", round(lowest$pred_lpm, 2), ": ", lowest$kidslt6,
+                            " kids under 6, $", round(lowest$nwifeinc),
+                            "k other income")) +
+    annotate("label", x = 0.35, y = 1.09, hjust = 0, size = 3.8,
+             label = paste0("p̂ = ", round(highest$pred_lpm, 3))) +
+    scale_y_continuous(breaks = seq(-0.4, 1, by = 0.2)) +
+    coord_cartesian(ylim = c(-0.48, 1.12)) +
+    labs(x = "Number of Children Under Age 6",
+         y = "LPM Predicted Probability",
+         title = "Every Woman's LPM Prediction",
+         subtitle = paste0("Red: impossible probabilities (", n_below,
+                           " below 0, ", n_above, " above 1)")) +
+    theme(legend.position = "none")
+```
+
+The LPM is a **straight line**, so extreme enough $\mathbf{x}$ values push it past 0 or 1. Here `r n_below + n_above` of `r nrow(lf_data)` women get impossible predictions, as low as `r round(lowest$pred_lpm, 2)`. No SE fixes this: we need a different model.
+
+
+## Logit: Bend the Line Into an S
+
+**Logistic regression** (logit) wraps the linear index in a function $G(\cdot)$ that always stays between 0 and 1:
+
+$$P(y = 1 \mid \mathbf{x}) = G(\beta_0 + \beta_1 x_1 + \cdots + \beta_k x_k), \qquad G(z) = \frac{\exp(z)}{1 + \exp(z)}$$
+
+```{r}
+#| label: logistic
+#| fig-width: 9
+#| fig-height: 3.4
+
+z_seq <- seq(-6, 6, by = 0.1)
+ggplot(tibble(z = z_seq, G = plogis(z_seq)), aes(x = z, y = G)) +
+    geom_line(color = "steelblue", linewidth = 1.4) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "gray70") +
+    geom_hline(yintercept = 1, linetype = "dashed", color = "gray70") +
+    geom_point(data = tibble(z = 0, G = 0.5), size = 3, color = "#D55E00") +
+    annotate("text", x = -0.3, y = 0.62, label = "G(0) = 0.5", color = "#D55E00",
+             size = 5, hjust = 1) +
+    annotate("text", x = -4.5, y = 0.15, label = "Approaches 0\nbut never reaches it",
+             color = "gray40", size = 3.5, fontface = "italic") +
+    annotate("text", x = 4.5, y = 0.85, label = "Approaches 1\nbut never reaches it",
+             color = "gray40", size = 3.5, fontface = "italic") +
+    annotate("segment", x = -1.5, xend = 1.5, y = 0.25, yend = 0.75,
+             color = "#009E73", linewidth = 0.8, linetype = "dashed") +
+    annotate("text", x = 2.2, y = 0.4, label = "Nearly linear\nin the middle",
+             color = "#009E73", size = 3.5, fontface = "italic") +
+    labs(x = "z (linear index)", y = "G(z)",
+         title = "The Logistic (Sigmoid) Function",
+         subtitle = "S-shaped, always between 0 and 1, and symmetric around z = 0")
+```
+
+
+## Estimating Logit in R {.smaller}
+
+$G(\cdot)$ is nonlinear, so we can't use OLS. OLS minimizes $\sum(y_i - \hat{y}_i)^2$; **maximum likelihood** (MLE) instead picks the $\beta$s that make the observed data **most probable**: high $\hat{p}_i$ when $y_i = 1$, low $\hat{p}_i$ when $y_i = 0$.
+
+::: {.columns}
+::: {.column width="60%"}
+```{r}
+#| echo: true
+
+logit_reg <- feglm(inlf ~ kidslt6 + kidsge6 +
+                     nwifeinc + educ,
+                   family = binomial(link = "logit"),
+                   data = lf_data)
+```
+
+```{r}
+#| label: lpm-logit-table
+
+modelsummary(
+  list("LPM (robust SEs)" = lpm_robust,
+       "Logit" = logit_reg),
+  stars = c('*' = 0.1,
+            '**' = 0.05,
+            '***' = 0.01),
+  coef_omit = "Intercept",
+  gof_map = "nobs")
+```
+:::
+
+::: {.column width="40%"}
+- `feglm()` works like `feols()`; `family = binomial(link = "logit")` tells it to use the logistic function
+- **Signs** match across the two models
+- **Magnitudes** don't: logit coefficients are on a different scale, the **log-odds**
+:::
+:::
+
+
+## Logit Coefficients Are Log-Odds {.smaller}
+
+In the LPM, $\hat{\beta}_j$ is the change in **probability**. In logit, it is the change in the **log-odds**.
+
+. . .
+
+The **odds** compare yes to no: $\;\text{Odds} = \frac{P(y = 1)}{1 - P(y = 1)}$. If $P = 0.75$, the odds are $0.75 / 0.25 = 3$ ("3 to 1 in favor").
+
+Logit is linear in the **log** of the odds:
+
+$$\ln\left(\frac{P(y = 1 \mid \mathbf{x})}{1 - P(y = 1 \mid \mathbf{x})}\right) = \beta_0 + \beta_1 x_1 + \cdots + \beta_k x_k$$
+
+. . .
+
+Few people think in log-odds, so there are three ways to read a logit coefficient:
+
+::: {.nonincremental}
+1. **Log-odds**: use the sign. Positive coefficients increase the probability; negative ones decrease it.
+2. **Odds ratios**: exponentiate the coefficient.
+3. **Marginal effects**: the change in probability, directly comparable to the LPM.
+:::
+
+
+## Interpretation 2: Odds Ratios {.smaller}
+
+The **odds ratio** $\exp(\hat{\beta}_j)$ is what a one-unit increase in $x_j$ multiplies the odds by.
+
+```{r}
+#| label: odds-ratios
+#| fig-width: 8
+#| fig-height: 3.5
+
+logit_coefs <- coef(logit_reg)[-1]
+logit_ses <- se(logit_reg)[-1]
+
+or_data <- tibble(
+    variable = c("Kids < 6", "Kids 6-18", "Non-wife Income", "Education"),
+    odds_ratio = exp(logit_coefs),
+    lower = exp(logit_coefs - 1.96 * logit_ses),
+    upper = exp(logit_coefs + 1.96 * logit_ses)
+)
+
+or_kids <- exp(coef(logit_reg)["kidslt6"])
+or_educ <- exp(coef(logit_reg)["educ"])
+
+ggplot(or_data, aes(x = odds_ratio, y = reorder(variable, odds_ratio))) +
+    geom_vline(xintercept = 1, linetype = "dashed", color = "gray50") +
+    geom_pointrange(aes(xmin = lower, xmax = upper), color = "steelblue", size = 0.8) +
+    labs(x = "Odds Ratio (with 95% CI)", y = NULL,
+         title = "Odds Ratios for Labor Force Participation",
+         subtitle = "Values < 1 reduce the odds; values > 1 increase the odds")
+```
+
+- **Kids < 6**: OR $\approx$ `r round(or_kids, 2)`. Each young child multiplies the odds of being in the labor force by `r round(or_kids, 2)`, cutting them by `r round(100 * (1 - or_kids))`%.
+- **Education**: OR $\approx$ `r round(or_educ, 2)`. Each year of education raises the odds by `r round(100 * (or_educ - 1))`%.
+
+
+## Interpretation 3: Marginal Effects {.smaller}
+
+In logit, the effect of $x_j$ on the probability **depends on where you start**. To compute it:
+
+::: {.nonincremental}
+1. **Pick values** for all the $x$ variables and compute the **predicted probability**
+2. **Increase $x_j$ by 1**, keeping everything else the same, and predict again
+3. **Subtract**: marginal effect $= \hat{P}(y = 1 \mid x_j + 1) - \hat{P}(y = 1 \mid x_j)$
+:::
+
+. . .
+
+`predict()` does steps 1 and 2. Give it the fitted model and a `newdata` data frame with the $x$ values:
+
+```{r}
+#| echo: true
+#| eval: false
+
+predict(my_model, newdata = data.frame(x1 = 5, x2 = 10), type = "response")
+```
+
+- The column names in `newdata` must **exactly match** the variable names in the model
+- **Always include `type = "response"`** so `predict()` returns a **probability**. Without it, some functions (like base R's `glm()`) return the log-odds instead.
+
+
+## Marginal Effects: Two Women {.smaller}
+
+Woman A has **no children under 6**, one older child, \$20k of other family income, and 12 years of education. What does **one young child** do?
+
+```{r}
+#| echo: true
+
+woman_a <- data.frame(kidslt6 = 0, kidsge6 = 1, nwifeinc = 20, educ = 12)
+p0 <- predict(logit_reg, newdata = woman_a, type = "response")
+p1 <- predict(logit_reg, newdata = woman_a |> mutate(kidslt6 = 1),
+              type = "response")
+p1 - p0
+```
+
+. . .
+
+Woman B is identical except for **\$50k** of other family income:
+
+```{r}
+#| label: two-women
+
+woman_b <- woman_a |> mutate(nwifeinc = 50)
+p0_b <- predict(logit_reg, newdata = woman_b, type = "response")
+p1_b <- predict(logit_reg, newdata = woman_b |> mutate(kidslt6 = 1),
+                type = "response")
+
+tibble(Woman = c("A", "B"),
+       `Other income` = c("\\$20k", "\\$50k"),
+       `P(in LF), 0 kids < 6` = c(p0, p0_b),
+       `P(in LF), 1 kid < 6` = c(p1, p1_b),
+       `Marginal effect` = c(p1 - p0, p1_b - p0_b)) |>
+    knitr::kable(digits = 3, align = "llccc")
+```
+
+Same child, different effect: B starts lower on the S-curve, where it is flatter. As in any nonlinear model, the effect depends on where you start.
+
+
+## Marginal Effect at the Mean {.smaller}
+
+Which $x$ values should we report? A common choice is the **mean** of every explanatory variable.
+
+```{r}
+#| echo: true
+
+mean_data <- lf_data |>
+    summarize(kidslt6 = mean(kidslt6), kidsge6 = mean(kidsge6),
+              nwifeinc = mean(nwifeinc), educ = mean(educ))
+p_mean  <- predict(logit_reg, newdata = mean_data, type = "response")
+p_plus1 <- predict(logit_reg, newdata = mean_data |> mutate(kidslt6 = kidslt6 + 1),
+                   type = "response")
+p_plus1 - p_mean
+```
+
+. . .
+
+The LPM coefficient is `r round(b_lpm["kidslt6"], 3)`: **close**, though not identical. A woman with average characteristics has a predicted probability of `r round(p_mean, 2)`, near the middle of the S-curve, where it is nearly linear.
+
+::: {.highlight-box}
+Near the center of the probability distribution, the LPM and logit produce **similar marginal effects**. They diverge mainly at the tails.
+:::
+
+
+## LPM vs. Logit by Number of Young Children {.smaller}
+
+```{r}
+#| label: by-kids
+#| cache: false
+
+kids_grid <- tibble(kidslt6 = 0:3,
+                    kidsge6 = mean(lf_data$kidsge6),
+                    nwifeinc = mean(lf_data$nwifeinc),
+                    educ = mean(lf_data$educ))
+
+pred_lpm_kids <- round(100 * predict(reg_lpm, newdata = kids_grid, type = "response"), 1)
+pred_logit_kids <- round(100 * predict(logit_reg, newdata = kids_grid, type = "response"), 1)
+step_logit <- sprintf("%.1f", -diff(pred_logit_kids))
+```
+
+Back to the opening question, with both models. Predicted probability of being in the labor force, with the other variables at their means:
+
+```{r}
+#| label: by-kids-table
+
+tibble(`Children under 6` = 0:3,
+       LPM = paste0(sprintf("%.1f", pred_lpm_kids), "%"),
+       Logit = paste0(sprintf("%.1f", pred_logit_kids), "%")) |>
+    knitr::kable(align = "ccc")
+```
+
+. . .
+
+- **LPM:** the same `r round(-100 * b_lpm["kidslt6"], 1)` points lower for every child, so 3 children gives a **negative** probability
+- **Logit:** `r step_logit[1]`, then `r step_logit[2]`, then `r step_logit[3]` points lower. The steps shrink as the S-curve flattens near 0, so it never goes below 0.
+
+
+## Prediction vs. Causality {.smaller}
+
+Which model fits depends on **the question you're asking**.
+
+::: {.columns}
+::: {.column width="50%"}
+### Causal question
+*If $x$ changes, how does $P(y = 1)$ change?*
+
+::: {.nonincremental}
+- Does a young child **cause** a woman to leave the labor force?
+- A causal $\hat{\beta}$ comes from the **research design**, not from LPM vs. logit
+- LPM: the effect directly, in percentage points
+:::
+:::
+
+::: {.column width="50%"}
+### Prediction question
+*For this person, what is $P(y = 1)$?*
+
+::: {.nonincremental}
+- Which loan applicants will **default**?
+- Coefficients need not be causal; probabilities must be accurate
+- Logit: predictions always between 0 and 1
+:::
+:::
+:::
+
+. . .
+
+::: {.highlight-box}
+Our LPM's `r round(b_lpm["kidslt6"], 2)` on `kidslt6` is a **correlation**, not a clean causal effect: women with young children may differ in other ways that affect whether they work. Fixed effects, DiD, IV and RD (Units 11--15) are about getting causal effects.
+:::
+
+
+## LPM or Logit? {.smaller}
+
+| | LPM | Logistic Regression |
+|:---|:---|:---|
+| **Shape** | Straight line: $P(y = 1) = \mathbf{x}\boldsymbol{\beta}$ | S-curve: $P(y = 1) = G(\mathbf{x}\boldsymbol{\beta})$ |
+| **Estimation** | OLS | Maximum Likelihood |
+| **Coefficients** | Change in probability | Change in log-odds |
+| **Interpretation** | Direct and intuitive | Requires conversion (OR or ME) |
+| **Predictions** | Can fall outside [0, 1] | Always in (0, 1) |
+| **Heteroskedasticity** | Always present (use robust SEs) | Handled by MLE |
+| **Common in** | Economics | Health sciences, epidemiology |
+| **Best for** | Causal inference | Prediction |
+
+. . .
+
+- **Causal questions in economics:** the LPM is the workhorse. Most applied micro papers use it, sometimes with logit as a robustness check.
+- **Health sciences, computer science, and other fields:** logit is the standard, usually reported as odds ratios.
+- **Prediction, in every field:** logit wins, because its predictions are always valid probabilities.
+
+
+## Summary {.smaller}
+
+1. When $y$ is binary, $E(y \mid \mathbf{x}) = P(y = 1 \mid \mathbf{x})$
+2. **LPM**: run OLS; $\hat{\beta}_j$ = change in probability (percentage points)
+3. LPM problems: out-of-bounds predictions and always heteroskedastic (use robust SEs!)
+4. **Logit**: wraps predictions in the logistic function; estimated by MLE
+5. Logit coefficients = log-odds; convert via odds ratios or marginal effects
+6. **Marginal effects at the mean** are the most practical way to compare logit to LPM
+7. Near the center of the distribution, the two models typically **agree closely**
+
+
+## Practice: Interpreting the LPM {.smaller}
+
+```{r}
+#| label: hmda-practice
+
+data("HMDA", package = "AER")
+hmda <- HMDA |>
+    mutate(denied = ifelse(deny == "yes", 1, 0),
+           black = ifelse(afam == "yes", 1, 0))
+
+lpm_hmda <- feols(denied ~ black + pirat, vcov = "HC1", data = hmda)
+b_hmda <- coef(lpm_hmda)
+```
+
+Boston mortgage applications (`HMDA` data, `AER` package), estimated with an LPM and robust SEs:
+
+::: {.columns}
+::: {.column width="40%"}
+```{r}
+#| label: hmda-table
+
+modelsummary(
+  list("denied" = lpm_hmda),
+  stars = c('*' = 0.1,
+            '**' = 0.05,
+            '***' = 0.01),
+  gof_map = "nobs")
+```
+:::
+
+::: {.column width="60%"}
+::: {.nonincremental}
+- `denied` = 1 if the mortgage application was denied
+- `black` = 1 if the applicant is Black
+- `pirat` = monthly debt payments ÷ monthly income
+:::
+
+**Q1.** Interpret the coefficient on `black`.
+
+**Q2.** An applicant's debt payments rise from 30% to 40% of monthly income (`pirat` rises by 0.10). How does the predicted probability of denial change?
+:::
+:::
+
+. . .
+
+::: {.nonincremental}
+1. Holding `pirat` constant, Black applicants were about `r round(100 * b_hmda["black"], 1)` **percentage points** more likely to be denied than other applicants.
+2. $0.10 \times `r round(b_hmda["pirat"], 3)` = `r round(0.1 * b_hmda["pirat"], 3)`$: the predicted probability of denial rises by about `r round(10 * b_hmda["pirat"], 1)` **percentage points**.
+:::
