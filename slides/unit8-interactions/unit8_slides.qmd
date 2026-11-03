@@ -131,7 +131,8 @@ bi <- coef(lm_interact)
 - A **premium** (**penalty**) is how much *higher* (*lower*) the outcome is for one group than for the group it's compared to
 - **Unmarried women** earn about `r round(-100*(exp(bi[2]) - 1), 0)`% less than unmarried men
 - **Married men** earn about `r round(100*(exp(bi[3]) - 1), 0)`% more than unmarried men ($\hat{\beta}_2$ is too big for the $100 \times \hat{\beta}$ shortcut)
-- **Interaction** ($\hat{\beta}_3 \approx `r round(bi[4], 3)`$, p < 0.001): the marriage premium is `r sprintf('%.3f', bi[3])` for men but only `r sprintf('%.3f', bi[3])` − `r sprintf('%.3f', -bi[4])` = `r sprintf('%.3f', bi[3] + bi[4])` for women
+- **Interaction** ($\hat{\beta}_3 \approx `r round(bi[4], 3)`$): Married women make $\hat{\beta}_1 + \hat{\beta}_2 + \hat{\beta}_3$ compared to unmarried men, $-0.132 + 0.427 - 0.375 = -0.08 \approx -8\%$
+- Conclusion: marriage premium for women no big enough to cancel our the gender pay gap
 
 
 ## Practice: Turn to Your Neighbor {.smaller}
@@ -274,14 +275,12 @@ slope_coefs <- coef(lm_slope)
 
 - Return to education for **men**: $\hat{\beta}_2 \approx `r round(slope_coefs[3], 3)`$ → `r round(100*slope_coefs[3], 1)`% per year
 - Return to education for **women**: $\hat{\beta}_2 + \hat{\beta}_3 \approx `r round(slope_coefs[3] + slope_coefs[4], 3)`$ → `r round(100*(slope_coefs[3] + slope_coefs[4]), 1)`% per year
-- The **interaction** ($\hat{\beta}_3 \approx `r round(slope_coefs[4], 3)`$): women gain `r round(100*slope_coefs[4], 1)` percentage points *more* per year of education
+- The **interaction** ($\hat{\beta}_3 \approx `r round(slope_coefs[4], 3)`$): women gain `r round(100*slope_coefs[4], 1)` percentage points *more* per year of education compared to men
 
 ```{r}
 #| echo: false
 real <- summary(lm(log(wage) ~ female * educ, data = wooldridge::wage1))$coefficients["female:educ", ]
 ```
-
-- In the **real** `wage1` data: $\hat{\beta}_3 = `r sprintf("%.4f", real[1])`$ (p = `r sprintf("%.3f", real[4])`), so no evidence the return to education differs by gender
 
 
 ## Side-by-Side: Dummy-Only vs. Interaction {.smaller}
@@ -438,6 +437,7 @@ tribble(
 
 - The interaction-only model gives the **same prediction** to unmarried men, unmarried women, and married men — it can't tell them apart!
 - It lumps every group *except married women* into one baseline
+- This makes it much harder to interpret the results!
 
 . . .
 
