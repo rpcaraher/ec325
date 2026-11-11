@@ -341,7 +341,9 @@ b_city_hand <- coef(lm(crime_demean ~ unem_demean, data = crime_dm))["unem_demea
 
 ## Going Further: Time Fixed Effects {.smaller}
 
-Demeaning by city removed stable, **unit-specific** confounders. But what about shocks that hit **all** cities in a given year (e.g., a recession, a national policy change)? We control for these with **time fixed effects**.
+- Demeaning by city removed stable, **unit-specific** confounders
+- But what about shocks that hit **all** cities in a given year (e.g., a recession, a national policy change)? 
+- We control for these with **time fixed effects**.
 
 ```{r}
 #| label: national-trend
@@ -353,7 +355,9 @@ yr_means <- crime_data |>
 
 . . .
 
-In our data, average unemployment fell from `r sprintf("%.1f", yr_means$unem[1])` to `r sprintf("%.1f", yr_means$unem[6])`, and crime fell from `r sprintf("%.1f", yr_means$crime[1])` to `r sprintf("%.1f", yr_means$crime[6])`, partly for reasons unrelated to unemployment. Demeaning by city alone credits unemployment with that shared trend. So we demean again, subtracting **year-specific across-city averages**:
+- In our data, crime fell, partly for reasons unrelated to unemployment such as overall reduction from the crime waves in the 1990s. Demeaning by city alone credits unemployment with that shared trend!
+
+- So we demean again, subtracting **year-specific across-city averages**:
 
 ```{r}
 #| echo: true
@@ -386,7 +390,7 @@ Instead of demeaning, we can estimate the same model with **dummy variable regre
 
 $$y_{it} = \beta_0 + \beta_1 x_{it} + a_i + \tau_t + \mu_{it}$$
 
-Include a **dummy variable for each unit** $i$ (minus one omitted category) and a **dummy variable for each time** $t$ (minus one omitted period). Don't forget the *dummy variable trap*!
+Include a **dummy variable for each unit** $i$ (minus one omitted category) and a **dummy variable for each time** $t$ (minus one omitted period)
 
 ```{r}
 #| label: dummy-versions
@@ -397,7 +401,7 @@ lsdv_no_int <- lm(crime ~ 0 + unem + factor(city) + factor(year), data = crime_d
 
 . . .
 
-Sometimes we **drop the intercept** instead and keep a dummy for **every** unit (one period is still omitted). Each unit's dummy is then its own baseline, not a difference from the omitted unit: city 2's is `r sprintf("%.2f", coef(lsdv_no_int)["factor(city)2"])` instead of `r sprintf("%.2f", coef(lsdv_int)["factor(city)2"])` (relative to city 1). Either way, $\hat{\beta}_1$ = `r sprintf("%.2f", coef(lsdv_int)["unem"])`.
+- Sometimes we **drop the intercept** instead and keep a dummy for **every** unit (one time period is still omitted). Each unit's dummy is then its own baseline, not a difference from the omitted unit
 
 . . .
 
@@ -460,7 +464,9 @@ results_table
 
 ## Interpreting Fixed Effects Coefficients (1/2) {.smaller}
 
-`fixef()` retrieves the fixed effects themselves. Start with the city FE:
+- Fixed effects are just dummy variables, so how can we interpret the coefficients on the dummy variables for each city and year?
+
+-`fixef()` retrieves the fixed effects themselves. Start with the city FE:
 
 . . .
 
@@ -540,7 +546,6 @@ from_unem <- coef(reg_fe)["unem"] * change_unem
 ::: {.column width="58%"}
 - **Year 1 is the reference**, so it's 0: `feols()` drops one year to avoid the dummy variable trap.
 - **Year 6 is `r sprintf("%.2f", fe_estimates$year["6"])`:** at the same unemployment rate, a city's crime rate is `r sprintf("%.2f", abs(fe_estimates$year["6"]))` lower than in year 1.
-- **Where does that come from?** Average crime fell `r sprintf("%.1f", abs(change_crime))` from year 1 to year 6, and unemployment fell `r sprintf("%.2f", abs(change_unem))` points. At `r sprintf("%.2f", coef(reg_fe)["unem"])` per point, the model attributes `r sprintf("%.1f", abs(from_unem))` of the fall to unemployment. The year FE pick up the remaining `r sprintf("%.1f", abs(fe_estimates$year["6"]))`.
 :::
 
 ::: {.column width="42%"}
@@ -691,6 +696,8 @@ reg_post <- feols(crime ~ unem | city^post + year, data = crime_post, vcov = "HC
 - **You need a lot of data and variation within groups.** Each FE group needs several observations whose $x$ moves differently. Treat years 4--6 as "post-COVID": city × post FE add 40 parameters, and the SE on `unem` rises from `r sprintf("%.2f", se(reg_fe)["unem"])` to `r sprintf("%.2f", se(reg_post)["unem"])`.
 - **A FE can't single out one observation.** With city × year FE, every observation is alone in its group, so its FE fits it perfectly and nothing is left to estimate $\beta_1$:
 
+. . .
+
 ```{r}
 #| echo: true
 #| error: true
@@ -745,56 +752,3 @@ feols(crime ~ unem | city^year, data = crime_data)
 Fixed effects $\neq$ no OVB. Unit-specific, time-varying confounders can still bias results. But FE is a **major improvement** over cross-sectional analysis when time-invariant confounders are the primary concern.
 :::
 
-
-
-## Practice: The Marriage Premium {.smaller}
-
-```{r}
-#| label: wagepan-practice
-
-wage_data <- wooldridge::wagepan
-
-pooled_wage <- feols(lwage ~ married + union + educ + black + hisp + exper + expersq | year,
-                     data = wage_data, vcov = "HC1")
-fe_wage <- feols(lwage ~ married + union + expersq | nr + year,
-                 data = wage_data, vcov = "HC1")
-
-b_unit8 <- coef(lm(log(wage) ~ female * married, data = wooldridge::wage1))["married"]
-```
-
-In Unit 8, married men earned about `r round(100 * (exp(b_unit8) - 1))`% more than unmarried men. Marriage, or do higher earners marry? `wagepan`: 545 men, 1980--87, $y$ = log hourly wage:
-
-::: {.columns}
-::: {.column width="45%"}
-```{r}
-#| label: wagepan-table
-
-modelsummary(list("Pooled OLS" = pooled_wage, "Worker + Year FE" = fe_wage),
-             coef_map = c("married" = "married"),
-             gof_map = "nobs",
-             add_rows = tribble(
-                 ~term, ~`Pooled OLS`, ~`Worker + Year FE`,
-                 "Worker FE", "No", "Yes",
-                 "Year FE", "Yes", "Yes"
-             ))
-```
-:::
-
-::: {.column width="55%"}
-Both include union status and experience squared. Pooled OLS also includes experience, education, race and ethnicity.
-
-**Q1.** Interpret the FE coefficient on `married`.
-
-**Q2.** Why is it smaller than the pooled estimate?
-
-**Q3.** Why isn't `educ` in the FE model?
-:::
-:::
-
-. . .
-
-::: {.nonincremental}
-1. The same man earns about `r round(100 * coef(fe_wage)["married"], 1)`% more when married than when not, holding year effects and the controls constant.
-2. Men who earn more to begin with are likelier to marry. Pooled OLS counts that stable difference; worker FE compare each man to himself.
-3. `educ` doesn't change within a man in these data, so it's collinear with the worker FE.
-:::

@@ -606,7 +606,7 @@
   <meta name="generator" content="quarto-1.11.9">
 
   <meta name="author" content="Prof. Caraher">
-  <meta name="dcterms.date" content="2026-11-08">
+  <meta name="dcterms.date" content="2026-11-11">
   <title>Panel Data and Fixed Effects</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1235,7 +1235,7 @@ Prof. Caraher
     </div>
 </div>
 
-  <p class="date">2026-11-08</p>
+  <p class="date">2026-11-11</p>
 </section>
 <section id="where-we-are" class="slide level2 smaller">
 <h2>Where We Are</h2>
@@ -1446,9 +1446,16 @@ Prof. Caraher
 </section>
 <section id="going-further-time-fixed-effects" class="slide level2 smaller">
 <h2>Going Further: Time Fixed Effects</h2>
-<p>Demeaning by city removed stable, <strong>unit-specific</strong> confounders. But what about shocks that hit <strong>all</strong> cities in a given year (e.g., a recession, a national policy change)? We control for these with <strong>time fixed effects</strong>.</p>
+<ul>
+<li class="fragment">Demeaning by city removed stable, <strong>unit-specific</strong> confounders</li>
+<li class="fragment">But what about shocks that hit <strong>all</strong> cities in a given year (e.g., a recession, a national policy change)?</li>
+<li class="fragment">We control for these with <strong>time fixed effects</strong>.</li>
+</ul>
 <div class="fragment">
-<p>In our data, average unemployment fell from 9.2 to 6.1, and crime fell from 80.2 to 66.4, partly for reasons unrelated to unemployment. Demeaning by city alone credits unemployment with that shared trend. So we demean again, subtracting <strong>year-specific across-city averages</strong>:</p>
+<ul>
+<li class="fragment"><p>In our data, crime fell, partly for reasons unrelated to unemployment such as overall reduction from the crime waves in the 1990s. Demeaning by city alone credits unemployment with that shared trend!</p></li>
+<li class="fragment"><p>So we demean again, subtracting <strong>year-specific across-city averages</strong>:</p></li>
+</ul>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href aria-label="1"></a>crime_dm <span class="ot">&lt;-</span> crime_dm <span class="sc">|&gt;</span></span>
 <span id="cb5-2"><a href aria-label="2"></a>  <span class="fu">group_by</span>(year) <span class="sc">|&gt;</span></span>
@@ -1473,9 +1480,11 @@ Prof. Caraher
 <h2>Equivalently: Dummy Variable Regression</h2>
 <p>Instead of demeaning, we can estimate the same model with <strong>dummy variable regression</strong>:</p>
 <p><span class="math display">\[y_{it} = \beta_0 + \beta_1 x_{it} + a_i + \tau_t + \mu_{it}\]</span></p>
-<p>Include a <strong>dummy variable for each unit</strong> <span class="math inline">\(i\)</span> (minus one omitted category) and a <strong>dummy variable for each time</strong> <span class="math inline">\(t\)</span> (minus one omitted period). Don’t forget the <em>dummy variable trap</em>!</p>
+<p>Include a <strong>dummy variable for each unit</strong> <span class="math inline">\(i\)</span> (minus one omitted category) and a <strong>dummy variable for each time</strong> <span class="math inline">\(t\)</span> (minus one omitted period)</p>
 <div class="fragment">
-<p>Sometimes we <strong>drop the intercept</strong> instead and keep a dummy for <strong>every</strong> unit (one period is still omitted). Each unit’s dummy is then its own baseline, not a difference from the omitted unit: city 2’s is 42.48 instead of -5.70 (relative to city 1). Either way, <span class="math inline">\(\hat{\beta}_1\)</span> = 2.83.</p>
+<ul>
+<li class="fragment">Sometimes we <strong>drop the intercept</strong> instead and keep a dummy for <strong>every</strong> unit (one time period is still omitted). Each unit’s dummy is then its own baseline, not a difference from the omitted unit</li>
+</ul>
 </div>
 <div class="fragment">
 <p>In R, <code>feols()</code> does this <strong>much faster</strong>. Fixed effects go after a vertical bar <code>|</code>:</p>
@@ -2051,7 +2060,10 @@ line-height: var(--tt-line-height-footnote-tight);
 </section>
 <section id="interpreting-fixed-effects-coefficients-12" class="slide level2 smaller">
 <h2>Interpreting Fixed Effects Coefficients (1/2)</h2>
-<p><code>fixef()</code> retrieves the fixed effects themselves. Start with the city FE:</p>
+<ul>
+<li class="fragment">Fixed effects are just dummy variables, so how can we interpret the coefficients on the dummy variables for each city and year?</li>
+</ul>
+<p>-<code>fixef()</code> retrieves the fixed effects themselves. Start with the city FE:</p>
 <div class="fragment">
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href aria-label="1"></a>fe_estimates <span class="ot">&lt;-</span> <span class="fu">fixef</span>(reg_fe)</span>
@@ -2101,7 +2113,6 @@ line-height: var(--tt-line-height-footnote-tight);
 <ul>
 <li class="fragment"><strong>Year 1 is the reference</strong>, so it’s 0: <code>feols()</code> drops one year to avoid the dummy variable trap.</li>
 <li class="fragment"><strong>Year 6 is -4.92:</strong> at the same unemployment rate, a city’s crime rate is 4.92 lower than in year 1.</li>
-<li class="fragment"><strong>Where does that come from?</strong> Average crime fell 13.8 from year 1 to year 6, and unemployment fell 3.15 points. At 2.83 per point, the model attributes 8.9 of the fall to unemployment. The year FE pick up the remaining 4.9.</li>
 </ul>
 </div><div class="column" style="width:42%;">
 <div class="fragment">
@@ -2754,6 +2765,7 @@ line-height: var(--tt-line-height-footnote-tight);
 <li class="fragment"><strong>You need a lot of data and variation within groups.</strong> Each FE group needs several observations whose <span class="math inline">\(x\)</span> moves differently. Treat years 4–6 as “post-COVID”: city × post FE add 40 parameters, and the SE on <code>unem</code> rises from 0.23 to 0.27.</li>
 <li class="fragment"><strong>A FE can’t single out one observation.</strong> With city × year FE, every observation is alone in its group, so its FE fits it perfectly and nothing is left to estimate <span class="math inline">\(\beta_1\)</span>:</li>
 </ul>
+<div class="fragment">
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href aria-label="1"></a><span class="fu">feols</span>(crime <span class="sc">~</span> unem <span class="sc">|</span> city<span class="sc">^</span>year, <span class="at">data =</span> crime_data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-error">
@@ -2767,6 +2779,7 @@ done.</code></pre>
 <li class="fragment"><strong>A FE can absorb your <span class="math inline">\(x\)</span>.</strong> If <span class="math inline">\(x\)</span> only varies at the level of a FE (e.g., a region-wide policy with region × year FE), it’s collinear with the FE and can’t be estimated.</li>
 <li class="fragment"><strong>More FE <span class="math inline">\(\neq\)</span> causal.</strong> Each new FE narrows the question <span class="math inline">\(\hat{\beta}_1\)</span> answers. Confounders that vary <em>within</em> the finest groups, and reverse causality, still bias it.</li>
 </ul>
+</div>
 </section>
 <section id="when-are-fixed-effects-most-useful" class="slide level2 smaller">
 <h2>When Are Fixed Effects Most Useful?</h2>
@@ -2801,545 +2814,6 @@ done.</code></pre>
 <div class="highlight-box">
 <p>Fixed effects <span class="math inline">\(\neq\)</span> no OVB. Unit-specific, time-varying confounders can still bias results. But FE is a <strong>major improvement</strong> over cross-sectional analysis when time-invariant confounders are the primary concern.</p>
 </div>
-</div>
-</section>
-<section id="practice-the-marriage-premium" class="slide level2 smaller">
-<h2>Practice: The Marriage Premium</h2>
-<p>In Unit 8, married men earned about 53% more than unmarried men. Marriage, or do higher earners marry? <code>wagepan</code>: 545 men, 1980–87, <span class="math inline">\(y\)</span> = log hourly wage:</p>
-<div class="columns">
-<div class="column" style="width:45%;">
-<div class="cell">
-<div class="cell-output-display">
-<!-- preamble start -->
-
-    <script>// TinyTable JavaScript Framework
-// Function factory for creating table-specific operations
-window.TinyTable = {
-  // Helper to create Tabulator instance with Luxon dependency
-  createTabulator: function(elementId, config) {
-    const { DateTime } = window.luxon || {};
-    return new Tabulator(elementId, {
-      dependencies: { DateTime },
-      ...config
-    });
-  },
-
-  createTableFunctions: function (tableId) {
-    const spans = []; // {top, left, rowspan, colspan}
-
-    function resolveToAnchor(i, j) {
-      // find if (i,j) is inside any span; return that span's anchor if so
-      for (const s of spans) {
-        if (
-          i >= s.top && i < s.top + s.rowspan &&
-          j >= s.left && j < s.left + s.colspan
-        ) {
-          return { i: s.top, j: s.left };
-        }
-      }
-      return { i, j };
-    }
-
-    return {
-      styleCell: function (i, j, css_id) {
-        // normalize possible string indices
-        i = +i; j = +j;
-
-        const table = document.getElementById(tableId);
-        const { i: ai, j: aj } = resolveToAnchor(i, j);
-        const cell = table.querySelector(`[data-row="${ai}"][data-col="${aj}"]`);
-        if (!cell) return; // silently skip if not found (e.g., removed)
-        cell.classList.add(css_id);
-      },
-
-      spanCell: function (i, j, rowspan, colspan) {
-        i = +i; j = +j;
-
-        const table = document.getElementById(tableId);
-        const targetCell = table.querySelector(`[data-row="${i}"][data-col="${j}"]`);
-        if (!targetCell) {
-          console.warn(`Cell at (${i}, ${j}) not found.`);
-          return;
-        }
-
-        // record span so future styleCell calls map to the anchor
-        spans.push({ top: i, left: j, rowspan, colspan });
-
-        // remove covered cells (except anchor)
-        const cellsToRemove = [];
-        for (let r = 0; r < rowspan; r++) {
-          for (let c = 0; c < colspan; c++) {
-            if (r === 0 && c === 0) continue;
-            const cell = table.querySelector(`[data-row="${i + r}"][data-col="${j + c}"]`);
-            if (cell) cellsToRemove.push(cell);
-          }
-        }
-        cellsToRemove.forEach(cell => cell.remove());
-
-        // set HTML attributes for clarity/serialization
-        targetCell.setAttribute('rowspan', rowspan);
-        targetCell.setAttribute('colspan', colspan);
-      }
-    };
-  }
-};
-
-// =============================================================================
-// TABULATOR CUSTOM FORMATTERS (revised)
-// =============================================================================
-
-// SVG sparkline
-function tinytable_sparkline(cell, p = {}) {
-  let values = cell.getValue() ?? [];
-  if (!Array.isArray(values)) values = [values];
-  // coerce to finite numbers & strip NaNs
-  values = values.map(Number).filter(Number.isFinite);
-  const n = values.length;
-  if (n === 0) return "";
-
-  const w = p.width ?? 120, h = p.height ?? 30, pad = p.pad ?? 2;
-  const color = p.color ?? "currentColor", sw = p.strokeWidth ?? 1.5;
-  const fill = p.fillArea ?? false;
-  const showDots = p.showDots ?? false;
-  const dotR = p.dotRadius ?? 1.75;
-  const ariaLabel = p.ariaLabel ?? `sparkline with ${n} points`;
-
-  // single pass for min/max
-  let min = Infinity, max = -Infinity;
-  for (let v of values) { if (v < min) min = v; if (v > max) max = v; }
-  const span = (max - min) || 1;
-
-  const x = i => pad + (i * (w - 2 * pad)) / Math.max(n - 1, 1);
-  const y = v => h - pad - ((v - min) * (h - 2 * pad)) / span;
-
-  let d = `M ${x(0)},${y(values[0])}`;
-  for (let i = 1; i < n; i++) d += ` L ${x(i)},${y(values[i])}`;
-
-  const NS = "http://www.w3.org/2000/svg";
-  const svg = document.createElementNS(NS, "svg");
-  svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
-  svg.setAttribute("width", w);
-  svg.setAttribute("height", h);
-  svg.setAttribute("role", "img");
-  svg.setAttribute("aria-label", ariaLabel);
-
-  const path = document.createElementNS(NS, "path");
-  path.setAttribute("stroke", color);
-  path.setAttribute("stroke-width", sw);
-  path.setAttribute("vector-effect", "non-scaling-stroke");
-
-  if (fill) {
-    const area = document.createElementNS(NS, "path");
-    area.setAttribute("d", d + ` L ${x(n - 1)},${h - pad} L ${x(0)},${h - pad} Z`);
-    area.setAttribute("fill", color);
-    area.setAttribute("fill-opacity", p.fillOpacity ?? 0.25);
-    svg.appendChild(area);
-    path.setAttribute("d", d);
-    path.setAttribute("fill", "none");
-  } else {
-    path.setAttribute("d", d);
-    path.setAttribute("fill", "none");
-  }
-  svg.appendChild(path);
-
-  if (showDots) {
-    const dot = (i) => {
-      const c = document.createElementNS(NS, "circle");
-      c.setAttribute("cx", x(i));
-      c.setAttribute("cy", y(values[i]));
-      c.setAttribute("r", dotR);
-      c.setAttribute("fill", color);
-      return c;
-    };
-    if (p.dots === "end") svg.appendChild(dot(n - 1));
-    else if (p.dots === "minmax") {
-      const iMin = values.indexOf(min), iMax = values.indexOf(max);
-      svg.appendChild(dot(iMin)); svg.appendChild(dot(iMax));
-    } else if (p.dots === true) {
-      for (let i = 0; i < n; i++) svg.appendChild(dot(i));
-    }
-  }
-
-  if (p.title) {
-    const title = document.createElementNS(NS, "title");
-    title.textContent = p.title;
-    svg.appendChild(title);
-  }
-
-  return svg;
-}
-
-// Canvas histogram
-function tinytable_histogram(cell, p = {}) {
-  let data = cell.getValue() ?? [];
-  if (!Array.isArray(data)) data = [data];
-  data = data.map(Number).filter(Number.isFinite);
-  const n = data.length;
-  if (n === 0) return "";
-
-  const cssWidth = p.width ?? 120;
-  const cssHeight = p.height ?? 30;
-  const color = p.color ?? "currentColor";
-  const gap = p.gap ?? 1;         // px gap between bars
-  const pad = p.pad ?? 0;         // inner padding
-  const ariaLabel = p.ariaLabel ?? `histogram with ${n} observations`;
-
-  // robust bins: Sturges as default; allow override
-  const k = Math.max(1, Math.min(64, p.bins ?? Math.ceil(Math.log2(n) + 1)));
-
-  // stats
-  let min = Infinity, max = -Infinity;
-  for (let v of data) { if (v < min) min = v; if (v > max) max = v; }
-
-  // zero-range safeguard -> single centered bar
-  const range = max - min;
-  const binWidth = range > 0 ? range / k : 1;
-
-  const bins = new Array(k).fill(0);
-  if (range === 0) {
-    // put all mass in the middle bin
-    bins[Math.floor(k / 2)] = n;
-  } else {
-    for (let v of data) {
-      let idx = Math.floor((v - min) / binWidth);
-      if (idx >= k) idx = k - 1; // clamp max edge
-      bins[idx]++;
-    }
-  }
-  const maxCount = Math.max(...bins, 1);
-
-  // HiDPI / Retina crispness
-  const dpr = window.devicePixelRatio || 1;
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.round(cssWidth * dpr);
-  canvas.height = Math.round(cssHeight * dpr);
-  canvas.style.width = cssWidth + "px";
-  canvas.style.height = cssHeight + "px";
-  canvas.setAttribute("role", "img");
-  canvas.setAttribute("aria-label", ariaLabel);
-
-  const ctx = canvas.getContext("2d");
-  ctx.scale(dpr, dpr);
-  ctx.clearRect(0, 0, cssWidth, cssHeight);
-  ctx.fillStyle = color;
-
-  const innerW = cssWidth - pad * 2;
-  const innerH = cssHeight - pad * 2;
-  const barW = innerW / k;
-
-  for (let i = 0; i < k; i++) {
-    const h = (bins[i] / maxCount) * innerH;
-    const x = pad + i * barW;
-    const y = cssHeight - pad - h;
-    // 0.5 translate helps crisp vertical edges on some displays
-    ctx.fillRect(Math.round(x) + 0.5, Math.floor(y), Math.max(0, barW - gap), Math.ceil(h));
-  }
-
-  if (p.title) canvas.title = p.title;
-  return canvas;
-}
-
-// Unified sorter that uses hidden rank field
-function tinytable_rank_sorter(a, b, aRow, bRow, column, dir, sorterParams) {
-  const rankField = sorterParams.rankField;
-  const aVal = aRow.getData()[rankField] || 0;
-  const bVal = bRow.getData()[rankField] || 0;
-  return aVal - bVal;
-}
-</script>
-
-    <script>
-      // Create table-specific functions using external factory
-      const tableFns_xwcmdl1nf0wlg8y5epdn = TinyTable.createTableFunctions("tinytable_xwcmdl1nf0wlg8y5epdn");
-      // tinytable span after
-      window.addEventListener('load', function () {
-          var cellsToStyle = [
-            // tinytable style arrays after
-          { positions: [ { i: '5', j: 2 }, { i: '5', j: 3 } ], css_id: 'tinytable_css_y4yavby0fr24xg481mvx',}, 
-          { positions: [ { i: '2', j: 2 }, { i: '2', j: 3 } ], css_id: 'tinytable_css_yswiazvnuxahb903gkye',}, 
-          { positions: [ { i: '1', j: 2 }, { i: '3', j: 2 }, { i: '4', j: 2 }, { i: '1', j: 3 }, { i: '3', j: 3 }, { i: '4', j: 3 } ], css_id: 'tinytable_css_m3f2iwow3opycmaxivtw',}, 
-          { positions: [ { i: '0', j: 2 }, { i: '0', j: 3 } ], css_id: 'tinytable_css_5kkcwuhxcwxv3m2fcf6n',}, 
-          { positions: [ { i: '5', j: 1 } ], css_id: 'tinytable_css_1kweqfeg8l6qvypb86f1',}, 
-          { positions: [ { i: '2', j: 1 } ], css_id: 'tinytable_css_s0rr1zsq5t60o87pyd5z',}, 
-          { positions: [ { i: '1', j: 1 }, { i: '3', j: 1 }, { i: '4', j: 1 } ], css_id: 'tinytable_css_i2l3nwol80qqvjk26eqt',}, 
-          { positions: [ { i: '0', j: 1 } ], css_id: 'tinytable_css_nkjhadgvku8s1204ko1a',}, 
-          ];
-
-          // Loop over the arrays to style the cells
-          cellsToStyle.forEach(function (group) {
-              group.positions.forEach(function (cell) {
-                  tableFns_xwcmdl1nf0wlg8y5epdn.styleCell(cell.i, cell.j, group.css_id);
-              });
-          });
-      });
-    </script>
-
-    <style type="text/css">
-
-
-.tinytable {
-
---tt-text-color: inherit;
---tt-line-color: black;
---tt-border-color: var(--tt-line-color);
---tt-striped-bg: rgba(0, 0, 0, .05);
---tt-hover-bg: rgba(0, 0, 0, .075);
---tt-background-color: transparent;
---tt-footnote-bg: var(--tt-background-color);
-
---tt-cell-padding: .5rem;
---tt-cell-padding-sm: calc(var(--tt-cell-padding) / 2);
---tt-table-margin: .5rem 0;
---tt-caption-padding: .5rem 0;
---tt-footnote-padding: .2rem .5rem;
---tt-footnote-first-padding-top: .5rem;
---tt-footnote-gap: .1rem;
---tt-container-padding: 10px;
-
---tt-font-size-footnote: 0.875rem;
---tt-font-size-caption: 1rem;
---tt-font-size-sup: 0.75em;
---tt-line-height-footnote: 1.25;
---tt-line-height-footnote-tight: 1.2;
---tt-font-weight-header: normal;
-
---tt-cell-valign: top;
---tt-header-align: left;
---tt-header-valign: bottom;
---tt-caption-align: var(--tt-header-align);
---tt-caption-side: top;
-
---tt-table-width: 100%;
-
---tt-border-width: 1px;
---tt-border-width-tbody: 2px;
-}
-
-.tinytable {
-width: var(--tt-table-width);
-margin: var(--tt-table-margin);
-border-collapse: collapse;
-background-color: var(--tt-background-color);
-color: var(--tt-text-color);
-font-family: inherit;
--webkit-font-smoothing: antialiased;
--moz-osx-font-smoothing: grayscale;
-}
-.tinytable *:not(mjx-container):not(mjx-container *) {
-font-family: inherit;
-}
-
-.tinytable th,
-.tinytable td {
-position: relative;
-padding: var(--tt-cell-padding);
-vertical-align: var(--tt-cell-valign);
-}
-.tinytable thead th {
-text-align: var(--tt-header-align);
-vertical-align: var(--tt-header-valign);
-font-weight: var(--tt-font-weight-header);
-border-bottom: none;
-}
-.tinytable thead th[align="center"] {
-text-align: center;
-}
-.tinytable tbody + tbody {
-border-top: var(--tt-border-width-tbody) solid var(--tt-border-color);
-}
-
-
-.tinytable-sm th,
-.tinytable-sm td {
-padding: var(--tt-cell-padding-sm);
-}
-
-.tinytable-bordered {
-border: var(--tt-border-width) solid var(--tt-border-color);
-}
-.tinytable-bordered th,
-.tinytable-bordered td {
-border: var(--tt-border-width) solid var(--tt-border-color);
-}
-
-.tinytable-striped tbody tr:nth-of-type(odd) {
-background-color: var(--tt-striped-bg);
-}
-
-.tinytable-hover tbody tr:hover {
-background-color: var(--tt-hover-bg);
-}
-
-.tinytable-responsive {
-width: var(--tt-table-width);
-overflow-x: auto;
--webkit-overflow-scrolling: touch;
-}
-
-.tinytable :is(td, th)[class*="tinytable_css_"] {
-position: relative;
-
---border-top: 0;
---border-right: 0;
---border-bottom: 0;
---border-left: 0;
-
---line-color-top: currentColor;
---line-color-right: currentColor;
---line-color-bottom: currentColor;
---line-color-left: currentColor;
-
---line-width-top: 0.1em;
---line-width-right: 0.1em;
---line-width-bottom: 0.1em;
---line-width-left: 0.1em;
-
---line-type-top: solid;
---line-type-right: solid;
---line-type-bottom: solid;
---line-type-left: solid;
-
---trim-top-left: 0%;
---trim-top-right: 0%;
---trim-right-top: 0%;
---trim-right-bottom: 0%;
---trim-bottom-left: 0%;
---trim-bottom-right: 0%;
---trim-left-top: 0%;
---trim-left-bottom: 0%;
-}
-
-.tinytable :is(td, th)[class*="tinytable_css_"]::before {
-content: "";
-position: absolute;
-top: var(--trim-top-left, var(--trim-top-right, 0));
-left: var(--trim-left-top, 0);
-right: var(--trim-right-top, 0);
-bottom: 0;
-pointer-events: none;
-z-index: 1;
-border-top: calc(var(--border-top) * var(--line-width-top)) var(--line-type-top, solid) var(--line-color-top);
-border-right: calc(var(--border-right) * var(--line-width-right)) var(--line-type-right, solid) var(--line-color-right);
-border-left: calc(var(--border-left) * var(--line-width-left)) var(--line-type-left, solid) var(--line-color-left);
-}
-
-.tinytable :is(td, th)[class*="tinytable_css_"]::after {
-content: "";
-position: absolute;
-left: var(--trim-bottom-left, 0);
-right: var(--trim-bottom-right, 0);
-bottom: var(--trim-left-bottom, var(--trim-right-bottom, 0));
-height: 0;
-border-bottom: calc(var(--border-bottom) * var(--line-width-bottom)) var(--line-type-bottom, solid) var(--line-color-bottom);
-pointer-events: none;
-z-index: 2;
-}
-
-.tinytable-container {
-padding: var(--tt-container-padding);
-overflow-x: auto;
-overflow-y: auto;
-width: auto;
-height: auto;
-}
-
-.tinytable caption {
-padding: var(--tt-caption-padding);
-caption-side: var(--tt-caption-side);
-font-size: var(--tt-font-size-caption);
-text-align: var(--tt-caption-align);
-}
-
-.tinytable tfoot tr:first-child td {
-padding-top: var(--tt-footnote-first-padding-top);
-}
-.tinytable tfoot td {
-padding: var(--tt-footnote-padding);
-font-size: var(--tt-font-size-footnote);
-line-height: var(--tt-line-height-footnote);
-background-color: var(--tt-footnote-bg);
-}
-
-.tinytable tfoot tr + tr td {
-padding-top: var(--tt-footnote-gap);
-}
-
-.tinytable tfoot sup {
-font-size: var(--tt-font-size-sup);
-line-height: 0;
-vertical-align: text-top;
-}
-
-.tinytable tfoot tr:nth-child(n+2) td {
-line-height: var(--tt-line-height-footnote-tight);
-}
-</style>
-    <style>
-
-#tinytable_xwcmdl1nf0wlg8y5epdn td.tinytable_css_y4yavby0fr24xg481mvx, #tinytable_xwcmdl1nf0wlg8y5epdn th.tinytable_css_y4yavby0fr24xg481mvx { position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
-#tinytable_xwcmdl1nf0wlg8y5epdn td.tinytable_css_yswiazvnuxahb903gkye, #tinytable_xwcmdl1nf0wlg8y5epdn th.tinytable_css_yswiazvnuxahb903gkye { position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
-#tinytable_xwcmdl1nf0wlg8y5epdn td.tinytable_css_m3f2iwow3opycmaxivtw, #tinytable_xwcmdl1nf0wlg8y5epdn th.tinytable_css_m3f2iwow3opycmaxivtw { text-align: center }
-#tinytable_xwcmdl1nf0wlg8y5epdn td.tinytable_css_5kkcwuhxcwxv3m2fcf6n, #tinytable_xwcmdl1nf0wlg8y5epdn th.tinytable_css_5kkcwuhxcwxv3m2fcf6n { position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
-#tinytable_xwcmdl1nf0wlg8y5epdn td.tinytable_css_1kweqfeg8l6qvypb86f1, #tinytable_xwcmdl1nf0wlg8y5epdn th.tinytable_css_1kweqfeg8l6qvypb86f1 { position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
-#tinytable_xwcmdl1nf0wlg8y5epdn td.tinytable_css_s0rr1zsq5t60o87pyd5z, #tinytable_xwcmdl1nf0wlg8y5epdn th.tinytable_css_s0rr1zsq5t60o87pyd5z { position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
-#tinytable_xwcmdl1nf0wlg8y5epdn td.tinytable_css_i2l3nwol80qqvjk26eqt, #tinytable_xwcmdl1nf0wlg8y5epdn th.tinytable_css_i2l3nwol80qqvjk26eqt { text-align: left }
-#tinytable_xwcmdl1nf0wlg8y5epdn td.tinytable_css_nkjhadgvku8s1204ko1a, #tinytable_xwcmdl1nf0wlg8y5epdn th.tinytable_css_nkjhadgvku8s1204ko1a { position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
-</style>
-    <div class="container">
-      <table class="tinytable" id="tinytable_xwcmdl1nf0wlg8y5epdn" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
-        
-        <thead>
-              <tr>
-                <th scope="col" data-row="0" data-col="1"> </th>
-                <th scope="col" data-row="0" data-col="2">Pooled OLS</th>
-                <th scope="col" data-row="0" data-col="3">Worker + Year FE</th>
-              </tr>
-        </thead>
-        
-        <tbody>
-                <tr>
-                  <td data-row="1" data-col="1">married</td>
-                  <td data-row="1" data-col="2">0.108</td>
-                  <td data-row="1" data-col="3">0.047</td>
-                </tr>
-                <tr>
-                  <td data-row="2" data-col="1"></td>
-                  <td data-row="2" data-col="2">(0.015)</td>
-                  <td data-row="2" data-col="3">(0.018)</td>
-                </tr>
-                <tr>
-                  <td data-row="3" data-col="1">Num.Obs.</td>
-                  <td data-row="3" data-col="2">4360</td>
-                  <td data-row="3" data-col="3">4360</td>
-                </tr>
-                <tr>
-                  <td data-row="4" data-col="1">Worker FE</td>
-                  <td data-row="4" data-col="2">No</td>
-                  <td data-row="4" data-col="3">Yes</td>
-                </tr>
-                <tr>
-                  <td data-row="5" data-col="1">Year FE</td>
-                  <td data-row="5" data-col="2">Yes</td>
-                  <td data-row="5" data-col="3">Yes</td>
-                </tr>
-        </tbody>
-      </table>
-    </div>
-<!-- hack to avoid NA insertion in last line -->
-</div>
-</div>
-</div><div class="column" style="width:55%;">
-<p>Both include union status and experience squared. Pooled OLS also includes experience, education, race and ethnicity.</p>
-<p><strong>Q1.</strong> Interpret the FE coefficient on <code>married</code>.</p>
-<p><strong>Q2.</strong> Why is it smaller than the pooled estimate?</p>
-<p><strong>Q3.</strong> Why isn’t <code>educ</code> in the FE model?</p>
-</div></div>
-<div class="fragment">
-<ol type="1">
-<li>The same man earns about 4.7% more when married than when not, holding year effects and the controls constant.</li>
-<li>Men who earn more to begin with are likelier to marry. Pooled OLS counts that stable difference; worker FE compare each man to himself.</li>
-<li><code>educ</code> doesn’t change within a man in these data, so it’s collinear with the worker FE.</li>
-</ol>
 
 </div>
 </section>
