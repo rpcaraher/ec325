@@ -221,7 +221,7 @@ $$\text{ATT} = E[Y_{1i} | D_i = 1] - E[Y_{0i} | D_i = 1]$$
 $$\underbrace{E[Y_i | D_i = 1] - E[Y_i | D_i = 0]}_{\text{Observed difference}} = \text{ATT} + \underbrace{E[Y_{0i} | D_i = 1] - E[Y_{0i} | D_i = 0]}_{\text{Selection bias}}$$
 
 - Selection bias: how the two groups would differ **even without treatment**
-- In an **RCT**, a coin flip decides $D_i$, so selection bias $= 0$ and the observed difference *is* the ATT
+- In an **RCT**, random assignment decides $D_i$, so selection bias $= 0$ and the observed difference *is* the ATT
 
 . . .
 
@@ -229,8 +229,9 @@ $$\underbrace{E[Y_i | D_i = 1] - E[Y_i | D_i = 0]}_{\text{Observed difference}} 
 - Is that the effect of the boatlift? Or were Miami's wages lower *to begin with*?
 
 
-## No Coin Flip? Look Before Treatment {.smaller}
+## No Random Assignment? Look Before Treatment {.smaller}
 
+- If we don't have random assignment, we can leverage the *panel* aspect of our data
 - Card observes the **same cities before and after** the boatlift
 - **Before** the boatlift (1979), no one has been treated yet, so the gap between the groups is **pure selection bias**:
 
@@ -259,14 +260,9 @@ $$
 - **LHS:** the treated group's trend without treatment (*unobservable*: we never see Miami's $Y_{0i,\text{post}}$)
 - **RHS:** the control group's trend (*observable*: the control cities are never treated)
 
+. . .
 
-## Parallel Trends in Unit 3 Terms {.smaller}
-
-- Rearrange the parallel trends assumption and it says **selection bias doesn't change**:
-
-$$\underbrace{E[Y_{0i,\text{post}} | D_i = 1] - E[Y_{0i,\text{post}} | D_i = 0]}_{\text{Selection bias, post}} = \underbrace{E[Y_{0i,\text{pre}} | D_i = 1] - E[Y_{0i,\text{pre}} | D_i = 0]}_{\text{Selection bias, pre}}$$
-
-- **Randomization:** selection bias is zero. **Parallel trends:** selection bias can be anything, as long as it **stays the same**
+- In Unit 3 terms: **randomization** makes selection bias zero; here, **parallel trends** lets selection bias be anything, as long as it **stays the same** before and after
 
 
 ## How It Works {.smaller}
@@ -283,27 +279,14 @@ $$\underbrace{E[Y_{0i,\text{post}} | D_i = 1] - E[Y_{0i,\text{post}} | D_i = 0]}
 
 . . .
 
-- Under **parallel trends**, the change in selection bias is zero, so the **difference-in-differences is the ATT**
-- Card's DiD is $0.00$: essentially **no effect** of the boatlift on wages
-- One more requirement: the treated group can't react to the treatment *before* it happens (**no anticipation**), so the pre-period gap really is just selection bias
-
-
-## The DiD Estimator {.smaller}
-
-- We can also take the differences in the other order: **over time first**, then across groups (the "Diff" column of our earlier table)
+- Under **parallel trends**, the change in selection bias is zero, so the **difference-in-differences is the ATT**: $0.00$, essentially **no effect** on wages
+- Same answer differencing **over time first** ($-0.02 - (-0.02)$, the "Diff" column earlier). That's the **DiD estimator**:
 
 . . .
 
-$$
-\begin{aligned}
-\text{ATT} = &\underbrace{(E[Y_{i,\text{post}} | D_i = 1] - E[Y_{i,\text{pre}} | D_i = 1])}_{\text{change for treated group}} \\
-& - \underbrace{(E[Y_{i,\text{post}} | D_i = 0] - E[Y_{i,\text{pre}} | D_i = 0])}_{\text{change for control group}}
-\end{aligned}
-$$
+$$\text{ATT} = \underbrace{(E[Y_{i,\text{post}} | D_i = 1] - E[Y_{i,\text{pre}} | D_i = 1])}_{\text{change for treated group}} - \underbrace{(E[Y_{i,\text{post}} | D_i = 0] - E[Y_{i,\text{pre}} | D_i = 0])}_{\text{change for control group}}$$
 
-- Miami: $1.83 - 1.85 = -0.02$. Controls: $1.91 - 1.93 = -0.02$. DiD: $-0.02 - (-0.02) =$ **0.00**
-- Same four averages, same answer
-- In words: parallel trends fills in Miami's missing $E[Y_{0i,\text{post}} | D_i = 1]$ with Miami's pre-period level **plus** the control cities' change
+- This also needs **no anticipation**: Miami can't react before the boatlift, so its pre-period gap is just selection bias
 
 
 ## Visualizing the DiD Estimator
@@ -455,10 +438,7 @@ $$
 
 This **is** the simple DiD regression. Same model, same estimate.
 
-- As in Unit 11, $\beta_1$ and $\beta_2$ are *differences* in fixed effects (treated $-$ control; post $-$ pre)
 - The advantage of TWFE: it generalizes to many units and many periods automatically
-- Our Card data are 2 cities $\times$ 7 years, not 2 periods; TWFE still matches because the panel is balanced and treatment starts at one date
-
 
 ## TWFE in R {.smaller}
 
@@ -477,26 +457,6 @@ round(coef(twfe_reg), 3)
 . . .
 
 - Same $\hat{\delta}$ as the simple DiD regression --- as expected
-
-
-## Comparing the Two Models {.smaller}
-
-```{r}
-#| echo: true
-
-modelsummary(list("Simple DiD" = did_reg, "TWFE" = twfe_reg),
-             statistic = NULL,
-             gof_omit = "AIC|BIC|Log|RMSE|Std|R2$|Num|F|Within")
-```
-
-- Standard errors are left out on purpose: with 2 cities they aren't meaningful (Unit 13)
-
-
-## Did Card (1990) Pick Good Controls?
-
-Card argues he chose these four cities (Atlanta, Los Angeles, Houston, and Tampa-St. Petersburg) because:
-
-> "they had relatively large populations of Blacks and Hispanics and because they exhibited a pattern of economic growth similar to that in Miami over the late 1970s and early 1980s. A comparison of employment growth rates... suggests that economic conditions were very similar in Miami and the average of the four comparison cities between 1976 and 1984."
 
 
 ## Did Card (1990) Pick Good Controls?
@@ -553,12 +513,18 @@ ggplot(plot_data, aes(x = year, y = wages, group = city)) +
 ```
 
 
-## Did Card (1990) Pick Good Controls?
+## Did Card (1990) Pick Good Controls? {.smaller}
+
+Card argues he chose these four cities (Atlanta, Los Angeles, Houston, and Tampa-St. Petersburg) because:
+
+> "they had relatively large populations of Blacks and Hispanics and because they exhibited a pattern of economic growth similar to that in Miami over the late 1970s and early 1980s. A comparison of employment growth rates... suggests that economic conditions were very similar in Miami and the average of the four comparison cities between 1976 and 1984."
+
+. . .
 
 - To me, they seem pretty solid
-- One caveat: we only have **one** pre-period year (1979), so this plot can't show pre-trends (Unit 13's event studies fix this)
+- One caveat: we only have **one** pre-period year (1979), so the plot can't show pre-trends
   - Every year after 1979 is *post*-treatment: DiD uses those years to estimate the effect, so they can't also test parallel trends
-  - Card's evidence comes from *outside* the plot: similar employment growth in Miami and the controls, 1976--1984
+  - Card's evidence comes from *outside* the plot: the 1976--1984 employment growth in his quote
 - But, others may argue differently!
 
 
@@ -569,12 +535,16 @@ ggplot(plot_data, aes(x = year, y = wages, group = city)) +
 - This is the **Parallel Trends Assumption**, the single most important assumption in DiD.
 - The 2x2 DiD model is:
 
+. . .
+
 $$
 y_{it} = \beta_0 + \beta_1D_{i} + \beta_2P_{t} + \delta(D_{i} \times P_{t}) + \mu_{it}
 $$
 
 - The coefficient $\delta$ on the interaction term *is* the DiD estimate (the ATT).
 - A more general way to estimate this (when all treated units start at the same time) is the **Two-Way Fixed Effects (TWFE)** model:
+
+. . .
 
 $$
 y_{it} = \delta(D_{it}) + a_{i} + \tau_{t} + \mu_{it}
@@ -585,7 +555,7 @@ $$
 
 ## Research Design {.smaller}
 
-The goal of your research design is to build a believable "what if" scenario.
+The goal of your research design is to build a believable "what if" scenario
 
 :::: {.columns}
 ::: {.column width="50%"}
@@ -600,8 +570,9 @@ The goal of your research design is to build a believable "what if" scenario.
 
 ### The Identifying Assumption
 
-- Your entire research design hinges on one *critical, non-provable* assumption: the **Parallel Trends Assumption**.
-- **In plain English:** This assumes that, *in the absence of the treatment*, the treatment and control groups' outcomes would have followed the same trend.
+- The assumption that lets us read our estimate as the **causal effect** (the ATT). In an RCT, it was **random assignment**
+- In DiD, it's **parallel trends**: *without the treatment*, the treated group's average outcome would have **changed by the same amount** as the control group's
+- It's *non-provable*: it's about a counterfactual we never see
 :::
 ::::
 
@@ -686,23 +657,6 @@ compute_did <- function(data, control_names) {
 ```
 
 
-## The Three Potential Controls
-
-```{r}
-#| fig-height: 5
-
-ggplot(sim_data, aes(x = year, y = uninsured, color = state)) +
-  geom_line(linewidth = 1.3) +
-  geom_point(size = 3) +
-  geom_vline(xintercept = 2014.5, linetype = "dotted", linewidth = 0.8, color = "grey40") +
-  annotate("text", x = 2014.35, y = 22, label = "Treatment", hjust = 1, size = 5, color = "grey40") +
-  scale_color_manual(values = state_colors) +
-  scale_x_continuous(breaks = seq(2010, 2019, 2)) +
-  labs(x = "Year", y = "Uninsured Rate (%)", color = NULL) +
-  theme(legend.position = "bottom", legend.text = element_text(size = 13))
-```
-
-
 ## Which States Have Parallel Pre-Trends? {.smaller}
 
 ```{r}
@@ -712,10 +666,10 @@ pre_only <- sim_data |> filter(year <= 2014)
 
 end_labels <- pre_only |> filter(year == 2014) |>
   mutate(trend_label = case_when(
-    state == "State A (Treated)" ~ "-0.5 pp/yr",
-    state == "State B" ~ "-0.5 pp/yr  (Same!)",
-    state == "State E" ~ "-1.5 pp/yr  (Too fast)",
-    state == "State G" ~ "+0.8 pp/yr  (Wrong direction)"
+    state == "State A (Treated)" ~ "State A (treated): -0.5 pp/yr",
+    state == "State B" ~ "State B: -0.5 pp/yr  (Same!)",
+    state == "State E" ~ "State E: -1.5 pp/yr  (Too fast)",
+    state == "State G" ~ "State G: +0.8 pp/yr  (Wrong direction)"
   ))
 
 ggplot(pre_only, aes(x = year, y = uninsured, color = state)) +
@@ -725,7 +679,7 @@ ggplot(pre_only, aes(x = year, y = uninsured, color = state)) +
             aes(x = year + 0.15, y = uninsured, label = trend_label),
             hjust = 0, fontface = "bold", size = 4.2, show.legend = FALSE) +
   scale_color_manual(values = state_colors) +
-  scale_x_continuous(breaks = 2010:2014, limits = c(2010, 2018)) +
+  scale_x_continuous(breaks = 2010:2014, limits = c(2010, 2018.6)) +
   labs(subtitle = "Pre-treatment period only (2010–2014)",
        x = "Year", y = "Uninsured Rate (%)") +
   theme(legend.position = "none")
@@ -775,7 +729,7 @@ ggplot(plot_data, aes(x = year, y = uninsured, color = state)) +
            label = "ATT\n= -4 pp", hjust = 0, fontface = "bold", size = 5, color = "#e7298a",
            lineheight = 0.85) +
   annotate("text", x = 2016.2, y = cf_data$uninsured[cf_data$year == 2016] + 0.7,
-           label = "Counterfactual\n(without treatment)",
+           label = "Correct Counterfactual",
            color = "#e7298a", fontface = "italic", size = 3.8, lineheight = 0.9) +
   scale_color_manual(values = state_colors) +
   scale_x_continuous(breaks = seq(2010, 2019, 1), limits = c(2010, 2020)) +
@@ -913,33 +867,6 @@ ggplot(plot_data, aes(x = year, y = uninsured, color = state)) +
 - The control is *rising* while the treated is falling, so DiD dramatically **overstates** the effect
 
 
-## Summary: How Controls Change the Estimate {.smaller}
-
-```{r}
-#| fig-height: 4.5
-
-results <- tibble(
-  control = factor(c("State B\n(-0.5 pp/yr)", "State E\n(-1.5 pp/yr)", "State G\n(+0.8 pp/yr)"),
-                   levels = c("State B\n(-0.5 pp/yr)", "State E\n(-1.5 pp/yr)", "State G\n(+0.8 pp/yr)")),
-  did_est = c(did_b, did_e, did_g),
-  color = c("#009E73", "#D55E00", "#E69F00")
-)
-
-ggplot(results, aes(x = control, y = did_est, fill = color)) +
-  geom_col(width = 0.6) +
-  geom_hline(yintercept = TRUE_ATT, linetype = "dashed", color = "#0072B2", linewidth = 1.2) +
-  geom_text(aes(label = sprintf("%+.1f", did_est)), vjust = ifelse(results$did_est < 0, 1.3, -0.3),
-            fontface = "bold", size = 6) +
-  annotate("text", x = 2, y = TRUE_ATT - 0.5,
-           label = "True ATT = -4.0", hjust = 0.5,
-           color = "#0072B2", fontface = "bold", size = 5) +
-  scale_fill_identity() +
-  scale_y_continuous(expand = expansion(mult = 0.15)) +
-  labs(x = NULL, y = "DiD Estimate (pp)") +
-  theme(axis.text.x = element_text(face = "bold", size = 13))
-```
-
-
 ## Key Lesson {.smaller}
 
 - **Parallel trends is everything.** A control is "good" if it is on the trend the treated unit *would have* followed without treatment.
@@ -958,29 +885,17 @@ ggplot(results, aes(x = control, y = did_est, fill = color)) +
 - **This is the "art" of applied econometrics:** finding controls where parallel trends is *credible*, and defending that choice.
 
 
-## Example: Minimum Wages and Employment {.smaller}
-
-- What is the effect of minimum wages on employment?
-- A naive approach: compare *all* states that raise MW ("treated") to *all* states that don't ("controls")
-
-![State-level Min. Wages](images/state_minimum_wages_map.png){fig-align="center" width=45%}
-
-. . .
-
-- Problem: these groups are **very different** (political leaning, education, industry mix, etc.)
-
-
-
 ## Card and Krueger (1994) {.smaller}
 
 :::: {.columns}
-::: {.column width="50%"}
+::: {.column width="55%"}
+- Comparing *all* states that raise the minimum wage to *all* that don't is risky: they differ in politics, education, industry mix
 - In 1992, NJ raised its minimum wage; nearby PA did not
-- Card & Krueger: surveyed 410 fast-food restaurants in NJ and nearby **eastern PA** (Philadelphia suburbs, Easton area) before and after
+- Card & Krueger surveyed 410 fast-food restaurants in NJ and nearby **eastern PA**, before and after
 - **Key insight:** geographic proximity makes these restaurants likely to be on **parallel trends**
 - Found: MW increase did *not* reduce employment
 :::
-::: {.column width="50%"}
+::: {.column width="45%"}
 ![Map of surveyed restaurants](images/nj_pa_border_map.png){width=85% fig-align="left"}
 :::
 ::::
