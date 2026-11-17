@@ -22,6 +22,7 @@ execute:
 
 ```{r}
 #| label: setup
+#| cache: false
 
 library(tidyverse)
 library(fixest)
@@ -52,77 +53,46 @@ theme_set(theme_minimal(base_size = 16) +
 # Data-Driven Matching
 
 
-## The Importance of Choosing Good Controls
+## Last Time: Choosing Controls by Intuition {.smaller}
 
-- As discussed last time:
-
-- Your *causal estimate* (the **ATT**) is only as valid as your counterfactual!
-
-- **Good Controls** $\rightarrow$ **Good Counterfactual** $\rightarrow$ **Good DiD Estimate**
-
-- **Bad Controls** $\rightarrow$ **Bad Counterfactual** $\rightarrow$ **Bad DiD Estimate**
-
-
-## One Method: Intuitive Selection of Controls {.smaller}
-
-- Choosing controls based on institutional, geographic, or other pre-existing knowledge
-- Example:
-    - **Border Discontinuity:** Locales that are near each other, but separated by a jurisdictional border
-        - **Parallel Trends Assumption:** Locales on one side of the border which experienced the event (the "treated" locales) would have had the same trend in outcomes as the locales on the other side of the border (the "control" locales)
-        - Card and Krueger (1994): Compares counties in NJ which passed an increase in the minimum wage to "control" counties immediately next door in PA
-
-
-## Dube, Lester, and Reich (2010)
-
-- Dube, Lester, and Reich (2010) extend this idea to *all* counties on state borders which have different minimum wages
+- **Border designs:** compare neighbors on opposite sides of a policy border
+  - Neighbors share local economic conditions, so they are more likely to be on **parallel trends**
+  - Card and Krueger (1994): fast-food restaurants in NJ vs. nearby eastern PA
+- Dube, Lester, and Reich (2010) extend this idea to *all* county pairs on state borders with different minimum wages (PS3 Q3 replicates a follow-up, Allegretto et al. 2017)
 
 . . .
 
-![Contiguous border county pairs where one county experiences a minimum wage change and the other does not](all_mw_borders.png){fig-align="center"}
+![Border county pairs with different minimum wages (Dube, Lester, and Reich 2010)](all_mw_borders.png){fig-align="center" width="31%"}
 
 
 ## Second Method: Data-Driven Selection of Controls {.smaller}
 
 - An alternative: choose controls based on "data-driven" methods
 - Use an algorithm to find "good" controls based on observable variables
-- **The idea:** if units share observable variables, they probably also share unobservable variables
+- **The idea:** units that look alike on observable variables are more likely to share the same *trends*, so parallel trends is more believable among them
 
 - There are *lots* of methods: synthetic controls, nearest-neighbors, propensity scores, etc.
 - All share the same goal; they differ in the algorithm used
 - We will focus on: **Inverse Propensity Score Weighted DiD (IPW-DiD)**
 
 
-# IPW-DiD: Propensity Score Weighting
-
-
 ## IPW-DiD: The Example {.smaller}
 
 - In 2014, many states expanded Medicaid eligibility under the ACA
-- Suppose we want to estimate the **effect of the ACA expansion on health insurance coverage rates**
-- The TWFE DiD estimator would be:
+- Suppose we want to estimate the **effect of Medicaid expansion on the uninsured rate**, using the same TWFE DiD as Unit 12:
+
+$$
+y_{it} = \delta D_{it} + a_i + \tau_t + \mu_{it}
+$$
+
+- $y_{it}$ is the uninsured rate in state $i$ in year $t$; $D_{it} = 1$ for expansion states from 2014 on
 
 . . .
 
-$$
-y_{it} = \beta_0 + \beta_1(D_{it}) + \alpha_i + \tau_t + \mu_{it}
-$$
+**The problem:** states which expanded Medicaid are *very different* from those that did not
 
-. . .
-
-where:
-
-- $y_{it}$ is the uninsured rate in state $i$ in year $t$
-- $D_{it}$ is the treatment indicator (= $1$ in treated state after 2014)
-- $\alpha_i$ are state fixed-effects
-- $\tau_t$ are time fixed-effects
-- $\mu_{it}$ is the error term
-
-
-## The Problem: Different Types of States
-
-- States which expanded ACA are *very different* from those that did not
-  - Different politics, different demographics, different incomes, etc.
-- Using *all states* which did not implement ACA expansion as controls may give us a poor counterfactual
+- Different politics, different demographics, different incomes, etc.
+- Using *all* non-expansion states as controls may give us a poor counterfactual
 - In particular: if these characteristics also affect *trends* in uninsured rates, parallel trends will fail
 
 
@@ -184,13 +154,14 @@ aca_exp_data <- panel_data |>
 
 ## ACA Expansion Map
 
-![Map of ACA Expansion States](aca_expansion.png){fig-align="center"}
+![Map of ACA Expansion States](aca_expansion.png){fig-align="center" width="50%"}
 
 
 ## ACA Expansion: Non-Parallel Pre-Trends {.smaller}
 
 ```{r}
 #| label: naive-trends
+#| fig-height: 3.8
 
 plot_data_naive <- panel_data |>
   group_by(year, is_expanded) |>
@@ -209,7 +180,7 @@ ggplot(plot_data_naive, aes(x = year, y = mean_y, color = Group, linetype = Grou
 
 . . .
 
-- We can see that states which expanded the ACA follow very different trends compared to all untreated states
+- States which expanded Medicaid follow very different trends compared to all non-expansion states
 - Pre-trends are clearly not parallel --- bad news for our DiD estimate!
 
 ## Choosing Better Control States {.smaller}
@@ -217,9 +188,9 @@ ggplot(plot_data_naive, aes(x = year, y = mean_y, color = Group, linetype = Grou
 - We know that using *all* non-expansion states as controls is unwise
     - Violation of parallel trends $\rightarrow$ bad estimate
 - So what can we do?
-- Idea: use states which **should have** expanded the ACA **but didn't** as controls
+- Idea: use states which **look like they should have** expanded Medicaid **but didn't** as controls
 - Why?
-  - States which were highly likely to expand but didn't (due to some last-minute change, a fluke in the political process, etc.) are much more *similar* to states which did expand
+  - States which were highly likely to expand but didn't (maybe due to some last-minute change, a fluke in the political process, etc.) are much more *similar* to states which did expand
   - Therefore, they are more likely to form a "good" counterfactual
 
 
@@ -231,22 +202,22 @@ ggplot(plot_data_naive, aes(x = year, y = mean_y, color = Group, linetype = Grou
 . . .
 
 $$
-P(D_{i} = 1 | x_1, ..., x_k) = G(\beta_0 + \beta_1(x_1) + ... + \beta_k(x_k) + \mu_{it})
+P(D_{i} = 1 | x_1, ..., x_k) = G(\beta_0 + \beta_1 x_1 + ... + \beta_k x_k)
 $$
 
 . . .
 
 where:
 
-- $D_{i} = 1$ is an indicator if a unit is in the treatment group (i.e., treated at any time)
+- $D_{i}$ is an indicator equal to $1$ if a unit is in the treatment group (i.e., treated at any time)
 - $P(D_{i} = 1 | x_1, ..., x_k)$ is the *probability of being in the treatment group conditional on $x$ variables*
-- $G()$ is a non-linear function (usually estimated with **logit regression**)
+- $G()$ is a non-linear function, usually the **logit** (Unit 10)
 - After estimating this regression, compute the *predicted probability of treatment,* $\hat{P_i}$, also called the **propensity score**
 
 
 ## From Predicted Probabilities to Weights {.smaller}
 
-- We then compute the **inverse propensity weight** with:
+- Then compute the **inverse propensity weight** and use it as a *weight* in TWFE DiD:
 
 . . .
 
@@ -256,41 +227,32 @@ $$
 
 . . .
 
-- Then, we use $IPW_i$ as *weights* in the standard TWFE DiD regression
-
-
-## What Does This Formula Do? {.smaller}
-
 - If a unit is **treated** ($D_i=1$): $IPW_i = 1$
-- If a unit is **untreated** ($D_i=0$): $IPW_i = \frac{\hat{P_i}}{1 - \hat{P_i}}$
-  - If the *predicted probability $\hat{P_i}$ is large*, then $IPW_i$ is large
-  - If the *predicted probability $\hat{P_i}$ is small*, then $IPW_i$ is small
+- If a unit is **untreated** ($D_i=0$): $IPW_i = \frac{\hat{P_i}}{1 - \hat{P_i}}$, which is large when $\hat{P_i}$ is large and small when $\hat{P_i}$ is small
 
 . . .
 
 - In other words:
-  - Untreated units that *look like* they should have been treated (but didnt't) get **a lot of weight** as a control
+  - Untreated units that *look like* they should have been treated (but didn't) get **a lot of weight** as a control
   - Untreated units that look *nothing like* treated units get **very little weight** as a control
-  - All treated units get weight of $1$
+- The weighted controls look like the **treated** group, so IPW-DiD still estimates the **ATT**
+
 
 
 ## Propensity Score Example {.smaller}
 
-- Whether or not a state extends the ACA is probably a function of (at least):
-  - Democratic vote share, region, and poverty rates
-    - Democrats more likely to support expansion; states with higher poverty rates also more likely to support it; if nearby states pass it so will others
-
-- So we can write:
+- Whether or not a state expands Medicaid is probably a function of (at least):
+  - Democratic vote share, region, and poverty rates (Democrats and poorer states were more supportive; neighbors tend to follow neighbors)
 
 . . .
 
 $$
-P(D_i = 1) = G(\beta_0 + \beta_1(dem\_votes_i) + \beta_2(region_i) + \beta_3(poverty_i))
+P(D_i = 1) = G(\beta_0 + \beta_1 dem\_share_i + \beta_2 region_i + \beta_3 pov\_rate_i)
 $$
 
 . . .
 
-- Estimated propensity scores ($\hat{P_i}$) and IPW weights ($IPW_i$) look like:
+- Some illustrative propensity scores ($\hat{P_i}$) and IPW weights ($IPW_i$):
 
 . . .
 
@@ -299,48 +261,31 @@ $$
 | MI    | Treated | 0.91 | 1.00 |
 | WI    | Control | 0.87 | **6.69** |
 | TX    | Control | 0.16 | 0.19 |
-| PA    | Control | 0.79 | **3.76** |
+| ME    | Control | 0.79 | **3.76** |
 | MA    | Treated | 0.98 | 1.00 |
-| LA    | Control | 0.28 | 0.38 |
-
-
-## Control Set with Equal Weights
-
-- Without IPW, all control states get equal weight --- regardless of how similar they are to treated states
-
-. . .
-
-![All four control states shown at equal size](state_wts_constant.png){fig-align="center"}
-
-
-## Control Set with IPW Weights
-
-- With IPW, control states that *look like* treated states (WI, PA) get much larger weight
-
-. . .
-
-![WI and PA are large (high weight); TX and LA are small (low weight)](state_wts_ipw.png){fig-align="center"}
+| GA    | Control | 0.28 | 0.39 |
 
 
 ## What the Weights Do {.smaller}
 
-- Control states like **WI** and **PA** --- which have a high probability of treatment *but don't get treated* --- get much higher weights in the TWFE regression
+- Without IPW, every control state counts equally in the construction of the counterfactual. With IPW, controls that *look like* treated states (**WI**, **ME**) count much more; controls that don't (**TX**, **GA**) barely count
 
-- Control states like **TX** and **LA** --- which have a low probability of treatment --- get very little weight
+. . .
 
-- Effect: build a weighted control group that is observably similar to the treated group
+![Each control state's share of the control group (among these four)](state_wts_compare.png){fig-align="center"}
 
 . . .
 
 ::: {.callout-important}
 ## Key Point
-IPW upweights control units which *almost* got treated and downweights control units which were never going to be treated. This builds a better counterfactual.
+IPW upweights control units which *likely should have got treated but didn't* and downweights *control units which were never going to be treated.* This builds a better counterfactual.
 :::
+
 
 
 ## Let's Implement This Step-by-Step {.smaller}
 
-- In the simulated data, the **true effect** of expansion is a $-5$ point drop in the uninsured rate
+- In our simulated data (200 simulated "states"), the **true effect** of expansion is a $-5$ point drop in the uninsured rate
 
 **Step 1:** Estimate the naive TWFE DiD (all controls, equal weight)
 
@@ -362,7 +307,7 @@ summary(did_naive)
 
 ## Step 2: Aggregate Data & Estimate Propensity Scores {.smaller}
 
-- It's usually a good idea to estimate propensity scores on *just pre-treatment periods*
+- It's usually a good idea to estimate propensity scores on *just pre-treatment periods* (the policy itself can change later values of the $x$'s)
 
 . . .
 
@@ -372,24 +317,15 @@ summary(did_naive)
 agg_state_data <- aca_exp_data |>
   filter(post == 0) |>
   group_by(state_id, is_expanded) |>
-  summarize(pretreat_dem_share = mean(dem_share, na.rm = T),
-    pretreat_region = mean(region, na.rm = T),
-    pretreat_pov_rate = mean(pov_rate, na.rm = T)
+  summarize(pretreat_dem_share = mean(dem_share, na.rm = TRUE),
+    pretreat_region = mean(region, na.rm = TRUE),
+    pretreat_pov_rate = mean(pov_rate, na.rm = TRUE)
   ) |>
   ungroup()
 
 logit_treatment <- glm(
   is_expanded ~ pretreat_dem_share + pretreat_region + pretreat_pov_rate,
   data = agg_state_data, family = binomial("logit"))
-```
-
-## Step 2.5: Examine Predictive Model {.smaller}
-
-```{r}
-#| echo: true
-
-summary(logit_treatment)
-
 ```
 
 ## Step 3: Get Predicted Probabilities & Compute IPW {.smaller}
@@ -418,21 +354,24 @@ aca_exp_data <- aca_exp_data |>
 
 ## Check Propensity Score Overlap {.smaller}
 
-- We need treated and control propensity scores to **overlap**
-  - Need untreated units with high predicted probability; treated units some variation in predicted probability
+- We need treated and control propensity scores to **overlap**: wherever there are treated states, we need control states with similar $\hat{P_i}$
 
 . . .
 
 ```{r}
+#| fig-height: 4
 ggplot(agg_state_data, aes(x = pred_prob, fill = factor(is_expanded))) +
   geom_histogram(bins = 25, alpha = 0.6, position = "identity", color = "white") +
   scale_fill_manual(values = c("0" = "#E69F00", "1" = "#0072B2"),
                     labels = c("Control", "Treated")) +
   labs(x = "Estimated Propensity Score", y = "Count",
     title = "Propensity Score Distributions by Treatment Status",
-    subtitle = "Good overlap means we can find comparable control units",
+    subtitle = "Few control states have scores above 0.75",
     fill = NULL)
 ```
+
+- Here, overlap is thin at the top: only 3 control states (vs. 26 treated) have $\hat{P_i} > 0.75$, so those few get very large weights
+
 
 
 ## Step 4: Estimate IPW-Weighted TWFE DiD {.smaller}
@@ -460,6 +399,7 @@ summary(did_ipw)
 ## Comparing Naive vs. IPW: The Trends {.smaller}
 
 ```{r}
+#| fig-height: 4.2
 plot_data_ipw <- aca_exp_data |>
   group_by(year, is_expanded) |>
   summarize(mean_y = weighted.mean(uninsured_rate, w = ipw), .groups = 'drop') |>
@@ -468,7 +408,8 @@ plot_data_ipw <- aca_exp_data |>
 plot_data_naive_f <- plot_data_naive |>
   mutate(type = "Naive (Unweighted)")
 
-plot_both <- bind_rows(plot_data_naive_f, plot_data_ipw)
+plot_both <- bind_rows(plot_data_naive_f, plot_data_ipw) |>
+  mutate(type = factor(type, levels = c("Naive (Unweighted)", "IPW-Weighted")))
 
 ggplot(plot_both, aes(x = year, y = mean_y, color = Group, linetype = Group)) +
   geom_line(linewidth = 1.1) +
@@ -478,27 +419,72 @@ ggplot(plot_both, aes(x = year, y = mean_y, color = Group, linetype = Group)) +
   scale_color_manual(values = c("Treated" = "#0072B2", "Control" = "#E69F00")) +
   labs(x = "Year", y = "Mean Uninsured Rate (%)",
     title = "Naive vs. IPW-Weighted Trends",
-    subtitle = "IPW reweighting brings pre-trends into alignment")
+    subtitle = "IPW narrows the gap in pre-trends, but doesn't close it")
 ```
+
+- Before 2014, the IPW-weighted controls are much closer to the treated states' trend, but not parallel: that leftover gap is why we're still about 1 point off
+
 
 
 ## Comparing Naive vs. IPW: The Estimates {.smaller}
 
 ```{r}
+# CIs use standard errors clustered by state (covered at the end of the unit)
+ci_naive <- confint(did_naive, cluster = ~state_id)
+ci_ipw <- confint(did_ipw, cluster = ~state_id)
+
 tibble(
     Method = c("Naive DiD (all controls, equal weight)", "IPW-Weighted DiD"),
     Estimate = c(coef(did_naive)["treat_post"], coef(did_ipw)["treat_post"]),
-    `95% CI Lower` = c(confint(did_naive)["treat_post", 1], confint(did_ipw)["treat_post", 1]),
-    `95% CI Upper` = c(confint(did_naive)["treat_post", 2], confint(did_ipw)["treat_post", 2]),
+    `95% CI Lower` = c(ci_naive["treat_post", 1], ci_ipw["treat_post", 1]),
+    `95% CI Upper` = c(ci_naive["treat_post", 2], ci_ipw["treat_post", 2]),
     `True Effect` = c(-5, -5)
 ) |>
-    knitr::kable(digits = 2)
+    knitr::kable(digits = 2, format.args = list(nsmall = 2))
 ```
 
 . . .
 
 - The naive 95% CI doesn't even contain the true effect of $-5$!
 - The IPW estimate is much closer to the truth, and its CI covers $-5$
+
+## Leave Out a Variable {.smaller}
+
+- Our propensity score model used Democratic vote share, region, and poverty rate
+- Suppose we **left one of them out** of the logit. Which omission would hurt the IPW-DiD estimate most? Why?
+
+. . .
+
+```{r}
+#| label: try-omit
+
+try_fit <- function(f) {
+  ps <- glm(f, data = agg_state_data, family = binomial("logit"))
+  w <- agg_state_data |>
+    mutate(p = predict(ps, type = "response"),
+           w = if_else(is_expanded == 1, 1, p / (1 - p))) |>
+    select(state_id, w)
+  m <- feols(uninsured_rate ~ treat_post | state_id + year, weights = ~w,
+             data = left_join(aca_exp_data, w, by = "state_id"))
+  unname(coef(m)["treat_post"])
+}
+
+tibble(
+  `Propensity score model` = c("All three variables", "Without Democratic vote share",
+                               "Without poverty rate", "Without region"),
+  `IPW-DiD estimate` = c(
+    try_fit(is_expanded ~ pretreat_dem_share + pretreat_region + pretreat_pov_rate),
+    try_fit(is_expanded ~ pretreat_region + pretreat_pov_rate),
+    try_fit(is_expanded ~ pretreat_dem_share + pretreat_region),
+    try_fit(is_expanded ~ pretreat_dem_share + pretreat_pov_rate)),
+  `True effect` = -5
+) |>
+  knitr::kable(digits = 2)
+```
+
+. . .
+
+- Leaving out a variable that drives *both* expansion *and* trends in the uninsured rate brings the bias back
 
 
 ## IPW-DiD: Key Takeaways {.smaller}
@@ -510,7 +496,8 @@ tibble(
 - **The Algorithm:**
   1. Estimate predicted probability of treatment (propensity score) using pre-treatment data
   2. Compute IPW from predicted probabilities and treatment status
-  3. Use IPW as weights in TWFE DiD regression
+  3. Check that treated and control propensity scores overlap
+  4. Use IPW as weights in TWFE DiD regression
 
 . . .
 
@@ -522,24 +509,17 @@ Your IPW-DiD estimate is only as good as your predictive model! If you leave out
 # Dynamic DiD
 
 
-## Introduction to Dynamic DiD
+## Introduction to Dynamic DiD {.smaller}
 
-- TWFE models can be extended to estimate **separate** treatment effects for each post-treatment period
-  - If treatment occurs in 2015, and we observe data for 2016, 2017, and 2018, we can estimate a different treatment effect for each year
+- TWFE models can be extended to estimate a **separate** treatment effect for each period
+  - If treatment starts in 2015 and we observe 2015--2018, we can estimate a different effect for each year
 - Why might we want to do this?
   - Maybe the treatment effect **grows** a few years after a policy comes into effect
   - Or maybe it **diminishes** over time
-
-- **Dynamic DiD** regressions allow us to estimate these period-by-period treatment effects
-
-
-## Relative Time
-
-- Dynamic DiD models are estimated using **relative time**
-- **Relative time:** the number of time periods since the event occurred
-- If an event occurs in 2015:
-  - For **2015, 2016, 2017, ...**, relative time is **0, 1, 2, ...**
+- Dynamic DiD uses **relative time**: the number of periods since the event
+  - If an event occurs in 2015: for **2015, 2016, 2017, ...**, relative time is **0, 1, 2, ...**
   - For **..., 2012, 2013, 2014**, relative time is **..., -3, -2, -1**
+
 
 
 ## The Dynamic DiD Model {.smaller}
@@ -549,33 +529,35 @@ Your IPW-DiD estimate is only as good as your predictive model! If you leave out
 . . .
 
 $$
-y_{it} = \sum_{j=-J}^{-2}\beta_jD_{it} + \sum_{k=0}^{K}\beta_kD_{it}  + \alpha_i + \tau_t + \mu_{it}
-$$ {#eq-dyn-did}
+y_{it} = \sum_{k \neq -1} \delta_k D^k_{it} + a_i + \tau_t + \mu_{it}
+$$
 
 . . .
 
 where:
 
-- $y_{it}$, $\alpha_i$, $\tau_t$, and $\mu_{it}$ are the same as in our TWFE model
-- $D_{kit}$ are dummy variables which equal $1$ if the unit is treated AND the relative time is $k$, and $0$ otherwise
-- **Important:** We **omit** the dummy for $k=−1$ (the period just before treatment) as the reference category
-- The $\hat{\beta_k}$ coefficients trace out the effect of the policy over the post-treatment period *relative* to $k=−1$
-- The $\hat{\beta_j}$ coefficients trace out the "effect" of the policy over the pre-treatment period *relative* to $k=−1$
+- $y_{it}$, $a_i$, $\tau_t$, and $\mu_{it}$ are the same as in our TWFE model
+- $D^k_{it}$ is a dummy that equals $1$ if unit $i$ is in the treated group AND period $t$ is relative time $k$, and $0$ otherwise
+- **Important:** We **omit** the dummy for $k=-1$ (the period just before treatment) as the reference category
+- For $k \geq 0$, $\hat{\delta}_k$ traces out the effect of the policy after adoption, *relative* to $k=-1$
+- For $k \leq -2$, $\hat{\delta}_k$ traces out the "effect" *before* adoption, *relative* to $k=-1$
+
 
 ## Why Omit $k=-1$? {.smaller}
 
 - Same reason we omit a reference category with any set of dummy variables --- to avoid perfect collinearity (the "dummy variable trap")
 - We choose $k=-1$ because it's the natural baseline:
   - All estimates are then interpreted as the treatment effect *relative to the period just before treatment*
-  - $\hat{\beta}_0$: effect in the year of treatment relative to the year before
-  - $\hat{\beta}_1$: effect one year after treatment relative to the year before
-  - $\hat{\beta}_{-3}$: "effect" three years before treatment relative to the year before (should be $\approx 0$!)
+  - $\hat{\delta}_0$: effect in the year of treatment relative to the year before
+  - $\hat{\delta}_1$: effect one year after treatment relative to the year before
+  - $\hat{\delta}_{-3}$: "effect" three years before treatment relative to the year before (should be $\approx 0$!)
 
 
 ## Example Data Structure {.smaller}
 
 - In a normal DiD, we have a single `treat_post` column
 - In dynamic DiD, we replace it with a **dummy for each relative time period** interacted with treatment
+- Shown: one treated unit (1) and one control unit (3)
 
 . . .
 
@@ -600,43 +582,20 @@ did_ex_tab <- did_ex_tab |>
   mutate(rel_t_treat_0 = rel_t_treat_0 * treatment_group) |>
   arrange(unit_id, rel_t)
 
-as.data.frame(
-  did_ex_tab |> select(unit_id, year, treatment_group, starts_with("rel_t_treat"))
-)
+old_width <- options(width = 120)
+did_ex_tab |>
+  filter(unit_id %in% c(1, 3)) |>
+  select(unit_id, year, treatment_group, `rel_t_treat_-2`, `rel_t_treat_-1`,
+         rel_t_treat_0, rel_t_treat_1, rel_t_treat_2) |>
+  as.data.frame()
+options(old_width)
 ```
 
 
-## Example Data Structure {.smaller}
+## Dynamic DiD Example: An Environmental Policy {.smaller}
 
-- Alternatively, we can create a **factor** variable which equals the *relative time* for treated units and 0 for control units
-
-. . .
-
-```{r}
-#| echo: true
-#| output-location: column-fragment
-
-did_ex_tab <- did_ex_tab |>
-  mutate(rel_treat_t = case_when(treatment_group == 1 ~ rel_t,
-    TRUE ~ 0),
-    rel_treat_t.f = as.factor(rel_treat_t),
-    rel_t_treat.f = relevel(rel_treat_t.f, ref = "-1")
-    )
-
-as.data.frame(
-  did_ex_tab |> select(unit_id, year, treatment_group, rel_t_treat.f)
-)
-
-```
-
-## Dynamic DiD Example {.smaller}
-
-- Suppose we want to estimate the effect of an *environmental policy* on manufacturing employment
-- Assume the effect of this policy *increases* over time
-- We have data on 50 cities:
-  - 25 of these cities enacted the policy in 2005 ("treated" cities)
-  - 25 did not ("control" cities)
-  - We observe all 50 cities from 1995 to 2010
+- Simulated: 50 cities, 1995--2010; 25 enact an *environmental policy* in 2005, 25 do not
+- The policy's effect on manufacturing employment *grows* over time
 
 ```{r}
 #| label: sim-env
@@ -701,10 +660,8 @@ final_simulated_data <- final_simulated_data |>
 
 ```
 
-
-## Raw Trends: Treated vs. Control Cities {.smaller}
-
 ```{r}
+#| fig-height: 4.2
 env_trends <- final_simulated_data |>
   group_by(year, treated_group) |>
   summarize(mean_emp = mean(manufacturing_emp), .groups = 'drop') |>
@@ -726,6 +683,7 @@ Note: figure generated using simulated data. True effects: $-100$ at $k=0$, grow
 :::
 
 
+
 ## Estimating the Dynamic Model {.smaller}
 
 ```{r}
@@ -742,26 +700,8 @@ dyn_did <- feols(manufacturing_emp ~ `rel_t_treat_-10` + `rel_t_treat_-9` +
     data = final_simulated_data)
 ```
 
-- Note: `rel_t_treat_-1` (the period right before treatment) is **omitted** as the reference category
+- Note: we leave `rel_t_treat_-1` (the period right before treatment) out of the formula: it's the reference category
 - Each coefficient = treatment effect at that relative time, compared to $k = -1$
-
-## Estimating the Dynamic Model {.smaller}
-
-- Instead estimating using the factor variable:
-
-. . .
-
-```{r}
-#| echo: true
-
-dyn_did_2 <- feols(manufacturing_emp ~ rel_t_treat.f |
-    city_id + year,
-    vcov = "HC1",
-    data = final_simulated_data)
-
-summary(dyn_did_2)
-
-```
 
 ## Interpreting the Results {.smaller}
 
@@ -774,13 +714,13 @@ summary(dyn_did)
 
 ## Interpreting the Coefficients {.smaller}
 
-Each $\hat{\beta}_k$ is the estimated treatment effect at relative time $k$, **relative to $k = -1$**
+Each $\hat{\delta}_k$ is the estimated treatment effect at relative time $k$, **relative to $k = -1$**
 
-- $\hat{\beta}_{-3} \approx -30$: Three years before adoption, treated cities had 30 less manufacturing jobs than control cities *compared to one year before adoption*. Not statistically different from zero $\rightarrow$ no pre-trend.
+- $\hat{\delta}_{-3} \approx -30$: Three years before adoption, treated cities had 30 fewer manufacturing jobs than control cities *compared to one year before adoption*. Not statistically different from zero $\rightarrow$ no sign of a pre-trend.
 
-- $\hat{\beta}_0 \approx -118$: In the adoption year, treated cities lost about 180 manufacturing jobs relative to control cities *compared to one year before adoption*. Statistically significant!
+- $\hat{\delta}_0 \approx -119$: In the adoption year, treated cities lost about 120 manufacturing jobs relative to control cities *compared to one year before adoption*. Statistically significant!
 
-- $\hat{\beta}_3 \approx -500$: Three years after adoption, the gap had grown to about 500 fewer jobs. Statistically significant!
+- $\hat{\delta}_3 \approx -500$: Three years after adoption, the gap had grown to about 500 fewer jobs. Statistically significant!
 
 . . .
 
@@ -788,26 +728,28 @@ Each $\hat{\beta}_k$ is the estimated treatment effect at relative time $k$, **r
 
 - The coefficients are *not* the level of employment --- they are *differences* between treated and control, benchmarked to the period just before the policy
 
-- If $\hat{\beta}_{-5} = 0$ and $\hat{\beta}_{-2} = 0$ but $\hat{\beta}_0 = -100$, that's the pattern we want: nothing happening pre-treatment, then a break at the policy date
+- If $\hat{\delta}_{-5} = 0$ and $\hat{\delta}_{-2} = 0$ but $\hat{\delta}_0 = -100$, that's the pattern parallel trends predicts: nothing happening pre-treatment, then a break at the policy date
 
-- The confidence intervals tell you whether each coefficient is statistically distinguishable from zero
 
 
 ## Pre-Treatment Results and Parallel Trends {.smaller}
 
-- Why do we estimate effects *before* the policy occurs?
-- Because this is a **test of our key DiD assumption: parallel trends**
+- Why estimate effects *before* the policy occurs? To check for **pre-trends**: evidence for (not proof of) our key assumption, **parallel trends**
+  - This is what Card (1990) couldn't show with only one pre-period year
 
 . . .
 
-- Think about what $\hat{\beta}_{-3}$ measures: the gap between treated and control groups at $k = -3$ relative to their gap at $k = -1$
-- If both groups were on the same trajectory before the policy, this gap should not have been changing $\rightarrow$ $\hat{\beta}_{-3} \approx 0$
-- If $\hat{\beta}_{-3}$ is large and statistically significant, the groups were drifting apart *before* the policy even existed
-  - Any post-treatment divergence might just be a continuation of that pre-existing trend
+- $\hat{\delta}_{-3}$ is the treated--control gap at $k = -3$ relative to the gap at $k = -1$. If both groups were on the same trajectory, the gap wasn't changing $\rightarrow$ $\hat{\delta}_{-3} \approx 0$
+- If the pre-treatment $\hat{\delta}_k$'s are large and significant, the groups were drifting apart *before* the policy: any post-treatment divergence might just continue that trend
 
 . . .
 
-- Here, our pre-treatment coefficients are close to zero: **good evidence for parallel trends**
+- Here, 8 of our 9 pre-treatment coefficients are close to zero. $\hat{\delta}_{-10}$ is significant at 5%, but with 9 tests, one false positive is not unusual: no *pattern* $\rightarrow$ **good evidence for parallel trends**
+
+::: {.callout-warning}
+A *pattern* of significant pre-treatment coefficients (e.g., a steady drift): **red flag!** Your control group is probably not valid
+:::
+
 
 
 ## The Event-Study Plot {.smaller}
@@ -818,8 +760,7 @@ Each $\hat{\beta}_k$ is the estimated treatment effect at relative time $k$, **r
 . . .
 
 ```{r}
-#| echo: true
-#| output-location: slide
+#| fig-height: 3.7
 
 est_tab <- as_tibble(dyn_did$coeftable) |>
   rownames_to_column(var = "coefname") |>
@@ -851,23 +792,7 @@ ggplot(data = est_tab) +
     subtitle = "Reference period: k = -1 (one year before adoption)")
 ```
 
-
-## Reading the Event Study Plot
-
-- **Left of the dashed line** (pre-treatment, $k < -1$):
-  - Coefficients are near zero, confidence intervals include zero
-  - i.e., no statistically significant difference between treatment and control groups prior to treatment
-  - $\rightarrow$ No evidence of pre-trends; parallel trends looks plausible
-
-- **Right of the dashed line** (post-treatment, $k \geq 0$):
-  - Coefficients become large and negative, growing over time
-  - $\rightarrow$ The causal effect of the policy, unfolding over time
-
-. . .
-
-::: {.callout-warning}
-If you saw significant pre-treatment coefficients: **red flag!** Your control group is probably not valid
-:::
+- **Left of the dashed line:** the pre-trends check. **Right of it:** the policy's effect, growing over time
 
 
 
@@ -876,12 +801,12 @@ If you saw significant pre-treatment coefficients: **red flag!** Your control gr
 - Our example was "simple": all treated cities adopted the policy in the same year (2005)
 - This is called **simultaneous adoption**
 - What if units are treated in different years? (e.g., some cities in 2005, others in 2007, more in 2010)
-- This is **staggered adoption**
+- This is **staggered adoption**, and it's common: the real Medicaid expansion was staggered (most states in 2014; PA and IN in 2015; LA in 2016; more since)
 
 . . .
 
 ::: {.callout-warning}
-The simple TWFE dynamic DiD model can be very biased under staggered adoption. The problem is that TWFE implicitly uses already-treated units as controls for later-treated units, creating "negative weights" on some treatment effects. If you have staggered adoption, you need different methods (e.g., the Callaway-Sant'Anna estimator in the `did` package).
+Under staggered adoption, simple TWFE (static or dynamic) can be very biased **when treatment effects change over time or differ across adoption groups**, like our environmental policy, whose effect grows. TWFE implicitly uses already-treated units as controls for later-treated units, creating "negative weights" on some treatment effects. Use methods built for staggered adoption: `sunab()` in `fixest` (Sun and Abraham) or the Callaway-Sant'Anna estimator in the `did` package.
 :::
 
 
@@ -893,23 +818,23 @@ The simple TWFE dynamic DiD model can be very biased under staggered adoption. T
 
 3. We **omit** $k=−1$ (period just before treatment) as the reference category
 
-4. Pre-treatment coefficients ($k < -1$) test the **parallel trends** assumption --- they should all be $\approx 0$
+4. Pre-treatment coefficients ($k < -1$) check for **pre-trends**: evidence for parallel trends, not proof --- they should be $\approx 0$, with no pattern
 
 5. Present your results using an **event study plot**
 
-6. The simple TWFE model **fails under staggered adoption**
+6. The simple TWFE model can **fail under staggered adoption** when effects change over time
 
 
 # Cluster-Robust Standard Errors
 
 
-## The Core Problem: An Intuitive Example
+## The Core Problem: An Intuitive Example {.smaller}
 
 - Imagine you want to know the average height of 5th graders in a city
 
 - You have two sampling options:
 
-- **Plan A (Simple Random Sample):** Randomly select 1,000 students from every school in the city
+- **Plan A (Simple Random Sample):** Randomly select 1,000 5th graders from across the whole city
 
 - **Plan B (Cluster Sample):** Randomly select 40 classrooms and measure all 25 students in each
 
@@ -918,66 +843,63 @@ The simple TWFE dynamic DiD model can be very biased under staggered adoption. T
 - **No!** In Plan B, students in the same class are more similar to each other (shared teacher, neighborhood, etc.). They are not *independent!*
 
 
-## What is a "Cluster"?
+## What is a "Cluster"? {.smaller}
 
 - A **cluster** is a group of observations that are more similar to each other than to observations in other groups
 
 - Errors from our regression are *correlated within the cluster*
 
-- But Errors from our regression are still *independent between clusters*
+- But errors from our regression are still *independent between clusters*
 
 . . .
 
 | Individual unit ($n$) | Cluster ($G$) |
 |:-------------------:|:-----------:|
-| Students            | Classroom   |
+| Student             | Classroom   |
 | Person              | State (or county) |
 | City                | State       |
-| Firms               | Industry    |
+| Firm                | Industry    |
+| State-year (panel data) | State   |
 
 - Why is this a problem for our standard errors?
 
 
 ## The Statistical Violation {.smaller}
 
-- This is a violation of our **Gauss-Markov** Assumptions
-- If one student in a class has a higher *error term*, her other classmates probably do too
-- Knowing one error tells you something about another error $\rightarrow$ correlated errors within each cluster
+- This violates **GM2 (random sampling)**: observations are no longer independent (heteroskedasticity broke GM5 in Unit 9)
+- If one student in a class has a higher *error term*, her classmates probably do too $\rightarrow$ correlated errors within each cluster
 
 . . .
 
 - Just like **heteroskedasticity**, clustered errors will **not bias** your coefficient estimate $\hat{\beta}$
-- However, it will lead to an (often very large) **underestimation** of our "true" standard errors
-
-
-## What Happens When Standard Errors Are Too Small? {.smaller}
-
-- If our standard errors are too small:
-  - Our t-statistics are too big
-  - Our p-values are too small
-  - Our confidence intervals are too narrow
+- But our usual standard errors are often far **too small**: t-statistics too big, p-values too small, confidence intervals too narrow
 
 . . .
 
-- This leads to **Type I Errors (False Positives)**
-
-- **Type I Error:** You conclude there is an effect when, in reality, there is no effect
-
-- We usually accept a 5% false positive rate (i.e., $\alpha = 0.05$)
-
-- When we ignore clustering, our actual Type I error rate might be 20%, 30%, or even 50%...
-
+- This leads to **Type I errors (false positives)**: concluding there is an effect when, in reality, there is none
+- We usually accept a 5% false positive rate ($\alpha = 0.05$). Ignoring clustering can push it far higher...
 - ...all while R tells us the p-value is 0.03!
+
+
+## Why DiD Needs Clustered SEs {.smaller}
+
+- DiD follows the *same states* over *many years*: a state's errors are correlated from year to year, so each state is a cluster
+- Bertrand, Duflo, and Mullainathan (2004) made up **fake ("placebo") state laws**, assigned at random, and estimated their "effects" on women's wages with DiD
+
+. . .
+
+- The laws were fake, so the true effect was zero. Yet with about 20 years of state-level data, the usual standard errors found a "significant" effect at 5% for **up to 45% of the fake laws**
+- Their fix: allow errors to be correlated within each state (cluster by state)
+
 
 
 ## Simulation: Setup {.smaller}
 
 - Let's see how bad this problem gets with a simulation
 - We generate data where the **true treatment effect is zero**, so *any* rejection of $H_0$ is a **Type I error**
+- Treatment is assigned to **whole clusters** (like a state policy): every student in a classroom is treated, or none is
 
 . . .
-
-**Simulation parameters:**
 
 | Parameter | Value | Meaning |
 |:----------|:-----:|:--------|
@@ -988,16 +910,21 @@ The simple TWFE dynamic DiD model can be very biased under staggered adoption. T
 | True treatment effect | **0** | Treatment does *nothing* |
 | Number of simulations | 1,000 | We repeat the experiment 1,000 times |
 
+. . .
+
+- Each time: run `feols(y ~ treatment)`, get p-values with **naive (iid)** and **HC1** standard errors, and check whether we reject $H_0$ at $\alpha = 0.05$
+
+
 
 ## What Does Clustered Data Look Like? {.smaller}
 
-- Here is one draw from our simulation (showing 8 clusters for clarity)
-- Each color = a different cluster; observations within a cluster share a common error component
+- Here is one draw (8 classrooms, for clarity). Students in the same classroom share a common error component, and the whole classroom is either treated or not
 
 . . .
 
 ```{r}
 #| label: cluster-scatter
+#| fig-height: 3.5
 
 set.seed(12345980)
 
@@ -1014,33 +941,20 @@ viz_data <- tibble(
   cluster_error = rep(rnorm(n_show, 0, sqrt(cluster_var)), each = obs_show),
   treatment = rep(rbinom(n_show, 1, 0.5), each = obs_show),
   individual_error = rnorm(n_show * obs_show, 0, sqrt(indiv_var)),
-  x = runif(n_show * obs_show, 0, 10),
   y = 5 + 0 * treatment + cluster_error + individual_error
-)
+) |>
+  mutate(Treatment = if_else(treatment == 1, "Treated classroom", "Control classroom"))
 
-ggplot(viz_data, aes(x = x, y = y, color = factor(cluster_id))) +
-  geom_point(size = 2.5, alpha = 0.7) +
-  geom_hline(data = viz_data |> group_by(cluster_id) |> summarize(mean_y = mean(y)),
-             aes(yintercept = mean_y, color = factor(cluster_id)),
-             linetype = "dashed", alpha = 0.5) +
-  scale_color_brewer(palette = "Set2") +
-  labs(x = "X", y = "Y",
-    title = "Clustered Data: Observations Within Groups Are Correlated",
-    subtitle = "Dashed lines = cluster means; dots of the same color tend to bunch together",
-    color = "Cluster")
+ggplot(viz_data, aes(x = factor(cluster_id), y = y, color = Treatment)) +
+  geom_jitter(width = 0.2, height = 0, size = 2, alpha = 0.6) +
+  stat_summary(fun = mean, geom = "crossbar", width = 0.6, color = "black", linewidth = 0.4) +
+  scale_color_manual(values = c("Control classroom" = "#E69F00", "Treated classroom" = "#0072B2")) +
+  labs(x = "Classroom", y = "Y", color = NULL,
+    title = "Clustered Data: Students Bunch Within Classrooms",
+    subtitle = "Black bars = classroom means. The true treatment effect is zero")
 ```
 
-- Notice: observations of the same color cluster around the same value of $y$
-- OLS treats all 1,500 dots as independent --- but dots of the same color are *not* independent!
-
-
-## Simulation: Running 1,000 Experiments {.smaller}
-
-- For each of 1,000 simulated datasets (50 clusters $\times$ 30 obs, true effect = 0):
-  1. Run OLS: `feols(y ~ treatment)`
-  2. Get p-value using **naive (iid)** standard errors
-  3. Get p-value using **HC1 (heteroskedasticity-robust)** standard errors --- the fix we've been using all semester
-  4. Check: did we reject $H_0$ at $\alpha = 0.05$? (Any rejection is a **Type I error**!)
+- OLS treats all 240 dots as independent, but each classroom is closer to *one* piece of information about treatment
 
 ```{r}
 #| label: cluster-sim
@@ -1085,6 +999,22 @@ alpha <- 0.05
 naive_rej <- mean(results[, "naive_p"] < alpha)
 hc1_rej <- mean(results[, "hc1_p"] < alpha)
 cluster_rej <- mean(results[, "cluster_p"] < alpha)
+
+# Same simulation, but treatment assigned to individual students (Try It slide)
+run_trial_ind <- function() {
+  sim_data <- generate_clustered_data(NUM_CLUSTERS, OBS_PER_CLUSTER, ICC, TRUE_EFFECT)
+  sim_data$treatment <- rbinom(nrow(sim_data), 1, 0.5)
+  model <- feols(y ~ treatment, data = sim_data)
+
+  naive_p <- summary(model, se = "iid")$coeftable["treatment", "Pr(>|t|)"]
+  cluster_p <- summary(model, cluster = ~cluster_id)$coeftable["treatment", "Pr(>|t|)"]
+
+  return(c(naive_p = naive_p, cluster_p = cluster_p))
+}
+
+results_ind <- t(replicate(NUM_SIMS, run_trial_ind()))
+naive_rej_ind <- mean(results_ind[, "naive_p"] < alpha)
+cluster_rej_ind <- mean(results_ind[, "cluster_p"] < alpha)
 ```
 
 
@@ -1104,53 +1034,27 @@ cat(sprintf("2. Heteroskedasticity-Robust (HC1) Errors:   %.1f%%\n", hc1_rej * 1
 - Neither of our usual standard error approaches works here. We need something new.
 
 
-## Visualizing the Problem {.smaller}
-
-```{r}
-results_long_pre <- as_tibble(results) |>
-  select(naive_p, hc1_p) |>
-  pivot_longer(everything(), names_to = "method", values_to = "pvalue") |>
-  mutate(method = case_when(
-    method == "naive_p" ~ "Naive (iid) SEs",
-    method == "hc1_p" ~ "HC1 (Heteroskedasticity-Robust) SEs"
-  ))
-
-ggplot(results_long_pre, aes(x = pvalue, fill = method)) +
-  geom_histogram(bins = 20, alpha = 0.7, color = "white") +
-  geom_vline(xintercept = 0.05, linetype = "dashed", color = "red") +
-  facet_wrap(~method) +
-  annotate("text", x = 0.15, y = 150, label = "alpha == 0.05", parse = TRUE,
-           color = "red", size = 4) +
-  scale_fill_manual(values = c("Naive (iid) SEs" = "#E69F00",
-                                "HC1 (Heteroskedasticity-Robust) SEs" = "#D55E00")) +
-  labs(x = "P-Value", y = "Count",
-    title = "P-Value Distributions Under the Null (True Effect = 0)",
-    subtitle = sprintf("Naive Type I error rate: %.0f%% | HC1 Type I error rate: %.0f%%",
-                      naive_rej * 100, hc1_rej * 100)) +
-  theme(legend.position = "none")
-```
-
-- Under $H_0$, p-values should be uniformly distributed (flat histogram)
-- Both naive and HC1: p-values pile up near zero $\rightarrow$ way too many Type I errors
-
-
 ## The Solution: Cluster-Robust Standard Errors {.smaller}
 
-- **Cluster-Robust Standard Errors (CRSEs)** are designed for exactly this problem
-- They allow for correlated errors *within* each cluster, while still assuming independence *between* clusters
+- **Cluster-Robust Standard Errors (CRSEs)** allow correlated errors *within* clusters (but not *between* them). Recall Unit 9's robust (HC1) formula:
+
+$$
+se(\hat{\beta}_1)^2 = \frac{\sum_{i=1}^{n} (x_i - \bar{x})^2 \, (\hat{\mu}_i)^2}{SST_x^2}
+$$
 
 . . .
 
-- The formula is too involved for this class, but the intuition:
-  1. Compute the regression residuals ($\hat{y}_i - y_i$)
-  2. Look at how much correlation exists *within each cluster group*
-  3. Compute an "effective" sample size based on the number of independent clusters
-  4. Adjust the standard errors to reflect the *effective* sample size
+- CRSEs **add up within each cluster $g$ first**, then square:
+
+$$
+se(\hat{\beta}_1)^2 = \frac{\sum_{g=1}^{G} \left( \sum_{i \in g} (x_i - \bar{x}) \, \hat{\mu}_i \right)^2}{SST_x^2}
+$$
 
 . . .
 
-- **Rule-of-Thumb:** Your "effective sample size" becomes closer to the number of clusters ($G$), not the number of observations ($N$)
-  - In our simulation: $N = 1{,}500$ observations, but effectively only $G = 50$ independent pieces of information
+- If treatment is the same for everyone in a cluster, so is $(x_i - \bar{x})$: correlated errors pile up instead of canceling $\rightarrow$ a bigger SE
+- **Rule of thumb:** the "effective sample size" is closer to $G$ than to $N$ (here, about 100, not 1,500)
+
 
 
 ## CRSEs in R {.smaller}
@@ -1176,36 +1080,18 @@ model <- feols(y ~ treatment, data = my_data, cluster = "cluster_id")
 
 . . .
 
-- The researcher must decide what the clusters are:
-  - **General rule: cluster at the level of treatment assignment**
-  - State-level policy $\rightarrow$ cluster by state
-  - School-level program $\rightarrow$ cluster by school
+- The researcher must decide what the clusters are: more on this shortly
 
 
 ## Now Let's See If CRSEs Fix the Problem {.smaller}
 
 ```{r}
-cat("--- Type I Error Rate (Expected: 5%) ---\n\n")
-cat(sprintf("1. Naive (iid) Standard Errors:              %.1f%%\n", naive_rej * 100))
-cat(sprintf("2. Heteroskedasticity-Robust (HC1) Errors:   %.1f%%\n", hc1_rej * 100))
-cat(sprintf("3. Cluster-Robust Standard Errors:           %.1f%%\n", cluster_rej * 100))
-```
-
-. . .
-
-- Naive and HC1: Type I error rates far above 5%
-- **Cluster-robust SEs: close to the target 5%!**
-- CRSEs are the *only* approach that properly accounts for within-cluster correlation
-
-
-## Visualizing All Three Approaches {.smaller}
-
-```{r}
+#| fig-height: 3.6
 results_long_all <- as_tibble(results) |>
   pivot_longer(everything(), names_to = "method", values_to = "pvalue") |>
   mutate(method = case_when(
     method == "naive_p" ~ "1. Naive (iid)",
-    method == "hc1_p" ~ "2. HC1 (Heteroskedastic-Robust)",
+    method == "hc1_p" ~ "2. HC1 (Heteroskedasticity-Robust)",
     method == "cluster_p" ~ "3. Cluster-Robust"
   ))
 
@@ -1216,7 +1102,7 @@ ggplot(results_long_all, aes(x = pvalue, fill = method)) +
   annotate("text", x = 0.2, y = 140, label = "alpha == 0.05", parse = TRUE,
            color = "red", size = 3.5) +
   scale_fill_manual(values = c("1. Naive (iid)" = "#E69F00",
-                                "2. HC1 (Heteroskedastic-Robust)" = "#D55E00",
+                                "2. HC1 (Heteroskedasticity-Robust)" = "#D55E00",
                                 "3. Cluster-Robust" = "#0072B2")) +
   labs(x = "P-Value", y = "Count",
     title = "P-Value Distributions Under the Null (True Effect = 0)",
@@ -1225,40 +1111,66 @@ ggplot(results_long_all, aes(x = pvalue, fill = method)) +
   theme(legend.position = "none")
 ```
 
-- Only cluster-robust SEs produce a (roughly) uniform distribution of p-values
+- Under $H_0$, p-values should be spread evenly (a flat histogram). Naive and HC1: they pile up near zero
+- **Cluster-robust SEs: roughly flat, with a Type I error rate close to the target 5%!**
+- Even with correct SEs, 5% of tests reject by chance: remember $\hat{\delta}_{-10}$ in our event study?
+
+
+## Try It: Assign Treatment to Students {.smaller}
+
+- Same simulation, one change: assign treatment to **individual students** instead of whole classrooms (the ICC is still 0.5)
+- Predict: what happens to the naive (iid) Type I error rate? Do we still need to cluster?
+
+. . .
+
+```{r}
+cat("--- Type I Error Rate, treatment assigned to students (Expected: 5%) ---\n\n")
+cat(sprintf("1. Naive (iid) Standard Errors:              %.1f%%\n", naive_rej_ind * 100))
+cat(sprintf("2. Cluster-Robust Standard Errors:           %.1f%%\n", cluster_rej_ind * 100))
+```
+
+. . .
+
+- Correlated errors alone aren't the problem. It's correlated errors **plus** a treatment that is the same for everyone in the cluster
+- That's why we **cluster at the level of treatment assignment**
+
 
 
 ## CRSEs in the ACA Example {.smaller}
 
-- Can easily tell `feols()` to use clustered standard errors (and at what level) using the `cluster = cluster_level` argument
+- Medicaid expansion is a **state-level** policy, so we cluster by state. Here is our IPW-DiD:
 
 . . .
 
 ```{r}
 #| echo: true
 
-did_crse <- feols(uninsured_rate ~ treat_post | state_id + year,
-                   cluster = "state_id",
-                   data = aca_exp_data)
+did_ipw_crse <- feols(uninsured_rate ~ treat_post | state_id + year,
+                      cluster = "state_id",
+                      weights = ~ipw,
+                      data = aca_exp_data)
 
-summary(did_crse)
+summary(did_ipw_crse)
 ```
 
-- The coefficient is unchanged (clustering does not affect the point estimate)
-- But the standard error is *larger*, giving wider confidence intervals and larger p-values
+- The coefficient is unchanged ($-6.24$): clustering does not affect the point estimate
+- The SE roughly doubles (HC1: 0.38), so the 95% CI widens to include the true $-5$. These are the CIs in our naive vs. IPW table
+
 
 
 ## Choosing the Right Cluster Level {.smaller}
 
-- So, *like* heteroskedastic robust SEs, easy to correct for
-- But *unlike* heteroskedastic robust SEs, we have to choose how we think the clusters are defined
-  - This is trickier than it seems:
-    - City data: cluster at the city-level? State-level? County?
-    - Individual data: hospital-level? County-level?
-  - **General rule: cluster at the level of treatment**
-    - Studying state-level policies? Cluster by state
-- You generally need at least 20 clusters for CRSEs to work well
+- So, *like* heteroskedasticity-robust SEs, easy to correct for
+- But *unlike* heteroskedasticity-robust SEs, we have to choose how we think the clusters are defined
+  - City data: cluster at the city-level? State-level? County?
+  - Individual data: hospital-level? County-level?
+- **General rule: cluster at the level of treatment assignment**
+  - State-level policy $\rightarrow$ cluster by state; school-level program $\rightarrow$ cluster by school
+  - Panel data: each unit's observations over time form a cluster
+- You generally need at least 30--50 clusters for CRSEs to work well
+  - With only 2 cities, as in Card (1990), clustering can't work: that's why we skipped those SEs in Unit 12
 - When in doubt, cluster at a broader level (e.g., state rather than county) --- this will usually result in more conservative SEs
+
 
 
 ## CRSEs: Key Takeaways
